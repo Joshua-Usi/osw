@@ -1,0 +1,2 @@
+# ignore vendor folder, contains assets
+**/vendor

@@ -1,0 +1,231 @@
+* {
+	cursor: url("src/images/cursor.png"), default;
+}
+
+body {
+	/* Helvetica for fallback*/
+	font-family: Varela Round, Helvetica;
+	font-size: 2.5vh;
+	background: #444;
+	margin: 0;
+	overflow: hidden;
+	-webkit-user-select: none;
+     -moz-user-select: -moz-none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.top-bar-text {
+	display: inline;
+	color: #fff;
+	padding: 2.23vh;
+	border-collapse: collapse;
+	margin: 0;
+	float: left;
+	transition: background 0.5s ease;
+}
+
+.nav-text {
+	display: inline;
+	color: #fff;
+	padding: 2.23vh;
+	border-collapse: collapse;
+	margin: 0;
+}
+
+.top-bar-text:hover {
+	background: #555;
+}
+
+.gamemode-icons {
+	padding: 1.6vh;
+	border-radius: 100px;
+	transition: transform 0.5s cubic-bezier(0,.65,.6,1.3);
+}
+
+.gamemode-icons:hover {
+	transform: rotate(180deg);
+}
+
+#avatar {
+	width: 6vh;
+	margin-top: 0.75vh;
+	border-radius: 1vh;
+}
+
+#audio-visualiser {
+	z-index: 5;
+	position: fixed;
+	top: calc(50vh - 70vh / 2);
+	left: calc(50vw - 70vh / 2);
+}
+
+.slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: calc(2.5vh * 2.6);
+	height: 2.5vh;
+	border-radius: 2.5vh;
+	border: 2px solid #FD67AE;
+	background: #222;
+	margin-top: calc(3.3vh / 2);
+	outline: none;
+	position: relative;
+	top: -7px;
+	transition: background 0.5s ease, box-shadow 0.25s ease;
+}
+.slider::-webkit-slider-thumb:hover {
+	background: #FD67AE;
+	box-shadow:
+	-5px -5px 10px #FD67AE99,
+	5px -5px 10px #FD67AE99,
+	5px 5px 10px #FD67AE99,
+	-5px 5px 10px #FD67AE99,
+	inset 0 0 10px #FD67AE;
+}
+
+.slider {
+	-webkit-appearance: none;
+	width: 10vw;
+	outline: none;
+	height: 0.5vh;
+	border-radius: 2.5vh;
+	margin-top: 2.5vh;
+	transition: height 0.5s ease;
+	background: linear-gradient(to right, #FD67AE 0%, #FD67AE 100%);
+}
+
+.slider:hover {
+	height: 0.75vh;
+}
+
+.checkbox {
+	width: calc(2.5vh * 2.6);
+	height: 2.5vh;
+	background-color: rgba(0, 0, 0, 0);
+	border-radius: 2.5vh;
+	vertical-align: middle;
+	border: 2px solid #FD67AE;
+	margin-top: 1.5vh;
+	-webkit-appearance: none;
+	outline: none;
+	transition: width 0.5s ease, box-shadow 0.25s ease;
+}
+.checkbox:hover {
+	width: calc(2.5vh * 3.9);
+	box-shadow:
+	-5px -5px 10px #FD67AE99,
+	5px -5px 10px #FD67AE99,
+	5px 5px 10px #FD67AE99,
+	-5px 5px 10px #FD67AE99,
+	inset 0 0 10px #FD67AE;
+}
+
+.checkbox:checked {
+	background-color: #FD67AE;
+}
+
+#background-blur {
+	position: absolute;
+	z-index: -10;
+	filter: blur(32px);
+	transition: filter 0.5s, opacity 1s;
+}
+
+#background-dim {
+	position: absolute;
+	z-index: -10;
+	transition: filter 0.5s;
+}
+
+#background {
+	z-index: -10;
+	object-fit: cover;
+	top: -5vh;
+	left: -5vh;
+	width: 110vw;
+	height: 110vh;
+}
+
+#top-bar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 10;
+	width: 100vw;
+	height: 7.5vh;
+	background: url("src/images/triangles.png"), #222;
+	background-size: 25vw;
+}
+
+#bottom-bar {
+	position: fixed;
+	top: calc(100vh - 3vh);
+	left: 0;
+	z-index: 10;
+	width: 100vw;
+	height: 3vh;
+	background: url("src/images/triangles.png"), #222;
+	background-size: 25vw;
+	clip-path: polygon(43% 0, 57% 0, 62% 50%, 100% 50%, 100% 100%, 0 100%, 0 50%, 38% 50%);
+}
+
+#logo {
+	z-index: 12;
+	width: 40vh;
+	background: url('src/images/triangles.png'), #FD67AE;
+	background-size: 50vh;
+	border-radius: 50%;
+	transition: width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s;
+	transition-timing-function: cubic-bezier(0,.65,.6,1.3);
+	position: fixed;
+	/* if javascript isn't enabled*/
+	top: calc(50vh - 20vh);
+	left: calc(50vw - 20vh);
+}
+
+#version {
+	z-index: 15;
+	position: relative;
+	top: -2.5vh;
+	color: #fff;
+	width: 100vw;
+	text-align: center;
+}
+
+#sidenav {
+	height: 100%;
+	width: 0;
+	position: fixed;
+	z-index: 16;
+	top: 0;
+	left: 0;
+	background: url("src/images/triangles.png"), #222;
+	background-size: 25vw;
+	overflow-x: hidden;
+	transition: 0.3s;
+	opacity: 0.2;
+	padding-top: 60px;
+}
+
+#sidenav p, #sidenav a {
+	padding: 8px;
+	margin: 0;
+	white-space: nowrap;
+	text-decoration: none;
+	font-size: 2.50vh;
+	color: #fff;
+	display: block;
+	transition: 0.3s;
+}
+
+#sidenav p:hover {
+	background-color: #444;
+}
+
+#sidenav #close-btn {
+	position: absolute;
+	top: 0;
+	right: 25px;
+	font-size: 36px;
+	margin-left: 50px;
+}

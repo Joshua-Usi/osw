@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>osu!web indev</title>
+	<link href='https://fonts.googleapis.com/css?family=Varela Round' rel='stylesheet'>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="icon" href="src/images/osu.png">
+</head>
+<body>
+	<div id="sidenav">
+			<a href="javascript:void(0)" id="close-btn">&times;</a>
+			<span class="span-top-bar-text" style="float: left;">
+			<p class="nav-text" >Low Power Mode</p>
+			<input type="checkbox" id="low-power-mode" class="checkbox" name="low-power-mode" value="false">
+		</span>
+		<span class="span-top-bar-text" style="float: left;">
+			<p class="nav-text" id="bpm-text">bpm not set</p>
+			<input type="range" id="bpm" class="slider" min="30" max="300" value="30">
+		</span>
+		<span class="span-top-bar-text" style="float: left;">
+			<p class="nav-text" id="volume-text">volume 100</p>
+			<input type="range" id="volume" class="slider" min="0" max="100" value="100">
+		</span>		</div>
+	<div id="top-bar">
+		<span class="span-top-bar-text" style="float: left;">
+			<img id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/settings.png">
+			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/standard.png">
+			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/taiko.png">
+			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/catch.png">
+			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/mania.png">
+			<p class="top-bar-text" id="welcome-user">Welcome Guest</p>
+			<img id="avatar" src="src/images/default-avatar.png" onclick="window.location = 'https://osu.ppy.sh/users/13478347';">
+		</span>
+		<p class="top-bar-text" id="now-playing" style="float: right;">Now Playing: </p>
+			<p class="top-bar-text" id="previous" style="float: right;">&#x25BA;&#x275A;</p>
+			<p class="top-bar-text" id="pause" style="float: right;">&#x275A;&#x275A;</p>
+			<p class="top-bar-text" id="next" style="float: right;">&#x275A;&#x25C4;</p>
+	</div>
+	<div id="background-blur">
+		<div id="background-dim">
+			<img id="background" src="src/images/osu_background.jpg">
+		</div>
+	</div>
+	<img id="logo" src="src/images/osu.png">
+	<span id="logo-beat"></span>
+	<span id="snow"></span>
+	<div id="bottom-bar">
+		<p id="version">osu!web v2020.0.0.5</p>
+	</div>
+	<canvas id="audio-visualiser"></canvas>
+	<!-- https://github.com/foobar404/Wave.js -->
+	<script type="text/javascript" src="src/scripts/wave.js"></script>
+	<script type="text/javascript" src="main.js"></script>
+</body>
+</html>

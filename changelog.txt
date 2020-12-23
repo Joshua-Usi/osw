@@ -1,0 +1,53 @@
+---------------------------------------------------------------
+v2020.0.0.1
+20 / 12 / 20
+Start Of Changelog
+---------------------------------------------------------------
+v2020.0.0.2
+21 / 12 / 20
+
+Added:
+	- Snowflakes during December
+
+Fixed:
+	- Beat pulses not working when song repeats
+---------------------------------------------------------------
+v2020.0.0.3
+22 / 12 / 20
+
+Added:
+	- Songs
+		- Nekodex - circles
+		- Nekodex - aureole
+
+Changed:
+	- Better, more "random", snowflakes during December
+
+Removed:
+	- file extension in "Now Playing"
+---------------------------------------------------------------
+v2020.0.0.4
+23 / 12 / 20
+
+Added:
+	- Menu Buttons and functionality to change songs
+	- Cross Browser support - hooray!
+
+Changed:
+	- Maximum snowflakes to be 50 (probably change later to be variable and user adjusted)
+	- Maximum beat pulses to be 5
+
+Fixed:
+	- Bpm not updating (visually) when song changes (slider bar)
+
+Misc:
+	- Variable Renaming
+	---------------------------------------------------------------
+v2020.0.0.5
+23 / 12 / 20
+
+Changed:
+	- side menu UI opacity changes
+
+Fixed:
+	- choosing undefined songs when playing new songs (IndexError)
