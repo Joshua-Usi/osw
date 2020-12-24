@@ -1,2 +1,5 @@
 # ignore vendor folder, contains assets
 **/vendor
+
+# ignore api key, in order to hide key
+apikey.js

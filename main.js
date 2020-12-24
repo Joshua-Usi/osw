@@ -1,5 +1,7 @@
 (function() {
-	let applicationProgrammingInterfaceAccessKey = "0fa1772fa3f264e1f7a21a68773d4bf3c08caa69";
+	if (window.origin === null) {
+		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS")
+	}
 	let mouse = {
 		x: 0,
 		y: 0,
