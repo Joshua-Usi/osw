@@ -47,7 +47,7 @@
 	let lastTime = 0;
 	let accumulator = 0;
 	/* Fetch --------------------------------------------------------------------------------------------------- */
-	fetch(`https://osu.ppy.sh/api/get_user?u=experimentator&k=${applicationProgrammingInterfaceAccessKey}`).then(function(response) {
+	/*fetch(`https://osu.ppy.sh/api/get_user?u=experimentator&k=${applicationProgrammingInterfaceAccessKey}`).then(function(response) {
 		if (response.status !== 200) {
 			console.log('Looks like there was a problem. Status Code: ' + response.status);
 			return;
@@ -60,7 +60,7 @@
 		});
 	}).catch(function(err) {
 		console.log('Fetch Error', err);
-	});
+	});*/
 	/* Local Storage ------------------------------------------------------------------------------------------- */
 	if (window.localStorage.getItem("use_low_power_mode") == parseInt(1)) {
 		document.getElementById("low-power-mode").checked = true;
