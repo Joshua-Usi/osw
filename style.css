@@ -1,5 +1,5 @@
 * {
-	cursor: url("src/images/cursor.png"), default;
+	cursor: url("src-main/images/cursor.png"), default;
 }
 
 body {
@@ -153,7 +153,7 @@ body {
 	z-index: 10;
 	width: 100vw;
 	height: 7.5vh;
-	background: url("src/images/triangles.png"), #222;
+	background: url("src-main/images/triangles.png"), #222;
 	background-size: 25vw;
 }
 
@@ -164,7 +164,7 @@ body {
 	z-index: 10;
 	width: 100vw;
 	height: 3vh;
-	background: url("src/images/triangles.png"), #222;
+	background: url("src-main/images/triangles.png"), #222;
 	background-size: 25vw;
 	clip-path: polygon(43% 0, 57% 0, 62% 50%, 100% 50%, 100% 100%, 0 100%, 0 50%, 38% 50%);
 }
@@ -172,7 +172,7 @@ body {
 #logo {
 	z-index: 12;
 	width: 40vh;
-	background: url('src/images/triangles.png'), #FD67AE;
+	background: url('src-main/images/triangles.png'), #FD67AE;
 	background-size: 50vh;
 	border-radius: 50%;
 	transition: width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s;
@@ -199,7 +199,7 @@ body {
 	z-index: 16;
 	top: 0;
 	left: 0;
-	background: url("src/images/triangles.png"), #222;
+	background: url("src-main/images/triangles.png"), #222;
 	background-size: 25vw;
 	overflow-x: hidden;
 	transition: 0.3s;
