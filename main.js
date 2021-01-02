@@ -1,4 +1,10 @@
 (function() {
+	/*
+	 * First time run setup
+	 */
+	 if (!window.localStorage.use_low_power_mode) {
+		window.localStorage.setItem("use_low_power_mode", 0);
+	}
 	if (window.origin === null) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS")
 	}
@@ -7,31 +13,26 @@
 		y: 0,
 	};
 	let songs = [
-		"cYsmix - Triangles.mp3",
-		"nekodex - circles.mp3",
-	];
-	let songBpm = [
-		160,
-		185,
+		new Song("cYsmix - Triangles.mp3", new Bpm(160)),
+		new Song("nekodex - circles.mp3", new Bpm([185, 360, 600, 185], [0, 8, 10.5, 12])),
 	];
 	/* only add christmas songs to list if the month is december*/
 	if (new Date().getMonth() === 11) {
-		songs.push("nekodex - aureole.mp3");
-		songBpm.push(140);
-		songs.push("nekodex - Little Drummer Girl.mp3");
-		songBpm.push(140);
+		songs.push(new Song("nekodex - aureole.mp3", new Bpm(140)));
+		songs.push(new Song("nekodex - Little Drummer Girl.mp3", new Bpm(140)));
 	}
 	let chosenSong = randomInt(0, songs.length - 1);
-	let bpm = songBpm[chosenSong];
+	let bpm = songs[chosenSong].bpm.get();
 	document.getElementById("bpm").value = bpm;
-	let menuAudio = new Audio(`src/audio/${songs[chosenSong]}`);
+	let menuAudio = new Audio(`src/audio/${songs[chosenSong].src}`);
 	menuAudio.addEventListener("play", function() {
-		document.getElementById("now-playing").innerText = "Now Playing: " + replaceAll(songs[chosenSong], [".wav", ".mp3"]);
+		document.getElementById("now-playing").innerText = "Now Playing: " + replaceAll(songs[chosenSong].src, [".wav", ".mp3"]);
 	});
 	menuAudio.addEventListener("ended", function() {
 		chosenSong = randomInt(0, songs.length - 1);
-		document.getElementById("now-playing").innerText = "Now Playing: " + songs[chosenSong];
-		this.src = `src/audio/${songs[chosenSong]}`;
+		document.getElementById("now-playing").innerText = "Now Playing: " + songs[chosenSong].src;
+		this.src = `src/audio/${songs[chosenSong].src}`;
+		bpm = songs[chosenSong].bpm.get();
 		this.play();
 	});
 	menuAudio.id = "menu-audio";
@@ -108,6 +109,7 @@
 				bottomBar.style.backgroundPositionY = offset + "px";
 				sidenav.style.backgroundPositionY = offset + "px";
 				/* beat detection and accumulation */
+				bpm = songs[chosenSong].bpm.get(time);
 				lastTime = time;
 				time = menuAudio.currentTime;
 				if (accumulator < -0.1) {
@@ -254,8 +256,8 @@
 	document.getElementById("previous").addEventListener("click", function() {
 		menuAudio.pause();
 		chosenSong = randomInt(0, songs.length - 1);
-		bpm = songBpm[chosenSong];
-		menuAudio.src = `src/audio/${songs[chosenSong]}`;
+		bpm = songs[chosenSong].bpm.get();
+		menuAudio.src = `src/audio/${songs[chosenSong].src}`;
 		menuAudio.play();
 		document.getElementById("bpm").value = bpm;
 		document.getElementById("bpm").dispatchEvent(new CustomEvent("input", {
@@ -265,8 +267,8 @@
 	document.getElementById("next").addEventListener("click", function() {
 		menuAudio.pause();
 		chosenSong = randomInt(0, songs.length - 1);
-		bpm = songBpm[chosenSong];
-		menuAudio.src = `src/audio/${songs[chosenSong]}`;
+		bpm = songs[chosenSong].bpm.get();
+		menuAudio.src = `src/audio/${songs[chosenSong].src}`;
 		menuAudio.play();
 		document.getElementById("bpm").value = bpm;
 		document.getElementById("bpm").dispatchEvent(new CustomEvent("input", {
@@ -301,7 +303,7 @@
 	}
 
 	function replaceAll(str, items) {
-		let s = str
+		let s = str;	
 		for (var i = 0; i < items.length; i++) {
 			s = s.replace(items[i], "");
 		}
@@ -316,4 +318,5 @@
 			colors: ["#fff5"]
 		});
 	}
+	console.log("running and ok");
 })();

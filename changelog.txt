@@ -42,7 +42,7 @@ Fixed:
 
 Misc:
 	- Variable Renaming
-	---------------------------------------------------------------
+---------------------------------------------------------------
 v2020.0.0.5
 23 / 12 / 20
 
@@ -51,3 +51,13 @@ Changed:
 
 Fixed:
 	- choosing undefined songs when playing new songs (IndexError)
+---------------------------------------------------------------
+v2020.0.0.6
+2 / 1 / 21
+
+Added:
+	- First run setup
+	- Songs to have multiple bpm's, based on time
+
+Fixed:
+	- Bpm changes when new song is played
