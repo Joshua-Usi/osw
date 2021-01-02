@@ -4,7 +4,7 @@
 	<title>osu!web indev</title>
 	<link href='https://fonts.googleapis.com/css?family=Varela Round' rel='stylesheet'>
 	<link rel="stylesheet" type="text/css" href="style.css">
-	<link rel="icon" href="src/images/osu.png">
+	<link rel="icon" href="src-main/images/osu.png">
 </head>
 <body>
 	<div id="sidenav">
@@ -23,13 +23,13 @@
 		</span>		</div>
 	<div id="top-bar">
 		<span class="span-top-bar-text" style="float: left;">
-			<img id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/settings.png">
-			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/standard.png">
-			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/taiko.png">
-			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/catch.png">
-			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/mania.png">
+			<img id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src-main/images/settings.png">
+			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src-main/images/standard.png">
+			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src-main/images/taiko.png">
+			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src-main/images/catch.png">
+			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src-main/images/mania.png">
 			<p class="top-bar-text" id="welcome-user">Welcome Guest</p>
-			<img id="avatar" src="src/images/default-avatar.png" onclick="window.location = 'https://osu.ppy.sh/users/13478347';">
+			<img id="avatar" src="src-main/images/default-avatar.png" onclick="window.location = 'https://osu.ppy.sh/users/13478347';">
 		</span>
 		<p class="top-bar-text" id="now-playing" style="float: right;">Now Playing: </p>
 			<p class="top-bar-text" id="previous" style="float: right;">&#x25BA;&#x275A;</p>
@@ -38,10 +38,10 @@
 	</div>
 	<div id="background-blur">
 		<div id="background-dim">
-			<img id="background" src="src/images/osu_background.jpg">
+			<img id="background" src="src-main/images/osu_background.jpg">
 		</div>
 	</div>
-	<img id="logo" src="src/images/osu.png">
+	<img id="logo" src="src-main/images/osu.png">
 	<span id="logo-beat"></span>
 	<span id="snow"></span>
 	<div id="bottom-bar">
@@ -49,10 +49,10 @@
 	</div>
 	<canvas id="audio-visualiser"></canvas>
 	<!-- https://github.com/foobar404/Wave.js -->
-	<script type="text/javascript" src="src/scripts/wave.js"></script>
-	<script type="text/javascript" src="src/scripts/BeatMap.js"></script>
-	<script type="text/javascript" src="src/scripts/MapSet.js"></script>
-	<script type="text/javascript" src="src/scripts/Song.js"></script>
+	<script type="text/javascript" src="src-main/scripts/wave.js"></script>
+	<script type="text/javascript" src="src-main/scripts/BeatMap.js"></script>
+	<script type="text/javascript" src="src-main/scripts/MapSet.js"></script>
+	<script type="text/javascript" src="src-main/scripts/Song.js"></script>
 	<script type="text/javascript" src="main.js"></script>
 </body>
 </html>

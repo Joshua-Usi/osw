@@ -24,14 +24,14 @@
 	let chosenSong = randomInt(0, songs.length - 1);
 	let bpm = songs[chosenSong].bpm.get();
 	document.getElementById("bpm").value = bpm;
-	let menuAudio = new Audio(`src/audio/${songs[chosenSong].src}`);
+	let menuAudio = new Audio(`src-main/audio/${songs[chosenSong].src}`);
 	menuAudio.addEventListener("play", function() {
 		document.getElementById("now-playing").innerText = "Now Playing: " + replaceAll(songs[chosenSong].src, [".wav", ".mp3"]);
 	});
 	menuAudio.addEventListener("ended", function() {
 		chosenSong = randomInt(0, songs.length - 1);
 		document.getElementById("now-playing").innerText = "Now Playing: " + songs[chosenSong].src;
-		this.src = `src/audio/${songs[chosenSong].src}`;
+		this.src = `src-main/audio/${songs[chosenSong].src}`;
 		bpm = songs[chosenSong].bpm.get();
 		this.play();
 	});
@@ -128,7 +128,7 @@
 					/* logo background pulse, maximum 5 to prevent lag */
 					if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
 						let logoCircle = document.createElement("img");
-						logoCircle.src = "src/images/circle.png";
+						logoCircle.src = "src-main/images/circle.png";
 						logoCircle.style.position = "fixed";
 						logoCircle.style.width = 45 + "vh";
 						logoCircle.style.top = "calc(50vh - " + 45 / 2 + "vh)";
@@ -139,7 +139,7 @@
 					/* snow only in december, maximum 50 to prevent lag*/
 					if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
 						let snowflake = document.createElement("img");
-						snowflake.src = "src/images/snowflake.png";
+						snowflake.src = "src-main/images/snowflake.png";
 						snowflake.style.position = "fixed";
 						snowflake.style.width = Math.random() * 2 + 1 + "vh";
 						snowflake.style.top = -10 + "vh";
@@ -219,7 +219,7 @@
 		bpm = parseInt(this.value);
 		currentSources++;
 		if (currentSources % 3 === 0) {
-			let audio = new Audio("src/audio/sliderbar.mp3");
+			let audio = new Audio("src-main/audio/sliderbar.mp3");
 			audio.volume = 1;
 			audio.playbackRate = map(this.value, this.min, this.max, 1, 2);
 			audio.play();
@@ -235,7 +235,7 @@
 		window.localStorage.setItem("volume_music", menuAudio.volume);
 		currentSources++;
 		if (currentSources % 3 === 0) {
-			let audio = new Audio("src/audio/sliderbar.mp3");
+			let audio = new Audio("src-main/audio/sliderbar.mp3");
 			audio.volume = 1;
 			audio.playbackRate = map(this.value, this.min, this.max, 1, 2);
 			audio.play();
@@ -257,7 +257,7 @@
 		menuAudio.pause();
 		chosenSong = randomInt(0, songs.length - 1);
 		bpm = songs[chosenSong].bpm.get();
-		menuAudio.src = `src/audio/${songs[chosenSong].src}`;
+		menuAudio.src = `src-main/audio/${songs[chosenSong].src}`;
 		menuAudio.play();
 		document.getElementById("bpm").value = bpm;
 		document.getElementById("bpm").dispatchEvent(new CustomEvent("input", {
@@ -268,7 +268,7 @@
 		menuAudio.pause();
 		chosenSong = randomInt(0, songs.length - 1);
 		bpm = songs[chosenSong].bpm.get();
-		menuAudio.src = `src/audio/${songs[chosenSong].src}`;
+		menuAudio.src = `src-main/audio/${songs[chosenSong].src}`;
 		menuAudio.play();
 		document.getElementById("bpm").value = bpm;
 		document.getElementById("bpm").dispatchEvent(new CustomEvent("input", {
