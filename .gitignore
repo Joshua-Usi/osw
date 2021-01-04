@@ -6,3 +6,4 @@ apikey.js
 
 # ignore experimental developments
 **/experimental*
+**/src-experimental
