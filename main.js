@@ -32,10 +32,8 @@
 	if (window.origin === null) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
-	let mouse = {
-		x: 0,
-		y: 0,
-	};
+	let mouse = new Mouse("body");
+	mouse.init();
 	let songs = [
 		new Song("cYsmix - Triangles.mp3", new Bpm(160)),
 		new Song("nekodex - circles.mp3", new Bpm([185, 360, 600, 185], [0, 8, 10.5, 12])),
