@@ -63,7 +63,11 @@ Fixed:
 	- Bpm changes when new song is played
 ---------------------------------------------------------------
 v2020.0.0.7
-2 / 1 / 21
+4 / 1 / 21
 
 Added:
 	- Software licence (MIT)
+	- Module to handle mouse events
+
+Changed:
+	- using new module to handle mouse events
