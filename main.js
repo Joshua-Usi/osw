@@ -95,10 +95,6 @@
 		}));
 	}
 	/* Event Listeners ----------------------------------------------------------------------------------------- */
-	window.addEventListener('mousemove', function(event) {
-		mouse.x = event.x;
-		mouse.y = event.y;
-	});
 	window.addEventListener("click", function() {
 		if (isFirstClick) {
 			menuAudio.volume = window.localStorage.getItem("volume_music");
@@ -120,8 +116,8 @@
 			let logoSizeIncrease = 1.1;
 			if (enableLowPowerMode === false) {
 				image.style.opacity = 1;
-				image.style.top = (mouse.y - window.innerHeight * 0.5) / 64 - window.innerHeight * 0.05 + "px";
-				image.style.left = (mouse.x - window.innerWidth * 0.5) / 64 - window.innerWidth * 0.05 + "px";
+				image.style.top = (mouse.position.y - window.innerHeight * 0.5) / 64 - window.innerHeight * 0.05 + "px";
+				image.style.left = (mouse.position.x - window.innerWidth * 0.5) / 64 - window.innerWidth * 0.05 + "px";
 				let topBar = document.getElementById("top-bar");
 				let bottomBar = document.getElementById("bottom-bar");
 				let sidenav = document.getElementById("sidenav");
