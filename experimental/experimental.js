@@ -50,14 +50,23 @@
 	let approachesX = [];
 	let approachesY = [];
 	let approachNumbers = [];
+	let firstClick = true;
+	window.addEventListener("click", function() {
+		if (firstClick) {
+			firstClick = false;
+			let song = new Song("tutorial.ogg", new Bpm(160));
+			let audio = new Audio(`src-experimental/audio/${song.src}`);
+			audio.play();
+		}
+	})
 	window.addEventListener("load", function() {
 		(function animate() {
 			p++;
-			if (p % 30 === 0) {
+			if (p % 5 === 0) {
 				approaches.push(1.5 * 2);
 				approachesX.push(randomInt(300, 1050));
 				approachesY.push(randomInt(70, 620));
-				approachNumbers.push((p / 30) % 10);
+				approachNumbers.push((p / 5) % 10);
 			}
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
