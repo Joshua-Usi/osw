@@ -3,7 +3,3 @@
 
 # ignore api key, in order to hide key
 apikey.js
-
-# ignore experimental developments
-**/experimental*
-**/src-experimental
