@@ -10,15 +10,15 @@
 	mouse.init();
 	
 	let cursor = new Image();
-	cursor.src = "src-experimental/images/cursor.png";
+	cursor.src = "src/images/gameplay/cursor.png";
 	let cursorTrail = new Image();
-	cursorTrail.src = "src-experimental/images/cursortrail.png";
+	cursorTrail.src = "src/images/gameplay/cursortrail.png";
 	let hitCircle = new Image();
-	hitCircle.src = "src-experimental/images/hitcircle.png";
+	hitCircle.src = "src/images/gameplay/hitcircle.png";
 	let hitCircleOverlay = new Image();
-	hitCircleOverlay.src = "src-experimental/images/hitcircleoverlay.png";
+	hitCircleOverlay.src = "src/images/gameplay/hitcircleoverlay.png";
 	let approachCircle = new Image();
-	approachCircle.src = "src-experimental/images/approachcircle.png";
+	approachCircle.src = "src/images/gameplay/approachcircle.png";
 	let numbers = [
 		new Image(),
 		new Image(),
@@ -31,16 +31,16 @@
 		new Image(),
 		new Image(),
 	]
-	numbers[0].src = "src-experimental/images/fonts/aller/default-0.png";
-	numbers[1].src = "src-experimental/images/fonts/aller/default-1.png";
-	numbers[2].src = "src-experimental/images/fonts/aller/default-2.png";
-	numbers[3].src = "src-experimental/images/fonts/aller/default-3.png";
-	numbers[4].src = "src-experimental/images/fonts/aller/default-4.png";
-	numbers[5].src = "src-experimental/images/fonts/aller/default-5.png";
-	numbers[6].src = "src-experimental/images/fonts/aller/default-6.png";
-	numbers[7].src = "src-experimental/images/fonts/aller/default-7.png";
-	numbers[8].src = "src-experimental/images/fonts/aller/default-8.png";
-	numbers[9].src = "src-experimental/images/fonts/aller/default-9.png";
+	numbers[0].src = "src/images/gameplay/fonts/aller/default-0.png";
+	numbers[1].src = "src/images/gameplay/fonts/aller/default-1.png";
+	numbers[2].src = "src/images/gameplay/fonts/aller/default-2.png";
+	numbers[3].src = "src/images/gameplay/fonts/aller/default-3.png";
+	numbers[4].src = "src/images/gameplay/fonts/aller/default-4.png";
+	numbers[5].src = "src/images/gameplay/fonts/aller/default-5.png";
+	numbers[6].src = "src/images/gameplay/fonts/aller/default-6.png";
+	numbers[7].src = "src/images/gameplay/fonts/aller/default-7.png";
+	numbers[8].src = "src/images/gameplay/fonts/aller/default-8.png";
+	numbers[9].src = "src/images/gameplay/fonts/aller/default-9.png";
 
 	ctx.font = "16px Arial";
 	ctx.fillStyle = "#fff";
@@ -55,7 +55,7 @@
 		if (firstClick) {
 			firstClick = false;
 			let song = new Song("tutorial.ogg", new Bpm(160));
-			let audio = new Audio(`src-experimental/audio/${song.src}`);
+			let audio = new Audio(`src/audio//gameplay${song.src}`);
 			audio.play();
 		}
 	})
@@ -105,6 +105,8 @@
 			if (mouse.isLeftButtonDown) {
 				size = 0.8;
 			}
+			mouse.position.x += (approachesX[0] - mouse.position.x) / 8;
+			mouse.position.y += (approachesY[0] - mouse.position.y) / 8;
 			for (let i = 0; i < mouse.previousPositions.x.length; i++) {
 				ctx.drawImage(cursorTrail, mouse.previousPositions.x[i] - cursorTrail.width / 2, mouse.previousPositions.y[i] - cursorTrail.height / 2);
 			}

@@ -67,4 +67,8 @@ class Mouse {
 		document.getElementById(this.element).removeEventListener("mousedown", this.mousedown);
 		document.getElementById(this.element).removeEventListener("mouseup", this.mouseup);
 	}
+	setPosition(x, y) {
+		this.position.y = event.y;
+		this.position.x = event.x;
+	}
 }
