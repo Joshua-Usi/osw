@@ -328,13 +328,17 @@
 		return s;
 	}
 	/* Library Stuff ------------------------------------------------------------------------------------------- */
-	if (window.localStorage.getItem("use_low_power_mode") == parseInt(0)) {
-		let wave = new Wave();
-		wave.fromElement("menu-audio", "audio-visualiser", {
-			stroke: 7,
-			type: "flower",
-			colors: ["#fff5"]
-		});
+	try	{
+		if (window.localStorage.getItem("use_low_power_mode") == parseInt(0)) {
+			let wave = new Wave();
+			wave.fromElement("menu-audio", "audio-visualiser", {
+				stroke: 7,
+				type: "flower",
+				colors: ["#fff5"]
+			});
+		}
+	} catch (e) {
+		console.error("offline context");
 	}
 	console.log("running and ok");
 })();

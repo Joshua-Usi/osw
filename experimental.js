@@ -7,6 +7,7 @@
 	document.querySelector("body").appendChild(canvas);
 	let ctx = canvas.getContext("2d");
 	let mouse = new Mouse("body", 10);
+	mouse.setPosition(0, 0);
 	mouse.init();
 	
 	let cursor = new Image();
@@ -45,58 +46,59 @@
 	ctx.font = "16px Arial";
 	ctx.fillStyle = "#fff";
 
+	let hitObjects = [];
+
 	let p = 0;
-	let approaches = [];
-	let approachesX = [];
-	let approachesY = [];
-	let approachNumbers = [];
 	let firstClick = true;
+
+	let arTime = AR(10);
+	let arFadeIn = ARFadeIn(10);
+
+	let song = new Song("tutorial.ogg", new Bpm(160));
+	let audio = new Audio(`src/audio/${song.src}`);
+	audio.playbackRate = 1;
 	window.addEventListener("click", function() {
 		if (firstClick) {
 			firstClick = false;
-			let song = new Song("tutorial.ogg", new Bpm(160));
-			let audio = new Audio(`src/audio//gameplay${song.src}`);
 			audio.play();
 		}
-	})
-	window.addEventListener("load", function() {
 		(function animate() {
-			p++;
-			if (p % 5 === 0) {
-				approaches.push(1.5 * 2);
-				approachesX.push(randomInt(300, 1050));
-				approachesY.push(randomInt(70, 620));
-				approachNumbers.push((p / 5) % 10);
+			if (p % 1 === 0) {
+				hitObjects.push(new HitCircle(audio.currentTime, randomInt(300, 1050), randomInt(70, 620), 1));
 			}
+			p++;
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 			let CircleSize = 0;
-			let CircleRadius = CS(2);
+			let CircleRadius = CS(4);
 			/* Map from osu!pixels to screen pixels */
 			CircleRadius = map(CircleRadius, 0, 512, 0, canvas.width);
 
-			for (var i = 0; i < approaches.length; i++) {
-				ctx.drawImage(hitCircle, approachesX[i] - CircleRadius / 2, approachesY[i] - CircleRadius / 2, CircleRadius, CircleRadius);
-				ctx.drawImage(hitCircleOverlay, approachesX[i] - CircleRadius / 2, approachesY[i] - CircleRadius / 2, CircleRadius, CircleRadius);
-				ctx.drawImage(approachCircle, approachesX[i] - (CircleRadius * approaches[i]) / 2, approachesY[i] - (CircleRadius * approaches[i]) / 2, CircleRadius * approaches[i], CircleRadius * approaches[i]);
-				ctx.drawImage(numbers[approachNumbers[i]], approachesX[i] - numbers[1].width / 2, approachesY[i] - numbers[1].width / 2);
+			for (var i = 0; i < hitObjects.length; i++) {
+				let l = map(audio.currentTime - hitObjects[i].time, 0, arTime, 4, 1.5);
+				// ctx.save();
+				ctx.globalAlpha = map(audio.currentTime - hitObjects[i].time, 0, arFadeIn, 0, 1)
+				ctx.drawImage(hitCircle, hitObjects[i].x - CircleRadius / 2, hitObjects[i].y - CircleRadius / 2, CircleRadius, CircleRadius);
+				ctx.drawImage(hitCircleOverlay, hitObjects[i].x - CircleRadius / 2, hitObjects[i].y - CircleRadius / 2, CircleRadius, CircleRadius);
+				ctx.drawImage(approachCircle, hitObjects[i].x - (CircleRadius * l) / 2, hitObjects[i].y - (CircleRadius * l) / 2, CircleRadius * l, CircleRadius * l);
+				ctx.drawImage(numbers[hitObjects[i].comboNumber], hitObjects[i].x - numbers[hitObjects[i].comboNumber].width / 2, hitObjects[i].y - numbers[hitObjects[i].comboNumber].width / 1.25);
+				// ctx.restore();	
 			}
+			ctx.globalAlpha = 1;
 
 			ctx.strokeStyle = "#000";
 			ctx.lineWidth = 2;
 			ctx.beginPath();
-			ctx.rect(canvas.width / 2 - canvas.height * 0.8 * (4 / 3) / 2, canvas.height / 2 - canvas.height * 0.8 / 2, canvas.height * 0.8 * (4 / 3), canvas.height * 0.8);
+			let playfieldSize = 0.8;
+			let playfieldXOffset = 0;
+			let playfieldYOffset = canvas.height / 50;
+			ctx.rect(playfieldXOffset + canvas.width / 2 - canvas.height * playfieldSize * (4 / 3) / 2, playfieldYOffset + canvas.height / 2 - canvas.height * playfieldSize / 2, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize);
 			ctx.stroke();
 			ctx.closePath();
 
-			for (var i = 0; i < approaches.length; i++) {
-				if (approaches[i] > 1.5) {
-					approaches[i] -= 0.05;
-				} else {
-					approaches.splice(i, 1);
-					approachesX.splice(i, 1);
-					approachesY.splice(i, 1);
-					approachNumbers.splice(i, 1);
+			for (var i = 0; i < hitObjects.length; i++) {
+				if (audio.currentTime - hitObjects[i].time > arTime) {
+					hitObjects.splice(i, 1);
 					i--;
 				}
 			}
@@ -105,8 +107,11 @@
 			if (mouse.isLeftButtonDown) {
 				size = 0.8;
 			}
-			mouse.position.x += (approachesX[0] - mouse.position.x) / 8;
-			mouse.position.y += (approachesY[0] - mouse.position.y) / 8;
+			try {
+				mouse.changePosition((hitObjects[0].x - mouse.position.x) / 4, (hitObjects[0].y - mouse.position.y) / 4);
+			} catch (e) {
+				console.error(e);
+			}
 			for (let i = 0; i < mouse.previousPositions.x.length; i++) {
 				ctx.drawImage(cursorTrail, mouse.previousPositions.x[i] - cursorTrail.width / 2, mouse.previousPositions.y[i] - cursorTrail.height / 2);
 			}
@@ -114,6 +119,7 @@
 
 			ctx.fillText(mouse.events.length + " pointer events per second", 10, 20);
 			ctx.fillText(mouse.position.x + ", " + mouse.position.y, 10, 40);
+			ctx.fillText(frameRate + "fps", 10, 60);
 			requestAnimationFrame(animate);
 		})();
 	})
@@ -123,4 +129,20 @@
 	function map(num, numMin, numMax, mapMin, mapMax) {
 		return mapMin + ((mapMax - mapMin) / (numMax - numMin)) * (num - numMin);
 	}
+	let times = [];
+	let time = 0;
+	let timeNow = 0;
+	let frameRate = 0;
+	function calculateFPS() {
+		window.requestAnimationFrame(() => {
+			const now = window.performance.now();
+			while (times.length > 0 && times[0] <= now - 1000) {
+				times.shift();
+			}
+			times.push(now);
+			frameRate = times.length;
+			calculateFPS();
+		});
+	}
+	calculateFPS();
 })();

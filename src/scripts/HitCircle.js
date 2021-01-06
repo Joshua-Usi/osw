@@ -18,6 +18,26 @@ function AR(n, timingMod) {
 	return ar;
 }
 
+function ARFadeIn(n, timingMod) {
+	if (timingMod === "easy") {
+		n *= 0.5;
+	} else if (timingMod === "hardrock") {
+		n *= 1.4;
+		if (n > 10) {
+			n = 10;
+		}
+	}
+	let ar;
+	if (n < 5) {
+		ar = 0.8 + 0.4 * (5 - n) / 5;
+	} else if (n === 5) {
+		ar = 0.8;
+	} else if (n > 5) {
+		ar = 0.8 - 0.5 * (n - 5) / 5;
+	}
+	return ar;
+}
+
 function CS(n, timingMod) {
 	let radius = 54.4 - 4.48 * n;
 	if (timingMod === "easy") {
@@ -80,4 +100,13 @@ function HP(n) {
 		LossPerNote,
 		GainPerNote,
 	]
+}
+
+class HitCircle {
+	constructor(time, x, y, comboNumber) {
+		this.time = time;
+		this.x = x;
+		this.y = y;
+		this.comboNumber = comboNumber;
+	}
 }

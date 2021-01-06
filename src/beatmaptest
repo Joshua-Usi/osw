@@ -1,8 +1,4 @@
-function BeatMap(data) {
-	this.data = data;
-}
-
-let beatmap = `osu file format v14
+osu file format v14
 
 [General]
 AudioFilename: audio.mp3
@@ -200,18 +196,3 @@ SliderTickRate:1
 209,348,89637,1,10,0:0:0:0:
 305,357,89871,1,10,0:0:0:0:
 361,279,90106,5,6,3:2:0:0:
-`;
-
-let splited = beatmap.split("\n");
-
-let Beatmap = {
-	version: splited[0],
-}
-
-/* start from 1 to ignore version */
-for (var i = 1; i < splited.length; i++) {
- 	if (splited[i] === "" || splited[i].substr(0, 2) === "//") {
- 		console.log("ignored " + splited[i]);
- 		continue;
- 	}
- } 

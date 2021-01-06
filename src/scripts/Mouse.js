@@ -16,39 +16,44 @@ class Mouse {
 		this.previousPositionsMax = max;
 		this.isLeftButtonDown = false;
 		this.isRightButtonDown = false;
-
 		this.events = [];
+		this.canUserControl = true;
 		/* needed to access outside scope */
 		let that = this;
-		(function animate() {
-			for (var i = 0; i < that.events.length; i++) {
-				if (that.events[i] < Date.now() - 1000) {
-					that.events.splice(i, 1);
+		/* References to functions for destroying */
+		this.removeOldEvents = function(context) {
+			for (var i = 0; i < context.events.length; i++) {
+				if (context.events[i] < Date.now() - 1000) {
+					context.events.splice(i, 1);
 				}
 			}
-			requestAnimationFrame(animate);
-		})(this);
-		/* References to functions for destroying */
+		}
 		this.mousemove = function(event) {
-			that.events.push(Date.now());
-
-			that.previousPositions.x.push(that.position.x);
-			that.previousPositions.y.push(that.position.y);
-			if (that.previousPositions.x.length >= that.previousPositionsMax) {
-				that.previousPositions.x.splice(0, 1);
+			that.removeOldEvents(that);
+			if (that.canUserControl) {
+				that.events.push(Date.now());
+				that.previousPositions.x.push(that.position.x);
+				that.previousPositions.y.push(that.position.y);
+				if (that.previousPositions.x.length >= that.previousPositionsMax) {
+					that.previousPositions.x.splice(0, 1);
+				}
+				if (that.previousPositions.y.length >= that.previousPositionsMax) {
+					that.previousPositions.y.splice(0, 1);
+				}
+				that.position.x = event.x;
+				that.position.y = event.y;
 			}
-			if (that.previousPositions.y.length >= that.previousPositionsMax) {
-				that.previousPositions.y.splice(0, 1);
-			}
-			that.position.x = event.x;
-			that.position.y = event.y;
 		};
 		this.contextmenu = event => event.preventDefault();
 		this.mousedown = function(event) {
-			that.isLeftButtonDown = true;
+			if (that.canUserControl) {
+				that.isLeftButtonDown = true;
+			}
 		};
 		this.mouseup = function(event) {
-			that.isLeftButtonDown = false;
+			if (that.canUserControl) {
+				that.isLeftButtonDown = false;
+			}
 		};
 	}
 	init() {
@@ -68,7 +73,37 @@ class Mouse {
 		document.getElementById(this.element).removeEventListener("mouseup", this.mouseup);
 	}
 	setPosition(x, y) {
-		this.position.y = event.y;
-		this.position.x = event.x;
+		this.removeOldEvents(this);
+		this.events.push(Date.now());
+		this.previousPositions.x.push(this.position.x);
+		this.previousPositions.y.push(this.position.y);
+		if (this.previousPositions.x.length >= this.previousPositionsMax) {
+			this.previousPositions.x.splice(0, 1);
+		}
+		if (this.previousPositions.y.length >= this.previousPositionsMax) {
+			this.previousPositions.y.splice(0, 1);
+		}
+		this.position.x = x;
+		this.position.y = y;
+	}
+	changePosition(x, y) {
+		this.removeOldEvents(this);
+		this.events.push(Date.now());
+		this.previousPositions.x.push(this.position.x);
+		this.previousPositions.y.push(this.position.y);
+		if (this.previousPositions.x.length >= this.previousPositionsMax) {
+			this.previousPositions.x.splice(0, 1);
+		}
+		if (this.previousPositions.y.length >= this.previousPositionsMax) {
+			this.previousPositions.y.splice(0, 1);
+		}
+		this.position.x += x;
+		this.position.y += y;
+	}
+	disableUserControl() {
+		this.canUserControl = false;
+	}
+	enableUserControl() {
+		this.canUserControl = true;
 	}
 }
