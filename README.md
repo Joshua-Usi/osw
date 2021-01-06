@@ -3,4 +3,4 @@
  
  Currently in heavy development
  
- So far it only works as a music client, but gameplay will be added soon
+ So far gameplay works but the only inputs that work is the mouse
