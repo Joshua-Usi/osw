@@ -72,11 +72,11 @@
 			audio.currentTime = beatmap.hitObjectsParsed[0].time - 5;
 		}
 		(function animate() {
-			while (audio.currentTime >= beatmap.hitObjectsParsed[currentHitObject].time) {
-				if (currentHitObject < beatmap.hitObjects.length && audio.currentTime >= beatmap.hitObjectsParsed[currentHitObject].time) {
+			while (currentHitObject < beatmap.hitObjects.length && audio.currentTime >= beatmap.hitObjectsParsed[currentHitObject].time) {
+				// if (currentHitObject < beatmap.hitObjects.length && audio.currentTime >= beatmap.hitObjectsParsed[currentHitObject].time) {
 					hitObjects.push(beatmap.hitObjectsParsed[currentHitObject]);
 					currentHitObject++;
-				}
+				// }
 			}
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 
