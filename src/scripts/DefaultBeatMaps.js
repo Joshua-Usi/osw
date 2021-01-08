@@ -1,0 +1,3 @@
+let loadedMaps = [
+	MapSet([]),
+];

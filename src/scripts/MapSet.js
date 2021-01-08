@@ -1,6 +1,11 @@
-function MapSet() {
-	this.name = "";
-	this.beatMaps = [];
-	this.bg = new Image(src);
-	this.audio = new Audio(src);
+class MapSet {
+	constructor(maps) {
+		if (typeof(maps) !== "object") {
+			maps = [];
+		}
+		this.beatMaps = maps;
+	}
+	add(beatMapString) {
+		this.beatMaps.push(beatMapString);
+	}
 }

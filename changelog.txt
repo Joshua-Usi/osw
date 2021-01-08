@@ -71,3 +71,9 @@ Added:
 
 Changed:
 	- using new module to handle mouse events
+---------------------------------------------------------------
+v2020.0.0.8
+8 / 1 / 21
+
+Fixed:
+	- CORS (Cross Origin Resource Sharing) Error when using offline contexts
