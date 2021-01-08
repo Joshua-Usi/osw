@@ -94,12 +94,14 @@
 				if (l > 4 || l < 0) {
 					continue;
 				}
+				let hitObjectMappedX = map(hitObjects[i].x, 0, 512, 0, canvas.height * playfieldSize * (4 / 3));
+				let hitObjectMappedY = map(hitObjects[i].y, 0, 384, 0, canvas.height * playfieldSize);
 				// ctx.save();
 				ctx.globalAlpha = map(audio.currentTime - hitObjects[i].time, 0, arFadeIn, 0, 1)
-				ctx.drawImage(hitCircle, hitObjectOffsetX + hitObjects[i].x - circleDiameter / 2, hitObjectOffsetY + hitObjects[i].y - circleDiameter / 2, circleDiameter, circleDiameter);
-				ctx.drawImage(hitCircleOverlay, hitObjectOffsetX + hitObjects[i].x - circleDiameter / 2, hitObjectOffsetY + hitObjects[i].y - circleDiameter / 2, circleDiameter, circleDiameter);
-				ctx.drawImage(approachCircle, hitObjectOffsetX + hitObjects[i].x - (circleDiameter * l) / 2, hitObjectOffsetY + hitObjects[i].y - (circleDiameter * l) / 2, circleDiameter * l, circleDiameter * l);
-				ctx.drawImage(numbers[1], hitObjectOffsetX + hitObjects[i].x - numbers[1].width / 2, hitObjectOffsetY + hitObjects[i].y - numbers[1].width / 1.25);
+				ctx.drawImage(hitCircle, hitObjectOffsetX + hitObjectMappedX - circleDiameter / 2, hitObjectOffsetY + hitObjectMappedY - circleDiameter / 2, circleDiameter, circleDiameter);
+				ctx.drawImage(hitCircleOverlay, hitObjectOffsetX + hitObjectMappedX - circleDiameter / 2, hitObjectOffsetY + hitObjectMappedY - circleDiameter / 2, circleDiameter, circleDiameter);
+				ctx.drawImage(approachCircle, hitObjectOffsetX + hitObjectMappedX - (circleDiameter * l) / 2, hitObjectOffsetY + hitObjectMappedY - (circleDiameter * l) / 2, circleDiameter * l, circleDiameter * l);
+				ctx.drawImage(numbers[1], hitObjectOffsetX + hitObjectMappedX - numbers[1].width / 2, hitObjectOffsetY + hitObjectMappedY - numbers[1].width / 1.25);
 				// ctx.restore();	
 			}
 			ctx.globalAlpha = 1;
