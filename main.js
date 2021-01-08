@@ -328,7 +328,7 @@
 		return s;
 	}
 	/* Library Stuff ------------------------------------------------------------------------------------------- */
-	try	{
+	if (window.origin !== "null") {
 		if (window.localStorage.getItem("use_low_power_mode") == parseInt(0)) {
 			let wave = new Wave();
 			wave.fromElement("menu-audio", "audio-visualiser", {
@@ -337,8 +337,8 @@
 				colors: ["#fff5"]
 			});
 		}
-	} catch (e) {
-		console.error("offline context");
+	} else {
+		console.warn("offline context, audio audio visualiser will not work");
 	}
 	console.log("running and ok");
 })();
