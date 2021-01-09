@@ -32,6 +32,11 @@
 	if (window.origin === null) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
+	let version = "osu!web v2020.0.0.9";
+	let classes = document.getElementsByClassName("version-number");
+	for (var i = 0; i < classes.length; i++) {
+		classes[i].innerText = version;
+	}
 	let mouse = new Mouse("body");
 	mouse.init();
 	let songs = [
@@ -136,37 +141,39 @@
 				accumulator += time - lastTime;
 				let logo = document.getElementById("logo");
 				if (accumulator > 1 / (bpm / 60)) {
-					/* logo pulse*/
-					logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
-					logo.style.width = "40vh";
-					logo.style.top = "calc(50vh - " + 40 / 2 + "vh)";
-					logo.style.left = "calc(50vw - " + 40 / 2 + "vh)";
-					logo.style.backgroundSize = 50 + "vh";
-					logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
-					/* logo background pulse, maximum 5 to prevent lag */
-					if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
-						let logoCircle = document.createElement("img");
-						logoCircle.src = "src/images/circle.png";
-						logoCircle.style.position = "fixed";
-						logoCircle.style.width = 45 + "vh";
-						logoCircle.style.top = "calc(50vh - " + 45 / 2 + "vh)";
-						logoCircle.style.left = "calc(50vw - " + 45 / 2 + "vh)";
-						logoCircle.style.opacity = 0.5;
-						document.getElementById("logo-beat").appendChild(logoCircle);
+					while (accumulator > 1 / (bpm / 60)) {
+						/* logo pulse*/
+						logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
+						logo.style.width = "40vh";
+						logo.style.top = "calc(50vh - " + 40 / 2 + "vh)";
+						logo.style.left = "calc(50vw - " + 40 / 2 + "vh)";
+						logo.style.backgroundSize = 50 + "vh";
+						logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
+						/* logo background pulse, maximum 5 to prevent lag */
+						if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
+							let logoCircle = document.createElement("img");
+							logoCircle.src = "src/images/circle.png";
+							logoCircle.style.position = "fixed";
+							logoCircle.style.width = 45 + "vh";
+							logoCircle.style.top = "calc(50vh - " + 45 / 2 + "vh)";
+							logoCircle.style.left = "calc(50vw - " + 45 / 2 + "vh)";
+							logoCircle.style.opacity = 0.5;
+							document.getElementById("logo-beat").appendChild(logoCircle);
+						}
+						/* snow only in december, maximum 50 to prevent lag*/
+						if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
+							let snowflake = document.createElement("img");
+							snowflake.src = "src/images/snowflake.png";
+							snowflake.style.position = "fixed";
+							snowflake.style.width = Math.random() * 2 + 1 + "vh";
+							snowflake.style.top = -10 + "vh";
+							snowflake.style.left = Math.random() * 100 + "vw";
+							snowflake.style.opacity = 0.4;
+							snowflake.style.zIndex = -5;
+							document.getElementById("snow").appendChild(snowflake);
+						}
+						accumulator -= 1 / (bpm / 60);
 					}
-					/* snow only in december, maximum 50 to prevent lag*/
-					if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
-						let snowflake = document.createElement("img");
-						snowflake.src = "src/images/snowflake.png";
-						snowflake.style.position = "fixed";
-						snowflake.style.width = Math.random() * 2 + 1 + "vh";
-						snowflake.style.top = -10 + "vh";
-						snowflake.style.left = Math.random() * 100 + "vw";
-						snowflake.style.opacity = 0.4;
-						snowflake.style.zIndex = -5;
-						document.getElementById("snow").appendChild(snowflake);
-					}
-					accumulator -= 1 / (bpm / 60);
 				} else {
 					logo.style.transition = "width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s";
 					logo.style.backgroundSize = 40 * logoSizeIncrease + "vh";
@@ -293,6 +300,10 @@
 			"detail": "set slider"
 		}));
 	});
+	document.getElementById("splash-screen").addEventListener("click", function() {
+		this.style.opacity = 0;
+		setTimeout(remove, 1000);
+	});
 	/* Onload events --------------------------------------------------------------------------------------------*/
 	blurDiv("background-blur", 0);
 	document.getElementById("bpm").dispatchEvent(new CustomEvent("input", {
@@ -302,6 +313,9 @@
 		"detail": "set slider"
 	}));
 	/* Helper -------------------------------------------------------------------------------------------------- */
+	function remove() {
+		document.getElementById("splash-screen").remove();
+	}
 	function map(num, numMin, numMax, mapMin, mapMax) {
 		return mapMin + ((mapMax - mapMin) / (numMax - numMin)) * (num - numMin);
 	}

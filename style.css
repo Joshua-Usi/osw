@@ -192,6 +192,10 @@ body {
 	text-align: center;
 }
 
+.text-white {
+	color: #fff;
+}
+
 #sidenav {
 	height: 100%;
 	width: 0;
@@ -228,4 +232,34 @@ body {
 	right: 25px;
 	font-size: 36px;
 	margin-left: 50px;
+}
+
+#splash-screen {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	text-align: center;
+	padding-top: calc(50vh - 3em);
+	background: #000;
+	z-index: 1000;
+	color: #000;
+
+	animation: splash-screen-text forwards;
+	animation-duration: 1s;
+	animation-delay: 1s;
+
+	transition: opacity 1s;
+}
+
+@keyframes splash-screen-text {
+	0% {
+		color: #000;
+		letter-spacing: 3px;
+	}
+	100% {
+		color: #fff;
+		letter-spacing: 0px;
+	}
 }
