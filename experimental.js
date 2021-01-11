@@ -1,4 +1,9 @@
-// (function() {
+define(function(require) {
+	/* RequireJS Module Loading */
+	const Formulas = require("./src/scripts/Formulas.js");
+	const Mouse = require("./src/scripts/Mouse.js");
+	const Song = require("./src/scripts/Song.js");
+	const beatmap = require("./src/scripts/BeatMap.js");
 	let canvas = document.createElement("canvas");
 	canvas.id = "gameplay";
 	canvas.height = window.innerHeight;
@@ -55,13 +60,13 @@
 	let playfieldXOffset = 0;
 	let playfieldYOffset = canvas.height / 50;
 
-	let arTime = AR(beatmap.ApproachRate);
-	let arFadeIn = ARFadeIn(beatmap.ApproachRate);
-	let circleDiameter = CS(beatmap.CircleSize) * 2;
+	let arTime = Formulas.AR(beatmap.ApproachRate);
+	let arFadeIn = Formulas.ARFadeIn(beatmap.ApproachRate);
+	let circleDiameter = Formulas.CS(beatmap.CircleSize) * 2;
 	/* Map from osu!pixels to screen pixels */
 	circleDiameter = map(circleDiameter, 0, 512, 0, canvas.height * playfieldSize * (4 / 3));
 
-	let song = new Song(beatmap.AudioFilename);
+	let song = Song.create(beatmap.AudioFilename);
 	let audio = new Audio(`src/audio/${song.src}`);
 	audio.playbackRate = 1;
 	window.addEventListener("click", function() {
@@ -126,12 +131,14 @@
 			requestAnimationFrame(animate);
 		})();
 	})
+	/* Helper -------------------------------------------------------------------------------------------------- */
 	function randomInt(min, max) {
 		return Math.round((Math.random() * (max - min)) + min);
 	}
 	function map(num, numMin, numMax, mapMin, mapMax) {
 		return mapMin + ((mapMax - mapMin) / (numMax - numMin)) * (num - numMin);
 	}
+	/* Profiling ----------------------------------------------------------------------------------------------- */
 	let times = [];
 	let time = 0;
 	let timeNow = 0;
@@ -148,4 +155,4 @@
 		});
 	}
 	calculateFPS();
-// })();
+});

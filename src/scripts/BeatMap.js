@@ -1,77 +1,6 @@
-function parseBeatMap(data) {
-	let splited = data.split("\n");
-	let beatmap = {
-		version: splited[0],
-		hitObjects: [],
-		hitObjectsParsed: [],
-	}
-	/* start from 1 to ignore version */
-	for (var i = 1; i < splited.length; i++) {
-		if (splited[i] === "" || splited[i].substr(0, 2) === "//") {
-			continue;
-		}
-		let l = splited[i].split(/:(.+)/);
-		if (l.length === 1) {
-			continue;
-		}
-		if (/\d/.test(l[0])) {
-			beatmap.hitObjects.push(splited[i]);
-			beatmap.hitObjectsParsed.push(parseHitObject(splited[i]));
-			beatmap.hitObjectsParsed[beatmap.hitObjectsParsed.length - 1].time -= AR(beatmap.ApproachRate);
-			continue;
-		}
-		if (isNaN(parseFloat(l[1]))) {
-			if (l[1].substr(0, 1) === " ") {
-				l[1] = l[1].substr(1);
-			}
-			beatmap[l[0]] = l[1];
-		} else {
-			beatmap[l[0]] = parseFloat(l[1]);
-		}
-	}
-	return beatmap;
-}
-
-function parseHitObject(data) {
-	let splited = data.split(",");
-	for (var i = 0; i < splited.length; i++) {
-		if (/^[0-9]+$/.test(splited[i])) {
-			splited[i] = parseFloat(splited[i]);
-		}
-	}
-	return new HitObject(...splited);
-}
-
-function binary(number, length) {
-	let asBinary = (number >>> 0). toString(2);
-	while (asBinary.length <= 8) {
-		asBinary = "0" + asBinary;
-	}
-	return asBinary; 
-}
-
-class HitObject {
-	constructor(x, y, time, type, hitSound, objectParams, hitSample) {
-		this.x = x;
-		this.y = y;
-		/* convert to seconds */
-		this.time = time / 1000;
-		this.type = reverse(binary(type));
-		this.hitSound = hitSound;
-		this.objectParams = objectParams;
-		this.hitSample = hitSample;
-	}
-}
-
-function reverse(str) {
-	var splitString = str.split("");;
-	var reverseArray = splitString.reverse();
-	var joinArray = reverseArray.join("");
-	return joinArray;
-}
-
-let beatmap = parseBeatMap(
-`osu file format v14
+define(function(require) {
+	const Parser = require("src/scripts/Parser.js");
+	return beatmap = Parser.parseBeatMap(`osu file format v14
 
 [General]
 AudioFilename: The Empress.mp3
@@ -20139,5 +20068,5 @@ Combo8 : 128,0,255
 82,246,118538,1,0,0:0:0:0:
 428,247,118538,1,0,0:0:0:0:
 256,192,118548,12,0,119424,0:0:0:0:
-
 `);
+});

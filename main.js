@@ -21,51 +21,59 @@
  *	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *	SOFTWARE.
  */
-(function() {
-  "use strict";
-	/*
-	 * First time run setup
-	 */
-	 if (!window.localStorage.use_low_power_mode) {
+define(function(require) {
+	"use strict";
+	/* RequireJS Module Loading */
+	const Mouse = require("./src/scripts/Mouse.js");
+	const Song = require("./src/scripts/Song.js");	
+	const utils = require("./src/scripts/utils.js");	
+	/* First time run setup */
+	if (!window.localStorage.use_low_power_mode) {
 		window.localStorage.setItem("use_low_power_mode", 0);
 	}
+	/* offline context checks, needed to ensure if effects are working */
 	if (window.origin === null) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
-	let version = "osu!web v2020.0.0.9";
+	/* osu!web version */
+	const version = "osu!web v2020.0.0.10";
+	/* set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (var i = 0; i < classes.length; i++) {
 		classes[i].innerText = version;
 	}
+	/* initialise mouse module */
 	let mouse = new Mouse("body");
 	mouse.init();
+	/* initial menu song pool */
 	let songs = [
-		new Song("cYsmix - Triangles.mp3", new Bpm(160)),
-		new Song("nekodex - circles.mp3", new Bpm([185, 360, 600, 185], [0, 8, 10.5, 12])),
+		Song.create("cYsmix - Triangles.mp3", Song.bpm(160)),
+		Song.create("nekodex - circles.mp3", Song.bpm([185, 360, 600, 185], [0, 8, 10.5, 12])),
 	];
 	/* only add christmas songs to list if the month is december*/
 	if (new Date().getMonth() === 11) {
-		songs.push(new Song("nekodex - aureole.mp3", new Bpm(140)));
-		songs.push(new Song("nekodex - Little Drummer Girl.mp3", new Bpm(140)));
+		songs.push(Song.create("nekodex - aureole.mp3", Song.bpm(140)));
+		songs.push(Song.create("nekodex - Little Drummer Girl.mp3", Song.bpm(140)));
 	}
-	let chosenSong = randomInt(0, songs.length - 1);
+	let chosenSong = utils.randomInt(0, songs.length - 1);
 	let bpm = songs[chosenSong].bpm.get();
 	document.getElementById("bpm").value = bpm;
 	let menuAudio = new Audio(`src/audio/${songs[chosenSong].src}`);
 	menuAudio.addEventListener("play", function() {
-		document.getElementById("now-playing").innerText = "Now Playing: " + replaceAll(songs[chosenSong].src, [".wav", ".mp3"]);
+		document.getElementById("now-playing").innerText = "Now Playing: " + utils.replaceAll(songs[chosenSong].src, [".wav", ".mp3", ".ogg"]);
 	});
 	menuAudio.addEventListener("ended", function() {
-		chosenSong = randomInt(0, songs.length - 1);
+		chosenSong = utils.randomInt(0, songs.length - 1);
 		document.getElementById("now-playing").innerText = "Now Playing: " + songs[chosenSong].src;
 		this.src = `src/audio/${songs[chosenSong].src}`;
 		bpm = songs[chosenSong].bpm.get();
 		this.play();
 	});
 	menuAudio.id = "menu-audio";
+	/* create canvas for audio visualizer */
 	let canvas = document.getElementById("audio-visualiser");
-	canvas.width = 0.7 * innerHeight;
-	canvas.height = 0.7 * innerHeight;
+	canvas.width = 0.7 * window.innerHeight;
+	canvas.height = 0.7 * window.innerHeight;
 	/* Need to append for wave.js */
 	document.querySelector("body").appendChild(menuAudio);
 	let isFirstClick = true;
@@ -74,30 +82,13 @@
 	let time = 0;
 	let lastTime = 0;
 	let accumulator = 0;
-	/* Fetch --------------------------------------------------------------------------------------------------- */
-	/*fetch(`https://osu.ppy.sh/api/get_user?u=experimentator&k=${applicationProgrammingInterfaceAccessKey}`).then(function(response) {
-		if (response.status !== 200) {
-			console.log('Looks like there was a problem. Status Code: ' + response.status);
-			return;
-		}
-		// Examine the text in the response
-		response.json().then(function(res) {
-			console.log(res);
-			document.getElementById("avatar").src = `https://a.ppy.sh/${res[0].user_id}`;
-			document.getElementById("welcome-user").innerText = "Welcome " + res[0].username;
-		});
-	}).catch(function(err) {
-		console.log('Fetch Error', err);
-	});*/
 	/* Local Storage ------------------------------------------------------------------------------------------- */
 	if (window.localStorage.getItem("use_low_power_mode") == parseInt(1)) {
 		document.getElementById("low-power-mode").checked = true;
 	}
 	if (window.localStorage.getItem("volume_music")) {
 		document.getElementById("volume").value = window.localStorage.getItem("volume_music") * 100;
-		document.getElementById("volume").dispatchEvent(new CustomEvent("input", {
-			"detail": "set slider"
-		}));
+		document.getElementById("volume").dispatchEvent(new CustomEvent("input"));
 	}
 	/* Event Listeners ----------------------------------------------------------------------------------------- */
 	window.addEventListener("click", function() {
@@ -111,8 +102,8 @@
 	});
 	window.addEventListener("resize", function() {
 		let canvas = document.getElementById("audio-visualiser");
-		canvas.width = 0.7 * innerHeight;
-		canvas.height = 0.7 * innerHeight;
+		canvas.width = 0.7 * window.innerHeight;
+		canvas.height = 0.7 * window.innerHeight;
 	});
 	window.addEventListener("load", function() {
 		(function animate() {
@@ -120,14 +111,15 @@
 			let enableLowPowerMode = document.getElementById("low-power-mode").checked;
 			let logoSizeIncrease = 1.1;
 			if (enableLowPowerMode === false) {
+				/* style image parallax based on mouse position */
 				image.style.opacity = 1;
-				image.style.top = (mouse.position.y - window.innerHeight * 0.5) / 64 - window.innerHeight * 0.05 + "px";
+				image.style.top = (mouse.position.y - window.window.innerHeight * 0.5) / 64 - window.window.innerHeight * 0.05 + "px";
 				image.style.left = (mouse.position.x - window.innerWidth * 0.5) / 64 - window.innerWidth * 0.05 + "px";
 				let topBar = document.getElementById("top-bar");
 				let bottomBar = document.getElementById("bottom-bar");
 				let sidenav = document.getElementById("sidenav");
+				/* triangle background moves */
 				offset -= 0.25;
-				/* triangle background moves*/
 				topBar.style.backgroundPositionY = offset + "px";
 				bottomBar.style.backgroundPositionY = offset + "px";
 				sidenav.style.backgroundPositionY = offset + "px";
@@ -135,7 +127,7 @@
 				bpm = songs[chosenSong].bpm.get(time);
 				lastTime = time;
 				time = menuAudio.currentTime;
-				if (accumulator < -0.1) {
+				if (accumulator < 0) {
 					accumulator = 0;
 				}
 				accumulator += time - lastTime;
@@ -160,7 +152,12 @@
 							logoCircle.style.opacity = 0.5;
 							document.getElementById("logo-beat").appendChild(logoCircle);
 						}
-						/* snow only in december, maximum 50 to prevent lag*/
+						/* snow only in december, maximum 50 to prevent lag */
+						/* last tested:
+						 *	
+						 *	27/12/2020, works
+						 *	9/01/2021, works
+						 */
 						if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
 							let snowflake = document.createElement("img");
 							snowflake.src = "src/images/snowflake.png";
@@ -213,14 +210,14 @@
 		})();
 	});
 	document.getElementById("top-bar").addEventListener("mouseenter", function() {
-		blurDiv('background-blur', 4);
-		brighten('background-dim', 0.75);
-		blurDiv('logo', 8);
+		utils.blurDiv('background-blur', 4);
+		utils.brighten('background-dim', 0.75);
+		utils.blurDiv('logo', 8);
 	});
 	document.getElementById("top-bar").addEventListener("mouseleave", function() {
-		blurDiv('background-blur', 0);
-		brighten('background-dim', 1);
-		blurDiv('logo', 0);
+		utils.blurDiv('background-blur', 0);
+		utils.brighten('background-dim', 1);
+		utils.blurDiv('logo', 0);
 	});
 	document.getElementById("close-btn").addEventListener("click", function() {
 		document.getElementById("sidenav").style.width = "0";
@@ -232,21 +229,21 @@
 	});
 	document.getElementById("low-power-mode").addEventListener("change", function(event) {
 		let enableLowPowerMode = this.checked;
-		if (enableLowPowerMode) {
+		if (enableLowPowerMode === true) {
 			window.localStorage.setItem("use_low_power_mode", 1);
 		} else {
 			window.localStorage.setItem("use_low_power_mode", 0);
 		}
 	});
 	document.getElementById("bpm").addEventListener("input", function() {
-		this.style.background = 'linear-gradient(to right, #FD67AE 0%, #FD67AE ' + map(this.value, this.min, this.max, 0, 100) + '%, #fff ' + map(this.value, this.min, this.max, 0, 100) + '%, white 100%)';
+		this.style.background = 'linear-gradient(to right, #FD67AE 0%, #FD67AE ' + utils.map(this.value, this.min, this.max, 0, 100) + '%, #fff ' + utils.map(this.value, this.min, this.max, 0, 100) + '%, white 100%)';
 		document.getElementById('bpm-text').innerText = 'BPM ' + this.value;
 		bpm = parseInt(this.value);
 		currentSources++;
 		if (currentSources % 3 === 0) {
 			let audio = new Audio("src/audio/sliderbar.mp3");
 			audio.volume = 1;
-			audio.playbackRate = map(this.value, this.min, this.max, 1, 2);
+			audio.playbackRate = utils.map(this.value, this.min, this.max, 1, 2);
 			audio.play();
 			audio.onend = function() {
 				currentSources--;
@@ -254,7 +251,7 @@
 		}
 	});
 	document.getElementById("volume").addEventListener("input", function() {
-		this.style.background = 'linear-gradient(to right, #FD67AE 0%, #FD67AE ' + map(this.value, this.min, this.max, 0, 100) + '%, #fff ' + map(this.value, this.min, this.max, 0, 100) + '%, white 100%)';
+		this.style.background = 'linear-gradient(to right, #FD67AE 0%, #FD67AE ' + utils.map(this.value, this.min, this.max, 0, 100) + '%, #fff ' + utils.map(this.value, this.min, this.max, 0, 100) + '%, white 100%)';
 		document.getElementById('volume-text').innerText = 'Volume ' + this.value;
 		menuAudio.volume = this.value / 100;
 		window.localStorage.setItem("volume_music", menuAudio.volume);
@@ -262,7 +259,7 @@
 		if (currentSources % 3 === 0) {
 			let audio = new Audio("src/audio/sliderbar.mp3");
 			audio.volume = 1;
-			audio.playbackRate = map(this.value, this.min, this.max, 1, 2);
+			audio.playbackRate = utils.map(this.value, this.min, this.max, 1, 2);
 			audio.play();
 			audio.onend = function() {
 				currentSources--;
@@ -280,79 +277,43 @@
 	});
 	document.getElementById("previous").addEventListener("click", function() {
 		menuAudio.pause();
-		chosenSong = randomInt(0, songs.length - 1);
+		chosenSong = utils.randomInt(0, songs.length - 1);
 		bpm = songs[chosenSong].bpm.get();
 		menuAudio.src = `src/audio/${songs[chosenSong].src}`;
 		menuAudio.play();
 		document.getElementById("bpm").value = bpm;
-		document.getElementById("bpm").dispatchEvent(new CustomEvent("input", {
-			"detail": "set slider"
-		}));
+		document.getElementById("bpm").dispatchEvent(new CustomEvent("input"));
 	});
 	document.getElementById("next").addEventListener("click", function() {
 		menuAudio.pause();
-		chosenSong = randomInt(0, songs.length - 1);
+		chosenSong = utils.randomInt(0, songs.length - 1);
 		bpm = songs[chosenSong].bpm.get();
 		menuAudio.src = `src/audio/${songs[chosenSong].src}`;
 		menuAudio.play();
 		document.getElementById("bpm").value = bpm;
-		document.getElementById("bpm").dispatchEvent(new CustomEvent("input", {
-			"detail": "set slider"
-		}));
+		document.getElementById("bpm").dispatchEvent(new CustomEvent("input"));
 	});
 	document.getElementById("splash-screen").addEventListener("click", function() {
 		this.style.opacity = 0;
 		setTimeout(remove, 1000);
 	});
 	/* Onload events --------------------------------------------------------------------------------------------*/
-	blurDiv("background-blur", 0);
-	document.getElementById("bpm").dispatchEvent(new CustomEvent("input", {
-		"detail": "set slider"
-	}));
-	document.getElementById("volume").dispatchEvent(new CustomEvent("input", {
-		"detail": "set slider"
-	}));
+	utils.blurDiv("background-blur", 0);
+	document.getElementById("bpm").dispatchEvent(new CustomEvent("input"));
+	document.getElementById("volume").dispatchEvent(new CustomEvent("input"));
 	/* Helper -------------------------------------------------------------------------------------------------- */
 	function remove() {
 		document.getElementById("splash-screen").remove();
 	}
-	function map(num, numMin, numMax, mapMin, mapMax) {
-		return mapMin + ((mapMax - mapMin) / (numMax - numMin)) * (num - numMin);
-	}
-
-	function randomInt(min, max) {
-		return Math.round((Math.random() * (max - min)) + min);
-	}
-
-	function blurDiv(element, value) {
-		let blur = document.getElementById(element);
-		blur.style.filter = "blur(" + value + "px)";
-	}
-
-	function brighten(element, value) {
-		let dim = document.getElementById(element);
-		dim.style.filter = "brightness(" + value + ")";
-	}
-
-	function replaceAll(str, items) {
-		let s = str;	
-		for (var i = 0; i < items.length; i++) {
-			s = s.replace(items[i], "");
-		}
-		return s;
-	}
 	/* Library Stuff ------------------------------------------------------------------------------------------- */
-	if (window.origin !== "null") {
-		if (window.localStorage.getItem("use_low_power_mode") == parseInt(0)) {
-			let wave = new Wave();
-			wave.fromElement("menu-audio", "audio-visualiser", {
-				stroke: 7,
-				type: "flower",
-				colors: ["#fff5"]
-			});
-		}
+	if (window.origin !== "null" && window.localStorage.getItem("use_low_power_mode") == parseInt(0)) {
+		let wave = new Wave();
+		wave.fromElement("menu-audio", "audio-visualiser", {
+			stroke: 8,
+			type: "flower",
+			colors: ["#fff5"]
+		});
 	} else {
-		console.warn("offline context, audio audio visualiser will not work");
+		console.warn("offline context, audio visualiser will not work");
 	}
-	console.log("running and ok");
-})();
+});
