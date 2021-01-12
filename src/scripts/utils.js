@@ -6,11 +6,13 @@ define(function(require) {
 		randomInt: function(min, max) {
 			return Math.round((Math.random() * (max - min)) + min);
 		},
+		dist: function(x1, y1, x2, y2) {
+			return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+		},
 		blurDiv: function(element, value) {
 			let blur = document.getElementById(element);
 			blur.style.filter = "blur(" + value + "px)";
 		},
-
 		brighten: function(element, value) {
 			let dim = document.getElementById(element);
 			dim.style.filter = "brightness(" + value + ")";
@@ -58,5 +60,51 @@ define(function(require) {
 				return "Expert+";
 			}
 		},
+		difficultyPoints: function(cs, hp, od) {
+			let total = cs + hp + od;
+			if (total < 5) {
+				return 2;
+			} else if (total < 12) {
+				return 3;
+			} else if (total < 17) {
+				return 4;
+			} else if (total < 24) {
+				return 5;
+			} else if (total < 30) {
+				return 6;
+			}
+		},
+		hitScore: function(hitValue, comboMultiplier, difficultyMultiplier, modMultiplier) {
+			return hitValue + (hitValue * ((comboMultiplier * difficultyMultiplier * modMultiplier) / 25))
+		},
+		grade: function(perfects, goods, bads, misses, hiddenOrFlashlight) {
+			let total = perfects + goods + bads + misses;
+			if (perfects >= total) {
+				if (hiddenOrFlashlight) {
+					return "xh";
+				} else {
+					return "x";
+				}
+			} else if (perfects >= total * 0.9 && bads <= total * 0.01 && misses === 0) {
+				if (hiddenOrFlashlight) {
+					return "sh";
+				} else {
+					return "s";
+				}
+			} else if ((perfects >= total * 0.8 && misses === 0) || perfects >= total * 0.9) {
+				return "a";
+			} else if ((perfects >= total * 0.7 && misses === 0) || perfects >= total * 0.8) {
+				return "b";
+			} else if (perfects >= total * 0.6) {
+				return "c";
+			} else {
+				return "d";
+			}
+		},
+		accuracy: function(perfects, goods, bads, misses) {
+			let total = perfects + goods + bads + misses;
+			return (50 * bads + 100 * goods + 300 * perfects) / (300 * total);
+
+		}
 	};
 });

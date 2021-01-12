@@ -129,7 +129,7 @@ define(function(require) {
 			let image = document.getElementById("background-blur");
 			let enableLowPowerMode = document.getElementById("low-power-mode").checked;
 			let logoSizeIncrease = 1.1;
-			if (enableLowPowerMode === false ) {
+			if (enableLowPowerMode === false) {
 				/* style image parallax based on mouse position */
 				image.style.opacity = 1;
 				image.style.top = (mouse.position.y - window.window.innerHeight * 0.5) / 64 - window.window.innerHeight * 0.05 + "px";
@@ -246,6 +246,10 @@ define(function(require) {
 		document.getElementById("sidenav").style.width = "20vw";
 		document.getElementById("sidenav").style.opacity = "1";
 	});
+	document.getElementById("menu-bar-settings").addEventListener("click", function() {
+		document.getElementById("sidenav").style.width = "20vw";
+		document.getElementById("sidenav").style.opacity = "1";
+	});
 	document.getElementById("low-power-mode").addEventListener("change", function(event) {
 		let enableLowPowerMode = this.checked;
 		if (enableLowPowerMode === true) {
@@ -314,7 +318,7 @@ define(function(require) {
 	});
 	document.getElementById("splash-screen").addEventListener("click", function() {
 		this.style.opacity = 0;
-		setTimeout(remove, 1000);
+		setTimeout(none, 1000);
 	});
 	document.getElementById("logo").addEventListener("click", function() {
 		logoX = 30;
@@ -328,8 +332,11 @@ define(function(require) {
 		canvas.style.left = "calc(" + logoX + "vw - " + canvas.height + "px / 2)";
 		let menuBar = document.getElementById("menu-bar");
 		menuBar.style.opacity = 1;
-		// menuBar.style.paddingTop = 5 + "vh";
-		// menuBar.style.paddingBottom = 5 + "vh";
+		let menuBarButtons = document.getElementsByClassName("menu-bar-buttons");
+		for (var i = 0; i < menuBarButtons.length; i++) {
+			menuBarButtons[i].style.paddingTop = 5 + "vh";
+			menuBarButtons[i].style.paddingBottom = 5 + "vh";
+		}
 		menuBar.style.top = "calc(50vh - 5vh * 1.5)";
 	});
 	/* Onload events --------------------------------------------------------------------------------------------*/
@@ -337,8 +344,8 @@ define(function(require) {
 	document.getElementById("bpm").dispatchEvent(new CustomEvent("input"));
 	document.getElementById("volume").dispatchEvent(new CustomEvent("input"));
 	/* Helper -------------------------------------------------------------------------------------------------- */
-	function remove() {
-		document.getElementById("splash-screen").remove();
+	function none() {
+		document.getElementById("splash-screen").style.display = "none";
 	}
 	/* Library Stuff ------------------------------------------------------------------------------------------- */
 	if (window.origin !== "null" && window.localStorage.getItem("use_low_power_mode") == parseInt(0)) {

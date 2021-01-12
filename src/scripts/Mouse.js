@@ -101,6 +101,12 @@ define(function(require) {
 			this.position.x += x;
 			this.position.y += y;
 		}
+		click() {
+			this.isLeftButtonDown = true;
+		}
+		unClick() {
+			this.isLeftButtonDown = false;
+		}
 		disableUserControl() {
 			this.canUserControl = false;
 		}

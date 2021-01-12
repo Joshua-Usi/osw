@@ -1,17 +1,8 @@
 define(function(require) {
-	window.addEventListener("keydown", function(e) {
-		if (keys[e.keyCode] === true) {
-			releasedKeys[e.keyCode] = false;
-		}
-		keys[e.keyCode] = true;
-	});
-	window.addEventListener("keyup", function(e) {
-		releasedKeys[e.keyCode] = true;
-		keys[e.keyCode] = false;
-	});
 	return class Keyboard {
 		constructor(element) {
 			"use strict";
+			this.element = element;
 			this.keys = [];
 			this.releasedKeys = [];
 			this.keyData = [];
@@ -60,6 +51,35 @@ define(function(require) {
 				this.keyData[221] = "close bracket";
 				this.keyData[222] = "single quote";
 			})();
+			const that = this;
+			this.keydown = function(e) {
+				if (that.keys[e.keyCode] === true) {
+					that.releasedKeys[e.keyCode] = false;
+				}
+				that.keys[e.keyCode] = true;
+			}
+			this.keyup = function(e) {
+				that.releasedKeys[e.keyCode] = true;
+				that.keys[e.keyCode] = false;
+			}
+		}
+		getKeyDown(keyName) {
+			let key = -1;
+			for (var i = 0; i < this.keyData.length; i++) {
+				if (this.keyData[i] === keyName) {
+					key = i;
+					break;
+				}
+			}
+			return this.keys[key];
+		}
+		init() {
+			document.getElementById(this.element).addEventListener("keydown", this.keydown);
+			document.getElementById(this.element).addEventListener("keyup", this.keyup);
+		}
+		destroy() {
+			document.getElementById(this.element).removeEventListener("keydown", this.keydown);
+			document.getElementById(this.element).removeEventListener("keyup", this.keyup);
 		}
 	}
 });

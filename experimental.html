@@ -16,10 +16,28 @@
 			background-size: 100vw;
 			background-position: center;
 		}
+		#score-container {
+			z-index: 100;
+			position: absolute;
+			top: 0vh;
+			left: 100vh;
+		}
+		#combo-container {
+			z-index: 100;
+			position: absolute;
+			top: calc(100vh - 52px);
+		}
+		#grade {
+			position: absolute;
+			z-index: 100;
+		}
 	</style>
 </head>
 <body id="body">
 	<script data-main="experimental" type="text/javascript" src=require.js></script>
+	<img id="grade" src="src/images/gameplay/ranking-X-small.png">
+	<span id="score-container"></span>
+	<span id="combo-container"></span>
 
 </body>
 </html>
