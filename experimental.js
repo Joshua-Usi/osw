@@ -161,20 +161,17 @@ define(function(require) {
 					let hitObjectMappedY = utils.map(hitObjects[i].y, 0, 384, 0, canvas.height * playfieldSize);
 					if (utils.dist(mouse.position.x, mouse.position.y, hitObjectOffsetX + hitObjectMappedX, hitObjectOffsetY + hitObjectMappedY) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 						if (utils.withinRange(audio.currentTime, hitObjects[i].time + arTime, odTime[2])) {
-							combo++;
-							accuracy += 300;
 							total300++;
 							score += utils.hitScore(300, combo, utils.difficultyPoints(beatmap.CircleSize, beatmap.HPDrainRate, beatmap.OverallDifficulty), 1);
-						} else if (utils.withinRange(audio.currentTime, hitObjects[i].time + arTime, odTime[1])) {
 							combo++;
-							accuracy += 100;
+						} else if (utils.withinRange(audio.currentTime, hitObjects[i].time + arTime, odTime[1])) {
 							total100++;
 							score += utils.hitScore(100, combo, utils.difficultyPoints(beatmap.CircleSize, beatmap.HPDrainRate, beatmap.OverallDifficulty), 1);
-						} else if (utils.withinRange(audio.currentTime, hitObjects[i].time + arTime, odTime[0])) {
 							combo++;
-							accuracy += 50;
+						} else if (utils.withinRange(audio.currentTime, hitObjects[i].time + arTime, odTime[0])) {
 							total50++;
 							score += utils.hitScore(50, combo, utils.difficultyPoints(beatmap.CircleSize, beatmap.HPDrainRate, beatmap.OverallDifficulty), 1);
+							combo++;
 						} else {
 							combo = 0
 							totalMisses++;
