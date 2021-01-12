@@ -74,8 +74,6 @@ define(function(require) {
 
 	let score = 0;
 	let scoreDisplay = 0;
-	let totalAccuracy = 0;
-	let accuracy = 0;
 	let total300 = 0;
 	let total300g = 0;
 	let total100 = 0;
