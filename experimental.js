@@ -174,7 +174,6 @@ define(function(require) {
 							combo = 0
 							totalMisses++;
 						}
-						totalAccuracy += 300;
 						hitObjects.splice(i, 1);
 						i--;
 						mouse.unClick();
