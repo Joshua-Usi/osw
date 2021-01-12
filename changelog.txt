@@ -52,7 +52,7 @@ Changed:
 Fixed:
 	- choosing undefined songs when playing new songs (IndexError)
 ---------------------------------------------------------------
-v2020.0.0.6
+v2021.0.0.6
 2 / 1 / 21
 
 Added:
@@ -62,7 +62,7 @@ Added:
 Fixed:
 	- Bpm changes when new song is played
 ---------------------------------------------------------------
-v2020.0.0.7
+v2021.0.0.7
 4 / 1 / 21
 
 Added:
@@ -72,13 +72,19 @@ Added:
 Changed:
 	- using new module to handle mouse events
 ---------------------------------------------------------------
-v2020.0.0.8
+v2021.0.0.8
 8 / 1 / 21
 
 Fixed:
 	- CORS (Cross Origin Resource Sharing) Error when using offline contexts
 ---------------------------------------------------------------
-v2020.0.0.10
+v2021.0.0.10
 11 / 1 / 21
 
 - RequireJS Modularisation
+---------------------------------------------------------------
+v2021.0.1.0
+12 / 1 / 21
+
+Added:
+	- Main menu functionality

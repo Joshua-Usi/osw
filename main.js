@@ -36,7 +36,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* osu!web version */
-	const version = "osu!web v2020.0.0.10";
+	const version = "osu!web v2021.0.1.0";
 	/* set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (var i = 0; i < classes.length; i++) {
@@ -72,8 +72,8 @@ define(function(require) {
 	menuAudio.id = "menu-audio";
 	/* create canvas for audio visualizer */
 	let canvas = document.getElementById("audio-visualiser");
-	canvas.width = 0.7 * window.innerHeight;
-	canvas.height = 0.7 * window.innerHeight;
+	canvas.width = 0.9 * window.innerHeight;
+	canvas.height = 0.9 * window.innerHeight;
 	/* Need to append for wave.js */
 	document.querySelector("body").appendChild(menuAudio);
 	let isFirstClick = true;
@@ -82,6 +82,18 @@ define(function(require) {
 	let time = 0;
 	let lastTime = 0;
 	let accumulator = 0;
+
+	/* states:
+	 * just-logo
+	 * first
+	 * play
+	 * settings
+	 */
+	let menuState = "just-logo";
+	let logoX = 50;
+	let logoY = 50;
+	let logoSize = 50;
+	let logoPulseSize = 55;
 	/* Local Storage ------------------------------------------------------------------------------------------- */
 	if (window.localStorage.getItem("use_low_power_mode") == parseInt(1)) {
 		document.getElementById("low-power-mode").checked = true;
@@ -102,15 +114,22 @@ define(function(require) {
 	});
 	window.addEventListener("resize", function() {
 		let canvas = document.getElementById("audio-visualiser");
-		canvas.width = 0.7 * window.innerHeight;
-		canvas.height = 0.7 * window.innerHeight;
+		if (menuAudio === "just-logo") {
+			canvas.width = 0.9 * window.innerHeight;
+			canvas.height = 0.9 * window.innerHeight;
+		} else {
+			canvas.width = 0.5 * window.innerHeight;
+			canvas.height = 0.5 * window.innerHeight;
+			canvas.style.top = "calc(" + logoY + "vh - " + canvas.height + "px / 2)";
+			canvas.style.left = "calc(" + logoX + "vw - " + canvas.height + "px / 2)";
+		}
 	});
 	window.addEventListener("load", function() {
 		(function animate() {
 			let image = document.getElementById("background-blur");
 			let enableLowPowerMode = document.getElementById("low-power-mode").checked;
 			let logoSizeIncrease = 1.1;
-			if (enableLowPowerMode === false) {
+			if (enableLowPowerMode === false ) {
 				/* style image parallax based on mouse position */
 				image.style.opacity = 1;
 				image.style.top = (mouse.position.y - window.window.innerHeight * 0.5) / 64 - window.window.innerHeight * 0.05 + "px";
@@ -136,19 +155,19 @@ define(function(require) {
 					while (accumulator > 1 / (bpm / 60)) {
 						/* logo pulse*/
 						logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
-						logo.style.width = "40vh";
-						logo.style.top = "calc(50vh - " + 40 / 2 + "vh)";
-						logo.style.left = "calc(50vw - " + 40 / 2 + "vh)";
-						logo.style.backgroundSize = 50 + "vh";
+						logo.style.width = logoSize + "vh";
+						logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
+						logo.style.left = "calc(" + logoX + "vw - " + logoSize / 2 + "vh)";
+						logo.style.backgroundSize = logoSize + "vh";
 						logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
 						/* logo background pulse, maximum 5 to prevent lag */
 						if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
 							let logoCircle = document.createElement("img");
 							logoCircle.src = "src/images/circle.png";
 							logoCircle.style.position = "fixed";
-							logoCircle.style.width = 45 + "vh";
-							logoCircle.style.top = "calc(50vh - " + 45 / 2 + "vh)";
-							logoCircle.style.left = "calc(50vw - " + 45 / 2 + "vh)";
+							logoCircle.style.width = logoPulseSize + "vh";
+							logoCircle.style.top = "calc(" + logoY + "vh - " + logoPulseSize / 2 + "vh)";
+							logoCircle.style.left = "calc(" + logoX + "vw - " + logoPulseSize / 2 + "vh)";
 							logoCircle.style.opacity = 0.5;
 							document.getElementById("logo-beat").appendChild(logoCircle);
 						}
@@ -173,11 +192,11 @@ define(function(require) {
 					}
 				} else {
 					logo.style.transition = "width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s";
-					logo.style.backgroundSize = 40 * logoSizeIncrease + "vh";
-					logo.style.width = 40 * logoSizeIncrease + "vh";
-					logo.style.top = "calc(50vh - " + ((40 * logoSizeIncrease) / 2) + "vh)";
-					logo.style.left = "calc(50vw - " + ((40 * logoSizeIncrease) / 2) + "vh)";
-					logo.style.backgroundSize = 50 * logoSizeIncrease + "vh";
+					logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
+					logo.style.width = logoSize * logoSizeIncrease + "vh";
+					logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
+					logo.style.left = "calc(" + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
+					logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
 					logo.style.backgroundPositionY = offset % (1024 * 0.5) * logoSizeIncrease + "px";
 				}
 			} else {
@@ -191,8 +210,8 @@ define(function(require) {
 				}
 				logoCircles[i].style.opacity = parseFloat(logoCircles[i].style.opacity) - 0.05;
 				logoCircles[i].style.width = parseFloat(logoCircles[i].style.width) + 0.5 + "vh";
-				logoCircles[i].style.top = "calc(50vh - " + logoCircles[i].style.width + " / 2)";
-				logoCircles[i].style.left = "calc(50vw - " + logoCircles[i].style.width + "/ 2)";
+				logoCircles[i].style.top = "calc(" + logoY + "vh - " + logoCircles[i].style.width + " / 2)";
+				logoCircles[i].style.left = "calc(" + logoX + "vw - " + logoCircles[i].style.width + " / 2)";
 			}
 			if (new Date().getMonth() === 11) {
 				let snow = document.getElementById("snow").querySelectorAll("img");
@@ -296,6 +315,22 @@ define(function(require) {
 	document.getElementById("splash-screen").addEventListener("click", function() {
 		this.style.opacity = 0;
 		setTimeout(remove, 1000);
+	});
+	document.getElementById("logo").addEventListener("click", function() {
+		logoX = 30;
+		logoY = 50;
+		logoSize = 25;
+		logoPulseSize = 26;
+		let canvas = document.getElementById("audio-visualiser");
+		canvas.width = 0.5 * window.innerHeight;
+		canvas.height = 0.5 * window.innerHeight;
+		canvas.style.top = "calc(" + logoY + "vh - " + canvas.height + "px / 2)";
+		canvas.style.left = "calc(" + logoX + "vw - " + canvas.height + "px / 2)";
+		let menuBar = document.getElementById("menu-bar");
+		menuBar.style.opacity = 1;
+		// menuBar.style.paddingTop = 5 + "vh";
+		// menuBar.style.paddingBottom = 5 + "vh";
+		menuBar.style.top = "calc(50vh - 5vh * 1.5)";
 	});
 	/* Onload events --------------------------------------------------------------------------------------------*/
 	utils.blurDiv("background-blur", 0);
