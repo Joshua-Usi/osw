@@ -48,7 +48,7 @@ define(function(require) {
 	/* initial menu song pool */
 	let songs = [
 		Song.create("cYsmix - Triangles.mp3", Song.bpm(160)),
-		Song.create("nekodex - circles.mp3", Song.bpm([185, 360, 600, 185], [0, 8, 10.5, 12])),
+		// Song.create("nekodex - circles.mp3", Song.bpm([185, 360, 600, 185], [0, 8, 10.5, 12])),
 	];
 	/* only add christmas songs to list if the month is december*/
 	if (new Date().getMonth() === 11) {
