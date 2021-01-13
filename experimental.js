@@ -5,7 +5,6 @@ define(function(require) {
 	const Keyboard = require("./src/scripts/Keyboard.js");
 	const Song = require("./src/scripts/Song.js");
 	const beatmap = require("./src/scripts/BeatMap.js");
-	console.log(beatmap);
 	const utils = require("./src/scripts/utils.js");
 	let canvas = document.createElement("canvas");
 	canvas.id = "gameplay";
@@ -19,6 +18,15 @@ define(function(require) {
 	mouse.setPosition(0, 0);
 	mouse.init();
 	keyboard.init();
+
+	class ScoreObject {
+		constructor(score, x, y, lifetime) {
+			this.score = score;
+			this.x = x;
+			this.y = y;
+			this.lifetime = lifetime;
+		}
+	}
 
 	
 	let cursor = new Image();
@@ -53,11 +61,22 @@ define(function(require) {
 	hitNumbers[7].src = "src/images/gameplay/fonts/aller/default-7.png";
 	hitNumbers[8].src = "src/images/gameplay/fonts/aller/default-8.png";
 	hitNumbers[9].src = "src/images/gameplay/fonts/aller/default-9.png";
+	let scoreNumbers = [
+		new Image(),
+		new Image(),
+		new Image(),
+		new Image(),
+	]
+	scoreNumbers[0].src = "src/images/gameplay/hit300.png"
+	scoreNumbers[1].src = "src/images/gameplay/hit100.png"
+	scoreNumbers[2].src = "src/images/gameplay/hit50.png"
+	scoreNumbers[3].src = "src/images/gameplay/hit0.png"
 	ctx.font = "16px Arial";
 	ctx.fillStyle = "#fff";
 
 	let currentHitObject = 0;
 	let hitObjects = [];
+	let scoreObjects = [];
 
 	let firstClick = true;
 
@@ -81,6 +100,8 @@ define(function(require) {
 	let total50 = 0;
 	let totalMisses = 0;
 	let combo = 0;
+
+	let comboPulseSize = 1;
 
 	let song = Song.create(beatmap.AudioFilename);
 	let audio = new Audio(`src/audio/${song.src}`);
@@ -162,17 +183,24 @@ define(function(require) {
 							total300++;
 							score += utils.hitScore(300, combo, utils.difficultyPoints(beatmap.CircleSize, beatmap.HPDrainRate, beatmap.OverallDifficulty), 1);
 							combo++;
+							scoreObjects.push(new ScoreObject(300, hitObjectOffsetX + hitObjectMappedX, hitObjectOffsetY + hitObjectMappedY, audio.currentTime + 1));
+							comboPulseSize = 1;
 						} else if (utils.withinRange(audio.currentTime, hitObjects[i].time + arTime, odTime[1])) {
 							total100++;
 							score += utils.hitScore(100, combo, utils.difficultyPoints(beatmap.CircleSize, beatmap.HPDrainRate, beatmap.OverallDifficulty), 1);
 							combo++;
+							scoreObjects.push(new ScoreObject(100, hitObjectOffsetX + hitObjectMappedX, hitObjectOffsetY + hitObjectMappedY, audio.currentTime + 1));
+							comboPulseSize = 1;
 						} else if (utils.withinRange(audio.currentTime, hitObjects[i].time + arTime, odTime[0])) {
 							total50++;
 							score += utils.hitScore(50, combo, utils.difficultyPoints(beatmap.CircleSize, beatmap.HPDrainRate, beatmap.OverallDifficulty), 1);
 							combo++;
+							scoreObjects.push(new ScoreObject(50, hitObjectOffsetX + hitObjectMappedX, hitObjectOffsetY + hitObjectMappedY, audio.currentTime + 1));
+							comboPulseSize = 1;
 						} else {
 							combo = 0
 							totalMisses++;
+							scoreObjects.push(new ScoreObject(0, hitObjectOffsetX + hitObjectMappedX, hitObjectOffsetY + hitObjectMappedY, audio.currentTime + 1));
 						}
 						hitObjects.splice(i, 1);
 						i--;
@@ -180,6 +208,28 @@ define(function(require) {
 					}
 				}
 			}
+			for (var i = 0; i < scoreObjects.length; i++) {
+				if (scoreObjects[i].lifetime - audio.currentTime > 0) {
+					let useImage = -1;
+					if (scoreObjects[i].score === 300) {
+						useImage = 0
+					} else if (scoreObjects[i].score === 100) {
+						useImage = 1;
+					} else if (scoreObjects[i].score === 50) {
+						useImage = 2;
+					} else if (scoreObjects[i].score === 0) {
+						useImage = 3
+					}
+					ctx.globalAlpha = utils.map(scoreObjects[i].lifetime - audio.currentTime, 1, 0, 1, 0);
+					let size = circleDiameter * 0.75 * utils.map(scoreObjects[i].lifetime - audio.currentTime, 1, 0, 1, 1.05);
+					ctx.drawImage(scoreNumbers[useImage], scoreObjects[i].x - size / 2, scoreObjects[i].y - size / 2, (size), (size));
+				} else {
+					scoreObjects.splice(i, 1);
+					i--;
+				}
+			}
+			comboPulseSize -= comboPulseSize / 8;
+			ctx.globalAlpha = 1;
 			scoreDisplay += (score - scoreDisplay) / 8;
 			let scoreDigits = utils.reverse(Math.round(scoreDisplay) + "");
 			for (var i = 0; i < scoreDigits.length; i++) {
@@ -192,7 +242,7 @@ define(function(require) {
 					document.getElementById("score-digit-" + i).src = "src/images/gameplay/fonts/aller/score-" + scoreDigits[i] + ".png";
 				}
 			}
-			document.getElementById("score-container").style.left = "calc(100vw - " + (document.getElementById("score-container").childNodes.length * parseFloat(document.getElementById("score-digit-" + 0).width)) + "px)";
+			document.getElementById("score-container").style.left = "calc(100vw - " + (document.getElementById("score-container").childNodes.length * 0.02 * innerWidth) + "px)";
 			let comboDigits = utils.reverse(combo + "x");
 			for (var i = 0; i < comboDigits.length; i++) {
 				if (document.getElementById("combo-digit-" + i) === null) {
@@ -203,6 +253,11 @@ define(function(require) {
 				} else {
 					document.getElementById("combo-digit-" + i).src = "src/images/gameplay/fonts/aller/score-" + comboDigits[i] + ".png";
 				}
+			}
+			document.getElementById("combo-container").style.top = "calc(100vh - 52 / 32 * " + 2 * (comboPulseSize + 1) + "vw)";
+			let els = document.getElementById("combo-container").querySelectorAll("img");
+			for (var i = 0; i < els.length; i++) {
+				els[i].style.width = 2 * (comboPulseSize + 1) + "vw";
 			}
 			for (let i = 0; i < mouse.previousPositions.x.length; i++) {
 				ctx.drawImage(cursorTrail, mouse.previousPositions.x[i] - cursorTrail.width / 2, mouse.previousPositions.y[i] - cursorTrail.height / 2);
