@@ -138,7 +138,7 @@ define(function(require) {
 					l = 5;
 				}
 				if (i === 0) {
-					// mouse.changePosition((hitObjectOffsetX + hitObjectMappedX - mouse.position.x) / 2, (hitObjectOffsetY + hitObjectMappedY - mouse.position.y) / 2);
+					mouse.changePosition((hitObjectOffsetX + hitObjectMappedX - mouse.position.x) / 2, (hitObjectOffsetY + hitObjectMappedY - mouse.position.y) / 2);
 				}
 				if (l <= 1.6) {
 					l = 1.6;
