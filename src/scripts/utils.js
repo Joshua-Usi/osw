@@ -103,6 +103,9 @@ define(function(require) {
 		},
 		accuracy: function(perfects, goods, bads, misses) {
 			let total = perfects + goods + bads + misses;
+			if (total === 0) {
+				return 1;
+			}
 			return (50 * bads + 100 * goods + 300 * perfects) / (300 * total);
 
 		}

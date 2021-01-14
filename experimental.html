@@ -27,10 +27,15 @@
 			position: absolute;
 			top: calc(100vh - 52 / 32 * 2vw);
 		}
+		#accuracy-container {
+			position: absolute;
+			top: 10vh;
+		}
 		#grade {
 			position: absolute;
 			z-index: 100;
 			width: 2vw;
+			top: 32vh;
 		}
 		#score-container img {
 			width: 2vw;
@@ -38,12 +43,16 @@
 		#combo-container img {
 			width: 2vw;
 		}
+		#accuracy-container img {
+			width: 1vw;
+		}
 	</style>
 </head>
 <body id="body">
 	<script data-main="experimental" type="text/javascript" src=require.js></script>
 	<img id="grade" src="src/images/gameplay/ranking-X-small.png">
 	<span id="score-container"></span>
+	<span id="accuracy-container"></span>
 	<span id="combo-container"></span>
 
 </body>

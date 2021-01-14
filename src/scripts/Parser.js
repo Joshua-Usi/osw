@@ -33,6 +33,13 @@ define(function(require) {
 					beatmap[l[0]] = parseFloat(l[1]);
 				}
 			}
+			for (var i = 0; i < beatmap.hitObjectsParsed.length; i++) {
+				if (typeof(beatmap.hitObjectsParsed[i].x) === "string") {
+					beatmap.hitObjectsParsed.splice(i, 1);
+					beatmap.hitObjects.splice(i, 1);
+					i--;
+				}
+			}
 			return beatmap;
 		},
 		parseHitObject: function(data) {
