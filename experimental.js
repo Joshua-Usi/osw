@@ -228,7 +228,11 @@ define(function(require) {
 						ctx.stroke();
 						if (hitObjects[i].slides > 1) {
 							ctx.translate(utils.map(hitObjectOffsetX + hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 1].x, 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 1].y, 0, 384, 0, canvas.height * playfieldSize));
-							ctx.rotate(-utils.direction(hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 4].x, hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 3].y, hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 2].x, hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 1].y) + Math.PI / 2);
+							if (hitObjects[i].curvePoints.length > 2) {
+								ctx.rotate(-utils.direction(hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 4].x, hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 3].y, hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 2].x, hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 1].y) + Math.PI / 2);
+							} else {
+								ctx.rotate(-utils.direction(hitObjects[i].x, hitObjects[i].y, hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 2].x, hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 1].y) + Math.PI / 2);
+							}
 							ctx.drawImage(reverseArrow, -circleDiameter / 2, -circleDiameter / 2, circleDiameter, circleDiameter);
 							ctx.resetTransform();
 						}
