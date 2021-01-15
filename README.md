@@ -3,4 +3,4 @@
  
  Currently in heavy development
  
- So far gameplay works but the only inputs that work is the mouse
+Most of gameplay is implemented, integration soon
