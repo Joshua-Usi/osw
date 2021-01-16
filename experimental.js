@@ -200,28 +200,52 @@ define(function(require) {
 					ctx.drawImage(hitNumbers[1], hitObjectOffsetX + hitObjectMappedX - hitNumbers[1].width / 2, hitObjectOffsetY + hitObjectMappedY - hitNumbers[1].width / 1.25);
 				} else if (hitObjects[i].type[1] === "1") {
 					/* draw slider */
-					ctx.lineWidth = circleDiameter / 1.1;
-					ctx.strokeStyle = "#fff";
-					ctx.lineCap = "round";
-					ctx.beginPath();
-					if (hitObjects[i].curveType === "B") {
+					if (hitObjects[i].curveType === "B" || hitObjects[i].curveType === "P") {
 						let points = Beizer(hitObjects[i].x, hitObjects[i].y, hitObjects[i].curvePoints);
 						let inc = 1;
 						/* if there are too many points, reduce the amount of drawnPoints */
 						if (points.length > 250) {
 							inc += Math.round(points.length / 250);
 						}
+						ctx.lineWidth = circleDiameter / 1.1;
+						ctx.strokeStyle = "#fff";
+						ctx.lineCap = "round";
+						ctx.beginPath();
+						for (var j = 0; j < points.length; j += inc) {
+							ctx.lineTo(hitObjectOffsetX + utils.map(points[j][0], 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(points[j][1], 0, 384, 0, canvas.height * playfieldSize));
+						}
+						ctx.stroke();
+						ctx.lineWidth = circleDiameter / 1.2;
+						ctx.strokeStyle = "#222";
+						ctx.lineCap = "round";
+						ctx.beginPath();
 						for (var j = 0; j < points.length; j += inc) {
 							ctx.lineTo(hitObjectOffsetX + utils.map(points[j][0], 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(points[j][1], 0, 384, 0, canvas.height * playfieldSize));
 						}
 						ctx.stroke();
 						if (hitObjects[i].slides > 1) {
-							ctx.translate(hitObjectOffsetX + utils.map(points[points.length - 1][0], 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(points[points.length - 1][1], 0, 384, 0, canvas.height * playfieldSize));
+							ctx.translate();
 							ctx.rotate(-utils.direction(points[points.length - 4][0], points[points.length - 3][1], points[points.length - 2][0], points[points.length - 1][1]) + Math.PI / 2);
 							ctx.drawImage(reverseArrow, -circleDiameter / 2, -circleDiameter / 2, circleDiameter, circleDiameter);
 							ctx.resetTransform();
+						} else {
+							ctx.drawImage(hitCircle, hitObjectOffsetX + utils.map(points[points.length - 1][0], 0, 512, 0, canvas.height * playfieldSize * (4 / 3)) - circleDiameter / 2, hitObjectOffsetY + utils.map(points[points.length - 1][1], 0, 384, 0, canvas.height * playfieldSize) - circleDiameter / 2, circleDiameter, circleDiameter);
+							ctx.drawImage(hitCircleOverlay, hitObjectOffsetX + utils.map(points[points.length - 1][0], 0, 512, 0, canvas.height * playfieldSize * (4 / 3)) - circleDiameter / 2, hitObjectOffsetY + utils.map(points[points.length - 1][1], 0, 384, 0, canvas.height * playfieldSize) - circleDiameter / 2, circleDiameter, circleDiameter);
 						}
 					} else if (hitObjects[i].curveType === "L") {
+						ctx.lineWidth = circleDiameter / 1.1;
+						ctx.strokeStyle = "#fff";
+						ctx.lineCap = "round";
+						ctx.beginPath();
+						ctx.moveTo(hitObjectOffsetX + utils.map(hitObjects[i].x, 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(hitObjects[i].y, 0, 384, 0, canvas.height * playfieldSize));
+						for (var j = 0; j < hitObjects[i].curvePoints.length; j++) {
+							ctx.lineTo(hitObjectOffsetX + utils.map(hitObjects[i].curvePoints[j].x, 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(hitObjects[i].curvePoints[j].y, 0, 384, 0, canvas.height * playfieldSize));
+						}
+						ctx.stroke();
+						ctx.lineWidth = circleDiameter / 1.2;
+						ctx.strokeStyle = "#222";
+						ctx.lineCap = "round";
+						ctx.beginPath();
 						ctx.moveTo(hitObjectOffsetX + utils.map(hitObjects[i].x, 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(hitObjects[i].y, 0, 384, 0, canvas.height * playfieldSize));
 						for (var j = 0; j < hitObjects[i].curvePoints.length; j++) {
 							ctx.lineTo(hitObjectOffsetX + utils.map(hitObjects[i].curvePoints[j].x, 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(hitObjects[i].curvePoints[j].y, 0, 384, 0, canvas.height * playfieldSize));
@@ -236,6 +260,14 @@ define(function(require) {
 							}
 							ctx.drawImage(reverseArrow, -circleDiameter / 2, -circleDiameter / 2, circleDiameter, circleDiameter);
 							ctx.resetTransform();
+						} else {
+							if (hitObjects[i].curvePoints.length >= 2) {
+								ctx.drawImage(hitCircle, hitObjectOffsetX + utils.map(hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 1][0], 0, 512, 0, canvas.height * playfieldSize * (4 / 3)) - circleDiameter / 2, hitObjectOffsetY + utils.map(hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 1][1], 0, 384, 0, canvas.height * playfieldSize) - circleDiameter / 2, circleDiameter, circleDiameter);
+								ctx.drawImage(hitCircleOverlay, hitObjectOffsetX + utils.map(hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 1][0], 0, 512, 0, canvas.height * playfieldSize * (4 / 3)) - circleDiameter / 2, hitObjectOffsetY + utils.map(hitObjects[i].curvePoints[hitObjects[i].curvePoints.length - 1][1], 0, 384, 0, canvas.height * playfieldSize) - circleDiameter / 2, circleDiameter, circleDiameter);
+							} else {
+								ctx.drawImage(hitCircle, hitObjectOffsetX + utils.map(hitObjects[i].curvePoints[0].x, 0, 512, 0, canvas.height * playfieldSize * (4 / 3)) - circleDiameter / 2, hitObjectOffsetY + utils.map(hitObjects[i].curvePoints[0].y, 0, 384, 0, canvas.height * playfieldSize) - circleDiameter / 2, circleDiameter, circleDiameter);
+								ctx.drawImage(hitCircleOverlay, hitObjectOffsetX + utils.map(hitObjects[i].curvePoints[0].x, 0, 512, 0, canvas.height * playfieldSize * (4 / 3)) - circleDiameter / 2, hitObjectOffsetY + utils.map(hitObjects[i].curvePoints[0].y, 0, 384, 0, canvas.height * playfieldSize) - circleDiameter / 2, circleDiameter, circleDiameter);
+							}
 						}
 					}
 					ctx.drawImage(hitCircle, hitObjectOffsetX + hitObjectMappedX - circleDiameter / 2, hitObjectOffsetY + hitObjectMappedY - circleDiameter / 2, circleDiameter, circleDiameter);
