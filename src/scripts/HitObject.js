@@ -22,6 +22,8 @@ define(function(require) {
 				this.hitSound = hitSound;
 				this.curveType = curveTypecurvePoints[0]
 				this.curvePoints = curveTypecurvePoints.substr(1).split("|");
+				/* also push hit object origin point for simiplicity*/
+				this.curvePoints.unshift(x + ":" + y);
 				for (var i = 0; i < this.curvePoints.length; i++) {
 					if (this.curvePoints[i] === "") {
 						this.curvePoints.splice(i, 1);

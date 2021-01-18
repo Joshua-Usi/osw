@@ -66,19 +66,19 @@ define(function(require) {
 		for (let i = 0; i < points.length - 1; i++) {
 			tLength += distance(points[i], points[i + 1]);
 		}
-		let step = (points.length / 10) / tLength;
+		let step = 1 / tLength;
 		// compute the support points
 		let temp = [];
-		for (let t = 0; t <= 1; t = t + step) {
+		for (let t = 0; t <= 1; t += step) {
 			let p = P(t, points);
 			temp.push(p);
 		}
 		return temp;
 	}
 	/* Draws a N grade bezier curve from current point on the context */
-	return function bezier(startX, startY, points) {
+	return function bezier(points) {
 		// transform initial arguments into an {x: n, y: n} of [x,y] coordinates
-		let initialPoints = [[startX, startY]];
+		let initialPoints = [];
 		for (let i = 0; i < points.length; i++) {
 			initialPoints.push([points[i].x, points[i].y]);
 		}

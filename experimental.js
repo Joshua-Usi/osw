@@ -201,15 +201,58 @@ define(function(require) {
 				} else if (hitObjects[i].type[1] === "1") {
 					/* draw slider */
 					if (hitObjects[i].curveType === "B" || hitObjects[i].curveType === "P") {
-						let points = Beizer(hitObjects[i].x, hitObjects[i].y, hitObjects[i].curvePoints);
+						let points = [];
+						/* determine slider red / white anchor */
+						let beizerTemp = [];
+						for (var j = 0; j < hitObjects[i].curvePoints.length; j++) {
+							if (hitObjects[i].curvePoints[j + 1] && hitObjects[i].curvePoints[j].x === hitObjects[i].curvePoints[j + 1].x && hitObjects[i].curvePoints[j].y === hitObjects[i].curvePoints[j + 1].y) {
+								points.push(hitObjects[i].curvePoints[j].x, hitObjects[i].curvePoints[j].y);
+								beizerTemp.push(hitObjects[i].curvePoints[j]);
+								let point = Beizer(beizerTemp);
+								for (var k = 0; k < point.length; k++) {
+									points.push(point[k]);
+								}
+								beizerTemp = [];
+							} else {
+								if (beizerTemp.length === 0) {
+									beizerTemp.push(hitObjects[i].curvePoints[j]);
+								}
+								beizerTemp.push(hitObjects[i].curvePoints[j]);
+							}
+						}
+						let point = Beizer(beizerTemp);
+						for (var k = 0; k < point.length; k++) {
+							points.push(point[k]);
+						}
+						beizerTemp = [];
+						// for (var j = -1; j < hitObjects[i].curvePoints.length - 1; j++) {
+						// 	if (j === -1) {
+						// 		if (hitObjects[i].x === hitObjects[i].curvePoints[0].x && hitObjects[i].y === hitObjects[i].curvePoints[0].y) {
+						// 			points.push([hitObjects[i].x, hitObjects[i].y]);
+						// 		} else {
+						// 			let point = Beizer(hitObjects[i].x, hitObjects[i].y, [hitObjects[i].curvePoints[0]]);
+						// 			for (var k = 0; k < point.length; k++) {
+						// 				points.push(point[k]);
+						// 			}
+						// 		}
+						// 	} else {
+						// 		if (hitObjects[i].curvePoints[j].x === hitObjects[i].curvePoints[j + 1].x && hitObjects[i].curvePoints[j].y === hitObjects[i].curvePoints[j + 1].y) {
+						// 			points.push([hitObjects[i].curvePoints[j].x, hitObjects[i].curvePoints[j].y]);
+						// 		} else {
+						// 			let point = Beizer(hitObjects[i].curvePoints[j].x, hitObjects[i].curvePoints[j].y, [hitObjects[i].curvePoints[j + 1]]);
+						// 			for (var k = 0; k < point.length; k++) {
+						// 				points.push(point[k]);
+						// 			}
+						// 		}
+						// 	}
+						// }
+						// points = Beizer(hitObjects[i].curvePoints);
 						let inc = 1;
 						/* if there are too many points, reduce the amount of drawnPoints */
-						if (points.length > 250) {
-							inc += Math.round(points.length / 250);
-						}
 						ctx.lineWidth = circleDiameter / 1.1;
 						ctx.strokeStyle = "#fff";
 						ctx.lineCap = "round";
+						ctx.lineJoin = 'round';
 						ctx.beginPath();
 						for (var j = 0; j < points.length; j += inc) {
 							ctx.lineTo(hitObjectOffsetX + utils.map(points[j][0], 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(points[j][1], 0, 384, 0, canvas.height * playfieldSize));
@@ -218,26 +261,27 @@ define(function(require) {
 						ctx.lineWidth = circleDiameter / 1.2;
 						ctx.strokeStyle = "#222";
 						ctx.lineCap = "round";
+						ctx.lineJoin = 'round';
 						ctx.beginPath();
 						for (var j = 0; j < points.length; j += inc) {
 							ctx.lineTo(hitObjectOffsetX + utils.map(points[j][0], 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(points[j][1], 0, 384, 0, canvas.height * playfieldSize));
 						}
 						ctx.stroke();
 						if (hitObjects[i].slides > 1) {
-							ctx.translate();
-							ctx.rotate(-utils.direction(points[points.length - 4][0], points[points.length - 3][1], points[points.length - 2][0], points[points.length - 1][1]) + Math.PI / 2);
-							ctx.drawImage(reverseArrow, -circleDiameter / 2, -circleDiameter / 2, circleDiameter, circleDiameter);
-							ctx.resetTransform();
+							// ctx.translate();
+							// ctx.rotate(-utils.direction(points[points.length - 4][0], points[points.length - 3][1], points[points.length - 2][0], points[points.length - 1][1]) + Math.PI / 2);
+							// ctx.drawImage(reverseArrow, -circleDiameter / 2, -circleDiameter / 2, circleDiameter, circleDiameter);
+							// ctx.resetTransform();
 						} else {
-							ctx.drawImage(hitCircle, hitObjectOffsetX + utils.map(points[points.length - 1][0], 0, 512, 0, canvas.height * playfieldSize * (4 / 3)) - circleDiameter / 2, hitObjectOffsetY + utils.map(points[points.length - 1][1], 0, 384, 0, canvas.height * playfieldSize) - circleDiameter / 2, circleDiameter, circleDiameter);
-							ctx.drawImage(hitCircleOverlay, hitObjectOffsetX + utils.map(points[points.length - 1][0], 0, 512, 0, canvas.height * playfieldSize * (4 / 3)) - circleDiameter / 2, hitObjectOffsetY + utils.map(points[points.length - 1][1], 0, 384, 0, canvas.height * playfieldSize) - circleDiameter / 2, circleDiameter, circleDiameter);
+							// ctx.drawImage(hitCircle, hitObjectOffsetX + utils.map(points[points.length - 1][0], 0, 512, 0, canvas.height * playfieldSize * (4 / 3)) - circleDiameter / 2, hitObjectOffsetY + utils.map(points[points.length - 1][1], 0, 384, 0, canvas.height * playfieldSize) - circleDiameter / 2, circleDiameter, circleDiameter);
+							// ctx.drawImage(hitCircleOverlay, hitObjectOffsetX + utils.map(points[points.length - 1][0], 0, 512, 0, canvas.height * playfieldSize * (4 / 3)) - circleDiameter / 2, hitObjectOffsetY + utils.map(points[points.length - 1][1], 0, 384, 0, canvas.height * playfieldSize) - circleDiameter / 2, circleDiameter, circleDiameter);
 						}
 					} else if (hitObjects[i].curveType === "L") {
 						ctx.lineWidth = circleDiameter / 1.1;
 						ctx.strokeStyle = "#fff";
 						ctx.lineCap = "round";
+						ctx.lineJoin = 'round';
 						ctx.beginPath();
-						ctx.moveTo(hitObjectOffsetX + utils.map(hitObjects[i].x, 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(hitObjects[i].y, 0, 384, 0, canvas.height * playfieldSize));
 						for (var j = 0; j < hitObjects[i].curvePoints.length; j++) {
 							ctx.lineTo(hitObjectOffsetX + utils.map(hitObjects[i].curvePoints[j].x, 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(hitObjects[i].curvePoints[j].y, 0, 384, 0, canvas.height * playfieldSize));
 						}
@@ -245,8 +289,8 @@ define(function(require) {
 						ctx.lineWidth = circleDiameter / 1.2;
 						ctx.strokeStyle = "#222";
 						ctx.lineCap = "round";
+						ctx.lineJoin = 'round';
 						ctx.beginPath();
-						ctx.moveTo(hitObjectOffsetX + utils.map(hitObjects[i].x, 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(hitObjects[i].y, 0, 384, 0, canvas.height * playfieldSize));
 						for (var j = 0; j < hitObjects[i].curvePoints.length; j++) {
 							ctx.lineTo(hitObjectOffsetX + utils.map(hitObjects[i].curvePoints[j].x, 0, 512, 0, canvas.height * playfieldSize * (4 / 3)), hitObjectOffsetY + utils.map(hitObjects[i].curvePoints[j].y, 0, 384, 0, canvas.height * playfieldSize));
 						}
@@ -310,7 +354,10 @@ define(function(require) {
 					mouse.unClick();
 				}
 				if (i <= -1) {
-					continue;
+					i = 0;
+					if (hitObjects.length === 0) {
+						continue;
+					}
 				}
 				if (hitObjects[i].type[0] === "1" && audio.currentTime - hitObjects[i].time > arTime + odTime[0] / 2) {
 					let hitObjectMappedX = utils.map(hitObjects[i].x, 0, 512, 0, canvas.height * playfieldSize * (4 / 3));
