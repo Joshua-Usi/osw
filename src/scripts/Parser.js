@@ -30,7 +30,6 @@ define(function(require) {
 				if (section === "[HitObjects]" && /[,]/g.test(splited[i])) {
 					beatmap.hitObjects.push(splited[i]);
 					beatmap.hitObjectsParsed.push(this.parseHitObject(splited[i]));
-					beatmap.hitObjectsParsed[beatmap.hitObjectsParsed.length - 1].time -= Formulas.AR(beatmap.ApproachRate);
 					continue;
 				}
 				if (l.length === 1) {

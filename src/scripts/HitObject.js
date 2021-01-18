@@ -53,6 +53,7 @@ define(function(require) {
 				this.hitSound = hitSound;
 				this.endTime = endTime / 1000;
 				this.hitSample = hitSample;
+				this.cache = {};
 			}
 		},
 		TimingPoint: class TimingPoint {
@@ -67,6 +68,14 @@ define(function(require) {
 				this.effects = effects;
 				this.cache = {};
 			}
-		}
+		},
+		ScoreObject: class ScoreObject {
+			constructor(score, x, y, lifetime) {
+				this.score = score;
+				this.x = x;
+				this.y = y;
+				this.lifetime = lifetime;
+			}
+		},
 	};
 });
