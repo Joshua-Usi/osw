@@ -111,6 +111,9 @@ define(function(require) {
 			}
 			return (50 * bads + 100 * goods + 300 * perfects) / (300 * total);
 
-		}
+		},
+		sliderMultiplier(multiplier) {
+			return 1 / (-multiplier / 100);
+		},
 	};
 });
