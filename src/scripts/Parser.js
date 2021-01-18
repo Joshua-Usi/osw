@@ -34,7 +34,6 @@ define(function(require) {
 					continue;
 				}
 				if (l.length === 1) {
-					console.log(section + ": " + l);
 					continue;
 				}
 				if (isNaN(parseFloat(l[1]))) {
