@@ -11,6 +11,7 @@ define(function(require) {
 				this.hitSound = hitSound;
 				this.objectParams = objectParams;
 				this.hitSample = hitSample;
+				this.cache = {};
 			}
 		},
 		Slider: class Slider {
@@ -39,6 +40,7 @@ define(function(require) {
 				this.edgeSounds = edgeSounds;
 				this.edgeSets = edgeSets;
 				this.hitSample = hitSample;
+				this.cache = {};
 			}
 		},
 		Spinner: class Spinner {
@@ -55,7 +57,7 @@ define(function(require) {
 		},
 		TimingPoint: class TimingPoint {
 			constructor(time, beatLength, meter, sampleSet, sampleIndex, volume, uninherited, effects) {
-				this.time = time;
+				this.time = time / 1000;
 				this.beatLength = beatLength;
 				this.meter = meter;
 				this.sampleSet = sampleSet;
@@ -63,6 +65,7 @@ define(function(require) {
 				this.volume = volume;
 				this.uninherited = uninherited;
 				this.effects = effects;
+				this.cache = {};
 			}
 		}
 	};
