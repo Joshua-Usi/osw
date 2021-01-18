@@ -225,28 +225,6 @@ define(function(require) {
 							points.push(point[k]);
 						}
 						beizerTemp = [];
-						// for (var j = -1; j < hitObjects[i].curvePoints.length - 1; j++) {
-						// 	if (j === -1) {
-						// 		if (hitObjects[i].x === hitObjects[i].curvePoints[0].x && hitObjects[i].y === hitObjects[i].curvePoints[0].y) {
-						// 			points.push([hitObjects[i].x, hitObjects[i].y]);
-						// 		} else {
-						// 			let point = Beizer(hitObjects[i].x, hitObjects[i].y, [hitObjects[i].curvePoints[0]]);
-						// 			for (var k = 0; k < point.length; k++) {
-						// 				points.push(point[k]);
-						// 			}
-						// 		}
-						// 	} else {
-						// 		if (hitObjects[i].curvePoints[j].x === hitObjects[i].curvePoints[j + 1].x && hitObjects[i].curvePoints[j].y === hitObjects[i].curvePoints[j + 1].y) {
-						// 			points.push([hitObjects[i].curvePoints[j].x, hitObjects[i].curvePoints[j].y]);
-						// 		} else {
-						// 			let point = Beizer(hitObjects[i].curvePoints[j].x, hitObjects[i].curvePoints[j].y, [hitObjects[i].curvePoints[j + 1]]);
-						// 			for (var k = 0; k < point.length; k++) {
-						// 				points.push(point[k]);
-						// 			}
-						// 		}
-						// 	}
-						// }
-						// points = Beizer(hitObjects[i].curvePoints);
 						let inc = 1;
 						/* if there are too many points, reduce the amount of drawnPoints */
 						ctx.lineWidth = circleDiameter / 1.1;
