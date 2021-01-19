@@ -1,6 +1,6 @@
 define(function(require) {
+  "use strict";
 	const HitObject = require("./HitObject.js");
-	const Formulas = require("./Formulas.js");
 	const utils = require("./utils.js");
 	return {
 		parseBeatMap: function(data) {
@@ -11,7 +11,7 @@ define(function(require) {
 				hitObjectsParsed: [],
 				timingPoints: [],
 				timingPointsParsed: [],
-			}
+			};
 			let section = "";
 			/* start from 1 to ignore version */
 			for (var i = 1; i < splited.length; i++) {

@@ -1,8 +1,12 @@
 define(function(require) {
+  "use strict";
 	return class Mouse {
-		constructor(element, max) {
+		constructor(element, max, sensitivity) {
 			if (max === undefined) {
 				max = 0;
+			}
+			if (sensitivity === undefined) {
+				sensitivity = 1;
 			}
 			/* Element id */
 			this.element = element;
@@ -19,6 +23,15 @@ define(function(require) {
 			this.isRightButtonDown = false;
 			this.events = [];
 			this.canUserControl = true;
+			this.locked = false;
+			this.sensitivity = 1.0;
+			this.positionLimit = false;
+			this.bounds = {
+				lowerX: 0,
+				lowerY: 0,
+				upperX: 0,
+				upperY: 0,
+			};
 			/* needed to access outside scope */
 			let that = this;
 			/* References to functions for destroying */
@@ -28,7 +41,7 @@ define(function(require) {
 						context.events.splice(i, 1);
 					}
 				}
-			}
+			};
 			this.mousemove = function(event) {
 				that.removeOldEvents(that);
 				if (that.canUserControl) {
@@ -43,6 +56,36 @@ define(function(require) {
 					}
 					that.position.x = event.x;
 					that.position.y = event.y;
+				}
+			};
+			this.mousemovelocked = function(event) {
+				that.removeOldEvents(that);
+				if (that.canUserControl) {
+					that.events.push(Date.now());
+					that.previousPositions.x.push(that.position.x);
+					that.previousPositions.y.push(that.position.y);
+					if (that.previousPositions.x.length >= that.previousPositionsMax) {
+						that.previousPositions.x.splice(0, 1);
+					}
+					if (that.previousPositions.y.length >= that.previousPositionsMax) {
+						that.previousPositions.y.splice(0, 1);
+					}
+					that.position.x += event.movementX * that.sensitivity;
+					that.position.y += event.movementY * that.sensitivity;
+					if (that.positionLimit === true) {
+						if (that.position.x < that.bounds.lowerX) {
+							that.position.x = that.bounds.lowerX;
+						}
+						if (that.position.y < that.bounds.lowerY) {
+							that.position.y = that.bounds.lowerY;
+						}
+						if (that.position.x > that.bounds.upperX) {
+							that.position.x = that.bounds.upperX;
+						}
+						if (that.position.y > that.bounds.upperY) {
+							that.position.y = that.bounds.upperY;
+						}
+					}
 				}
 			};
 			this.contextmenu = event => event.preventDefault();
@@ -113,5 +156,27 @@ define(function(require) {
 		enableUserControl() {
 			this.canUserControl = true;
 		}
-	}
+		lockPointer() {
+			this.locked = true;
+			document.getElementById(this.element).requestPointerLock();
+			document.getElementById(this.element).removeEventListener("mousemove", this.mousemove);
+			document.getElementById(this.element).addEventListener("mousemove", this.mousemovelocked);
+		}
+		unlockPointer() {
+			this.locked = false;
+			document.exitPointerLock();
+			document.getElementById(this.element).removeEventListener("mousemove", this.mousemovelocked);
+			document.getElementById(this.element).addEventListener("mousemove", this.mousemove);
+		}
+		positionBound(lowerX, lowerY, upperX, upperY) {
+			this.positionLimit = true;
+			this.bounds.lowerX = lowerX;
+			this.bounds.lowerY = lowerY;
+			this.bounds.upperX = upperX;
+			this.bounds.upperY = upperY;
+		}
+		unbound() {
+			this.positionLimit = false;
+		}
+	};
 });

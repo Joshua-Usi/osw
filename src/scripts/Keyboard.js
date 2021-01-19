@@ -1,7 +1,7 @@
 define(function(require) {
+  "use strict";
 	return class Keyboard {
 		constructor(element) {
-			"use strict";
 			this.element = element;
 			this.keys = [];
 			this.releasedKeys = [];
@@ -57,11 +57,11 @@ define(function(require) {
 					that.releasedKeys[e.keyCode] = false;
 				}
 				that.keys[e.keyCode] = true;
-			}
+			};
 			this.keyup = function(e) {
 				that.releasedKeys[e.keyCode] = true;
 				that.keys[e.keyCode] = false;
-			}
+			};
 		}
 		getKeyDown(keyName) {
 			let key = -1;
@@ -81,5 +81,5 @@ define(function(require) {
 			document.getElementById(this.element).removeEventListener("keydown", this.keydown);
 			document.getElementById(this.element).removeEventListener("keyup", this.keyup);
 		}
-	}
+	};
 });

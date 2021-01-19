@@ -1,4 +1,5 @@
 define(function(require) {
+  "use strict";
 	return {
 		map: function(num, numMin, numMax, mapMin, mapMax) {
 			return mapMin + ((mapMax - mapMin) / (numMax - numMin)) * (num - numMin);
@@ -22,7 +23,7 @@ define(function(require) {
 		},
 		replaceAll: function(str, items) {
 			let s = str;
-			for (var i = 0; i < items.length; i++) {
+			for (let i = 0; i < items.length; i++) {
 				s = s.replace(items[i], "");
 			}
 			return s;
@@ -35,9 +36,9 @@ define(function(require) {
 			return asBinary;
 		},
 		reverse: function(str) {
-			var splitString = str.split("");;
-			var reverseArray = splitString.reverse();
-			var joinArray = reverseArray.join("");
+			let splitString = str.split("");
+			let reverseArray = splitString.reverse();
+			let joinArray = reverseArray.join("");
 			return joinArray;
 		},
 		/* range centered around value */
@@ -78,7 +79,7 @@ define(function(require) {
 			}
 		},
 		hitScore: function(hitValue, comboMultiplier, difficultyMultiplier, modMultiplier) {
-			return hitValue + (hitValue * ((comboMultiplier * difficultyMultiplier * modMultiplier) / 25))
+			return hitValue + (hitValue * ((comboMultiplier * difficultyMultiplier * modMultiplier) / 25));
 		},
 		grade: function(perfects, goods, bads, misses, hiddenOrFlashlight) {
 			let total = perfects + goods + bads + misses;
@@ -115,5 +116,111 @@ define(function(require) {
 		sliderMultiplier(multiplier) {
 			return 1 / (-multiplier / 100);
 		},
+		lineLine(x1, y1, x2, y2, x3, y3, x4, y4) {
+			const den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+			if (den === 0) return;
+			const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
+			const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
+			if (t > 0 && t < 1 && u > 0 && u < 1) {
+				const pt = {
+					x: undefined,
+					y: undefined,
+				};
+				pt.x = x1 + t * (x2 - x1);
+				pt.y = y1 + t * (y2 - y1);
+				return pt;
+			} else {
+				return;
+			}
+		},
+		// To find orientation of ordered triplet (p1, p2, p3). 
+		// The function returns following values 
+		// 0 --> p, q and r are colinear 
+		// 1 --> Clockwise 
+		// 2 --> Counterclockwise 
+		orientation(p1, p2, p3) 
+		{ 
+			let val = (p2.y - p1.y) * (p3.x - p2.x) - 
+					  (p2.x - p1.x) * (p3.y - p2.y); 
+			// colinear
+			if (val == 0) {
+				return 0;
+			}
+			// clock or counterclock wise 
+			return (val > 0) ? 1 : 2; 
+		},
+		/* 90 sided circle */
+		circleToPoints(x, y, r, length, startingAngle, clockwise) {
+			let points = [];
+			let totalLength = 0;
+			let direction;
+			if (clockwise === 2) {
+				direction = 1;
+			}
+			if (clockwise === 1) {
+				direction = -1;
+			}
+			for (let i = 0; i < 360; i += 4) {
+				points.push({
+					x: x + Math.cos(startingAngle + direction * i * Math.PI / 180) * r,
+					y: y + Math.sin(startingAngle + direction * i * Math.PI / 180) * r,
+				});
+				if (i >= 1) {
+					totalLength += this.dist(points[i / 4].x, points[i / 4].y, points[i / 4 - 1].x, points[i / 4 - 1].y);
+				}
+				if (totalLength >= length) {
+					break;
+				}
+			}
+			return points;
+		},
+		circumcircle(a, b, c) {
+			a = a;
+			b = b;
+			c = c;
+			let EPSILON = 1.0 / 1048576.0;
+			let ax = a.x,
+				ay = a.y,
+				bx = b.x,
+				by = b.y,
+				cx = c.x,
+				cy = c.y,
+				fabsy1y2 = Math.abs(ay - by),
+				fabsy2y3 = Math.abs(by - cy),
+				xc, yc, m1, m2, mx1, mx2, my1, my2, dx, dy;
+			/* Check for coincident points */
+			if (fabsy1y2 < EPSILON && fabsy2y3 < EPSILON) {
+				throw new Error("Eek! Coincident points!");
+			}
+			if (fabsy1y2 < EPSILON) {
+				m2 = -((cx - bx) / (cy - by));
+				mx2 = (bx + cx) / 2.0;
+				my2 = (by + cy) / 2.0;
+				xc = (bx + ax) / 2.0;
+				yc = m2 * (xc - mx2) + my2;
+			} else if (fabsy2y3 < EPSILON) {
+				m1 = -((bx - ax) / (by - ay));
+				mx1 = (ax + bx) / 2.0;
+				my1 = (ay + by) / 2.0;
+				xc = (cx + bx) / 2.0;
+				yc = m1 * (xc - mx1) + my1;
+			} else {
+				m1 = -((bx - ax) / (by - ay));
+				m2 = -((cx - bx) / (cy - by));
+				mx1 = (ax + bx) / 2.0;
+				mx2 = (bx + cx) / 2.0;
+				my1 = (ay + by) / 2.0;
+				my2 = (by + cy) / 2.0;
+				xc = (m1 * mx1 - m2 * mx2 + my2 - my1) / (m1 - m2);
+				yc = (fabsy1y2 > fabsy2y3) ? m1 * (xc - mx1) + my1 : m2 * (xc - mx2) + my2;
+			}
+			dx = bx - xc;
+			dy = by - yc;
+			return {
+				x: xc,
+				y: yc,
+				r: Math.sqrt(dx * dx + dy * dy),
+			};
+		}
 	};
 });

@@ -1,4 +1,5 @@
 define(function(require) {
+  "use strict";
 	let utils = require("./utils.js");
 	return {
 		HitCircle: class HitCircle {
@@ -21,7 +22,7 @@ define(function(require) {
 				this.time = time / 1000;
 				this.type = utils.reverse(utils.binary(type));
 				this.hitSound = hitSound;
-				this.curveType = curveTypecurvePoints[0]
+				this.curveType = curveTypecurvePoints[0];
 				this.curvePoints = curveTypecurvePoints.substr(1).split("|");
 				/* also push hit object origin point for simiplicity*/
 				this.curvePoints.unshift(x + ":" + y);
@@ -59,7 +60,10 @@ define(function(require) {
 		TimingPoint: class TimingPoint {
 			constructor(time, beatLength, meter, sampleSet, sampleIndex, volume, uninherited, effects) {
 				this.time = time / 1000;
-				this.beatLength = beatLength;
+				this.beatLength = beatLength / 1000;
+				if (uninherited === 0) {
+					this.beatLength *= 1000;
+				}
 				this.meter = meter;
 				this.sampleSet = sampleSet;
 				this.sampleIndex = sampleIndex;

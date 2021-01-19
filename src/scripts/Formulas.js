@@ -1,4 +1,5 @@
 define(function(require) {
+  "use strict";
 	return {
 		AR: function(n, timingMod) {
 			if (timingMod === "easy") {
@@ -76,27 +77,27 @@ define(function(require) {
 			}
 			let od;
 			if (n < 5) {
-				od = 5 - 2 * (5 - OD) / 5
+				od = 5 - 2 * (5 - n) / 5;
 			} else if (n === 5) {
 				od = 5;
 			} else if (n > 5) {
-				od = 5 + 2.5 * (OD - 5) / 5;
+				od = 5 + 2.5 * (n - 5) / 5;
 			}
 			return od;
 		},
 		/* returns loss and gain per note in array*/
 		HP: function(n) {
 			let LossPerNote = 0.75 * n + 0.75;
-			let GainPerNote
-			if (hp >= 9) {
-				GainPerNote = -0.4 * (n + ((n - 9) / 180)) + 4
+			let GainPerNote;
+			if (n >= 9) {
+				GainPerNote = -0.4 * (n + ((n - 9) / 180)) + 4;
 			} else {
 				GainPerNote = -0.4 * n + 4;
 			}
 			return [
 				LossPerNote,
 				GainPerNote,
-			]
+			];
 		}
-	}
+	};
 });
