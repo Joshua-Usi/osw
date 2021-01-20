@@ -50,11 +50,14 @@ define(function(require) {
 	 *	@param {Array} points - an {Array} of [x,y] coodinates. The initial points
 	 **/
 	function P(t, points) {
-		let r = [0, 0];
+		let r = {
+			x: 0,
+			y: 0,
+		};
 		let n = points.length - 1;
 		for (let i = 0; i <= n; i++) {
-			r[0] += points[i][0] * B(i, n, t);
-			r[1] += points[i][1] * B(i, n, t);
+			r.x += points[i][0] * B(i, n, t);
+			r.y += points[i][1] * B(i, n, t);
 		}
 		return r;
 	}

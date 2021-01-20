@@ -160,13 +160,13 @@ define(function(require) {
 			if (clockwise === 1) {
 				direction = -1;
 			}
-			for (let i = 0; i < 360; i += 4) {
+			for (let i = 0; i < 360; i += 1) {
 				points.push({
 					x: x + Math.cos(startingAngle + direction * i * Math.PI / 180) * r,
 					y: y + Math.sin(startingAngle + direction * i * Math.PI / 180) * r,
 				});
 				if (i >= 1) {
-					totalLength += this.dist(points[i / 4].x, points[i / 4].y, points[i / 4 - 1].x, points[i / 4 - 1].y);
+					totalLength += this.dist(points[i].x, points[i].y, points[i - 1].x, points[i - 1].y);
 				}
 				if (totalLength >= length) {
 					break;
@@ -188,10 +188,6 @@ define(function(require) {
 				fabsy1y2 = Math.abs(ay - by),
 				fabsy2y3 = Math.abs(by - cy),
 				xc, yc, m1, m2, mx1, mx2, my1, my2, dx, dy;
-			/* Check for coincident points */
-			if (fabsy1y2 < EPSILON && fabsy2y3 < EPSILON) {
-				throw new Error("Eek! Coincident points!");
-			}
 			if (fabsy1y2 < EPSILON) {
 				m2 = -((cx - bx) / (cy - by));
 				mx2 = (bx + cx) / 2.0;
