@@ -113,10 +113,10 @@ define(function(require) {
 			return (50 * bads + 100 * goods + 300 * perfects) / (300 * total);
 
 		},
-		sliderMultiplier(multiplier) {
+		sliderMultiplier: function(multiplier) {
 			return 1 / (-multiplier / 100);
 		},
-		lineLine(x1, y1, x2, y2, x3, y3, x4, y4) {
+		lineLine: function(x1, y1, x2, y2, x3, y3, x4, y4) {
 			const den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
 			if (den === 0) return;
 			const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
@@ -138,7 +138,7 @@ define(function(require) {
 		// 0 --> p, q and r are colinear 
 		// 1 --> Clockwise 
 		// 2 --> Counterclockwise 
-		orientation(p1, p2, p3) 
+		orientation: function(p1, p2, p3) 
 		{ 
 			let val = (p2.y - p1.y) * (p3.x - p2.x) - 
 					  (p2.x - p1.x) * (p3.y - p2.y); 
@@ -150,7 +150,7 @@ define(function(require) {
 			return (val > 0) ? 1 : 2; 
 		},
 		/* 90 sided circle */
-		circleToPoints(x, y, r, length, startingAngle, clockwise) {
+		circleToPoints: function(x, y, r, length, startingAngle, clockwise) {
 			let points = [];
 			let totalLength = 0;
 			let direction;
@@ -174,7 +174,7 @@ define(function(require) {
 			}
 			return points;
 		},
-		circumcircle(a, b, c) {
+		circumcircle: function(a, b, c) {
 			a = a;
 			b = b;
 			c = c;
@@ -221,6 +221,43 @@ define(function(require) {
 				y: yc,
 				r: Math.sqrt(dx * dx + dy * dy),
 			};
+		},
+		mapToOsuPixels: function(x, y, toWidth, toHeight, offsetX, offsetY) {
+			return {
+				x: offsetX + this.map(x, 0, 512, 0, toWidth),
+				y: offsetY + this.map(y, 0, 384, 0, toHeight),
+			}
+		},
+		htmlCounter: function(digits, container, element, rootSrc, positionTag, positioning) {
+			for (let i = 0; i < digits.length; i++) {
+				if (document.getElementById(element + i) === null) {
+					let image = new Image();
+					image.id = element + i;
+					document.getElementById(container).insertBefore(image, document.getElementById(container).childNodes[0]);
+				}
+				let image = document.getElementById(element + i);
+				if (/^[0-9]+$/.test(digits[i])) {
+					image.src = rootSrc + digits[i] + ".png";
+				} else {
+					let trueSrc = "0";
+					switch (digits[i]) {
+						case ".":
+							trueSrc = "dot";
+							break;
+						case ",":
+							trueSrc = "comma";
+							break;
+						case "%":
+							trueSrc = "percent";
+							break;
+						case "x":
+							trueSrc = "x";
+							break;
+					}
+					image.src = rootSrc + trueSrc + ".png";
+				}
+			}
+			document.getElementById(container).style[positionTag] = positioning;
 		}
 	};
 });
