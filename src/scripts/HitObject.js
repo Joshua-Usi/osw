@@ -12,7 +12,10 @@ define(function(require) {
 				this.hitSound = hitSound;
 				this.objectParams = objectParams;
 				this.hitSample = hitSample;
-				this.cache = {};
+				this.cache = {
+					cacheSet: false,
+					cacheSetAfterHit: false,
+				};
 			}
 		},
 		Slider: class Slider {
@@ -41,7 +44,10 @@ define(function(require) {
 				this.edgeSounds = edgeSounds;
 				this.edgeSets = edgeSets;
 				this.hitSample = hitSample;
-				this.cache = {};
+				this.cache = {
+					cacheSet: false,
+					cacheSetAfterHit: false,
+				};
 			}
 		},
 		Spinner: class Spinner {
@@ -70,7 +76,10 @@ define(function(require) {
 				this.volume = volume;
 				this.uninherited = uninherited;
 				this.effects = effects;
-				this.cache = {};
+				this.cache = {
+					cacheSet: false,
+					cacheSetAfterHit: false,
+				};
 			}
 		},
 		ScoreObject: class ScoreObject {

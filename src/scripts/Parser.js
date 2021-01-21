@@ -35,6 +35,13 @@ define(function(require) {
 				if (l.length === 1) {
 					continue;
 				}
+				if (l[0] === "AudioFilename") {
+					if (l[1].substr(0, 1) === " ") {
+						l[1] = l[1].substr(1);
+					}
+					beatmap[l[0]] = l[1];
+					continue;
+				}
 				if (isNaN(parseFloat(l[1]))) {
 					if (l[1].substr(0, 1) === " ") {
 						l[1] = l[1].substr(1);
