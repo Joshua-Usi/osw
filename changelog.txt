@@ -88,3 +88,12 @@ v2021.0.1.0
 
 Added:
 	- Main menu functionality
+---------------------------------------------------------------
+v2021.0.1.1
+22 / 1 / 21
+
+Added:
+	- top bar icon functionality
+
+Fixed:
+	- responsiveness of main menu
