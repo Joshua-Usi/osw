@@ -631,6 +631,16 @@ define(function(require) {
 			ctx.globalAlpha = 1;
 			ctx.drawImage(cursor, mouse.position.x - (cursor.width * size) / 2, mouse.position.y - (cursor.height * size) / 2, cursor.width * size, cursor.height * size);
 			ctx.fillStyle = "#fff";
+			document.getElementById("frame-rate").innerText = frameRate + " / 60 fps";
+			if (frameRate > 60) {
+				document.getElementById("frame-rate").style.background = "#6d9eeb";
+			} else if (frameRate > 45) {
+				document.getElementById("frame-rate").style.background = "#39e639";
+			} else if (frameRate > 20) {
+				document.getElementById("frame-rate").style.background = "#ffa500";
+			} else {
+				document.getElementById("frame-rate").style.background = "#B00020";
+			}
 			// ctx.fillText(frameRate + "fps", 10, 20);
 			setTimeout(animate, 0);
 		})();
