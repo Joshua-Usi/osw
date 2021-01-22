@@ -9,21 +9,18 @@
 <body id="body">
 	<div id="sidenav">
 			<a href="javascript:void(0)" id="close-btn">&times;</a>
-			<span class="span-top-bar-text" style="float: left;">
-			<p class="nav-text">Low Power Mode</p>
+			<span>
+				<p class="sidenav-title-text">Audio</p>
+				<p id="volume-text">Music Volume</p>
+				<input type="range" id="volume-music" class="slider" min="0" max="100" value="100">
+				<p id="volume-text">Effects Volume</p>
+				<input type="range" id="volume-effects" class="slider" min="0" max="100" value="100">
+			</span>
+			<p class="sidenav-title-text">Inputs</p>
+			<p class="sidenav-title-text">Gameplay</p>
+			<p class="sidenav-title-text">Performance</p>
 			<input type="checkbox" id="low-power-mode" class="checkbox" name="low-power-mode" value="false">
-		</span>
-		<span class="span-top-bar-text" style="float: left;">
-			<p class="nav-text" id="bpm-text">bpm not set</p>
-			<input type="range" id="bpm" class="slider" min="30" max="300" value="30">
-		</span>
-		<span class="span-top-bar-text" style="float: left;">
-			<p class="nav-text" id="volume-text">volume 100</p>
-			<input type="range" id="volume" class="slider" min="0" max="100" value="100">
-		</span>	
-		<span class="span-top-bar-text" style="float: left;">
-			<p class="nav-text" onclick="window.open('experimental.html', '_self');">Go to Experimental</p>
-		</span>	
+			<p class="sidenav-title-text">Skin</p>
 	</div>
 	<div id="top-bar">
 		<span class="span-top-bar-text" style="float: left;">
@@ -48,12 +45,12 @@
 	<img id="logo" src="src/images/osu.png">
 	<div id="menu-bar">
 		<div class="menu-bar-buttons" id="menu-bar-settings">settings</div>
-		<span id="menu-right-side">
+		<!-- <span id="menu-right-side"> -->
 			<div class="menu-bar-buttons" id="menu-bar-play" onclick="window.open('experimental.html', '_self');">play</div>
 			<div class="menu-bar-buttons" id="menu-bar-edit">edit</div>
 			<div class="menu-bar-buttons" id="menu-bar-direct" onclick="window.open('https://osu.ppy.sh/home', '_self');">osu! official</div>
 			<div class="menu-bar-buttons" id="menu-bar-exit" onclick="window.close()">exit</div>
-		</span>
+		<!-- </span> -->
 	</div>
 	<span id="logo-beat"></span>
 	<span id="snow"></span>
