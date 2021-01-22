@@ -5,6 +5,9 @@ define(function(require) {
 	return {
 		parseBeatMap: function(data) {
 			let splited = data.split("\n");
+			if (splited[0] !== "osu file format v14") {
+				console.warn("Currently Parsed Beatmap uses \"" + splited[0] + "\" which is incompatible with the current parser");
+			}
 			let beatmap = {
 				version: splited[0],
 				hitObjects: [],
