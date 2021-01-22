@@ -25,14 +25,6 @@ body {
 	transition: background 0.5s ease;
 }
 
-.nav-text {
-	display: inline;
-	color: #fff;
-	padding: 2.23vh;
-	border-collapse: collapse;
-	margin: 0;
-}
-
 .top-bar-text:hover {
 	background: #555;
 }
@@ -191,10 +183,6 @@ body {
 	text-align: center;
 }
 
-.text-white {
-	color: #fff;
-}
-
 #sidenav {
 	height: 100%;
 	width: 0;
@@ -211,18 +199,13 @@ body {
 }
 
 #sidenav p, #sidenav a {
-	padding: 8px;
+	padding: 4px;
 	margin: 0;
 	white-space: nowrap;
 	text-decoration: none;
-	font-size: 2.50vh;
+	font-size: 1.3vw;
 	color: #fff;
 	display: block;
-	transition: 0.3s;
-}
-
-#sidenav p:hover {
-	background-color: #444;
 }
 
 #sidenav #close-btn {
@@ -231,6 +214,12 @@ body {
 	right: 25px;
 	font-size: 36px;
 	margin-left: 50px;
+}
+
+.sidenav-title-text {
+	color: #f8c621 !important;
+	padding-left: 2vw !important;
+	font-size: 2vw !important;
 }
 
 #splash-screen {
@@ -274,17 +263,15 @@ body {
 	border-collapse: collapse;
 	margin: 0;
 	float: left;
-	padding-top: 0vh;
-	padding-bottom: 0vh;
 	padding-left: 5vw;
 	padding-right: 5vw;
 	transition: padding 0.2s, left 0.2s;
 	transition-timing-function: cubic-bezier(.0,.7,.65,1.9);
 	/*clip-path: polygon(20% 0, 100% 0, 80% 100%, 0% 100%);*/
 	z-index: 9;
-	-webkit-box-shadow: inset 5px 0px 5px -1px #0002;
-	-moz-box-shadow: inset 5px 0px 5px -1px #0002;
-	box-shadow: inset 5px 0px 5px -1px #0002;
+	-webkit-box-shadow: inset 5px 0px 5px -1px #0004;
+	-moz-box-shadow: inset 5px 0px 5px -1px #0004;
+	box-shadow: inset 5px 0px 5px -1px #0004;
 }
 
 #menu-bar-play {
@@ -312,13 +299,13 @@ body {
 	background-color: #555555;
 }
 .menu-bar-buttons:hover {
-	padding-left: 10vh;
-	padding-right: 15vh;
+	padding-left: 5vw;
+	padding-right: 7.5vw;
 }
 
 #menu-bar-settings:hover {
-	padding-left: 12.5vh;
-	padding-right: 10vh;
+	padding-left: 7.5vw;
+	padding-right: 2.5vw;
 	left: 7.5vw;
 }
 
