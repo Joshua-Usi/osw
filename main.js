@@ -36,7 +36,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* osu!web version */
-	const version = "osu!web v2021.0.1.0";
+	const version = "osu!web v2021.0.1.1";
 	/* set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (var i = 0; i < classes.length; i++) {
@@ -338,6 +338,9 @@ define(function(require) {
 			menuBarButtons[i].style.paddingBottom = 5 + "vh";
 		}
 		menuBar.style.top = "calc(50vh - 5vh * 1.5)";
+	});
+	document.getElementById("standard-top-icon").addEventListener("click", function() {
+		document.getElementById("logo").dispatchEvent(new CustomEvent("click"));
 	});
 	/* Onload events --------------------------------------------------------------------------------------------*/
 	utils.blurDiv("background-blur", 0);
