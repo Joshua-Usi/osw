@@ -76,10 +76,7 @@ define(function(require) {
 				this.volume = volume;
 				this.uninherited = uninherited;
 				this.effects = effects;
-				this.cache = {
-					cacheSet: false,
-					cacheSetAfterHit: false,
-				};
+				this.cache = {};
 			}
 		},
 		ScoreObject: class ScoreObject {
