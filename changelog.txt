@@ -97,3 +97,9 @@ Added:
 
 Fixed:
 	- responsiveness of main menu
+---------------------------------------------------------------
+v2021.0.1.2
+24 / 1 / 21
+
+Changed:
+	- Main Menu to act more like osu!lazer

@@ -37,7 +37,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* osu!web version */
-	const version = "osu!web v2021.0.1.1";
+	const version = "osu!web v2021.0.1.2";
 	/* set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (var i = 0; i < classes.length; i++) {
