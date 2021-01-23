@@ -57,7 +57,7 @@ body {
 
 .slider::-webkit-slider-thumb {
 	-webkit-appearance: none;
-	width: calc(2.5vh * 2.6);
+	width: 4vw;
 	height: 2.5vh;
 	border-radius: 2.5vh;
 	border: 2px solid #FD67AE;
@@ -79,8 +79,10 @@ body {
 }
 
 .slider {
+	position: relative;
 	-webkit-appearance: none;
-	width: 10vw;
+	width: 90%;
+	left: 5%;
 	outline: none;
 	height: 0.5vh;
 	border-radius: 2.5vh;
@@ -90,7 +92,7 @@ body {
 }
 
 .checkbox {
-	width: calc(2.5vh * 2.6);
+	width: 4vw;
 	height: 2.5vh;
 	background-color: rgba(0, 0, 0, 0);
 	border-radius: 2.5vh;
@@ -102,7 +104,7 @@ body {
 	transition: width 0.5s ease, box-shadow 0.25s ease;
 }
 .checkbox:hover {
-	width: calc(2.5vh * 3.9);
+	/*width: calc(2.5vh * 3.9);*/
 	box-shadow:
 	-5px -5px 10px #FD67AE99,
 	5px -5px 10px #FD67AE99,
@@ -262,7 +264,7 @@ body {
 	box-sizing: border-box;
 	width: 15vw;
 	white-space: nowrap;
-	transition: width 0.2s, left 0.2s;
+	transition: padding 0.2s, width 0.2s, left 0.2s;
 	transition-timing-function: cubic-bezier(.0,.7,.65,1.9);
 	transform: skewX(-25deg);
 	z-index: 9;
@@ -306,7 +308,7 @@ body {
 }
 
 #menu-bar-settings:hover {
-	left: 7.5vw;
+	left: 8vw;
 }
 
 @keyframes splash-screen-text {

@@ -331,7 +331,7 @@ define(function(require) {
 		canvas.style.left = "calc(" + logoX + "vw - " + canvas.height + "px / 2)";
 		let menuBar = document.getElementById("menu-bar");
 		menuBar.style.opacity = 1;
-		let menuBarButtons = document.getElementsByClassName("menu-bar-buttons");
+		let menuBarButtons = document.getElementsByClassName("menu-bar-buttons-parent");
 		for (var i = 0; i < menuBarButtons.length; i++) {
 			menuBarButtons[i].style.paddingTop = 5 + "vh";
 			menuBarButtons[i].style.paddingBottom = 5 + "vh";
