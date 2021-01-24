@@ -148,6 +148,7 @@ define(function(require) {
 			}
 			let hitObjectOffsetX = playfieldXOffset + canvas.width / 2 - canvas.height * playfieldSize * (4 / 3) / 2;
 			let hitObjectOffsetY = playfieldYOffset + canvas.height / 2 - canvas.height * playfieldSize / 2;
+			/* Cache Loop ---------------------------------------------------------------- */
 			for (let i = 0; i < hitObjects.length; i++) {
 				/* Cache Setup ---------------------------------------------------------------- */
 				let sliderSpeedMultiplier = beatmap.SliderMultiplier;
@@ -233,135 +234,10 @@ define(function(require) {
 						hitObjects[i].cache.currentAngle = 0;
 					}
 				}
-				/* Approach Circle Calculations ---------------------------------------------------------------- */
-				let approachCircleSize = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 5, 1.6);
+			}
+			/* Processing Loop ---------------------------------------------------------------- */
+			for (let i = 0; i < hitObjects.length; i++) {
 				let hitObjectMapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-				/* approach circle max size */
-				if (approachCircleSize >= 5) {
-					approachCircleSize = 5;
-				}
-				/* approach circle min size */
-				if (approachCircleSize <= 1.6) {
-					approachCircleSize = 1.6;
-					if (hitObjects[i].type[0] === "1") {
-						mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y)
-						mouse.click();
-					}
-				}
-				/* Alpha Calculations ---------------------------------------------------------------- */
-				if (hitObjects[i].type[0] === "1") {
-					if (mods.hidden) {
-						/* hidden fade in and out for hit circle */
-						if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) < 0.4) {
-							ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime * 0.4, 0, 1);
-						} else if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) < 0.7) {
-							ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), arTime * 0.4, arTime * 0.7, 1, 0);
-						} else {
-							ctx.globalAlpha = 0;
-						}
-					} else {
-						/* normal fade in and out for hit circle */
-						if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= 1) {
-							ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arFadeIn, 0, 1);
-						} else {
-							let alpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), arTime, arTime + odTime[0] / 2, 1, 0);
-							if (alpha < 0) {
-								alpha = 0;
-							}
-							ctx.globalAlpha = alpha;
-						}
-					}
-				} else if (hitObjects[i].type[1] === "1") {
-					if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= 1) {
-						ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arFadeIn, 0, 1);
-					} else {
-						ctx.globalAlpha = 1;
-					}
-				}
-				/* Object Draw ---------------------------------------------------------------- */
-				if (hitObjects[i].type[0] === "1") {
-					/* Draw Hit Circle ---------------------------------------------------------------- */
-					let size = circleDiameter;
-					if (hitObjects[i].cache.hasHit === true || hitObjects[i].cache.hasMiss === true) {
-						size *= utils.map(hitObjects[i].cache.hitTime - audio.currentTime, 0, 1, 1, 1.2);
-					}
-					ctx.drawImage(hitCircle, hitObjectMapped.x - size / 2, hitObjectMapped.y - size / 2, size, size);
-					ctx.drawImage(hitCircleOverlay, hitObjectMapped.x - size / 2, hitObjectMapped.y - size / 2, size, size);
-					ctx.drawImage(approachCircle, hitObjectMapped.x - (size * approachCircleSize) / 2, hitObjectMapped.y - (size * approachCircleSize) / 2, size * approachCircleSize, size * approachCircleSize);
-					ctx.drawImage(comboNumbers[1], hitObjectMapped.x - comboNumbers[1].width / 2, hitObjectMapped.y - comboNumbers[1].width / 1.25);
-				} else if (hitObjects[i].type[1] === "1") {
-					/* Draw Slider ---------------------------------------------------------------- */
-					/* Slider Curve calculated the at the hitobject time - ar time */
-					ctx.lineCap = "round";
-					ctx.lineJoin = 'round';
-					/* Draw Outer Slider Body ---------------------------------------------------------------- */
-					ctx.lineWidth = circleDiameter;
-					ctx.strokeStyle = "rgba(255, 255, 255, " + ctx.globalAlpha + ")";
-					ctx.beginPath();
-					for (let j = 0; j < hitObjects[i].cache.points.length; j++) {
-						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[j].x, hitObjects[i].cache.points[j].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-						ctx.lineTo(mapped.x, mapped.y);
-					}
-					ctx.stroke();
-					/* Draw Inner Slider Body ---------------------------------------------------------------- */
-					ctx.lineWidth = circleDiameter / 1.1;
-					ctx.strokeStyle = "#222";
-					ctx.beginPath();
-					for (let j = 0; j < hitObjects[i].cache.points.length; j++) {
-						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[j].x, hitObjects[i].cache.points[j].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-						ctx.lineTo(mapped.x, mapped.y);
-					}
-					ctx.stroke();
-					/* Draw Slider End ---------------------------------------------------------------- */
-					if (hitObjects[i].slides > 1) {
-						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-						ctx.translate(mapped.x, mapped.y);
-						ctx.rotate(-utils.direction(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 4].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 3].y, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 2].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y) + Math.PI / 2);
-						ctx.drawImage(reverseArrow, -circleDiameter / 2, -circleDiameter / 2, circleDiameter, circleDiameter);
-						ctx.resetTransform();
-					} else {
-						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-						ctx.drawImage(hitCircle, mapped.x - circleDiameter / 2, mapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
-						ctx.drawImage(hitCircleOverlay, mapped.x - circleDiameter / 2, mapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
-					}
-					/* Draw Slider Ticks ---------------------------------------------------------------- */
-					if (hitObjects[i].cache.totalTicks >= 1) {
-						let inc = hitObjects[i].cache.points.length / (hitObjects[i].cache.totalTicks);
-						let k = -1;
-						for (let j = 0; j < hitObjects[i].cache.points.length; j += inc) {
-							if (hitObjects[i].cache.specificSliderTicksHit[k] === true) {
-								k++;
-								continue;
-							}
-							k++;
-							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[Math.floor(j)].x, hitObjects[i].cache.points[Math.floor(j)].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							ctx.drawImage(sliderScorePoint, mapped.x - sliderScorePoint.width / 2, mapped.y - sliderScorePoint.height / 2);
-						}
-					}
-					/* Draw Slider Head */
-					if (hitObjects[i].cache.hitHead === false) {
-						ctx.drawImage(hitCircle, hitObjectMapped.x - circleDiameter / 2, hitObjectMapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
-						ctx.drawImage(hitCircleOverlay, hitObjectMapped.x - circleDiameter / 2, hitObjectMapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
-						ctx.drawImage(approachCircle, hitObjectMapped.x - (circleDiameter * approachCircleSize) / 2, hitObjectMapped.y - (circleDiameter * approachCircleSize) / 2, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
-						ctx.drawImage(comboNumbers[1], hitObjectMapped.x - comboNumbers[1].width / 2, hitObjectMapped.y - comboNumbers[1].width / 1.25);
-					}
-					if (hitObjects[i].cache.sliderBodyPosition !== undefined && audio.currentTime >= hitObjects[i].time) {
-						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-						ctx.drawImage(sliderBody, mapped.x - circleDiameter / 2, mapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
-						if (hitObjects[i].cache.onFollowCircle === true) {
-							ctx.drawImage(sliderFollowCircle, mapped.x - circleDiameter * 2.4 / 2, mapped.y - circleDiameter * 2.4 /2 , circleDiameter * 2.4, circleDiameter * 2.4);
-						}
-					}	
-				} else if (hitObjects[i].type[3] === "1") {
-					/* draw spinner */
-					let size = utils.map(hitObjects[i].endTime - audio.currentTime, 0, hitObjects[i].endTime - (hitObjects[i].time - arTime), 0, 0.8);
-					ctx.drawImage(spinnerApproachCircle, hitObjectMapped.x - size * window.innerHeight / 2, hitObjectMapped.y - size * window.innerHeight / 2, size * window.innerHeight, size * window.innerHeight);
-					ctx.drawImage(spinnerTop, hitObjectMapped.x - 0.2 * window.innerHeight / 2, hitObjectMapped.y - 0.2 * window.innerHeight / 2, 0.2 * window.innerHeight, 0.2 * window.innerHeight);
-				}
-				if (hitObjects[i].cache.hasHit === true && audio.currentTime >= hitObjects[i].time) {
-					// continue;
-				}
-				ctx.globalAlpha = 1;
 				/* Hit Circle Hit Handling ---------------------------------------------------------------- */
 				if (hitObjects[i].type[0] === "1" && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 					let hitWindowScore = 0;
@@ -576,6 +452,138 @@ define(function(require) {
 					i--;
 					document.getElementById("combo-container").innerHTML = "";
 				}
+			}
+			/* Render Loop ---------------------------------------------------------------- */
+			for (let i = 0; i < hitObjects.length; i++) {
+				/* Approach Circle Calculations ---------------------------------------------------------------- */
+				let approachCircleSize = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 5, 1.6);
+				let hitObjectMapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+				/* approach circle max size */
+				if (approachCircleSize >= 5) {
+					approachCircleSize = 5;
+				}
+				/* approach circle min size */
+				if (approachCircleSize <= 1.6) {
+					approachCircleSize = 1.6;
+					if (hitObjects[i].type[0] === "1") {
+						mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y)
+						mouse.click();
+					}
+				}
+				/* Alpha Calculations ---------------------------------------------------------------- */
+				if (hitObjects[i].type[0] === "1") {
+					if (mods.hidden) {
+						/* hidden fade in and out for hit circle */
+						if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) < 0.4) {
+							ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime * 0.4, 0, 1);
+						} else if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) < 0.7) {
+							ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), arTime * 0.4, arTime * 0.7, 1, 0);
+						} else {
+							ctx.globalAlpha = 0;
+						}
+					} else {
+						/* normal fade in and out for hit circle */
+						if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= 1) {
+							ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arFadeIn, 0, 1);
+						} else {
+							let alpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), arTime, arTime + odTime[0] / 2, 1, 0);
+							if (alpha < 0) {
+								alpha = 0;
+							}
+							ctx.globalAlpha = alpha;
+						}
+					}
+				} else if (hitObjects[i].type[1] === "1") {
+					if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= 1) {
+						ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arFadeIn, 0, 1);
+					} else {
+						ctx.globalAlpha = 1;
+					}
+				}
+				/* Object Draw ---------------------------------------------------------------- */
+				if (hitObjects[i].type[0] === "1") {
+					/* Draw Hit Circle ---------------------------------------------------------------- */
+					let size = circleDiameter;
+					if (hitObjects[i].cache.hasHit === true || hitObjects[i].cache.hasMiss === true) {
+						size *= utils.map(hitObjects[i].cache.hitTime - audio.currentTime, 0, 1, 1, 1.2);
+					}
+					ctx.drawImage(hitCircle, hitObjectMapped.x - size / 2, hitObjectMapped.y - size / 2, size, size);
+					ctx.drawImage(hitCircleOverlay, hitObjectMapped.x - size / 2, hitObjectMapped.y - size / 2, size, size);
+					ctx.drawImage(approachCircle, hitObjectMapped.x - (size * approachCircleSize) / 2, hitObjectMapped.y - (size * approachCircleSize) / 2, size * approachCircleSize, size * approachCircleSize);
+					ctx.drawImage(comboNumbers[1], hitObjectMapped.x - comboNumbers[1].width / 2, hitObjectMapped.y - comboNumbers[1].width / 1.25);
+				} else if (hitObjects[i].type[1] === "1") {
+					/* Draw Slider ---------------------------------------------------------------- */
+					/* Slider Curve calculated the at the hitobject time - ar time */
+					ctx.lineCap = "round";
+					ctx.lineJoin = 'round';
+					/* Draw Outer Slider Body ---------------------------------------------------------------- */
+					ctx.lineWidth = circleDiameter;
+					ctx.strokeStyle = "rgba(255, 255, 255, " + ctx.globalAlpha + ")";
+					ctx.beginPath();
+					for (let j = 0; j < hitObjects[i].cache.points.length; j++) {
+						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[j].x, hitObjects[i].cache.points[j].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+						ctx.lineTo(mapped.x, mapped.y);
+					}
+					ctx.stroke();
+					/* Draw Inner Slider Body ---------------------------------------------------------------- */
+					ctx.lineWidth = circleDiameter / 1.1;
+					ctx.strokeStyle = "#222";
+					ctx.beginPath();
+					for (let j = 0; j < hitObjects[i].cache.points.length; j++) {
+						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[j].x, hitObjects[i].cache.points[j].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+						ctx.lineTo(mapped.x, mapped.y);
+					}
+					ctx.stroke();
+					/* Draw Slider End ---------------------------------------------------------------- */
+					if (hitObjects[i].slides > 1) {
+						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+						ctx.translate(mapped.x, mapped.y);
+						ctx.rotate(-utils.direction(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 4].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 3].y, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 2].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y) + Math.PI / 2);
+						ctx.drawImage(reverseArrow, -circleDiameter / 2, -circleDiameter / 2, circleDiameter, circleDiameter);
+						ctx.resetTransform();
+					} else {
+						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+						ctx.drawImage(hitCircle, mapped.x - circleDiameter / 2, mapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
+						ctx.drawImage(hitCircleOverlay, mapped.x - circleDiameter / 2, mapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
+					}
+					/* Draw Slider Ticks ---------------------------------------------------------------- */
+					if (hitObjects[i].cache.totalTicks >= 1) {
+						let inc = hitObjects[i].cache.points.length / (hitObjects[i].cache.totalTicks);
+						let k = -1;
+						for (let j = 0; j < hitObjects[i].cache.points.length; j += inc) {
+							if (hitObjects[i].cache.specificSliderTicksHit[k] === true) {
+								k++;
+								continue;
+							}
+							k++;
+							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[Math.floor(j)].x, hitObjects[i].cache.points[Math.floor(j)].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+							ctx.drawImage(sliderScorePoint, mapped.x - sliderScorePoint.width / 2, mapped.y - sliderScorePoint.height / 2);
+						}
+					}
+					/* Draw Slider Head */
+					if (hitObjects[i].cache.hitHead === false) {
+						ctx.drawImage(hitCircle, hitObjectMapped.x - circleDiameter / 2, hitObjectMapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
+						ctx.drawImage(hitCircleOverlay, hitObjectMapped.x - circleDiameter / 2, hitObjectMapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
+						ctx.drawImage(approachCircle, hitObjectMapped.x - (circleDiameter * approachCircleSize) / 2, hitObjectMapped.y - (circleDiameter * approachCircleSize) / 2, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
+						ctx.drawImage(comboNumbers[1], hitObjectMapped.x - comboNumbers[1].width / 2, hitObjectMapped.y - comboNumbers[1].width / 1.25);
+					}
+					if (hitObjects[i].cache.sliderBodyPosition !== undefined && audio.currentTime >= hitObjects[i].time) {
+						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+						ctx.drawImage(sliderBody, mapped.x - circleDiameter / 2, mapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
+						if (hitObjects[i].cache.onFollowCircle === true) {
+							ctx.drawImage(sliderFollowCircle, mapped.x - circleDiameter * 2.4 / 2, mapped.y - circleDiameter * 2.4 /2 , circleDiameter * 2.4, circleDiameter * 2.4);
+						}
+					}	
+				} else if (hitObjects[i].type[3] === "1") {
+					/* draw spinner */
+					let size = utils.map(hitObjects[i].endTime - audio.currentTime, 0, hitObjects[i].endTime - (hitObjects[i].time - arTime), 0, 0.8);
+					ctx.drawImage(spinnerApproachCircle, hitObjectMapped.x - size * window.innerHeight / 2, hitObjectMapped.y - size * window.innerHeight / 2, size * window.innerHeight, size * window.innerHeight);
+					ctx.drawImage(spinnerTop, hitObjectMapped.x - 0.2 * window.innerHeight / 2, hitObjectMapped.y - 0.2 * window.innerHeight / 2, 0.2 * window.innerHeight, 0.2 * window.innerHeight);
+				}
+				if (hitObjects[i].cache.hasHit === true && audio.currentTime >= hitObjects[i].time) {
+					// continue;
+				}
+				ctx.globalAlpha = 1;
 			}
 			let size = 1;
 			if (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) {
