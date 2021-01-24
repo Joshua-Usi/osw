@@ -37,7 +37,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* osu!web version */
-	const version = "osu!web v2021.0.1.2";
+	const version = "osu!web v2021.0.1.3";
 	/* set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (var i = 0; i < classes.length; i++) {
@@ -123,14 +123,17 @@ define(function(require) {
 	});
 	window.addEventListener("load", function() {
 		(function animate() {
-			let image = document.getElementById("background-blur");
+			let backgroundImageParallax = document.getElementById("background-blur");
+			let menuParallax = document.getElementById("menu-parallax");
 			let enableLowPowerMode = false;
 			let logoSizeIncrease = 1.1;
 			if (enableLowPowerMode === false) {
 				/* style image parallax based on mouse position */
-				image.style.opacity = 1;
-				image.style.top = (mouse.position.y - window.window.innerHeight * 0.5) / 64 - window.window.innerHeight * 0.05 + "px";
-				image.style.left = (mouse.position.x - window.innerWidth * 0.5) / 64 - window.innerWidth * 0.05 + "px";
+				backgroundImageParallax.style.opacity = 1;
+				backgroundImageParallax.style.top = (mouse.position.y - window.innerHeight * 0.5) / 64 - window.innerHeight * 0.05 + "px";
+				backgroundImageParallax.style.left = (mouse.position.x - window.innerWidth * 0.5) / 64 - window.innerWidth * 0.05 + "px";
+				menuParallax.style.top = "calc(5vh + " + ((mouse.position.y - window.innerHeight * 0.5) / 32 - window.innerHeight * 0.05) + "px)";
+				menuParallax.style.left = "calc(" + ((mouse.position.x - window.innerWidth * 0.5) / 32 - window.innerWidth * 0.05) + "px)";
 				let topBar = document.getElementById("top-bar");
 				let bottomBar = document.getElementById("bottom-bar");
 				let sidenav = document.getElementById("sidenav");
@@ -154,7 +157,7 @@ define(function(require) {
 						logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
 						logo.style.width = logoSize + "vh";
 						logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
-						logo.style.left = "calc(" + logoX + "vw - " + logoSize / 2 + "vh)";
+						logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
 						logo.style.backgroundSize = logoSize + "vh";
 						logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
 						/* logo background pulse, maximum 5 to prevent lag */
@@ -192,12 +195,12 @@ define(function(require) {
 					logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
 					logo.style.width = logoSize * logoSizeIncrease + "vh";
 					logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
-					logo.style.left = "calc(" + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
+					logo.style.left = "calc(5vw + " + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
 					logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
 					logo.style.backgroundPositionY = offset % (1024 * 0.5) * logoSizeIncrease + "px";
 				}
 			} else {
-				image.style.opacity = 0;
+				backgroundImageParallax.style.opacity = 0;
 			}
 			let logoCircles = document.getElementById("logo-beat").querySelectorAll("img");
 			for (let i = 0; i < logoCircles.length; i++) {
@@ -226,14 +229,14 @@ define(function(require) {
 		})();
 	});
 	document.getElementById("top-bar").addEventListener("mouseenter", function() {
-		utils.blurDiv('background-blur', 4);
-		utils.brighten('background-dim', 0.75);
-		utils.blurDiv('logo', 8);
+		utils.blurDiv("background-blur", 4);
+		utils.brighten("background-dim", 0.75);
+		utils.blurDiv("menu-parallax", 8);
 	});
 	document.getElementById("top-bar").addEventListener("mouseleave", function() {
-		utils.blurDiv('background-blur', 0);
-		utils.brighten('background-dim', 1);
-		utils.blurDiv('logo', 0);
+		utils.blurDiv("background-blur", 0);
+		utils.brighten("background-dim", 1);
+		utils.blurDiv("menu-parallax", 0);
 	});
 	document.getElementById("close-btn").addEventListener("click", function() {
 		document.getElementById("sidenav").style.width = "0";
@@ -250,7 +253,7 @@ define(function(require) {
 	let sliders = document.getElementsByClassName("slider");
 	for (let i = 0; i < sliders.length; i++) {
 		sliders[i].addEventListener("input", function() {
-			this.style.background = 'linear-gradient(to right, #FD67AE 0%, #FD67AE ' + utils.map(this.value, this.min, this.max, 0, 100) + '%, #fff ' + utils.map(this.value, this.min, this.max, 0, 100) + '%, white 100%)';
+			this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
 		});	
 	}
 	// document.getElementById("low-power-mode").addEventListener("change", function(event) {
@@ -262,8 +265,8 @@ define(function(require) {
 	// 	}
 	// });
 	// document.getElementById("bpm").addEventListener("input", function() {
-	// 	this.style.background = 'linear-gradient(to right, #FD67AE 0%, #FD67AE ' + utils.map(this.value, this.min, this.max, 0, 100) + '%, #fff ' + utils.map(this.value, this.min, this.max, 0, 100) + '%, white 100%)';
-	// 	document.getElementById('bpm-text').innerText = 'BPM ' + this.value;
+	// 	this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
+	// 	document.getElementById("bpm-text").innerText = "BPM " + this.value;
 	// 	bpm = parseInt(this.value);
 	// 	currentSources++;
 	// 	if (currentSources % 3 === 0) {
@@ -277,8 +280,8 @@ define(function(require) {
 	// 	}
 	// });
 	// document.getElementById("volume").addEventListener("input", function() {
-	// 	this.style.background = 'linear-gradient(to right, #FD67AE 0%, #FD67AE ' + utils.map(this.value, this.min, this.max, 0, 100) + '%, #fff ' + utils.map(this.value, this.min, this.max, 0, 100) + '%, white 100%)';
-	// 	document.getElementById('volume-text').innerText = 'Volume ' + this.value;
+	// 	this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
+	// 	document.getElementById("volume-text").innerText = "Volume " + this.value;
 	// 	menuAudio.volume = this.value / 100;
 	// 	window.localStorage.setItem("volume_music", menuAudio.volume);
 	// 	currentSources++;
