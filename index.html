@@ -8,6 +8,13 @@
 		<link rel="icon" href="src/images/osu.png">
 	</head>
 	<body id="body">
+		<!-- Prioritise loading splashscreen first -->
+		<div id="splash-screen">
+			<div id="heart-loader" class="lds-heart"><div></div></div>
+			<p style="margin: 0;">osu!web is in heavy development</p>
+			<p style="margin: 0;"class="version-number"></p>
+			<p style="margin: 0;">click to continue...</p>
+		</div>
 		<div id="sidenav">
 			<div style="padding-top: 10vh;"></div>
 			<a href="javascript:void(0)" id="close-btn">&times;</a>
@@ -82,11 +89,6 @@
 		<span id="snow"></span>
 		<div id="bottom-bar">
 			<p id="version" class="version-number"></p>
-		</div>
-		<div id="splash-screen">
-			<p style="margin: 0;">osu!web is in heavy development</p>
-			<p style="margin: 0;"class="version-number"></p>
-			<p style="margin: 0;">click to continue...</p>
 		</div>
 		<!-- https://github.com/foobar404/Wave.js -->
 		<script type="text/javascript" src="src/scripts/wave.js"></script>

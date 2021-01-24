@@ -249,11 +249,77 @@ body {
 	z-index: 1000;
 	color: #000;
 
-	animation: splash-screen-text forwards;
-	animation-duration: 1s;
-	animation-delay: 1s;
+	/*animation: splash-screen-text forwards;*/
+	/*animation-duration: 1s;
+	animation-delay: 1s;*/
 
 	transition: opacity 1s;
+}
+
+@keyframes splash-screen-text {
+	0% {
+		color: #000;
+		letter-spacing: 3px;
+	}
+	100% {
+		color: #fff;
+		letter-spacing: 0px;
+	}
+}
+
+.lds-heart {
+	display: inline-block;
+	position: relative;
+	width: 80px;
+	height: 80px;
+	transform: rotate(45deg);
+	transform-origin: 40px 40px;
+}
+.lds-heart div {
+	top: 32px;
+	left: 32px;
+	position: absolute;
+	width: 32px;
+	height: 32px;
+	background: #FD67AE;
+	animation: lds-heart 0.7s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+.lds-heart div:after,
+.lds-heart div:before {
+	content: " ";
+	position: absolute;
+	display: block;
+	width: 32px;
+	height: 32px;
+	background: #FD67AE;
+}
+.lds-heart div:before {
+	left: -24px;
+	border-radius: 50% 0 0 50%;
+}
+.lds-heart div:after {
+	top: -24px;
+	border-radius: 50% 50% 0 0;
+}
+@keyframes lds-heart {
+	0% {
+		transform: scale(0.95);
+	}
+	5% {
+		transform: scale(1.1);
+	}
+	39% {
+		transform: scale(0.85);
+	}
+	45% {
+		transform: scale(1);
+	}
+	60% {
+		transform: scale(0.95);
+	}
+	100% {
+		transform: scale(0.9);
+	}
 }
 
 #menu-parallax {
@@ -327,15 +393,4 @@ body {
 
 #menu-bar-settings:hover {
 	left: 17.5vw;
-}
-
-@keyframes splash-screen-text {
-	0% {
-		color: #000;
-		letter-spacing: 3px;
-	}
-	100% {
-		color: #fff;
-		letter-spacing: 0px;
-	}
 }
