@@ -110,3 +110,9 @@ v2021.0.1.3
 Added:
 	- More menu parallax
 	- Reduced menu button sizes
+	---------------------------------------------------------------
+v2021.0.1.4
+25 / 1 / 21
+
+Added:
+	- UI for settings
