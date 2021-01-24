@@ -103,3 +103,10 @@ v2021.0.1.2
 
 Changed:
 	- Main Menu to act more like osu!lazer
+---------------------------------------------------------------
+v2021.0.1.3
+24 / 1 / 21
+
+Added:
+	- More menu parallax
+	- Reduced menu button sizes
