@@ -26,41 +26,42 @@ define(function(require) {
 	mouse.sensitivity = 1;
 	mouse.positionBound(0, 0, window.innerWidth, window.innerHeight);
 	keyboard.init();
+	let skin = "ajax transparent";
 	/* cursor assets */
-	let cursor = AssetLoader.image("src/images/gameplay/cursor.png");
-	let cursorTrail = AssetLoader.image("src/images/gameplay/cursortrail.png");
+	let cursor = AssetLoader.image(`src/images/skins/${skin}/cursor.png`);
+	let cursorTrail = AssetLoader.image(`src/images/skins/${skin}/cursortrail.png`);
 	/* hit circle assets */
-	let hitCircle = AssetLoader.image("src/images/gameplay/hitCircle.png");
-	let hitCircleOverlay = AssetLoader.image("src/images/gameplay/hitCircleoverlay.png");
-	let approachCircle = AssetLoader.image("src/images/gameplay/approachcircle.png");
+	let hitCircle = AssetLoader.image(`src/images/skins/${skin}/hitCircle.png`);
+	let hitCircleOverlay = AssetLoader.image(`src/images/skins/${skin}/hitCircleoverlay.png`);
+	let approachCircle = AssetLoader.image(`src/images/skins/${skin}/approachcircle.png`);
 	/* slider assets */
-	let sliderBody = AssetLoader.image("src/images/gameplay/sliderb0.png");
-	let sliderFollowCircle = AssetLoader.image("src/images/gameplay/sliderfollowcircle.png");
-	let sliderScorePoint = AssetLoader.image("src/images/gameplay/sliderscorepoint.png");
-	let reverseArrow = AssetLoader.image("src/images/gameplay/reverseArrow.png");
+	let sliderBody = AssetLoader.image(`src/images/skins/${skin}/sliderb0.png`);
+	let sliderFollowCircle = AssetLoader.image(`src/images/skins/${skin}/sliderfollowcircle.png`);
+	let sliderScorePoint = AssetLoader.image(`src/images/skins/${skin}/sliderscorepoint.png`);
+	let reverseArrow = AssetLoader.image(`src/images/skins/${skin}/reverseArrow.png`);
 	/* spinner assets */
-	let spinnerApproachCircle = AssetLoader.image("src/images/gameplay/spinner-approachcircle.png");
-	let spinnerRPM = AssetLoader.image("src/images/gameplay/spinner-rpm.png");
-	let spinnerTop = AssetLoader.image("src/images/gameplay/spinner-top.png");
+	let spinnerApproachCircle = AssetLoader.image(`src/images/skins/${skin}/spinner-approachcircle.png`);
+	let spinnerRPM = AssetLoader.image(`src/images/skins/${skin}/spinner-rpm.png`);
+	let spinnerTop = AssetLoader.image(`src/images/skins/${skin}/spinner-top.png`);
 	/* combo number assets */
 	let comboNumbers = [
-		AssetLoader.image("src/images/gameplay/fonts/aller/default-0.png"),
-		AssetLoader.image("src/images/gameplay/fonts/aller/default-1.png"),
-		AssetLoader.image("src/images/gameplay/fonts/aller/default-2.png"),
-		AssetLoader.image("src/images/gameplay/fonts/aller/default-3.png"),
-		AssetLoader.image("src/images/gameplay/fonts/aller/default-4.png"),
-		AssetLoader.image("src/images/gameplay/fonts/aller/default-5.png"),
-		AssetLoader.image("src/images/gameplay/fonts/aller/default-6.png"),
-		AssetLoader.image("src/images/gameplay/fonts/aller/default-7.png"),
-		AssetLoader.image("src/images/gameplay/fonts/aller/default-8.png"),
-		AssetLoader.image("src/images/gameplay/fonts/aller/default-9.png"),
+		AssetLoader.image(`src/images/skins/${skin}/fonts/aller/default-0.png`),
+		AssetLoader.image(`src/images/skins/${skin}/fonts/aller/default-1.png`),
+		AssetLoader.image(`src/images/skins/${skin}/fonts/aller/default-2.png`),
+		AssetLoader.image(`src/images/skins/${skin}/fonts/aller/default-3.png`),
+		AssetLoader.image(`src/images/skins/${skin}/fonts/aller/default-4.png`),
+		AssetLoader.image(`src/images/skins/${skin}/fonts/aller/default-5.png`),
+		AssetLoader.image(`src/images/skins/${skin}/fonts/aller/default-6.png`),
+		AssetLoader.image(`src/images/skins/${skin}/fonts/aller/default-7.png`),
+		AssetLoader.image(`src/images/skins/${skin}/fonts/aller/default-8.png`),
+		AssetLoader.image(`src/images/skins/${skin}/fonts/aller/default-9.png`),
 	];
 	/* hit score number assets */
 	let scoreNumbers = [
-		AssetLoader.image("src/images/gameplay/hit300.png"),
-		AssetLoader.image("src/images/gameplay/hit100.png"),
-		AssetLoader.image("src/images/gameplay/hit50.png"),
-		AssetLoader.image("src/images/gameplay/hit0.png"),
+		AssetLoader.image(`src/images/skins/${skin}/hit300.png`),
+		AssetLoader.image(`src/images/skins/${skin}/hit100.png`),
+		AssetLoader.image(`src/images/skins/${skin}/hit50.png`),
+		AssetLoader.image(`src/images/skins/${skin}/hit0.png`),
 	];
 	ctx.font = "16px Arial";
 	ctx.fillStyle = "#fff";
@@ -609,13 +610,13 @@ define(function(require) {
 			comboPulseSize -= comboPulseSize / 8;
 			scoreDisplay += (score - scoreDisplay) / 8;
 			/* update score html element */
-			utils.htmlCounter(utils.reverse(Math.round(scoreDisplay) + ""), "score-container", "score-digit-", "src/images/gameplay/fonts/aller/score-", "left", "calc(100vw - " + (document.getElementById("score-container").childNodes.length * 2) + "vw)");
+			utils.htmlCounter(utils.reverse(Math.round(scoreDisplay) + ""), "score-container", "score-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "left", "calc(100vw - " + (document.getElementById("score-container").childNodes.length * 2) + "vw)");
 			/* update combo html element */
-			utils.htmlCounter(utils.reverse(combo + "x"), "combo-container", "combo-digit-", "src/images/gameplay/fonts/aller/score-", "top", "calc(100vh - 52 / 32 * " + 2 * (comboPulseSize + 1) + "vw)");
+			utils.htmlCounter(utils.reverse(combo + "x"), "combo-container", "combo-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "top", "calc(100vh - 52 / 32 * " + 2 * (comboPulseSize + 1) + "vw)");
 			/* update accuracy html element */
-			utils.htmlCounter("%" + utils.reverse("" + (utils.accuracy(total300, total100, total50, totalMisses) * 100).toPrecision(4)), "accuracy-container", "accuracy-digit-", "src/images/gameplay/fonts/aller/score-", "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
+			utils.htmlCounter("%" + utils.reverse("" + (utils.accuracy(total300, total100, total50, totalMisses) * 100).toPrecision(4)), "accuracy-container", "accuracy-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
 			/* rank grade */
-			document.getElementById("grade").src = "src/images/gameplay/ranking-" + utils.grade(total300, total100, total50, totalMisses, false) + "-small.png";
+			document.getElementById("grade").src = `src/images/skins/${skin}/ranking-` + utils.grade(total300, total100, total50, totalMisses, false) + "-small.png";
 			/* combo pulse size */
 			let els = document.getElementById("combo-container").querySelectorAll("img");
 			for (let i = 0; i < els.length; i++) {
@@ -630,18 +631,6 @@ define(function(require) {
 			}
 			ctx.globalAlpha = 1;
 			ctx.drawImage(cursor, mouse.position.x - (cursor.width * size) / 2, mouse.position.y - (cursor.height * size) / 2, cursor.width * size, cursor.height * size);
-			ctx.fillStyle = "#fff";
-			document.getElementById("frame-rate").innerText = frameRate + " / 60 fps";
-			if (frameRate > 60) {
-				document.getElementById("frame-rate").style.background = "#6d9eeb";
-			} else if (frameRate > 45) {
-				document.getElementById("frame-rate").style.background = "#39e639";
-			} else if (frameRate > 20) {
-				document.getElementById("frame-rate").style.background = "#ffa500";
-			} else {
-				document.getElementById("frame-rate").style.background = "#B00020";
-			}
-			// ctx.fillText(frameRate + "fps", 10, 20);
 			setTimeout(animate, 0);
 		})();
 	});
@@ -657,6 +646,16 @@ define(function(require) {
 			}
 			times.push(now);
 			frameRate = times.length;
+			document.getElementById("frame-rate").innerText = frameRate + " / 60 fps";
+			if (frameRate > 60) {
+				document.getElementById("frame-rate").style.background = "#6d9eeb";
+			} else if (frameRate > 45) {
+				document.getElementById("frame-rate").style.background = "#39e639";
+			} else if (frameRate > 20) {
+				document.getElementById("frame-rate").style.background = "#ffa500";
+			} else {
+				document.getElementById("frame-rate").style.background = "#B00020";
+			}
 			calculateFPS();
 		}, 0);
 	}
