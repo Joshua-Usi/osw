@@ -1,82 +1,95 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>osu!web indev</title>
-	<link href='https://fonts.googleapis.com/css?family=Varela Round' rel='stylesheet'>
-	<link rel="stylesheet" type="text/css" href="style.css">
-	<link rel="icon" href="src/images/osu.png">
-</head>
-<body id="body">
-	<div id="sidenav">
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>osu!web indev</title>
+		<link href='https://fonts.googleapis.com/css?family=Varela Round' rel='stylesheet'>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="icon" href="src/images/osu.png">
+	</head>
+	<body id="body">
+		<div id="sidenav">
+			<div style="padding-top: 10vh;"></div>
 			<a href="javascript:void(0)" id="close-btn">&times;</a>
-			<span>
-				<p class="sidenav-title-text">Audio</p>
-				<p id="volume-text">Music Volume</p>
-				<input type="range" id="volume-music" class="slider" min="0" max="100" value="100">
-				<p id="volume-text">Effects Volume</p>
-				<input type="range" id="volume-effects" class="slider" min="0" max="100" value="100">
-			</span>
+			<p class="sidenav-title-text">Audio</p>
+			<p id="volume-text">Music Volume</p>
+			<input type="range" id="volume-music" class="slider" min="0" max="100" value="100">
+			<p id="volume-text">Effects Volume</p>
+			<input type="range" id="volume-effects" class="slider" min="0" max="100" value="100">
 			<p class="sidenav-title-text">Inputs</p>
+			<p>Keyboard Left Button</p>
+			<p>Keyboard Right Button</p>
+			<p>Allow Mouse Buttons</p>
+			<input type="checkbox" id="allow-mouse-buttons" class="checkbox" name="allow-mouse-buttons" value="true">
 			<p class="sidenav-title-text">Gameplay</p>
+			<p>Max Framerate</p>
+			<p>Draw 300 hits</p>
+			<input type="checkbox" id="draw-300-hits" class="checkbox" name="draw-300-hits" value="true">
 			<p class="sidenav-title-text">Performance</p>
+			<p>Low Power Mode</p>
 			<input type="checkbox" id="low-power-mode" class="checkbox" name="low-power-mode" value="false">
+			<p>Slider Resolution: Full</p>
+			<input type="range" id="volume-effects" class="slider" min="1" max="32" value="1">
+			<p>Draw Hit Values</p>
+			<input type="checkbox" id="draw-hit-values" class="checkbox" name="draw-hit-values" value="true">
 			<p class="sidenav-title-text">Skin</p>
-	</div>
-	<div id="top-bar">
-		<span class="span-top-bar-text" style="float: left;">
-			<img id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/settings.png">
-			<img id="standard-top-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/standard.png">
-			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/taiko.png">
-			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/catch.png">
-			<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/mania.png">
-			<p class="top-bar-text" id="welcome-user">Welcome Guest</p>
-			<img id="avatar" src="src/images/default-avatar.png" onclick="window.location = 'https://osu.ppy.sh/users/13478347';">
-		</span>
-		<p class="top-bar-text" id="now-playing" style="float: right;">Now Playing: </p>
+			<p>Using: ajax transparent</p>
+		</div>
+		<div id="top-bar">
+			<span class="span-top-bar-text" style="float: left;">
+				<img id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/settings.png">
+				<img id="standard-top-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/standard.png">
+				<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/taiko.png">
+				<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/catch.png">
+				<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/mania.png">
+				<p class="top-bar-text" id="welcome-user">Welcome Guest</p>
+				<img id="avatar" src="src/images/default-avatar.png" onclick="window.location = 'https://osu.ppy.sh/users/13478347';">
+			</span>
+			<p class="top-bar-text" id="now-playing" style="float: right;">Now Playing: </p>
 			<p class="top-bar-text" id="previous" style="float: right;">&#x25BA;&#x275A;</p>
 			<p class="top-bar-text" id="pause" style="float: right;">&#x275A;&#x275A;</p>
 			<p class="top-bar-text" id="next" style="float: right;">&#x275A;&#x25C4;</p>
-	</div>
-	<div id="background-blur">
-		<div id="background-dim">
-			<img id="background" src="src/images/osu_background.jpg">
 		</div>
-	</div>
-	<div id="menu-parallax">
-		<img id="logo" src="src/images/osu.png">
-		<div id="menu-bar">
-			<div class="menu-bar-buttons-parent" id="menu-bar-settings">
-				<div class="menu-bar-buttons">settings</div>
-			</div>
-			<div id="menu-right-side">
-				<div class="menu-bar-buttons-parent" id="menu-bar-play">
-					<div class="menu-bar-buttons" onclick="window.open('experimental.html', '_self');">play</div>
-				</div>
-				<div class="menu-bar-buttons-parent" id="menu-bar-edit">
-					<div class="menu-bar-buttons">edit</div>
-				</div>
-				<div class="menu-bar-buttons-parent" id="menu-bar-direct">
-					<div class="menu-bar-buttons" onclick="window.open('https://osu.ppy.sh/home', '_self');">osu! official</div>
-				</div>
-				<div class="menu-bar-buttons-parent" id="menu-bar-exit">
-					<div class="menu-bar-buttons" onclick="window.close()">exit</div>
-				</div>
+		<div id="background-blur">
+			<div id="background-dim">
+				<img id="background" src="src/images/osu_background.jpg">
 			</div>
 		</div>
-	</div>
-	<span id="logo-beat"></span>
-	<span id="snow"></span>
-	<canvas id="audio-visualiser"></canvas>
-	<div id="bottom-bar">
-		<p id="version" class="version-number"></p>
-	</div>
-	<div id="splash-screen">
-		<p style="margin: 0;">osu!web is in heavy development</p>
-		<p style="margin: 0;"class="version-number"></p>
-		<p style="margin: 0;">click to continue...</p>
-	</div>
-	<!-- https://github.com/foobar404/Wave.js -->
-	<script type="text/javascript" src="src/scripts/wave.js"></script>
-	<script data-main="main" type="text/javascript" src=require.js></script>
-</body>
+		<div id="menu-parallax">
+			<img id="logo" src="src/images/osu.png">
+			<canvas id="audio-visualiser"></canvas>
+			<span id="logo-beat"></span>
+			<div id="menu-bar">
+				<div class="menu-bar-buttons-parent" id="menu-bar-settings">
+					<div class="menu-bar-buttons">settings</div>
+				</div>
+				<div id="menu-right-side">
+					<div class="menu-bar-buttons-parent" id="menu-bar-play">
+						<div class="menu-bar-buttons" onclick="window.open('experimental.html', '_self');">play</div>
+					</div>
+					<div class="menu-bar-buttons-parent" id="menu-bar-edit">
+						<div class="menu-bar-buttons">edit</div>
+					</div>
+					<div class="menu-bar-buttons-parent" id="menu-bar-direct">
+						<div class="menu-bar-buttons" onclick="window.open('https://osu.ppy.sh/home', '_self');">osu! official</div>
+					</div>
+					<div class="menu-bar-buttons-parent" id="menu-bar-exit">
+						<div class="menu-bar-buttons" onclick="window.close()">exit</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<span id="snow"></span>
+		<div id="bottom-bar">
+			<p id="version" class="version-number"></p>
+		</div>
+		<div id="splash-screen">
+			<p style="margin: 0;">osu!web is in heavy development</p>
+			<p style="margin: 0;"class="version-number"></p>
+			<p style="margin: 0;">click to continue...</p>
+		</div>
+		<!-- https://github.com/foobar404/Wave.js -->
+		<script type="text/javascript" src="src/scripts/wave.js"></script>
+		<script data-main="main" type="text/javascript" src=require.js></script>
+	</body>
 </html>

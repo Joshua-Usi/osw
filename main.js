@@ -136,12 +136,10 @@ define(function(require) {
 				menuParallax.style.left = "calc(" + ((mouse.position.x - window.innerWidth * 0.5) / 32 - window.innerWidth * 0.05) + "px)";
 				let topBar = document.getElementById("top-bar");
 				let bottomBar = document.getElementById("bottom-bar");
-				let sidenav = document.getElementById("sidenav");
 				/* triangle background moves */
 				offset -= 0.25;
 				topBar.style.backgroundPositionY = offset + "px";
 				bottomBar.style.backgroundPositionY = offset + "px";
-				sidenav.style.backgroundPositionY = offset + "px";
 				/* beat detection and accumulation */
 				bpm = songs[chosenSong].bpm.get(time);
 				lastTime = time;
@@ -164,7 +162,7 @@ define(function(require) {
 						if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
 							let logoCircle = document.createElement("img");
 							logoCircle.src = "src/images/circle.png";
-							logoCircle.style.position = "fixed";
+							logoCircle.style.position = "absolute";
 							logoCircle.style.width = logoPulseSize + "vh";
 							logoCircle.style.top = "calc(" + logoY + "vh - " + logoPulseSize / 2 + "vh)";
 							logoCircle.style.left = "calc(" + logoX + "vw - " + logoPulseSize / 2 + "vh)";
@@ -211,7 +209,7 @@ define(function(require) {
 				logoCircles[i].style.opacity = parseFloat(logoCircles[i].style.opacity) - 0.05;
 				logoCircles[i].style.width = parseFloat(logoCircles[i].style.width) + 0.5 + "vh";
 				logoCircles[i].style.top = "calc(" + logoY + "vh - " + logoCircles[i].style.width + " / 2)";
-				logoCircles[i].style.left = "calc(" + logoX + "vw - " + logoCircles[i].style.width + " / 2)";
+				logoCircles[i].style.left = "calc(5vw + " + logoX + "vw - " + logoCircles[i].style.width + " / 2)";
 			}
 			if (new Date().getMonth() === 11) {
 				let snow = document.getElementById("snow").querySelectorAll("img");
@@ -331,7 +329,7 @@ define(function(require) {
 		canvas.width = 0.5 * window.innerHeight;
 		canvas.height = 0.5 * window.innerHeight;
 		canvas.style.top = "calc(" + logoY + "vh - " + canvas.height + "px / 2)";
-		canvas.style.left = "calc(" + logoX + "vw - " + canvas.height + "px / 2)";
+		canvas.style.left = "calc(5vw + " + logoX + "vw - " + canvas.height + "px / 2)";
 		let menuBar = document.getElementById("menu-bar");
 		menuBar.style.opacity = 1;
 		let menuBarButtons = document.getElementsByClassName("menu-bar-buttons-parent");
