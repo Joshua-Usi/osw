@@ -421,7 +421,18 @@ define(function(require) {
 				}
 				/* Slider Score Calculations ---------------------------------------------------------------- */
 				if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hasEnded === true) {
-					// if () {}
+					let mapped;
+					if (hitObjects[i].slides % 2 === 0) {
+						mapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+					} else {
+						mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+					}
+					score += utils.hitScore(300, combo, difficultyMultiplier, 1);
+					combo++;
+					comboPulseSize = 1;
+					scoreObjects.push(new HitObject.ScoreObject(300, mapped.x, mapped.y, audio.currentTime + 1));
+					hitObjects.splice(i, 1);
+					i--;
 				}
 				/* Out of Index Handling ---------------------------------------------------------------- */
 				if (i <= -1) {

@@ -1,6 +1,26 @@
 define(function(require) {
-  "use strict";
+	"use strict";
 	return {
+		/* View in fullscreen */
+		openFullscreen: function() {
+			if (document.documentElement.requestFullscreen) {
+				document.documentElement.requestFullscreen();
+			} else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+				document.documentElement.webkitRequestFullscreen();
+			} else if (document.documentElement.msRequestFullscreen) { /* IE11 */
+				document.documentElement.msRequestFullscreen();
+			}
+		},
+		/* Close fullscreen */
+		closeFullscreen: function() {
+			if (document.exitFullscreen) {
+				document.exitFullscreen();
+			} else if (document.webkitExitFullscreen) { /* Safari */
+				document.webkitExitFullscreen();
+			} else if (document.msExitFullscreen) { /* IE11 */
+				document.msExitFullscreen();
+			}
+		},
 		map: function(num, numMin, numMax, mapMin, mapMax) {
 			return mapMin + ((mapMax - mapMin) / (numMax - numMin)) * (num - numMin);
 		},
@@ -140,8 +160,7 @@ define(function(require) {
 		// 2 --> Counterclockwise 
 		orientation: function(p1, p2, p3) 
 		{ 
-			let val = (p2.y - p1.y) * (p3.x - p2.x) - 
-					  (p2.x - p1.x) * (p3.y - p2.y); 
+			let val = (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y); 
 			// colinear
 			if (val == 0) {
 				return 0;
