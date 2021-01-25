@@ -101,7 +101,7 @@ define(function(require) {
 	}
 	/* Event Listeners ----------------------------------------------------------------------------------------- */
 	window.addEventListener("click", function() {
-		if (isFirstClick) {
+		if (isFirstClick === true && document.readyState === "complete") {
 			menuAudio.volume = window.localStorage.getItem("volume_music");
 			menuAudio.play();
 			isFirstClick = false;
