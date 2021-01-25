@@ -81,8 +81,7 @@ body {
 .slider {
 	position: relative;
 	-webkit-appearance: none;
-	width: 90%;
-	left: 5%;
+	width: 100%;
 	outline: none;
 	height: 0.5vh;
 	border-radius: 2.5vh;
@@ -235,6 +234,10 @@ body {
 	color: #f8c621 !important;
 	padding-left: 2vw !important;
 	font-size: 2vw !important;
+}
+
+#sidenav-padding {
+	padding: 5%;
 }
 
 #splash-screen {

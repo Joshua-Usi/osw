@@ -134,10 +134,10 @@ define(function(require) {
 			if (enableLowPowerMode === false) {
 				/* style image parallax based on mouse position */
 				backgroundImageParallax.style.opacity = 1;
-				backgroundImageParallax.style.top = (mouse.position.y - window.innerHeight * 0.5) / 64 - window.innerHeight * 0.05 + "px";
-				backgroundImageParallax.style.left = (mouse.position.x - window.innerWidth * 0.5) / 64 - window.innerWidth * 0.05 + "px";
-				menuParallax.style.top = "calc(5vh + " + ((mouse.position.y - window.innerHeight * 0.5) / 32 - window.innerHeight * 0.05) + "px)";
-				menuParallax.style.left = "calc(" + ((mouse.position.x - window.innerWidth * 0.5) / 32 - window.innerWidth * 0.05) + "px)";
+				backgroundImageParallax.style.top = (mouse.position.y - window.innerHeight * 0.5) / 32 - window.innerHeight * 0.05 + "px";
+				backgroundImageParallax.style.left = (mouse.position.x - window.innerWidth * 0.5) / 32 - window.innerWidth * 0.05 + "px";
+				menuParallax.style.top = "calc(5vh + " + ((mouse.position.y - window.innerHeight * 0.5) / 64 - window.innerHeight * 0.05) + "px)";
+				menuParallax.style.left = "calc(" + ((mouse.position.x - window.innerWidth * 0.5) / 64 - window.innerWidth * 0.05) + "px)";
 				let topBar = document.getElementById("top-bar");
 				let bottomBar = document.getElementById("bottom-bar");
 				/* triangle background moves */

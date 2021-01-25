@@ -3,7 +3,7 @@
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>osu!web indev</title>
-		<link href='https://fonts.googleapis.com/css?family=Varela Round' rel='stylesheet'>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Varela Round">
 		<link rel="stylesheet" type="text/css" href="style.css">
 		<link rel="icon" href="src/images/osu.png">
 	</head>
@@ -12,35 +12,37 @@
 		<div id="splash-screen">
 			<div id="heart-loader" class="lds-heart"><div></div></div>
 			<p style="margin: 0;">osu!web is in heavy development</p>
-			<p style="margin: 0;"class="version-number"></p>
+			<p style="margin: 0;" class="version-number"></p>
 			<p style="margin: 0;">click to continue...</p>
 		</div>
 		<div id="sidenav">
-			<div style="padding-top: 10vh;"></div>
-			<a href="javascript:void(0)" id="close-btn">&times;</a>
-			<p class="sidenav-title-text">Audio</p>
-			<p id="volume-text">Music Volume</p>
-			<input type="range" id="volume-music" class="slider" min="0" max="100" value="100">
-			<p id="volume-text">Effects Volume</p>
-			<input type="range" id="volume-effects" class="slider" min="0" max="100" value="100">
-			<p class="sidenav-title-text">Inputs</p>
-			<p>Keyboard Left Button</p>
-			<p>Keyboard Right Button</p>
-			<p>Allow Mouse Buttons</p>
-			<input type="checkbox" id="allow-mouse-buttons" class="checkbox" name="allow-mouse-buttons" value="true">
-			<p class="sidenav-title-text">Gameplay</p>
-			<p>Max Framerate</p>
-			<p>Draw 300 hits</p>
-			<input type="checkbox" id="draw-300-hits" class="checkbox" name="draw-300-hits" value="true">
-			<p class="sidenav-title-text">Performance</p>
-			<p>Low Power Mode</p>
-			<input type="checkbox" id="low-power-mode" class="checkbox" name="low-power-mode" value="false">
-			<p>Slider Resolution: Full</p>
-			<input type="range" id="volume-effects" class="slider" min="1" max="32" value="1">
-			<p>Draw Hit Values</p>
-			<input type="checkbox" id="draw-hit-values" class="checkbox" name="draw-hit-values" value="true">
-			<p class="sidenav-title-text">Skin</p>
-			<p>Using: ajax transparent</p>
+			<div id="sidenav-padding">
+				<div style="padding-top: 10vh;"></div>
+				<a href="javascript:void(0)" id="close-btn">&times;</a>
+				<p class="sidenav-title-text">Audio</p>
+				<p id="music-volume-text">Music Volume</p>
+				<input type="range" id="volume-music" class="slider" min="0" max="100" value="100">
+				<p id="effects-volume-text">Effects Volume</p>
+				<input type="range" id="volume-effects" class="slider" min="0" max="100" value="100">
+				<p class="sidenav-title-text">Inputs</p>
+				<p>Keyboard Left Button</p>
+				<p>Keyboard Right Button</p>
+				<p>Allow Mouse Buttons</p>
+				<input type="checkbox" id="allow-mouse-buttons" class="checkbox" name="allow-mouse-buttons" value="true">
+				<p class="sidenav-title-text">Gameplay</p>
+				<p>Max Framerate</p>
+				<p>Draw 300 hits</p>
+				<input type="checkbox" id="draw-300-hits" class="checkbox" name="draw-300-hits" value="true">
+				<p class="sidenav-title-text">Performance</p>
+				<p>Low Power Mode</p>
+				<input type="checkbox" id="low-power-mode" class="checkbox" name="low-power-mode" value="false">
+				<p>Slider Resolution: Full</p>
+				<input type="range" id="volume-effects" class="slider" min="1" max="32" value="1">
+				<p>Draw Hit Values</p>
+				<input type="checkbox" id="draw-hit-values" class="checkbox" name="draw-hit-values" value="true">
+				<p class="sidenav-title-text">Skin</p>
+				<p>Using: ajax transparent</p>
+			</div>
 		</div>
 		<div id="top-bar">
 			<span class="span-top-bar-text" style="float: left;">
