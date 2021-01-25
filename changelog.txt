@@ -123,3 +123,4 @@ v2021.0.1.5
 Added:
 	- Loading bar
 		- Prevents errors
+	- Dividers between groups of settings

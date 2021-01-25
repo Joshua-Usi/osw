@@ -248,6 +248,13 @@ body {
 	padding: 2.5%;
 }
 
+.sidenav-divider {
+	margin-top: 2vh;
+	margin-bottom: 2vh;
+	padding: 0.25vh;
+	background: #000;
+}
+
 .character {
 	margin: auto;
 	display: inline-block;

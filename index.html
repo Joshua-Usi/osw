@@ -23,6 +23,7 @@
 				<div style="padding-top: 5vh;"></div>
 				<a href="javascript:void(0)" id="close-btn">&times;</a>
 				<!-- Audio Settings -->
+				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Audio</p>
 				<p id="master-volume-text">Master volume: 100%</p>
 				<input type="range" id="master-volume" class="slider" min="0" max="100" value="100">
@@ -31,23 +32,39 @@
 				<p id="effects-volume-text">Effects volume: 100%</p>
 				<input type="range" id="effects-volume" class="slider" min="0" max="100" value="100">
 				<!-- Input Settings -->
+				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Inputs</p>
 				<p class="inline-block">Keyboard left button</p>
 				<p class="inline-block character float-right">z</p>
 				<p class="inline-block">Keyboard right button</p>
 				<p class="inline-block character float-right">x</p>
-				<p class="inline-block">Allow mouse buttons</p>
+				<p style="color: #999;">Note! osu!web does not support right clicks</p>
+				<p class="inline-block">Enable mouse buttons</p>
 				<input type="checkbox" id="allow-mouse-buttons" class="checkbox inline-block float-right" name="allow-mouse-buttons" value="true" checked>
+				<p id="mouse-sensitivity-text">Mouse Sensitivity: 1.0x</p>
+				<input type="range" id="mouse-sensitivity" class="slider" min="0" max="100" value="100">
 				<!-- Gameplay Settings -->
+				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Gameplay</p>
-				<p class="inline-block">Draw 300 hits</p>
-				<input type="checkbox" id="draw-300-hits" class="checkbox inline-block float-right" name="draw-300-hits" value="true" checked>
+				<div>
+					<p class="inline-block">Draw 300 hits</p>
+					<input type="checkbox" id="draw-300-hits" class="checkbox inline-block float-right" name="draw-300-hits" value="true" checked>
+				</div>
+				<div>
+					<p class="inline-block">Snaking sliders</p>
+					<input type="checkbox" id="snaking-sliders" class="checkbox inline-block float-right" name="snaking-sliders" value="true" checked>
+				</div>
 				<!-- Performance Settings -->
+				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Performance</p>
-				<p class="inline-block">Low power mode</p>
-				<input type="checkbox" id="low-power-mode" class="checkbox inline-block float-right" name="low-power-mode" value="false">
-				<p class="inline-block">Menu parallax</p>
-				<input type="checkbox" id="enable-menu-parallax" class="checkbox inline-block float-right" name="enable-menu-parallax" value="true" checked>
+				<div>
+					<p class="inline-block">Low power mode</p>
+					<input type="checkbox" id="low-power-mode" class="checkbox inline-block float-right" name="low-power-mode" value="false">
+				</div>
+				<div>
+					<p class="inline-block">Menu parallax</p>
+					<input type="checkbox" id="enable-menu-parallax" class="checkbox inline-block float-right" name="enable-menu-parallax" value="true" checked>
+				</div>
 				<!-- setTimeout has a minimum timeout time of 4ms, thus making 250fps the limit -->
 				<!-- Vsync, 2x Vsync, Browser Maximum (250fps) -->
 				<p>Max Frame Rate</p>
@@ -58,6 +75,7 @@
 				<input type="checkbox" id="draw-hit-values" class="checkbox inline-block float-right" name="draw-hit-values" value="true" checked>
 				<p>Score Update Rate</p>
 				<!-- Skin Settings -->
+				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Skin</p>
 				<p>Using: ajax transparent</p>
 			</div>
