@@ -17,7 +17,7 @@ body {
 
 .top-bar-text {
 	display: inline;
-	color: #fff;
+	color: #e4ecef;
 	padding: 2.23vh;
 	border-collapse: collapse;
 	margin: 0;
@@ -117,6 +117,28 @@ body {
 	background-color: #ffc4ff;
 }
 
+.settings-button {
+	width: 100%;
+	outline: none;
+	border-radius: 1.5vh;
+	background: url("src/images/triangles.png"), #2ca4cc;
+	background-size: 25vw;
+	color: #e4ecef;
+	text-align: center;
+	font-family: inherit;
+	font-size: 1vw;
+	border: none;
+	margin-bottom: 1vh;
+	height: calc(5vh + 1em);
+	transition: background 0.2s;
+}
+
+.settings-button:hover {
+	background: url("src/images/triangles.png"), #45b0de;
+	background-size: 25vw;
+
+}
+
 #background-blur {
 	position: absolute;
 	z-index: -10;
@@ -180,7 +202,7 @@ body {
 	z-index: 15;
 	position: relative;
 	top: -2.5vh;
-	color: #fff;
+	color: #e4ecef;
 	width: 100vw;
 	text-align: center;
 }
@@ -228,7 +250,7 @@ body {
 	white-space: nowrap;
 	text-decoration: none;
 	font-size: 1vw;
-	color: #fff;
+	color: #e4ecef;
 }
 
 #sidenav #close-btn {
@@ -300,7 +322,7 @@ body {
 		letter-spacing: 3px;
 	}
 	100% {
-		color: #fff;
+		color: #e4ecef;
 		letter-spacing: 0px;
 	}
 }
@@ -384,7 +406,7 @@ body {
 	display: inline-block;
 	text-align: center;
 	position: relative;
-	color: #fff;
+	color: #e4ecef;
 	border-collapse: collapse;
 	margin: 0;
 	float: left;

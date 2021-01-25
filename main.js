@@ -37,7 +37,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* osu!web version */
-	const version = "osu!web v2021.0.1.5";
+	const version = "osu!web v2021.0.1.6";
 	/* set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (var i = 0; i < classes.length; i++) {
@@ -102,7 +102,7 @@ define(function(require) {
 	/* Event Listeners ----------------------------------------------------------------------------------------- */
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
-			menuAudio.volume = 1;
+			menuAudio.volume = 0.02;
 			menuAudio.play();
 			isFirstClick = false;
 			time = 0;
@@ -138,12 +138,12 @@ define(function(require) {
 				backgroundImageParallax.style.left = (mouse.position.x - window.innerWidth * 0.5) / 32 - window.innerWidth * 0.05 + "px";
 				menuParallax.style.top = "calc(5vh + " + ((mouse.position.y - window.innerHeight * 0.5) / 64 - window.innerHeight * 0.05) + "px)";
 				menuParallax.style.left = "calc(" + ((mouse.position.x - window.innerWidth * 0.5) / 64 - window.innerWidth * 0.05) + "px)";
-				let topBar = document.getElementById("top-bar");
-				let bottomBar = document.getElementById("bottom-bar");
+				let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
 				/* triangle background moves */
 				offset -= 0.25;
-				topBar.style.backgroundPositionY = offset + "px";
-				bottomBar.style.backgroundPositionY = offset + "px";
+				for (var i = 0; i < triangleBackgroundMoves.length; i++) {
+					triangleBackgroundMoves[i].style.backgroundPositionY = offset + "px";
+				}
 				/* beat detection and accumulation */
 				bpm = songs[chosenSong].bpm.get(time);
 				lastTime = time;
@@ -255,34 +255,25 @@ define(function(require) {
 	let sliders = document.getElementsByClassName("slider");
 	for (let i = 0; i < sliders.length; i++) {
 		sliders[i].addEventListener("input", function() {
-			this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
+			this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
 		});	
 	}
-	// document.getElementById("low-power-mode").addEventListener("change", function(event) {
-	// 	let enableLowPowerMode = this.checked;
-	// 	if (enableLowPowerMode === true) {
-	// 		window.localStorage.setItem("use_low_power_mode", 1);
-	// 	} else {
-	// 		window.localStorage.setItem("use_low_power_mode", 0);
-	// 	}
-	// });
-	// document.getElementById("bpm").addEventListener("input", function() {
-	// 	this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
-	// 	document.getElementById("bpm-text").innerText = "BPM " + this.value;
-	// 	bpm = parseInt(this.value);
-	// 	currentSources++;
-	// 	if (currentSources % 3 === 0) {
-	// 		let audio = new Audio("src/audio/sliderbar.mp3");
-	// 		audio.volume = 1;
-	// 		audio.playbackRate = utils.map(this.value, this.min, this.max, 1, 2);
-	// 		audio.play();
-	// 		audio.onend = function() {
-	// 			currentSources--;
-	// 		};
-	// 	}
-	// });
-	document.getElementById("slider-resolution").addEventListener("input", function() {
-		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
+	document.getElementById("settings-master-volume").addEventListener("input", function() {
+		document.getElementById("settings-master-volume-text").innerText = "Master volume: " + this.value + "%";
+	});
+	document.getElementById("settings-music-volume").addEventListener("input", function() {
+		document.getElementById("settings-music-volume-text").innerText = "Music volume: " + this.value + "%";
+	});
+	document.getElementById("settings-effects-volume").addEventListener("input", function() {
+		document.getElementById("settings-effects-volume-text").innerText = "Music volume: " + this.value + "%";
+	});
+	document.getElementById("settings-mouse-sensitivity").addEventListener("input", function() {
+		document.getElementById("settings-mouse-sensitivity-text").innerText = "Mouse sensitivity: " + (window.parseInt(this.value) / 10).toFixed(1) + "x";
+	});
+	document.getElementById("settings-background-dim").addEventListener("input", function() {
+		document.getElementById("settings-background-dim-text").innerText = "Background dim: " + this.value + "%";
+	});
+	document.getElementById("settings-slider-resolution").addEventListener("input", function() {
 		let resolution = "";
 		if (this.value === "1") {
 			resolution = "Full";
@@ -295,35 +286,7 @@ define(function(require) {
 		} else if (this.value === "5") {
 			resolution = "Sixteenth";
 		}
-		document.getElementById("slider-resolution-text").innerText = "Slider Resolution: " + resolution;
-	});
-	document.getElementById("master-volume").addEventListener("input", function() {
-		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
-		document.getElementById("master-volume-text").innerText = "Master Volume: " + this.value + "%";
-	});
-	document.getElementById("music-volume").addEventListener("input", function() {
-		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
-		document.getElementById("music-volume-text").innerText = "Music Volume: " + this.value + "%";
-	});
-	document.getElementById("effects-volume").addEventListener("input", function() {
-		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
-		document.getElementById("effects-volume-text").innerText = "Music Volume: " + this.value + "%";
-	});
-	document.getElementById("slider-resolution").addEventListener("input", function() {
-		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
-		let resolution = "";
-		if (this.value === "1") {
-			resolution = "Full";
-		} else if (this.value === "2") {
-			resolution = "Half";
-		} else if (this.value === "3") {
-			resolution = "Quarter";
-		} else if (this.value === "4") {
-			resolution = "Eighth";
-		} else if (this.value === "5") {
-			resolution = "Sixteenth";
-		}
-		document.getElementById("slider-resolution-text").innerText = "Slider Resolution: " + resolution;
+		document.getElementById("settings-slider-resolution-text").innerText = "Slider resolution: " + resolution;
 	});
 	document.getElementById("pause").addEventListener("click", function() {
 		if (menuAudio.paused) {

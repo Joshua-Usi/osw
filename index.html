@@ -22,15 +22,20 @@
 				<!-- Padding -->
 				<div style="padding-top: 5vh;"></div>
 				<a href="javascript:void(0)" id="close-btn">&times;</a>
+				<!-- General Settings -->
+				<div class="sidenav-divider"></div>
+				<p class="sidenav-title-text">General</p>
+				<button type="button" class="settings-button triangle-background" onclick="window.open('https://github.com/Joshua-Usi/unofficial-osu-web', '_self');">Visit Github repository</button>
+				<button type="button" class="settings-button triangle-background" onclick="window.open('http://osu.ppy.sh/', '_self');">Visit official osu! website</button>
 				<!-- Audio Settings -->
 				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Audio</p>
-				<p id="master-volume-text">Master volume: 100%</p>
-				<input type="range" id="master-volume" class="slider" min="0" max="100" value="100">
-				<p id="music-volume-text">Music volume: 100%</p>
-				<input type="range" id="music-volume" class="slider" min="0" max="100" value="100">
-				<p id="effects-volume-text">Effects volume: 100%</p>
-				<input type="range" id="effects-volume" class="slider" min="0" max="100" value="100">
+				<p id="settings-master-volume-text">Master volume: 100%</p>
+				<input type="range" id="settings-master-volume" class="slider" min="0" max="100" value="100">
+				<p id="settings-music-volume-text">Music volume: 100%</p>
+				<input type="range" id="settings-music-volume" class="slider" min="0" max="100" value="100">
+				<p id="settings-effects-volume-text">Effects volume: 100%</p>
+				<input type="range" id="settings-effects-volume" class="slider" min="0" max="100" value="100">
 				<!-- Input Settings -->
 				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Inputs</p>
@@ -39,40 +44,51 @@
 				<p class="inline-block">Keyboard right button</p>
 				<p class="inline-block character float-right">x</p>
 				<p style="color: #999;">Note! osu!web does not support right clicks</p>
-				<p class="inline-block">Enable mouse buttons</p>
-				<input type="checkbox" id="allow-mouse-buttons" class="checkbox inline-block float-right" name="allow-mouse-buttons" value="true" checked>
-				<p id="mouse-sensitivity-text">Mouse Sensitivity: 1.0x</p>
-				<input type="range" id="mouse-sensitivity" class="slider" min="0" max="100" value="100">
+				<p class="inline-block">Enable mouse buttons in gameplay</p>
+				<input type="checkbox" id="settings-enable-mouse-buttons" class="checkbox inline-block float-right" name="settings-enable-mouse-buttons" value="true" checked>
+				<p id="settings-mouse-sensitivity-text">Mouse sensitivity: 1.0x</p>
+				<input type="range" id="settings-mouse-sensitivity" class="slider" min="1" max="60" value="10">
+				<!-- User Interface Settings -->
+				<div class="sidenav-divider"></div>
+				<p class="sidenav-title-text">User Interface</p>
+				<!-- Triangles or Circles -->
+				<p>Intro sequence</p>
 				<!-- Gameplay Settings -->
 				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Gameplay</p>
+				<p id="settings-background-dim-text">Background dim: 80%</p>
+				<input type="range" id="settings-background-dim" class="slider" min="0" max="100" value="80">
 				<div>
 					<p class="inline-block">Draw 300 hits</p>
-					<input type="checkbox" id="draw-300-hits" class="checkbox inline-block float-right" name="draw-300-hits" value="true" checked>
+					<input type="checkbox" id="settings-draw-300-hits" class="checkbox inline-block float-right" name="settings-draw-300-hits" value="true" checked>
 				</div>
 				<div>
 					<p class="inline-block">Snaking sliders</p>
-					<input type="checkbox" id="snaking-sliders" class="checkbox inline-block float-right" name="snaking-sliders" value="true" checked>
+					<input type="checkbox" id="settings-snaking-sliders" class="checkbox inline-block float-right" name="settings-snaking-sliders" value="true" checked>
 				</div>
 				<!-- Performance Settings -->
 				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Performance</p>
 				<div>
 					<p class="inline-block">Low power mode</p>
-					<input type="checkbox" id="low-power-mode" class="checkbox inline-block float-right" name="low-power-mode" value="false">
+					<input type="checkbox" id="settings-low-power-mode" class="checkbox inline-block float-right" name="settings-low-power-mode" value="false">
 				</div>
 				<div>
 					<p class="inline-block">Menu parallax</p>
-					<input type="checkbox" id="enable-menu-parallax" class="checkbox inline-block float-right" name="enable-menu-parallax" value="true" checked>
+					<input type="checkbox" id="settings-enable-menu-parallax" class="checkbox inline-block float-right" name="settings-enable-menu-parallax" value="true" checked>
 				</div>
 				<!-- setTimeout has a minimum timeout time of 4ms, thus making 250fps the limit -->
 				<!-- Vsync, 2x Vsync, Browser Maximum (250fps) -->
 				<p>Max Frame Rate</p>
+				<div>
+					<p class="inline-block">Show FPS</p>
+					<input type="checkbox" id="settings-show-fps" class="checkbox inline-block float-right" name="settings-show-fps" value="false">
+				</div>
 				<!-- Full, Half, Quarter, Eighth, Sixteenth -->
-				<p id="slider-resolution-text">Slider Resolution: Full</p>
-				<input type="range" id="slider-resolution" class="slider" min="1" max="5" value="1">
+				<p id="settings-slider-resolution-text">Slider Resolution: Full</p>
+				<input type="range" id="settings-slider-resolution" class="slider" min="1" max="5" value="1">
 				<p class="inline-block">Draw Hit Values</p>
-				<input type="checkbox" id="draw-hit-values" class="checkbox inline-block float-right" name="draw-hit-values" value="true" checked>
+				<input type="checkbox" id="settings-draw-hit-values" class="checkbox inline-block float-right" name="settings-draw-hit-values" value="true" checked>
 				<p>Score Update Rate</p>
 				<!-- Skin Settings -->
 				<div class="sidenav-divider"></div>
@@ -80,7 +96,7 @@
 				<p>Using: ajax transparent</p>
 			</div>
 		</div>
-		<div id="top-bar">
+		<div id="top-bar" class="triangle-background">
 			<span class="span-top-bar-text" style="float: left;">
 				<img id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/settings.png">
 				<img id="standard-top-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/standard.png">
@@ -125,7 +141,7 @@
 			</div>
 		</div>
 		<span id="snow"></span>
-		<div id="bottom-bar">
+		<div id="bottom-bar" class="triangle-background">
 			<p id="version" class="version-number"></p>
 		</div>
 		<!-- https://github.com/foobar404/Wave.js -->
