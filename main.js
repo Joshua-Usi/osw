@@ -297,16 +297,20 @@ define(function(require) {
 		}
 		document.getElementById("slider-resolution-text").innerText = "Slider Resolution: " + resolution;
 	});
+	document.getElementById("master-volume").addEventListener("input", function() {
+		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
+		document.getElementById("master-volume-text").innerText = "Master Volume: " + this.value + "%";
+	});
 	document.getElementById("music-volume").addEventListener("input", function() {
-		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
+		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
 		document.getElementById("music-volume-text").innerText = "Music Volume: " + this.value + "%";
 	});
 	document.getElementById("effects-volume").addEventListener("input", function() {
-		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
+		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
 		document.getElementById("effects-volume-text").innerText = "Music Volume: " + this.value + "%";
 	});
 	document.getElementById("slider-resolution").addEventListener("input", function() {
-		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
+		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
 		let resolution = "";
 		if (this.value === "1") {
 			resolution = "Full";
