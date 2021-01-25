@@ -102,7 +102,7 @@ define(function(require) {
 	/* Event Listeners ----------------------------------------------------------------------------------------- */
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
-			menuAudio.volume = window.localStorage.getItem("volume_music");
+			menuAudio.volume = 1;
 			menuAudio.play();
 			isFirstClick = false;
 			time = 0;
@@ -245,11 +245,11 @@ define(function(require) {
 		document.getElementById("sidenav").style.opacity = "0.2";
 	});
 	document.getElementById("settings-icon").addEventListener("click", function() {
-		document.getElementById("sidenav").style.width = "20vw";
+		document.getElementById("sidenav").style.width = "25vw";
 		document.getElementById("sidenav").style.opacity = "1";
 	});
 	document.getElementById("menu-bar-settings").addEventListener("click", function() {
-		document.getElementById("sidenav").style.width = "20vw";
+		document.getElementById("sidenav").style.width = "25vw";
 		document.getElementById("sidenav").style.opacity = "1";
 	});
 	let sliders = document.getElementsByClassName("slider");
@@ -281,22 +281,46 @@ define(function(require) {
 	// 		};
 	// 	}
 	// });
-	// document.getElementById("volume").addEventListener("input", function() {
-	// 	this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
-	// 	document.getElementById("volume-text").innerText = "Volume " + this.value;
-	// 	menuAudio.volume = this.value / 100;
-	// 	window.localStorage.setItem("volume_music", menuAudio.volume);
-	// 	currentSources++;
-	// 	if (currentSources % 3 === 0) {
-	// 		let audio = new Audio("src/audio/sliderbar.mp3");
-	// 		audio.volume = 1;
-	// 		audio.playbackRate = utils.map(this.value, this.min, this.max, 1, 2);
-	// 		audio.play();
-	// 		audio.onend = function() {
-	// 			currentSources--;
-	// 		};
-	// 	}
-	// });
+	document.getElementById("slider-resolution").addEventListener("input", function() {
+		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
+		let resolution = "";
+		if (this.value === "1") {
+			resolution = "Full";
+		} else if (this.value === "2") {
+			resolution = "Half";
+		} else if (this.value === "3") {
+			resolution = "Quarter";
+		} else if (this.value === "4") {
+			resolution = "Eighth";
+		} else if (this.value === "5") {
+			resolution = "Sixteenth";
+		}
+		document.getElementById("slider-resolution-text").innerText = "Slider Resolution: " + resolution;
+	});
+	document.getElementById("music-volume").addEventListener("input", function() {
+		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
+		document.getElementById("music-volume-text").innerText = "Music Volume: " + this.value + "%";
+	});
+	document.getElementById("effects-volume").addEventListener("input", function() {
+		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
+		document.getElementById("effects-volume-text").innerText = "Music Volume: " + this.value + "%";
+	});
+	document.getElementById("slider-resolution").addEventListener("input", function() {
+		this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #fff " + utils.map(this.value, this.min, this.max, 0, 100) + "%, white 100%)";
+		let resolution = "";
+		if (this.value === "1") {
+			resolution = "Full";
+		} else if (this.value === "2") {
+			resolution = "Half";
+		} else if (this.value === "3") {
+			resolution = "Quarter";
+		} else if (this.value === "4") {
+			resolution = "Eighth";
+		} else if (this.value === "5") {
+			resolution = "Sixteenth";
+		}
+		document.getElementById("slider-resolution-text").innerText = "Slider Resolution: " + resolution;
+	});
 	document.getElementById("pause").addEventListener("click", function() {
 		if (menuAudio.paused) {
 			menuAudio.play();

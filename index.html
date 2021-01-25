@@ -17,29 +17,39 @@
 		</div>
 		<div id="sidenav">
 			<div id="sidenav-padding">
+				<!--  -->
 				<div style="padding-top: 10vh;"></div>
 				<a href="javascript:void(0)" id="close-btn">&times;</a>
+				<!-- Audio Settings -->
 				<p class="sidenav-title-text">Audio</p>
-				<p id="music-volume-text">Music Volume</p>
-				<input type="range" id="volume-music" class="slider" min="0" max="100" value="100">
-				<p id="effects-volume-text">Effects Volume</p>
-				<input type="range" id="volume-effects" class="slider" min="0" max="100" value="100">
+				<p id="music-volume-text">Music Volume: 100%</p>
+				<input type="range" id="music-volume" class="slider" min="0" max="100" value="100">
+				<p id="effects-volume-text">Effects Volume: 100%</p>
+				<input type="range" id="effects-volume" class="slider" min="0" max="100" value="100">
+				<!-- Input Settings -->
 				<p class="sidenav-title-text">Inputs</p>
 				<p>Keyboard Left Button</p>
 				<p>Keyboard Right Button</p>
 				<p>Allow Mouse Buttons</p>
 				<input type="checkbox" id="allow-mouse-buttons" class="checkbox" name="allow-mouse-buttons" value="true">
+				<!-- Gameplay Settings -->
 				<p class="sidenav-title-text">Gameplay</p>
-				<p>Max Framerate</p>
 				<p>Draw 300 hits</p>
 				<input type="checkbox" id="draw-300-hits" class="checkbox" name="draw-300-hits" value="true">
+				<!-- Performance Settings -->
 				<p class="sidenav-title-text">Performance</p>
 				<p>Low Power Mode</p>
 				<input type="checkbox" id="low-power-mode" class="checkbox" name="low-power-mode" value="false">
-				<p>Slider Resolution: Full</p>
-				<input type="range" id="volume-effects" class="slider" min="1" max="32" value="1">
+				<!-- setTimeout has a minimum timeout time of 4ms, thus making 250fps the limit -->
+				<!-- Vsync, 2x Vsync, Browser Maximum (250fps) -->
+				<p>Max Frame Rate</p>
+				<!-- Full, Half, Quarter, Eighth, Sixteenth -->
+				<p id="slider-resolution-text">Slider Resolution: Full</p>
+				<input type="range" id="slider-resolution" class="slider" min="1" max="5" value="1">
 				<p>Draw Hit Values</p>
 				<input type="checkbox" id="draw-hit-values" class="checkbox" name="draw-hit-values" value="true">
+				<p>Score Update Rate</p>
+				<!-- Skin Settings -->
 				<p class="sidenav-title-text">Skin</p>
 				<p>Using: ajax transparent</p>
 			</div>

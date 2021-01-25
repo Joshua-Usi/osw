@@ -119,6 +119,9 @@ define(function(require) {
 	// audio.currentTime = beatmap.hitObjectsParsed[0].time - 5;
 	audio.currentTime = 0;
 	audio.playbackRate = 1;
+	/* Profiling variables */
+	let times = [];
+	let frameRate = 0;
 	window.addEventListener("click", function() {
 		if (firstClick) {
 			firstClick = false;
@@ -639,15 +642,7 @@ define(function(require) {
 			}
 			ctx.globalAlpha = 1;
 			ctx.drawImage(cursor, mouse.position.x - (cursor.width * size) / 2, mouse.position.y - (cursor.height * size) / 2, cursor.width * size, cursor.height * size);
-			setTimeout(animate, 0);
-		})();
-	});
-	/* Profiling ----------------------------------------------------------------------------------------------- */
-	let times = [];
-	let frameRate = 0;
-
-	function calculateFPS() {
-		window.setTimeout(() => {
+			/* Profiling ----------------------------------------------------------------------------------------------- */
 			const now = Date.now();
 			while (times.length > 0 && times[0] <= now - 1000) {
 				times.shift();
@@ -664,8 +659,8 @@ define(function(require) {
 			} else {
 				document.getElementById("frame-rate").style.background = "#B00020";
 			}
-			calculateFPS();
-		}, 0);
-	}
-	calculateFPS();
+			setTimeout(animate, 0);
+		})();
+	});
+	
 });
