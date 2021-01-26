@@ -46,6 +46,7 @@
 				<p style="color: #999;">Note! osu!web does not support right clicks</p>
 				<p class="inline-block" style="letter-spacing: -0.01vw;">Enable mouse buttons in gameplay</p>
 				<input type="checkbox" id="settings-enable-mouse-buttons" class="checkbox inline-block float-right" name="settings-enable-mouse-buttons" value="true" checked>
+				<p style="color: #999;">Note! sensitivity only applies during gameplay</p>
 				<p id="settings-mouse-sensitivity-text">Mouse sensitivity: 1.0x</p>
 				<input type="range" id="settings-mouse-sensitivity" class="slider" min="1" max="60" value="10">
 				<!-- User Interface Settings -->
@@ -53,6 +54,10 @@
 				<p class="sidenav-title-text">User Interface</p>
 				<!-- Triangles or Circles -->
 				<p>Intro sequence</p>
+				<div>
+					<p class="inline-block">Menu parallax</p>
+					<input type="checkbox" id="settings-enable-menu-parallax" class="checkbox inline-block float-right" name="settings-enable-menu-parallax" value="true" checked>
+				</div>
 				<!-- Gameplay Settings -->
 				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Gameplay</p>
@@ -72,10 +77,6 @@
 				<div>
 					<p class="inline-block">Low power mode</p>
 					<input type="checkbox" id="settings-low-power-mode" class="checkbox inline-block float-right" name="settings-low-power-mode" value="false">
-				</div>
-				<div>
-					<p class="inline-block">Menu parallax</p>
-					<input type="checkbox" id="settings-enable-menu-parallax" class="checkbox inline-block float-right" name="settings-enable-menu-parallax" value="true" checked>
 				</div>
 				<!-- setTimeout has a minimum timeout time of 4ms, thus making 250fps the limit -->
 				<!-- Vsync, 2x Vsync, Browser Maximum (250fps) -->
