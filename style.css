@@ -458,3 +458,49 @@ body {
 #menu-bar-settings:hover {
 	left: 17.5vw;
 }
+
+.select-box-selected-container {
+	background: #060606;
+	border-radius: 1vh;
+	margin-bottom: 1vh;
+	padding-top: 0.5vw;
+	padding-bottom: 0.5vw;
+	padding-right: 0.5vw;
+	transition: background 0.2s;
+}
+
+.select-box-selected-container:hover {
+	background: #FD67AE;
+}
+
+.select-box-selected {
+	display: inline-block;
+}
+
+.select-box-arrow {
+	display: inline-block;
+	float: right; 
+	transform: scale(2.25, 1.25);
+}
+
+.select-box-selections {
+	height: 0px;
+	opacity: 0;
+	padding: 2.5% 0 2.5% 0;
+	width: 100%;
+	background: #060606;
+	border-radius: 1vh;
+	overflow: hidden;
+	transition: height 0.3s;
+}
+
+.select-box-selections p {
+	padding: 0.5vh !important;
+	margin: 0 1vh 0 1vh !important;
+	border-radius: 1vh;
+	transition: background 0.2s;
+}
+
+.select-box-selections p:hover {
+	background: #FD67AE;
+}

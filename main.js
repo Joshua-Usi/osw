@@ -288,6 +288,25 @@ define(function(require) {
 		}
 		document.getElementById("settings-slider-resolution-text").innerText = "Slider resolution: " + resolution;
 	});
+	let selectBoxes = document.getElementsByClassName("select-box");
+	for (var i = 0; i < selectBoxes.length; i++) {
+		selectBoxes[i].addEventListener("click", function() {
+			let selectBoxSelections = this.getElementsByClassName("select-box-selections")[0];
+			console.log(selectBoxSelections.style.height);
+			if (selectBoxSelections.style.height === "0px" || selectBoxSelections.style.height === "") {
+				selectBoxSelections.style.transition = "";
+				selectBoxSelections.style.height = "auto";
+				let height = document.defaultView.getComputedStyle(selectBoxSelections).height;
+				selectBoxSelections.style.height = null;
+				selectBoxSelections.style.transition = "height 0.3s, opacity 0.3s";
+				selectBoxSelections.style.height = height;
+				selectBoxSelections.style.opacity = 1;
+			} else {
+				selectBoxSelections.style.height = "0px";
+				selectBoxSelections.style.opacity = 0;
+			}
+		});
+	}
 	document.getElementById("pause").addEventListener("click", function() {
 		if (menuAudio.paused) {
 			menuAudio.play();
