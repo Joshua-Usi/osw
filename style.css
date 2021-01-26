@@ -58,8 +58,8 @@ body {
 .slider::-webkit-slider-thumb {
 	-webkit-appearance: none;
 	width: 4vw;
-	height: 2.5vh;
-	border-radius: 2.5vh;
+	height: 1vw;
+	border-radius: 1vw;
 	border: 0.4vh solid #FD67AE;
 	background: #0d0d0d;
 	margin-top: calc(3.3vh / 2);
@@ -93,9 +93,9 @@ body {
 
 .checkbox {
 	width: 4vw;
-	height: 2.5vh;
+	height: 1vw;
 	background-color: rgba(0, 0, 0, 0);
-	border-radius: 2.5vh;
+	border-radius: 1vw;
 	vertical-align: middle;
 	border: 0.4vh solid #FD67AE;
 	margin-top: 1.5vh;
@@ -105,6 +105,7 @@ body {
 }
 
 .checkbox:hover {
+	width: 5vw;
 	border-color: #ffc4ff;
 	box-shadow: -5px -5px 10px #FD67AE99, 5px -5px 10px #FD67AE99, 5px 5px 10px #FD67AE99, -5px 5px 10px #FD67AE99;
 }
