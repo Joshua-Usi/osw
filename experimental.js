@@ -116,7 +116,7 @@ define(function(require) {
 	let comboPulseSize = 1;
 	/* Audio variables */
 	let audio = AssetLoader.audio(`src/audio/${beatmap.AudioFilename}`);
-	audio.currentTime = beatmap.hitObjectsParsed[4].time - 5;
+	audio.currentTime = beatmap.hitObjectsParsed[0].time - 5;
 	// audio.currentTime = 0;
 	audio.playbackRate = 1;
 	/* Profiling variables */
@@ -312,9 +312,19 @@ define(function(require) {
 				/* Slider Follow Circle Handling ---------------------------------------------------------------- */
 				if (hitObjects[i].type[1] === "1" && audio.currentTime >= hitObjects[i].time) {
 					if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
+						let sliderRepeat = false;
 						let time = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * beatmap.timingPointsParsed[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
 						if (hitObjects[i].cache.currentSlide % 2 === 0) {
 							hitObjects[i].cache.sliderBodyPosition = Math.floor(utils.map(audio.currentTime, hitObjects[i].time + time * hitObjects[i].cache.currentSlide, hitObjects[i].time + time * (hitObjects[i].cache.currentSlide + 1), 0, hitObjects[i].cache.points.length - 1));
+							/* Prevent Index Errors */
+							if (hitObjects[i].cache.sliderBodyPosition <= 0) {
+								hitObjects[i].cache.sliderBodyPosition = 0;
+							}
+							/* Check if slider repeats, then switch direction */
+							if (hitObjects[i].cache.sliderBodyPosition >= hitObjects[i].cache.points.length - 1) {
+								hitObjects[i].cache.sliderBodyPosition = hitObjects[i].cache.points.length - 1;
+								sliderRepeat = true;
+							}
 							/* Check if slider follow circle went over slider ticks */
 							for (let j = 0; j < hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide].length; j++) {
 								if (hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j] === false) {
@@ -330,27 +340,9 @@ define(function(require) {
 									}
 								}
 							}
-							/* Check if slider repeats, then switch direction */
-							if (hitObjects[i].cache.sliderBodyPosition >= hitObjects[i].cache.points.length - 1) {
-								hitObjects[i].cache.sliderBodyPosition = hitObjects[i].cache.points.length - 1;
-								hitObjects[i].cache.currentSlide++;
-								let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-								if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true) {
-									score += 30;
-									combo++;
-									comboPulseSize = 1;
-								} else {
-									combo = 0;
-									document.getElementById("combo-container").innerHTML = "";
-								}
-							}
-							/* Prevent Index Errors */
-							if (hitObjects[i].cache.sliderBodyPosition <= 0) {
-								hitObjects[i].cache.sliderBodyPosition = 0;
-							}
 							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							// mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
-							// mouse.click();
+							mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
+							mouse.click();
 							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 								hitObjects[i].cache.onFollowCircle = true;
 							} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
@@ -360,6 +352,15 @@ define(function(require) {
 							}
 						} else if (hitObjects[i].cache.currentSlide % 2 === 1) {
 							hitObjects[i].cache.sliderBodyPosition = Math.floor(utils.map(audio.currentTime, hitObjects[i].time + time * hitObjects[i].cache.currentSlide, hitObjects[i].time + time * (hitObjects[i].cache.currentSlide + 1), hitObjects[i].cache.points.length - 1, 0));
+							/* Prevent Index Errors */
+							if (hitObjects[i].cache.sliderBodyPosition >= hitObjects[i].cache.points.length - 1) {
+								hitObjects[i].cache.sliderBodyPosition = hitObjects[i].cache.points.length - 1;
+							}
+							/* Check if Slider Repeats, then switch direction */
+							if (hitObjects[i].cache.sliderBodyPosition <= 0) {
+								hitObjects[i].cache.sliderBodyPosition = 0;
+								sliderRepeat = true;
+							}
 							/* Check if slider follow circle went over slider ticks */
 							for (let j = 0; j < hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide].length; j++) {
 								if (hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j] === false) {
@@ -375,33 +376,27 @@ define(function(require) {
 									}
 								}
 							}
-							/* Check if Slider Repeats, then switch direction */
-							if (hitObjects[i].cache.sliderBodyPosition <= 0) {
-								hitObjects[i].cache.sliderBodyPosition = 0;
-								hitObjects[i].cache.currentSlide++;
-								let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-								if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true) {
-									score += 30;
-									combo++;
-									comboPulseSize = 1;
-								} else {
-									combo = 0;
-									document.getElementById("combo-container").innerHTML = "";
-								}
-							}
-							/* Prevent Index Errors */
-							if (hitObjects[i].cache.sliderBodyPosition >= hitObjects[i].cache.points.length - 1) {
-								hitObjects[i].cache.sliderBodyPosition = hitObjects[i].cache.points.length - 1;
-							}
 							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							// mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
-							// mouse.click();
+							mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
+							mouse.click();
 							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 								hitObjects[i].cache.onFollowCircle = true;
 							} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 								hitObjects[i].cache.onFollowCircle = true;
 							} else {
 								hitObjects[i].cache.onFollowCircle = false;
+							}
+						}
+						if (sliderRepeat === true) {
+							hitObjects[i].cache.currentSlide++;
+							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true) {
+								score += 30;
+								combo++;
+								comboPulseSize = 1;
+							} else {
+								combo = 0;
+								document.getElementById("combo-container").innerHTML = "";
 							}
 						}
 					} else {
@@ -456,7 +451,7 @@ define(function(require) {
 						mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					}
 					score += utils.hitScore(300, combo, difficultyMultiplier, 1);
-					combo++;
+					// combo++;
 					comboPulseSize = 1;
 					scoreObjects.push(new HitObject.ScoreObject(300, mapped.x, mapped.y, audio.currentTime + 1));
 					hitObjects.splice(i, 1);
@@ -508,8 +503,8 @@ define(function(require) {
 				if (approachCircleSize <= 1.6) {
 					approachCircleSize = 1.6;
 					if (hitObjects[i].type[0] === "1") {
-						// mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y)
-						// mouse.click();
+						mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y)
+						mouse.click();
 					}
 				}
 				/* Alpha Calculations ---------------------------------------------------------------- */
