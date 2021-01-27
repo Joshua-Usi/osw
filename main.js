@@ -33,7 +33,21 @@ define(function(require) {
 	if (window.localStorage.options === undefined) {
 		window.localStorage.setItem("options", JSON.stringify(Options));
 	} else {
-		Options = JSON.parse(window.localStorage.getItem("options"));
+		let OptionsTemp = JSON.parse(window.localStorage.getItem("options"));
+		if (OptionsTemp.version < Options.version) {
+			localStorage.setItem("options", Options);
+			console.log("Your Options was reset due to new version");
+		// 	for (let key in Options) {
+		// 		if (typeof(key) === "object") {
+		// 			for (let key2 in Options[key]) {
+
+		// 			}
+		// 		} else {
+		// 			Options[key] ==
+		// 		}
+		// 	}
+		}
+		Options = OptionsTemp;
 	}
 	/* offline context checks, needed to ensure if effects are working */
 	if (window.origin === null) {

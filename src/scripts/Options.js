@@ -1,6 +1,7 @@
 define(function(require) {
 	"use strict";
 	return {
+		version: 1,
 		Audio: {
 			masterVolume: 1,
 			musicVolume: 1,
