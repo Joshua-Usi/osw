@@ -1,5 +1,5 @@
 define(function(require) {
-  "use strict";
+	"use strict";
 	let utils = require("./utils.js");
 	return {
 		HitCircle: class HitCircle {

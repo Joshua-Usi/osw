@@ -241,7 +241,7 @@ define(function(require) {
 			return {
 				x: offsetX + this.map(x, 0, 512, 0, toWidth),
 				y: offsetY + this.map(y, 0, 384, 0, toHeight),
-			}
+			};
 		},
 		htmlCounter: function(digits, container, element, rootSrc, positionTag, positioning) {
 			for (let i = 0; i < digits.length; i++) {

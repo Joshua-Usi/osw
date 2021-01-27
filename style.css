@@ -132,7 +132,23 @@ body {
 	transition: background 0.2s;
 }
 
-.settings-button:hover {
+.red {
+	background: url("src/images/triangles.png"), #FD67AE;
+	background-size: 25vw;
+}
+
+.blue {
+	background: url("src/images/triangles.png"), #2ca4cc;
+	background-size: 25vw;
+}
+
+.settings-button.red:hover {
+	background: url("src/images/triangles.png"), #ff9ccb;
+	background-size: 25vw;
+
+}
+
+.settings-button.blue:hover {
 	background: url("src/images/triangles.png"), #45b0de;
 	background-size: 25vw;
 

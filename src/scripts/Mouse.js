@@ -1,5 +1,5 @@
 define(function(require) {
-  "use strict";
+	"use strict";
 	return class Mouse {
 		constructor(element, max, sensitivity) {
 			if (max === undefined) {

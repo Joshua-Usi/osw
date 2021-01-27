@@ -1,25 +1,37 @@
 define(function(require) {
+  "use strict";
 	return {
 		Audio: {
+			masterVolume: 1,
 			musicVolume: 1,
 			effectVolume: 1,
 		},
 		Inputs: {
-			keyBind1: "z",
-			keyBind2: "x",
-			allowMouseClicks: true,
+			keyBoardLeftButton: "z",
+			keyBoardRightButton: "x",
+			enableMouseButtonsInGameplay: true,
+			mouseSensitivty: 1,
 		},
-		Performance: {
-			useLowPower: false,
-			// Amount of points to skip when drawing sliders
-			sliderDetail: 1,
-			drawHitValues: true,
-			drawComboNumbers: true,
-			drawHitCircleOverlay: true,
+		UserInterface: {
+			introSequence: "Triangles",
+			menuParallax: true,	
 		},
 		Gameplay: {
-			draw300HitValue: true,
+			backgroundDim: 0.8,
+			draw300Hits: true,
+			snakingSliders: true,
+			cursorTrails: "Interpolated",
 		},
-		Skin: {},
-	}
+		Performance: {
+			lowPowerMode: false,
+			maxFrameRate: "VSync",
+			ShowFPS: false,
+			sliderResolution: 1,
+			drawHitValues: true,
+			scoreUpdateRate: "Equal to frame rate"
+		},
+		Skin: {
+			currentSkin: "Ajax Transparent",
+		},
+	};
 });

@@ -25,10 +25,10 @@ define(function(require) {
 	"use strict";
 	/* RequireJS Module Loading */
 	const Mouse = require("./src/scripts/Mouse.js");
-	const Song = require("./src/scripts/Song.js");	
+	const Song = require("./src/scripts/Song.js");
 	const Options = require("./src/scripts/Options.js");
 	const AssetLoader = require("./src/scripts/AssetLoader.js");
-	const utils = require("./src/scripts/utils.js");	
+	const utils = require("./src/scripts/utils.js");
 	/* First time run setup */
 	if (!window.localStorage.use_low_power_mode) {
 		window.localStorage.setItem("use_low_power_mode", 0);
@@ -41,7 +41,7 @@ define(function(require) {
 	const version = "osu!web v2021.0.1.6";
 	/* set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
-	for (var i = 0; i < classes.length; i++) {
+	for (let i = 0; i < classes.length; i++) {
 		classes[i].innerText = version;
 	}
 	/* initialise mouse module */
@@ -77,12 +77,10 @@ define(function(require) {
 	/* Need to append for wave.js */
 	document.querySelector("body").appendChild(menuAudio);
 	let isFirstClick = true;
-	let currentSources = 0;
 	let offset = 0;
 	let time = 0;
 	let lastTime = 0;
 	let accumulator = 0;
-
 	/* states:
 	 * just-logo
 	 * first
@@ -98,12 +96,11 @@ define(function(require) {
 	if (window.localStorage.getItem("use_low_power_mode") == parseInt(1)) {
 		document.getElementById("low-power-mode").checked = true;
 	}
-	if (window.localStorage.getItem("volume_music")) {
-	}
+	if (window.localStorage.getItem("volume_music")) {}
 	/* Event Listeners ----------------------------------------------------------------------------------------- */
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
-			menuAudio.volume = 0.02;
+			menuAudio.volume = 1;
 			menuAudio.play();
 			isFirstClick = false;
 			time = 0;
@@ -142,7 +139,7 @@ define(function(require) {
 				let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
 				/* triangle background moves */
 				offset -= 0.25;
-				for (var i = 0; i < triangleBackgroundMoves.length; i++) {
+				for (let i = 0; i < triangleBackgroundMoves.length; i++) {
 					triangleBackgroundMoves[i].style.backgroundPositionY = offset + "px";
 				}
 				/* beat detection and accumulation */
@@ -254,7 +251,7 @@ define(function(require) {
 		document.getElementById("sidenav").style.opacity = "1";
 	});
 	let checkbox = document.getElementsByClassName("checkbox");
-	for (var i = 0; i < checkbox.length; i++) {
+	for (let i = 0; i < checkbox.length; i++) {
 		checkbox[i].addEventListener("input", function() {
 			if (this.checked === true) {
 				let checkOn = AssetLoader.audio("./src/audio/effects/check-on.wav");
@@ -270,7 +267,7 @@ define(function(require) {
 		});
 	}
 	let buttons = document.getElementsByClassName("menu-bar-buttons-parent");
-	for (var i = 0; i < buttons.length; i++) {
+	for (let i = 0; i < buttons.length; i++) {
 		buttons[i].addEventListener("click", function() {
 			let menuHit = AssetLoader.audio("./src/audio/effects/menuHit.wav");
 			menuHit.play();
@@ -325,7 +322,7 @@ define(function(require) {
 		document.getElementById("settings-slider-resolution-text").innerText = "Slider resolution: " + resolution;
 	});
 	let selectBoxes = document.getElementsByClassName("select-box");
-	for (var i = 0; i < selectBoxes.length; i++) {
+	for (let i = 0; i < selectBoxes.length; i++) {
 		let selectBoxSelections = selectBoxes[i].getElementsByClassName("select-box-selections")[0];
 		selectBoxSelections.style.height = "auto";
 		selectBoxSelections.style.cacheHeight = document.defaultView.getComputedStyle(selectBoxSelections).height;
@@ -387,7 +384,7 @@ define(function(require) {
 		let menuBar = document.getElementById("menu-bar");
 		menuBar.style.opacity = 1;
 		let menuBarButtons = document.getElementsByClassName("menu-bar-buttons-parent");
-		for (var i = 0; i < menuBarButtons.length; i++) {
+		for (let i = 0; i < menuBarButtons.length; i++) {
 			menuBarButtons[i].style.paddingTop = 5 + "vh";
 			menuBarButtons[i].style.paddingBottom = 5 + "vh";
 		}
@@ -410,7 +407,6 @@ define(function(require) {
 			type: "flower",
 			colors: ["#fff5"]
 		});
-		console.log(wave);
 	} else {
 		console.warn("offline context, audio visualiser will not work");
 	}

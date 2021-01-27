@@ -4,7 +4,6 @@ define(function(require) {
 	const Formulas = require("./src/scripts/Formulas.js");
 	const Mouse = require("./src/scripts/Mouse.js");
 	const Keyboard = require("./src/scripts/Keyboard.js");
-	const Song = require("./src/scripts/Song.js");
 	const beatmap = require("./src/scripts/BeatMap.js");
 	const Beizer = require("./src/scripts/Beizer.js");
 	const utils = require("./src/scripts/utils.js");
@@ -303,7 +302,7 @@ define(function(require) {
 				}
 				/* Slider Head Hit Handling ---------------------------------------------------------------- */
 				if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hitHead === false && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[0])) {
-					score += 30
+					score += 30;
 					combo++;
 					comboPulseSize = 1;
 					hitObjects[i].cache.hitHead = true;
@@ -336,7 +335,6 @@ define(function(require) {
 										score += 10;
 										combo++;
 										comboPulseSize = 1;
-
 									}
 								}
 							}
@@ -372,7 +370,6 @@ define(function(require) {
 										score += 10;
 										combo++;
 										comboPulseSize = 1;
-
 									}
 								}
 							}
@@ -416,7 +413,7 @@ define(function(require) {
 				}
 				/* Slider Tick Miss Check ---------------------------------------------------------------- */
 				if (hitObjects[i].type[1] === "1" && audio.currentTime >= hitObjects[i].time) {
-					let copy = []
+					let copy = [];
 					let matches = 0;
 					let totalOccurences = 0;
 					for (let j = 0; j < hitObjects[i].cache.specificSliderTicksHit.length; j++) {
@@ -441,9 +438,7 @@ define(function(require) {
 				/* Slider Score Calculations ---------------------------------------------------------------- */
 				if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hasEnded === true) {
 					let sliderElementsHit = 0;
-					if (hitObjects[i]) {
-
-					}
+					if (hitObjects[i]) {}
 					let mapped;
 					if (hitObjects[i].slides % 2 === 0) {
 						mapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
@@ -604,9 +599,9 @@ define(function(require) {
 						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 						ctx.drawImage(sliderBody, mapped.x - circleDiameter / 2, mapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
 						if (hitObjects[i].cache.onFollowCircle === true) {
-							ctx.drawImage(sliderFollowCircle, mapped.x - circleDiameter * 2.4 / 2, mapped.y - circleDiameter * 2.4 /2 , circleDiameter * 2.4, circleDiameter * 2.4);
+							ctx.drawImage(sliderFollowCircle, mapped.x - circleDiameter * 2.4 / 2, mapped.y - circleDiameter * 2.4 / 2, circleDiameter * 2.4, circleDiameter * 2.4);
 						}
-					}	
+					}
 				} else if (hitObjects[i].type[3] === "1") {
 					/* draw spinner */
 					let size = utils.map(hitObjects[i].endTime - audio.currentTime, 0, hitObjects[i].endTime - (hitObjects[i].time - arTime), 0, 0.8);
@@ -693,5 +688,4 @@ define(function(require) {
 			requestAnimationFrame(animate);
 		})();
 	});
-	
 });
