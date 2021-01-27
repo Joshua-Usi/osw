@@ -423,6 +423,7 @@ body {
 
 .menu-bar-buttons {
 	transform: skewX(20deg);
+	overflow: hidden;
 }
 
 #menu-right-side {
@@ -452,11 +453,11 @@ body {
 }
 
 .menu-bar-buttons-parent:hover {
-	width: 12.5vw;
+	width: 17.5vw;
 }
 
 #menu-bar-settings:hover {
-	left: 17.5vw;
+	left: 12.5vw;
 }
 
 .select-box-selected-container {
@@ -491,7 +492,7 @@ body {
 	background: #060606;
 	border-radius: 1vh;
 	overflow: hidden;
-	transition: height 0.3s;
+	transition: height 0.3s, opacity 0.3s;
 }
 
 .select-box-selections p {
@@ -502,5 +503,9 @@ body {
 }
 
 .select-box-selections p:hover {
+	background: #FD67AE;
+}
+
+.selected {
 	background: #FD67AE;
 }

@@ -27,6 +27,7 @@ define(function(require) {
 	const Mouse = require("./src/scripts/Mouse.js");
 	const Song = require("./src/scripts/Song.js");	
 	const Options = require("./src/scripts/Options.js");
+	const AssetLoader = require("./src/scripts/AssetLoader.js");
 	const utils = require("./src/scripts/utils.js");	
 	/* First time run setup */
 	if (!window.localStorage.use_low_power_mode) {
@@ -252,20 +253,55 @@ define(function(require) {
 		document.getElementById("sidenav").style.width = "25vw";
 		document.getElementById("sidenav").style.opacity = "1";
 	});
+	let checkbox = document.getElementsByClassName("checkbox");
+	for (var i = 0; i < checkbox.length; i++) {
+		checkbox[i].addEventListener("input", function() {
+			if (this.checked === true) {
+				let checkOn = AssetLoader.audio("./src/audio/effects/check-on.wav");
+				checkOn.play();
+			} else {
+				let checkOff = AssetLoader.audio("./src/audio/effects/check-off.wav");
+				checkOff.play();
+			}
+		});
+		checkbox[i].addEventListener("mouseenter", function() {
+			let menuClick = AssetLoader.audio("./src/audio/effects/menuclick.wav");
+			menuClick.play();
+		});
+	}
+	let buttons = document.getElementsByClassName("menu-bar-buttons-parent");
+	for (var i = 0; i < buttons.length; i++) {
+		buttons[i].addEventListener("click", function() {
+			let menuHit = AssetLoader.audio("./src/audio/effects/menuHit.wav");
+			menuHit.play();
+		});
+		buttons[i].addEventListener("mouseenter", function() {
+			let menuHover = AssetLoader.audio("./src/audio/effects/menu-back-hover.wav");
+			menuHover.play();
+		});
+	}
 	let sliders = document.getElementsByClassName("slider");
 	for (let i = 0; i < sliders.length; i++) {
 		sliders[i].addEventListener("input", function() {
 			this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
-		});	
+			let sliderBar = AssetLoader.audio("./src/audio/effects/sliderbar.wav");
+			sliderBar.play();
+		});
+		sliders[i].addEventListener("mouseenter", function() {
+			let menuClick = AssetLoader.audio("./src/audio/effects/menuclick.wav");
+			menuClick.play();
+		});
 	}
 	document.getElementById("settings-master-volume").addEventListener("input", function() {
 		document.getElementById("settings-master-volume-text").innerText = "Master volume: " + this.value + "%";
+		menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 	});
 	document.getElementById("settings-music-volume").addEventListener("input", function() {
 		document.getElementById("settings-music-volume-text").innerText = "Music volume: " + this.value + "%";
+		menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 	});
 	document.getElementById("settings-effects-volume").addEventListener("input", function() {
-		document.getElementById("settings-effects-volume-text").innerText = "Music volume: " + this.value + "%";
+		document.getElementById("settings-effects-volume-text").innerText = "Effects volume: " + this.value + "%";
 	});
 	document.getElementById("settings-mouse-sensitivity").addEventListener("input", function() {
 		document.getElementById("settings-mouse-sensitivity-text").innerText = "Mouse sensitivity: " + (window.parseInt(this.value) / 10).toFixed(1) + "x";
@@ -290,21 +326,23 @@ define(function(require) {
 	});
 	let selectBoxes = document.getElementsByClassName("select-box");
 	for (var i = 0; i < selectBoxes.length; i++) {
+		let selectBoxSelections = selectBoxes[i].getElementsByClassName("select-box-selections")[0];
+		selectBoxSelections.style.height = "auto";
+		selectBoxSelections.style.cacheHeight = document.defaultView.getComputedStyle(selectBoxSelections).height;
+		selectBoxSelections.style.height = "0px";
 		selectBoxes[i].addEventListener("click", function() {
 			let selectBoxSelections = this.getElementsByClassName("select-box-selections")[0];
-			console.log(selectBoxSelections.style.height);
 			if (selectBoxSelections.style.height === "0px" || selectBoxSelections.style.height === "") {
-				selectBoxSelections.style.transition = "";
-				selectBoxSelections.style.height = "auto";
-				let height = document.defaultView.getComputedStyle(selectBoxSelections).height;
-				selectBoxSelections.style.height = null;
-				selectBoxSelections.style.transition = "height 0.3s, opacity 0.3s";
-				selectBoxSelections.style.height = height;
+				selectBoxSelections.style.height = selectBoxSelections.style.cacheHeight;
 				selectBoxSelections.style.opacity = 1;
 			} else {
-				selectBoxSelections.style.height = "0px";
+				selectBoxSelections.style.height = 0;
 				selectBoxSelections.style.opacity = 0;
 			}
+		});
+		selectBoxes[i].addEventListener("mouseenter", function() {
+			let menuClick = AssetLoader.audio("./src/audio/effects/menuclick.wav");
+			menuClick.play();
 		});
 	}
 	document.getElementById("pause").addEventListener("click", function() {
@@ -335,6 +373,8 @@ define(function(require) {
 		setTimeout(none, 1000);
 	});
 	document.getElementById("logo").addEventListener("click", function() {
+		let menuHit = AssetLoader.audio("./src/audio/effects/menuHit.wav");
+		menuHit.play();
 		logoX = 30;
 		logoY = 50;
 		logoSize = 25;

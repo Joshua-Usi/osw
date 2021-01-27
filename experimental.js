@@ -116,7 +116,7 @@ define(function(require) {
 	let comboPulseSize = 1;
 	/* Audio variables */
 	let audio = AssetLoader.audio(`src/audio/${beatmap.AudioFilename}`);
-	audio.currentTime = beatmap.hitObjectsParsed[0].time - 5;
+	audio.currentTime = beatmap.hitObjectsParsed[4].time - 5;
 	// audio.currentTime = 0;
 	audio.playbackRate = 1;
 	/* Profiling variables */
@@ -341,8 +341,8 @@ define(function(require) {
 								}
 							}
 							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
-							mouse.click();
+							// mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
+							// mouse.click();
 							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 								hitObjects[i].cache.onFollowCircle = true;
 							} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
@@ -377,8 +377,8 @@ define(function(require) {
 								}
 							}
 							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
-							mouse.click();
+							// mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
+							// mouse.click();
 							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 								hitObjects[i].cache.onFollowCircle = true;
 							} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
@@ -503,8 +503,8 @@ define(function(require) {
 				if (approachCircleSize <= 1.6) {
 					approachCircleSize = 1.6;
 					if (hitObjects[i].type[0] === "1") {
-						mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y)
-						mouse.click();
+						// mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y)
+						// mouse.click();
 					}
 				}
 				/* Alpha Calculations ---------------------------------------------------------------- */

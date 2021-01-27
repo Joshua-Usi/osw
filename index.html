@@ -61,7 +61,7 @@
 						<p class="select-box-arrow">&#709;</p>
 					</div>
 					<div class="select-box-selections">
-						<p>Triangles</p>
+						<p class="selected">Triangles</p>
 						<p>Circles</p>
 					</div>
 				</div>
@@ -82,6 +82,19 @@
 					<p class="inline-block">Snaking sliders</p>
 					<input type="checkbox" id="settings-snaking-sliders" class="checkbox inline-block float-right" name="settings-snaking-sliders" value="true" checked>
 				</div>
+				<p>Cursor Trails</p>
+				<div class="select-box">
+					<div class="select-box-selected-container">
+						<!-- Default option -->
+						<p class="select-box-selected">Interpolated</p>
+						<p class="select-box-arrow">&#709;</p>
+					</div>
+					<div class="select-box-selections">
+						<p class="selected">Interpolated</p>
+						<p>Positional</p>
+						<p>None</p>
+					</div>
+				</div>
 				<!-- Performance Settings -->
 				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Performance</p>
@@ -92,6 +105,18 @@
 				<!-- setTimeout has a minimum timeout time of 4ms, thus making 250fps the limit -->
 				<!-- Vsync, 2x Vsync, Browser Maximum (250fps) -->
 				<p>Max Frame Rate</p>
+				<div class="select-box">
+					<div class="select-box-selected-container">
+						<!-- Default option -->
+						<p class="select-box-selected">VSync</p>
+						<p class="select-box-arrow">&#709;</p>
+					</div>
+					<div class="select-box-selections">
+						<p class="selected">VSync</p>
+						<p>2x VSync</p>
+						<p>Browser Maximum (250fps)</p>
+					</div>
+				</div>
 				<div>
 					<p class="inline-block">Show FPS</p>
 					<input type="checkbox" id="settings-show-fps" class="checkbox inline-block float-right" name="settings-show-fps" value="false">
@@ -102,10 +127,35 @@
 				<p class="inline-block">Draw Hit Values</p>
 				<input type="checkbox" id="settings-draw-hit-values" class="checkbox inline-block float-right" name="settings-draw-hit-values" value="true" checked>
 				<p>Score Update Rate</p>
+				<div class="select-box">
+					<div class="select-box-selected-container">
+						<!-- Default option -->
+						<p class="select-box-selected">Equal to frame rate</p>
+						<p class="select-box-arrow">&#709;</p>
+					</div>
+					<div class="select-box-selections">
+						<p class="selected">Equal to frame rate</p>
+						<p>Only on Change</p>
+						<p>15fps</p>
+						<p>30fps</p>
+						<p>60fps</p>
+						<p>Browser Maximum (250fps)</p>
+					</div>
+				</div>
 				<!-- Skin Settings -->
 				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Skin</p>
-				<p>Using: ajax transparent</p>
+				<p>Current Skin</p>
+				<div class="select-box">
+					<div class="select-box-selected-container">
+						<!-- Default option -->
+						<p class="select-box-selected">Ajax Transparent</p>
+						<p class="select-box-arrow">&#709;</p>
+					</div>
+					<div class="select-box-selections">
+						<p class="selected">Ajax Transparent</p>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div id="top-bar" class="triangle-background">
