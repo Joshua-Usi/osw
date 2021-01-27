@@ -1,16 +1,16 @@
 define(function(require) {
-  "use strict";
+	"use strict";
 	return {
 		Audio: {
 			masterVolume: 1,
 			musicVolume: 1,
-			effectVolume: 1,
+			effectsVolume: 1,
 		},
 		Inputs: {
-			keyBoardLeftButton: "z",
-			keyBoardRightButton: "x",
+			keyboardLeftButton: "z",
+			keyboardRightButton: "x",
 			enableMouseButtonsInGameplay: true,
-			mouseSensitivty: 1,
+			mouseSensitivity: 1,
 		},
 		UserInterface: {
 			introSequence: "Triangles",
@@ -28,7 +28,7 @@ define(function(require) {
 			ShowFPS: false,
 			sliderResolution: 1,
 			drawHitValues: true,
-			scoreUpdateRate: "Equal to frame rate"
+			scoreUpdateRate: "Equal to frame rate",
 		},
 		Skin: {
 			currentSkin: "Ajax Transparent",

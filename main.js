@@ -26,12 +26,14 @@ define(function(require) {
 	/* RequireJS Module Loading */
 	const Mouse = require("./src/scripts/Mouse.js");
 	const Song = require("./src/scripts/Song.js");
-	const Options = require("./src/scripts/Options.js");
+	let Options = require("./src/scripts/Options.js");
 	const AssetLoader = require("./src/scripts/AssetLoader.js");
 	const utils = require("./src/scripts/utils.js");
 	/* First time run setup */
-	if (!window.localStorage.use_low_power_mode) {
-		window.localStorage.setItem("use_low_power_mode", 0);
+	if (window.localStorage.options === undefined) {
+		window.localStorage.setItem("options", JSON.stringify(Options));
+	} else {
+		Options = JSON.parse(window.localStorage.getItem("options"));
 	}
 	/* offline context checks, needed to ensure if effects are working */
 	if (window.origin === null) {
@@ -76,6 +78,7 @@ define(function(require) {
 	canvas.height = 0.9 * window.innerHeight;
 	/* Need to append for wave.js */
 	document.querySelector("body").appendChild(menuAudio);
+	let settingsSet = false;
 	let isFirstClick = true;
 	let offset = 0;
 	let time = 0;
@@ -92,19 +95,52 @@ define(function(require) {
 	let logoY = 50;
 	let logoSize = 50;
 	let logoPulseSize = 55;
-	/* Local Storage ------------------------------------------------------------------------------------------- */
-	if (window.localStorage.getItem("use_low_power_mode") == parseInt(1)) {
-		document.getElementById("low-power-mode").checked = true;
-	}
-	if (window.localStorage.getItem("volume_music")) {}
 	/* Event Listeners ----------------------------------------------------------------------------------------- */
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
-			menuAudio.volume = 1;
+			menuAudio.volume = menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);;
 			menuAudio.play();
 			isFirstClick = false;
 			time = 0;
 			lastTime = 0;
+			/* Setting settings -----------------------------------------------------------------------------------------*/
+			/* Audio */
+			document.getElementById("settings-master-volume").value = Options.Audio.masterVolume * 100;
+			document.getElementById("settings-master-volume").dispatchEvent(new CustomEvent("input"));
+
+			document.getElementById("settings-music-volume").value = Options.Audio.musicVolume * 100;
+			document.getElementById("settings-music-volume").dispatchEvent(new CustomEvent("input"));
+
+			document.getElementById("settings-effects-volume").value = Options.Audio.effectsVolume * 100;
+			document.getElementById("settings-effects-volume").dispatchEvent(new CustomEvent("input"));
+			/* Inputs */
+			document.getElementById("settings-keyboard-left-button").innerText = Options.Inputs.keyboardLeftButton;
+			document.getElementById("settings-keyboard-right-button").innerText = Options.Inputs.keyboardRightButton;
+			document.getElementById("settings-enable-mouse-buttons-in-gameplay").checked = Options.Inputs.enableMouseButtonsInGameplay;
+
+			document.getElementById("settings-mouse-sensitivity").value = Options.Inputs.mouseSensitivity * 10;
+			document.getElementById("settings-mouse-sensitivity").dispatchEvent(new CustomEvent("input"));
+			/* User Interface */
+			document.getElementById("settings-intro-sequence").getElementsByClassName("select-box-selected")[0].innerText = Options.UserInterface.introSequence;
+			document.getElementById("settings-menu-parallax").checked = Options.UserInterface.menuParallax;
+			/* Gameplay */
+			document.getElementById("settings-background-dim").value = Options.Gameplay.backgroundDim * 100;
+			document.getElementById("settings-background-dim").dispatchEvent(new CustomEvent("input"));
+
+			document.getElementById("settings-draw-300-hits").checked = Options.Gameplay.draw300Hits;
+			document.getElementById("settings-snaking-sliders").checked = Options.Gameplay.snakingSliders;
+			document.getElementById("settings-cursor-trails").getElementsByClassName("select-box-selected")[0].innerText = Options.Gameplay.cursorTrails;
+			/* Performance */
+			document.getElementById("settings-low-power-mode").checked = Options.Performance.lowPowerMode;
+			document.getElementById("settings-max-frame-rate").getElementsByClassName("select-box-selected")[0].innerText = Options.Performance.maxFrameRate;
+			document.getElementById("settings-show-fps").checked = Options.Performance.ShowFPS;
+
+			document.getElementById("settings-slider-resolution").value = Options.Performance.sliderResolution;
+			document.getElementById("settings-slider-resolution").dispatchEvent(new CustomEvent("input"));
+
+			document.getElementById("settings-draw-hit-values").checked = Options.Performance.drawHitValues;
+			document.getElementById("settings-score-update-rate").getElementsByClassName("select-box-selected")[0].innerText = Options.Performance.scoreUpdateRate;
+			settingsSet = true;
 		}
 	});
 	window.addEventListener("resize", function() {
@@ -255,14 +291,18 @@ define(function(require) {
 		checkbox[i].addEventListener("input", function() {
 			if (this.checked === true) {
 				let checkOn = AssetLoader.audio("./src/audio/effects/check-on.wav");
+				checkOn.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 				checkOn.play();
 			} else {
 				let checkOff = AssetLoader.audio("./src/audio/effects/check-off.wav");
+				checkOff.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 				checkOff.play();
 			}
+			setSettings();
 		});
 		checkbox[i].addEventListener("mouseenter", function() {
 			let menuClick = AssetLoader.audio("./src/audio/effects/menuclick.wav");
+			menuClick.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 			menuClick.play();
 		});
 	}
@@ -270,10 +310,12 @@ define(function(require) {
 	for (let i = 0; i < buttons.length; i++) {
 		buttons[i].addEventListener("click", function() {
 			let menuHit = AssetLoader.audio("./src/audio/effects/menuHit.wav");
+			menuHit.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 			menuHit.play();
 		});
 		buttons[i].addEventListener("mouseenter", function() {
 			let menuHover = AssetLoader.audio("./src/audio/effects/menu-back-hover.wav");
+			menuHover.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 			menuHover.play();
 		});
 	}
@@ -282,29 +324,36 @@ define(function(require) {
 		sliders[i].addEventListener("input", function() {
 			this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
 			let sliderBar = AssetLoader.audio("./src/audio/effects/sliderbar.wav");
+			sliderBar.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 			sliderBar.play();
 		});
 		sliders[i].addEventListener("mouseenter", function() {
 			let menuClick = AssetLoader.audio("./src/audio/effects/menuclick.wav");
+			menuClick.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 			menuClick.play();
 		});
 	}
 	document.getElementById("settings-master-volume").addEventListener("input", function() {
 		document.getElementById("settings-master-volume-text").innerText = "Master volume: " + this.value + "%";
 		menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
+		setSettings();
 	});
 	document.getElementById("settings-music-volume").addEventListener("input", function() {
 		document.getElementById("settings-music-volume-text").innerText = "Music volume: " + this.value + "%";
 		menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
+		setSettings();
 	});
 	document.getElementById("settings-effects-volume").addEventListener("input", function() {
 		document.getElementById("settings-effects-volume-text").innerText = "Effects volume: " + this.value + "%";
+		setSettings();
 	});
 	document.getElementById("settings-mouse-sensitivity").addEventListener("input", function() {
 		document.getElementById("settings-mouse-sensitivity-text").innerText = "Mouse sensitivity: " + (window.parseInt(this.value) / 10).toFixed(1) + "x";
+		setSettings();
 	});
 	document.getElementById("settings-background-dim").addEventListener("input", function() {
 		document.getElementById("settings-background-dim-text").innerText = "Background dim: " + this.value + "%";
+		setSettings();
 	});
 	document.getElementById("settings-slider-resolution").addEventListener("input", function() {
 		let resolution = "";
@@ -320,17 +369,30 @@ define(function(require) {
 			resolution = "Sixteenth";
 		}
 		document.getElementById("settings-slider-resolution-text").innerText = "Slider resolution: " + resolution;
+		setSettings();
 	});
 	let selectBoxes = document.getElementsByClassName("select-box");
 	for (let i = 0; i < selectBoxes.length; i++) {
 		let selectBoxSelections = selectBoxes[i].getElementsByClassName("select-box-selections")[0];
+		let selections = selectBoxSelections.querySelectorAll("p");
+		for (let j = 0; j < selections.length; j++) {
+			selections[j].addEventListener("click", function() {
+				let p = this.parentNode.querySelectorAll("p");
+				for (let k = 0; k < p.length; k++) {
+					p[k].setAttribute("class", "");
+				}
+				this.setAttribute("class", "selected");
+				this.parentNode.parentNode.getElementsByClassName("select-box-selected")[0].innerText = this.innerText;
+				setSettings();
+			});
+		}
 		selectBoxSelections.style.height = "auto";
 		selectBoxSelections.style.cacheHeight = document.defaultView.getComputedStyle(selectBoxSelections).height;
 		selectBoxSelections.style.height = "0px";
 		selectBoxes[i].addEventListener("click", function() {
 			let selectBoxSelections = this.getElementsByClassName("select-box-selections")[0];
 			if (selectBoxSelections.style.height === "0px" || selectBoxSelections.style.height === "") {
-				selectBoxSelections.style.height = selectBoxSelections.style.cacheHeight;
+				selectBoxSelections.style.height = "calc(" + selectBoxSelections.style.cacheHeight + " + 1px)";
 				selectBoxSelections.style.opacity = 1;
 			} else {
 				selectBoxSelections.style.height = 0;
@@ -399,8 +461,38 @@ define(function(require) {
 	function none() {
 		document.getElementById("splash-screen").style.display = "none";
 	}
+	function setSettings() {
+		if (settingsSet === true) {
+			/* Audio */
+			Options.Audio.masterVolume = document.getElementById("settings-master-volume").value / 100;
+			Options.Audio.musicVolume = document.getElementById("settings-music-volume").value / 100;
+			Options.Audio.effectsVolume = document.getElementById("settings-effects-volume").value / 100;
+			/* Inputs */
+			Options.Inputs.keyboardLeftButton = document.getElementById("settings-keyboard-left-button").innerText;
+			Options.Inputs.keyboardRightButton = document.getElementById("settings-keyboard-right-button").innerText;
+			Options.Inputs.enableMouseButtonsInGameplay = document.getElementById("settings-enable-mouse-buttons-in-gameplay").checked;
+			Options.Inputs.mouseSensitivity = document.getElementById("settings-mouse-sensitivity").value / 10;
+			/* User Interface */
+			Options.UserInterface.introSequence = document.getElementById("settings-intro-sequence").getElementsByClassName("select-box-selected")[0].innerText;
+			Options.UserInterface.menuParallax = document.getElementById("settings-menu-parallax").checked;
+			/* Gameplay */
+			Options.Gameplay.backgroundDim = document.getElementById("settings-background-dim").value / 100;
+			Options.Gameplay.draw300Hits = document.getElementById("settings-draw-300-hits").checked;
+			Options.Gameplay.snakingSliders = document.getElementById("settings-snaking-sliders").checked;
+			Options.Gameplay.cursorTrails = document.getElementById("settings-cursor-trails").getElementsByClassName("select-box-selected")[0].innerText;
+			/* Performance */
+			Options.Performance.lowPowerMode = document.getElementById("settings-low-power-mode").checked;
+			Options.Performance.maxFrameRate = document.getElementById("settings-max-frame-rate").getElementsByClassName("select-box-selected")[0].innerText;
+			Options.Performance.ShowFPS = document.getElementById("settings-show-fps").checked;
+			Options.Performance.sliderResolution = document.getElementById("settings-slider-resolution").value;
+			Options.Performance.drawHitValues = document.getElementById("settings-draw-hit-values").checked;
+			Options.Performance.scoreUpdateRate = document.getElementById("settings-score-update-rate").getElementsByClassName("select-box-selected")[0].innerText;
+			localStorage.setItem("options", JSON.stringify(Options));
+			console.log("settings saved!");
+		}
+	}
 	/* Library Stuff ------------------------------------------------------------------------------------------- */
-	if (window.origin !== "null" && window.localStorage.getItem("use_low_power_mode") == parseInt(0)) {
+	if (window.origin !== "null") {
 		let wave = new Wave();
 		wave.fromElement("menu-audio", "audio-visualiser", {
 			stroke: 8,

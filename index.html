@@ -40,12 +40,12 @@
 				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Inputs</p>
 				<p class="inline-block">Keyboard left button</p>
-				<p class="inline-block character float-right">z</p>
+				<p class="inline-block character float-right" id="settings-keyboard-left-button">z</p>
 				<p class="inline-block">Keyboard right button</p>
-				<p class="inline-block character float-right">x</p>
+				<p class="inline-block character float-right" id="settings-keyboard-right-button">x</p>
 				<p style="color: #999;">Note! osu!web does not support right clicks</p>
 				<p class="inline-block" style="letter-spacing: -0.01vw;">Enable mouse buttons in gameplay</p>
-				<input type="checkbox" id="settings-enable-mouse-buttons" class="checkbox inline-block float-right" name="settings-enable-mouse-buttons" value="true" checked>
+				<input type="checkbox" id="settings-enable-mouse-buttons-in-gameplay" class="checkbox inline-block float-right" name="settings-enable-mouse-buttons-in-gameplay" checked>
 				<p style="color: #999;">Note! sensitivity only applies during gameplay</p>
 				<p id="settings-mouse-sensitivity-text">Mouse sensitivity: 1.0x</p>
 				<input type="range" id="settings-mouse-sensitivity" class="slider" min="1" max="60" value="10">
@@ -54,7 +54,7 @@
 				<p class="sidenav-title-text">User Interface</p>
 				<!-- Triangles or Circles -->
 				<p>Intro Sequence</p>
-				<div class="select-box">
+				<div class="select-box" id="settings-intro-sequence">
 					<div class="select-box-selected-container">
 						<!-- Default option -->
 						<p class="select-box-selected">Triangles</p>
@@ -67,7 +67,7 @@
 				</div>
 				<div>
 					<p class="inline-block">Menu parallax</p>
-					<input type="checkbox" id="settings-enable-menu-parallax" class="checkbox inline-block float-right" name="settings-enable-menu-parallax" value="true" checked>
+					<input type="checkbox" id="settings-menu-parallax" class="checkbox inline-block float-right" name="settings-menu-parallax" checked>
 				</div>
 				<!-- Gameplay Settings -->
 				<div class="sidenav-divider"></div>
@@ -76,14 +76,14 @@
 				<input type="range" id="settings-background-dim" class="slider" min="0" max="100" value="80">
 				<div>
 					<p class="inline-block">Draw 300 hits</p>
-					<input type="checkbox" id="settings-draw-300-hits" class="checkbox inline-block float-right" name="settings-draw-300-hits" value="true" checked>
+					<input type="checkbox" id="settings-draw-300-hits" class="checkbox inline-block float-right" name="settings-draw-300-hits" checked>
 				</div>
 				<div>
 					<p class="inline-block">Snaking sliders</p>
-					<input type="checkbox" id="settings-snaking-sliders" class="checkbox inline-block float-right" name="settings-snaking-sliders" value="true" checked>
+					<input type="checkbox" id="settings-snaking-sliders" class="checkbox inline-block float-right" name="settings-snaking-sliders" checked>
 				</div>
 				<p>Cursor Trails</p>
-				<div class="select-box">
+				<div class="select-box" id="settings-cursor-trails">
 					<div class="select-box-selected-container">
 						<!-- Default option -->
 						<p class="select-box-selected">Interpolated</p>
@@ -100,12 +100,12 @@
 				<p class="sidenav-title-text">Performance</p>
 				<div>
 					<p class="inline-block">Low power mode</p>
-					<input type="checkbox" id="settings-low-power-mode" class="checkbox inline-block float-right" name="settings-low-power-mode" value="false">
+					<input type="checkbox" id="settings-low-power-mode" class="checkbox inline-block float-right" name="settings-low-power-mode">
 				</div>
 				<!-- setTimeout has a minimum timeout time of 4ms, thus making 250fps the limit -->
 				<!-- Vsync, 2x Vsync, Browser Maximum (250fps) -->
 				<p>Max Frame Rate</p>
-				<div class="select-box">
+				<div class="select-box" id="settings-max-frame-rate">
 					<div class="select-box-selected-container">
 						<!-- Default option -->
 						<p class="select-box-selected">VSync</p>
@@ -119,15 +119,15 @@
 				</div>
 				<div>
 					<p class="inline-block">Show FPS</p>
-					<input type="checkbox" id="settings-show-fps" class="checkbox inline-block float-right" name="settings-show-fps" value="false">
+					<input type="checkbox" id="settings-show-fps" class="checkbox inline-block float-right" name="settings-show-fps">
 				</div>
 				<!-- Full, Half, Quarter, Eighth, Sixteenth -->
 				<p id="settings-slider-resolution-text">Slider Resolution: Full</p>
 				<input type="range" id="settings-slider-resolution" class="slider" min="1" max="5" value="1">
 				<p class="inline-block">Draw Hit Values</p>
-				<input type="checkbox" id="settings-draw-hit-values" class="checkbox inline-block float-right" name="settings-draw-hit-values" value="true" checked>
+				<input type="checkbox" id="settings-draw-hit-values" class="checkbox inline-block float-right" name="settings-draw-hit-values" checked>
 				<p>Score Update Rate</p>
-				<div class="select-box">
+				<div class="select-box" id="settings-score-update-rate">
 					<div class="select-box-selected-container">
 						<!-- Default option -->
 						<p class="select-box-selected">Equal to frame rate</p>
@@ -135,7 +135,7 @@
 					</div>
 					<div class="select-box-selections">
 						<p class="selected">Equal to frame rate</p>
-						<p>Only on Change</p>
+						<p>Only on Change (fastest)</p>
 						<p>15fps</p>
 						<p>30fps</p>
 						<p>60fps</p>
@@ -146,7 +146,7 @@
 				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Skin</p>
 				<p>Current Skin</p>
-				<div class="select-box">
+				<div class="select-box" id="current-skin">
 					<div class="select-box-selected-container">
 						<!-- Default option -->
 						<p class="select-box-selected">Ajax Transparent</p>
