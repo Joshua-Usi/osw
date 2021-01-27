@@ -124,3 +124,9 @@ Added:
 	- Loading bar
 		- Prevents errors
 	- Dividers between groups of settings
+---------------------------------------------------------------
+v2021.0.2.6
+27 / 1 / 21
+
+Added:
+	- Settings functionality
