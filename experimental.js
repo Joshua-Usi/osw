@@ -291,7 +291,6 @@ define(function(require) {
 					scoreObjects.push(new HitObject.ScoreObject(hitWindowScore, hitObjectMapped.x, hitObjectMapped.y, audio.currentTime + 1));
 					hitObjects.splice(i, 1);
 					i--;
-					mouse.unClick();
 				}
 				/* Out of Index Handling ---------------------------------------------------------------- */
 				if (i <= -1) {
@@ -299,14 +298,6 @@ define(function(require) {
 					if (hitObjects.length === 0) {
 						continue;
 					}
-				}
-				/* Slider Head Hit Handling ---------------------------------------------------------------- */
-				if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hitHead === false && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[0])) {
-					score += 30;
-					combo++;
-					comboPulseSize = 1;
-					hitObjects[i].cache.hitHead = true;
-					hitObjects[i].cache.hasHitAtAll = true;
 				}
 				/* Slider Follow Circle Handling ---------------------------------------------------------------- */
 				if (hitObjects[i].type[1] === "1" && audio.currentTime >= hitObjects[i].time) {
@@ -329,7 +320,7 @@ define(function(require) {
 								if (hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j] === false) {
 									let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].x, hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 									let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-									if (utils.dist(mapped.x, mapped.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2) {
+									if (utils.dist(mapped.x, mapped.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true) {
 										hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j] = true;
 										hitObjects[i].cache.sliderTicksHit++;
 										score += 10;
@@ -364,7 +355,7 @@ define(function(require) {
 								if (hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j] === false) {
 									let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].x, hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 									let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-									if (utils.dist(mapped.x, mapped.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2) {
+									if (utils.dist(mapped.x, mapped.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true) {
 										hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j] = true;
 										hitObjects[i].cache.sliderTicksHit++;
 										score += 10;
@@ -391,9 +382,6 @@ define(function(require) {
 								score += 30;
 								combo++;
 								comboPulseSize = 1;
-							} else {
-								combo = 0;
-								document.getElementById("combo-container").innerHTML = "";
 							}
 						}
 					} else {
@@ -410,6 +398,14 @@ define(function(require) {
 							}
 						}
 					}
+				}
+				/* Slider Head Hit Handling ---------------------------------------------------------------- */
+				if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hitHead === false && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[0])) {
+					score += 30;
+					combo++;
+					comboPulseSize = 1;
+					hitObjects[i].cache.hitHead = true;
+					hitObjects[i].cache.hasHitAtAll = true;
 				}
 				/* Slider Tick Miss Check ---------------------------------------------------------------- */
 				if (hitObjects[i].type[1] === "1" && audio.currentTime >= hitObjects[i].time) {
@@ -474,8 +470,11 @@ define(function(require) {
 					}
 					scoreObjects.push(new HitObject.ScoreObject(0, mapped.x, mapped.y, audio.currentTime + 1));
 				} else if (hitObjects[i].type[3] === "1" && audio.currentTime >= hitObjects[i].endTime) {
-					miss = true;
-					scoreObjects.push(new HitObject.ScoreObject(0, hitObjectMapped.x, hitObjectMapped.y, audio.currentTime + 1));
+					// miss = true;
+					scoreObjects.push(new HitObject.ScoreObject(300, hitObjectMapped.x, hitObjectMapped.y, audio.currentTime + 1));
+					combo++;
+					hitObjects.splice(i, 1);
+					i--;
 				}
 				if (miss === true) {
 					// combo = 0;
@@ -484,7 +483,9 @@ define(function(require) {
 					i--;
 					document.getElementById("combo-container").innerHTML = "";
 				}
+				mouse.unClick();
 			}
+			mouse.unClick();
 			/* Render Loop ---------------------------------------------------------------- */
 			for (let i = 0; i < hitObjects.length; i++) {
 				/* Approach Circle Calculations ---------------------------------------------------------------- */
@@ -498,8 +499,8 @@ define(function(require) {
 				if (approachCircleSize <= 1.6) {
 					approachCircleSize = 1.6;
 					if (hitObjects[i].type[0] === "1") {
-						// mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y)
-						// mouse.click();
+						mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y)
+						mouse.click();
 					}
 				}
 				/* Alpha Calculations ---------------------------------------------------------------- */
@@ -684,8 +685,8 @@ define(function(require) {
 			} else {
 				document.getElementById("frame-rate").style.background = "#B00020";
 			}
-			// setTimeout(animate, 0);
-			requestAnimationFrame(animate);
+			setTimeout(animate, 0);
+			// requestAnimationFrame(animate);
 		})();
 	});
 });
