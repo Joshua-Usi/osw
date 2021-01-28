@@ -445,7 +445,7 @@ body {
 }
 .menu-bar-buttons-icon-animation {
 	animation-name: icon-rotate;
-	animation-duration: 1.6s;
+	animation-duration: 1.5s;
 	animation-iteration-count: infinite;
 }
 
@@ -474,8 +474,8 @@ body {
 
 .menu-bar-image-move-animation {
 	animation-name: icon-bounce;
-	animation-duration: 0.4s;
-	animation-timing-function: ease-in-out;
+	animation-duration: 375ms;
+	animation-timing-function: cubic-bezier(0.68, -0.6, 0.32, 1.6);
 	animation-iteration-count: infinite;
 }
 
