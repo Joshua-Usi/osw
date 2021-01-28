@@ -66,23 +66,23 @@ define(function(require) {
 	/* initial menu song pool */
 	let songs = [
 		Song.create("cYsmix - Triangles.mp3", Song.bpm(160)),
-		// Song.create("nekodex - circles.mp3", Song.bpm([185, 360, 600, 185], [0, 8, 10.5, 12])),
+		Song.create("nekodex - circles.mp3", Song.bpm([185, 360, 600, 185], [0, 8, 10.5, 12])),
 	];
 	/* only add christmas songs to list if the month is december*/
 	if (new Date().getMonth() === 11) {
 		songs.push(Song.create("nekodex - aureole.mp3", Song.bpm(140)));
 		songs.push(Song.create("nekodex - Little Drummer Girl.mp3", Song.bpm(140)));
 	}
-	let chosenSong = utils.randomInt(0, songs.length - 1);
-	let bpm = songs[chosenSong].bpm.get();
-	let menuAudio = new Audio(`src/audio/${songs[chosenSong].src}`);
+	let chosenSong;
+	let bpm;
+	let menuAudio = new Audio();
 	menuAudio.addEventListener("play", function() {
 		document.getElementById("now-playing").innerText = "Now Playing: " + utils.replaceAll(songs[chosenSong].src, [".wav", ".mp3", ".ogg"]);
 	});
 	menuAudio.addEventListener("ended", function() {
-		chosenSong = utils.randomInt(0, songs.length - 1);
-		document.getElementById("now-playing").innerText = "Now Playing: " + songs[chosenSong].src;
-		this.src = `src/audio/${songs[chosenSong].src}`;
+		// chosenSong = utils.randomInt(0, songs.length - 1);
+		// document.getElementById("now-playing").innerText = "Now Playing: " + songs[chosenSong].src;
+		// this.src = `src/audio/${songs[chosenSong].src}`;
 		this.play();
 	});
 	menuAudio.id = "menu-audio";
@@ -112,11 +112,6 @@ define(function(require) {
 	/* Event Listeners ----------------------------------------------------------------------------------------- */
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
-			menuAudio.volume = menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);;
-			menuAudio.play();
-			isFirstClick = false;
-			time = 0;
-			lastTime = 0;
 			/* Setting settings -----------------------------------------------------------------------------------------*/
 			/* Audio */
 			document.getElementById("settings-master-volume").value = Options.Audio.masterVolume * 100;
@@ -155,6 +150,123 @@ define(function(require) {
 			document.getElementById("settings-draw-hit-values").checked = Options.Performance.drawHitValues;
 			document.getElementById("settings-score-update-rate").getElementsByClassName("select-box-selected")[0].innerText = Options.Performance.scoreUpdateRate;
 			settingsSet = true;
+			if (document.getElementById("settings-intro-sequence").getElementsByClassName("select-box-selected")[0].innerText === "Triangles") {
+				chosenSong = 0;
+				menuAudio.src = `src/audio/${songs[chosenSong].src}`;
+				bpm = songs[chosenSong].bpm.get();
+			} else {
+				chosenSong = 1;
+				menuAudio.src = `src/audio/${songs[chosenSong].src}`;
+				bpm = songs[chosenSong].bpm.get();
+			}
+			menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);;
+			menuAudio.play();
+			isFirstClick = false;
+			time = 0;
+			lastTime = 0;
+			(function animate() {
+				let backgroundImageParallax = document.getElementById("background-blur");
+				let menuParallax = document.getElementById("menu-parallax");
+				let enableLowPowerMode = false;
+				let logoSizeIncrease = 1.1;
+				if (enableLowPowerMode === false) {
+					/* style image parallax based on mouse position */
+					backgroundImageParallax.style.opacity = 1;
+					backgroundImageParallax.style.top = (mouse.position.y - window.innerHeight * 0.5) / 32 - window.innerHeight * 0.05 + "px";
+					backgroundImageParallax.style.left = (mouse.position.x - window.innerWidth * 0.5) / 32 - window.innerWidth * 0.05 + "px";
+					menuParallax.style.top = "calc(5vh + " + ((mouse.position.y - window.innerHeight * 0.5) / 64 - window.innerHeight * 0.05) + "px)";
+					menuParallax.style.left = "calc(" + ((mouse.position.x - window.innerWidth * 0.5) / 64 - window.innerWidth * 0.05) + "px)";
+					let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
+					/* triangle background moves */
+					offset -= 0.25;
+					for (let i = 0; i < triangleBackgroundMoves.length; i++) {
+						triangleBackgroundMoves[i].style.backgroundPositionY = offset + "px";
+					}
+					/* beat detection and accumulation */
+					bpm = songs[chosenSong].bpm.get(time);
+					lastTime = time;
+					time = menuAudio.currentTime;
+					if (accumulator < 0) {
+						accumulator = 0;
+					}
+					accumulator += time - lastTime;
+					let logo = document.getElementById("logo");
+					if (accumulator > 1 / (bpm / 60)) {
+						while (accumulator > 1 / (bpm / 60)) {
+							/* logo pulse*/
+							logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
+							logo.style.width = logoSize + "vh";
+							logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
+							logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
+							logo.style.backgroundSize = logoSize + "vh";
+							logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
+							/* logo background pulse, maximum 5 to prevent lag */
+							if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
+								let logoCircle = document.createElement("img");
+								logoCircle.src = "src/images/circle.png";
+								logoCircle.style.position = "absolute";
+								logoCircle.style.width = logoPulseSize + "vh";
+								logoCircle.style.top = "calc(" + logoY + "vh - " + logoPulseSize / 2 + "vh)";
+								logoCircle.style.left = "calc(" + logoX + "vw - " + logoPulseSize / 2 + "vh)";
+								logoCircle.style.opacity = 0.5;
+								document.getElementById("logo-beat").appendChild(logoCircle);
+							}
+							/* snow only in december, maximum 50 to prevent lag */
+							/* last tested:
+							 *	
+							 *	27/12/2020, works
+							 *	9/01/2021, works
+							 */
+							if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
+								let snowflake = document.createElement("img");
+								snowflake.src = "src/images/snowflake.png";
+								snowflake.style.position = "fixed";
+								snowflake.style.width = Math.random() * 2 + 1 + "vh";
+								snowflake.style.top = -10 + "vh";
+								snowflake.style.left = Math.random() * 100 + "vw";
+								snowflake.style.opacity = 0.4;
+								snowflake.style.zIndex = -5;
+								document.getElementById("snow").appendChild(snowflake);
+							}
+							accumulator -= 1 / (bpm / 60);
+						}
+					} else {
+						logo.style.transition = "width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s";
+						logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
+						logo.style.width = logoSize * logoSizeIncrease + "vh";
+						logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
+						logo.style.left = "calc(5vw + " + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
+						logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
+						logo.style.backgroundPositionY = offset % (1024 * 0.5) * logoSizeIncrease + "px";
+					}
+				} else {
+					backgroundImageParallax.style.opacity = 0;
+				}
+				let logoCircles = document.getElementById("logo-beat").querySelectorAll("img");
+				for (let i = 0; i < logoCircles.length; i++) {
+					if (parseFloat(logoCircles[i].style.opacity) <= 0) {
+						logoCircles[i].remove();
+						break;
+					}
+					logoCircles[i].style.opacity = parseFloat(logoCircles[i].style.opacity) - 0.05;
+					logoCircles[i].style.width = parseFloat(logoCircles[i].style.width) + 0.5 + "vh";
+					logoCircles[i].style.top = "calc(" + logoY + "vh - " + logoCircles[i].style.width + " / 2)";
+					logoCircles[i].style.left = "calc(5vw + " + logoX + "vw - " + logoCircles[i].style.width + " / 2)";
+				}
+				if (new Date().getMonth() === 11) {
+					let snow = document.getElementById("snow").querySelectorAll("img");
+					for (let i = 0; i < snow.length; i++) {
+						if (parseFloat(snow[i].style.top) >= 100) {
+							snow[i].remove();
+							break;
+						}
+						snow[i].style.top = parseFloat(snow[i].style.top) + parseFloat(snow[i].style.width) / 10 + "vh";
+						snow[i].style.left = parseFloat(snow[i].style.left) + Math.sin(parseFloat(snow[i].style.width) * 9 + parseFloat(snow[i].style.top) / 10) / 25 + "vw";
+						snow[i].style.transform = "rotate(" + parseFloat(snow[i].style.top) * parseFloat(snow[i].style.width) + "deg)";
+					}
+				}
+				requestAnimationFrame(animate);
+			})();
 		}
 	});
 	window.addEventListener("resize", function() {
@@ -174,109 +286,6 @@ define(function(require) {
 		document.getElementById("splash-screen").style.animationDuration = "1s";
 		document.getElementById("splash-screen").style.animationDelay = "1s";
 		document.getElementById("heart-loader").style.display = "none";
-		(function animate() {
-			let backgroundImageParallax = document.getElementById("background-blur");
-			let menuParallax = document.getElementById("menu-parallax");
-			let enableLowPowerMode = false;
-			let logoSizeIncrease = 1.1;
-			if (enableLowPowerMode === false) {
-				/* style image parallax based on mouse position */
-				backgroundImageParallax.style.opacity = 1;
-				backgroundImageParallax.style.top = (mouse.position.y - window.innerHeight * 0.5) / 32 - window.innerHeight * 0.05 + "px";
-				backgroundImageParallax.style.left = (mouse.position.x - window.innerWidth * 0.5) / 32 - window.innerWidth * 0.05 + "px";
-				menuParallax.style.top = "calc(5vh + " + ((mouse.position.y - window.innerHeight * 0.5) / 64 - window.innerHeight * 0.05) + "px)";
-				menuParallax.style.left = "calc(" + ((mouse.position.x - window.innerWidth * 0.5) / 64 - window.innerWidth * 0.05) + "px)";
-				let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
-				/* triangle background moves */
-				offset -= 0.25;
-				for (let i = 0; i < triangleBackgroundMoves.length; i++) {
-					triangleBackgroundMoves[i].style.backgroundPositionY = offset + "px";
-				}
-				/* beat detection and accumulation */
-				bpm = songs[chosenSong].bpm.get(time);
-				lastTime = time;
-				time = menuAudio.currentTime;
-				if (accumulator < 0) {
-					accumulator = 0;
-				}
-				accumulator += time - lastTime;
-				let logo = document.getElementById("logo");
-				if (accumulator > 1 / (bpm / 60)) {
-					while (accumulator > 1 / (bpm / 60)) {
-						/* logo pulse*/
-						logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
-						logo.style.width = logoSize + "vh";
-						logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
-						logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
-						logo.style.backgroundSize = logoSize + "vh";
-						logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
-						/* logo background pulse, maximum 5 to prevent lag */
-						if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
-							let logoCircle = document.createElement("img");
-							logoCircle.src = "src/images/circle.png";
-							logoCircle.style.position = "absolute";
-							logoCircle.style.width = logoPulseSize + "vh";
-							logoCircle.style.top = "calc(" + logoY + "vh - " + logoPulseSize / 2 + "vh)";
-							logoCircle.style.left = "calc(" + logoX + "vw - " + logoPulseSize / 2 + "vh)";
-							logoCircle.style.opacity = 0.5;
-							document.getElementById("logo-beat").appendChild(logoCircle);
-						}
-						/* snow only in december, maximum 50 to prevent lag */
-						/* last tested:
-						 *	
-						 *	27/12/2020, works
-						 *	9/01/2021, works
-						 */
-						if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
-							let snowflake = document.createElement("img");
-							snowflake.src = "src/images/snowflake.png";
-							snowflake.style.position = "fixed";
-							snowflake.style.width = Math.random() * 2 + 1 + "vh";
-							snowflake.style.top = -10 + "vh";
-							snowflake.style.left = Math.random() * 100 + "vw";
-							snowflake.style.opacity = 0.4;
-							snowflake.style.zIndex = -5;
-							document.getElementById("snow").appendChild(snowflake);
-						}
-						accumulator -= 1 / (bpm / 60);
-					}
-				} else {
-					logo.style.transition = "width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s";
-					logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
-					logo.style.width = logoSize * logoSizeIncrease + "vh";
-					logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
-					logo.style.left = "calc(5vw + " + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
-					logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
-					logo.style.backgroundPositionY = offset % (1024 * 0.5) * logoSizeIncrease + "px";
-				}
-			} else {
-				backgroundImageParallax.style.opacity = 0;
-			}
-			let logoCircles = document.getElementById("logo-beat").querySelectorAll("img");
-			for (let i = 0; i < logoCircles.length; i++) {
-				if (parseFloat(logoCircles[i].style.opacity) <= 0) {
-					logoCircles[i].remove();
-					break;
-				}
-				logoCircles[i].style.opacity = parseFloat(logoCircles[i].style.opacity) - 0.05;
-				logoCircles[i].style.width = parseFloat(logoCircles[i].style.width) + 0.5 + "vh";
-				logoCircles[i].style.top = "calc(" + logoY + "vh - " + logoCircles[i].style.width + " / 2)";
-				logoCircles[i].style.left = "calc(5vw + " + logoX + "vw - " + logoCircles[i].style.width + " / 2)";
-			}
-			if (new Date().getMonth() === 11) {
-				let snow = document.getElementById("snow").querySelectorAll("img");
-				for (let i = 0; i < snow.length; i++) {
-					if (parseFloat(snow[i].style.top) >= 100) {
-						snow[i].remove();
-						break;
-					}
-					snow[i].style.top = parseFloat(snow[i].style.top) + parseFloat(snow[i].style.width) / 10 + "vh";
-					snow[i].style.left = parseFloat(snow[i].style.left) + Math.sin(parseFloat(snow[i].style.width) * 9 + parseFloat(snow[i].style.top) / 10) / 25 + "vw";
-					snow[i].style.transform = "rotate(" + parseFloat(snow[i].style.top) * parseFloat(snow[i].style.width) + "deg)";
-				}
-			}
-			requestAnimationFrame(animate);
-		})();
 	});
 	document.getElementById("top-bar").addEventListener("mouseenter", function() {
 		utils.blurDiv("background-blur", 4);
@@ -291,10 +300,14 @@ define(function(require) {
 	document.getElementById("close-btn").addEventListener("click", function() {
 		document.getElementById("sidenav").style.width = "0";
 		document.getElementById("sidenav").style.opacity = "0.2";
+		let backButtonClick = AssetLoader.audio("./src/audio/effects/back-button-click.wav");
+		backButtonClick.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
+		backButtonClick.play();
 	});
 	document.getElementById("settings-icon").addEventListener("click", function() {
 		document.getElementById("sidenav").style.width = "25vw";
 		document.getElementById("sidenav").style.opacity = "1";
+		document.getElementById("menu-bar-settings").dispatchEvent(new CustomEvent("click"));
 	});
 	document.getElementById("menu-bar-settings").addEventListener("click", function() {
 		document.getElementById("sidenav").style.width = "25vw";
@@ -323,13 +336,47 @@ define(function(require) {
 	let buttons = document.getElementsByClassName("menu-bar-buttons-parent");
 	for (let i = 0; i < buttons.length; i++) {
 		buttons[i].addEventListener("click", function() {
-			let menuHit = AssetLoader.audio("./src/audio/effects/menuHit.wav");
+			let menuHit = AssetLoader.audio();
 			menuHit.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
+			switch (this.id) {
+				case "menu-bar-settings":
+					menuHit.src = "./src/audio/effects/menu-options-click.wav";
+					break;
+				case "menu-bar-play":
+					menuHit.src = "./src/audio/effects/menu-freeplay-click.wav";
+					break;
+				case "menu-bar-edit":
+					menuHit.src = "./src/audio/effects/menu-edit-click.wav";
+					break;
+				case "menu-bar-direct":
+					menuHit.src = "./src/audio/effects/menu-direct-click.wav";
+					break;
+				case "menu-bar-exit":
+					menuHit.src = "./src/audio/effects/menu-exit-click.wav";
+					break;
+			}
 			menuHit.play();
 		});
 		buttons[i].addEventListener("mouseenter", function() {
-			let menuHover = AssetLoader.audio("./src/audio/effects/menu-back-hover.wav");
+			let menuHover = AssetLoader.audio();
 			menuHover.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
+			switch (this.id) {
+				case "menu-bar-settings":
+					menuHover.src = "./src/audio/effects/menu-options-hover.wav";
+					break;
+				case "menu-bar-play":
+					menuHover.src = "./src/audio/effects/menu-freeplay-hover.wav";
+					break;
+				case "menu-bar-edit":
+					menuHover.src = "./src/audio/effects/menu-edit-hover.wav";
+					break;
+				case "menu-bar-direct":
+					menuHover.src = "./src/audio/effects/menu-direct-hover.wav";
+					break;
+				case "menu-bar-exit":
+					menuHover.src = "./src/audio/effects/menu-exit-hover.wav";
+					break;
+			}
 			menuHover.play();
 		});
 	}
@@ -428,18 +475,18 @@ define(function(require) {
 		}
 	});
 	document.getElementById("previous").addEventListener("click", function() {
-		menuAudio.pause();
-		chosenSong = utils.randomInt(0, songs.length - 1);
-		bpm = songs[chosenSong].bpm.get();
-		menuAudio.src = `src/audio/${songs[chosenSong].src}`;
-		menuAudio.play();
+		// menuAudio.pause();
+		// chosenSong = utils.randomInt(0, songs.length - 1);
+		// bpm = songs[chosenSong].bpm.get();
+		// menuAudio.src = `src/audio/${songs[chosenSong].src}`;
+		// menuAudio.play();
 	});
 	document.getElementById("next").addEventListener("click", function() {
-		menuAudio.pause();
-		chosenSong = utils.randomInt(0, songs.length - 1);
-		bpm = songs[chosenSong].bpm.get();
-		menuAudio.src = `src/audio/${songs[chosenSong].src}`;
-		menuAudio.play();
+		// menuAudio.pause();
+		// chosenSong = utils.randomInt(0, songs.length - 1);
+		// bpm = songs[chosenSong].bpm.get();
+		// menuAudio.src = `src/audio/${songs[chosenSong].src}`;
+		// menuAudio.play();
 	});
 	document.getElementById("splash-screen").addEventListener("click", function() {
 		this.style.opacity = 0;
