@@ -115,7 +115,7 @@ define(function(require) {
 	let comboPulseSize = 1;
 	/* Audio variables */
 	let audio = AssetLoader.audio(`src/audio/${beatmap.AudioFilename}`);
-	audio.currentTime = beatmap.hitObjectsParsed[4].time - 5;
+	audio.currentTime = beatmap.hitObjectsParsed[0].time - 5;
 	// audio.currentTime = 0;
 	audio.playbackRate = 1;
 	/* Profiling variables */
@@ -201,6 +201,7 @@ define(function(require) {
 							}
 							hitObjects[i].cache.specificSliderTicksPosition.push(tempArray);
 						}
+						hitObjects[i].cache.totalTicks = hitObjects[i].cache.specificSliderTicksPosition[0].length;
 					} else if (hitObjects[i].type[3] === "1" && hitObjects[i].cache.cacheSetAfterHit === false) {
 						hitObjects[i].cache.cacheSetAfterHit = true;
 						/* Cache Setup for Spinner ---------------------------------------------------------------- */
@@ -222,6 +223,7 @@ define(function(require) {
 						hitObjects[i].cache.sliderBodyPosition = 0;
 						hitObjects[i].cache.currentSlide = 0;
 						hitObjects[i].cache.sliderTicksHit = 0;
+						hitObjects[i].cache.repeatsHit = 0;
 						hitObjects[i].cache.points = [];
 						hitObjects[i].cache.timingPointUninheritedIndex = timingPointUninheritedIndex;
 						/* Precalculate Slider Curve Points */
@@ -377,11 +379,17 @@ define(function(require) {
 						}
 						if (sliderRepeat === true) {
 							hitObjects[i].cache.currentSlide++;
+							if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
+								hitObjects[i].cache.repeatsHit++;
+							}
 							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true) {
 								score += 30;
 								combo++;
 								comboPulseSize = 1;
+							} else if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
+								combo = 0;
+								document.getElementById("combo-container").innerHTML = "";
 							}
 						}
 					} else {
@@ -434,17 +442,56 @@ define(function(require) {
 				/* Slider Score Calculations ---------------------------------------------------------------- */
 				if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hasEnded === true) {
 					let sliderElementsHit = 0;
-					if (hitObjects[i]) {}
+					/* 1 head */
+					/* 1 end */
+					/* 1 follow circle */
+					/* n repeats */
+					/* m * n ticks */
+					let totalSliderElements = hitObjects[i].slides + (hitObjects[i].slides) * hitObjects[i].cache.totalTicks;
+					if (hitObjects[i].cache.headHit === true) {
+						sliderElementsHit++;
+					}
+					if (hitObjects[i].cache.hitEnd === true) {
+						sliderElementsHit++;
+					}
+					if (hitObjects[i].cache.onFollowCircle === true) {
+						sliderElementsHit++;
+					}
+					sliderElementsHit += hitObjects[i].cache.repeatsHit;
+					for (var j = 0; j < hitObjects[i].cache.specificSliderTicksHit.length; j++) {
+						for (var k = 0; k < hitObjects[i].cache.specificSliderTicksHit[j].length; k++) {
+							if (hitObjects[i].cache.specificSliderTicksHit[j][k] === true) {
+								sliderElementsHit++;
+							}
+						}
+					}
 					let mapped;
 					if (hitObjects[i].slides % 2 === 0) {
 						mapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					} else {
 						mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					}
-					score += utils.hitScore(300, combo, difficultyMultiplier, 1);
+					let hitScore = 0;
+					if (sliderElementsHit === totalSliderElements) {
+						hitScore = 300;
+						total300++;
+					} else if (sliderElementsHit >= 0.5 * totalSliderElements) {
+						hitScore = 100;
+						total100++;
+					} else if (sliderElementsHit > 0) {
+						hitScore = 50;
+						total50++;
+					}
 					// combo++;
-					comboPulseSize = 1;
-					scoreObjects.push(new HitObject.ScoreObject(300, mapped.x, mapped.y, audio.currentTime + 1));
+					if (hitScore !== 0) {
+						comboPulseSize = 1;
+						score += utils.hitScore(hitScore, combo, difficultyMultiplier, 1);
+						scoreObjects.push(new HitObject.ScoreObject(hitScore, mapped.x, mapped.y, audio.currentTime + 1));
+					} else {
+						totalMisses++;
+						combo = 0;
+						document.getElementById("combo-container").innerHTML = "";
+					}
 					hitObjects.splice(i, 1);
 					i--;
 				}
@@ -685,7 +732,7 @@ define(function(require) {
 			} else {
 				document.getElementById("frame-rate").style.background = "#B00020";
 			}
-			setTimeout(animate, 0);
+			setTimeout(animate, 4);
 			// requestAnimationFrame(animate);
 		})();
 	});
