@@ -25,18 +25,9 @@ body {
 	transition: background 0.5s ease;
 }
 
-.top-bar-text:hover {
-	background: #555;
-}
-
 .gamemode-icons {
 	padding: 1.6vh;
 	border-radius: 100px;
-	transition: transform 0.5s cubic-bezier(0, .65, .6, 1.3);
-}
-
-.gamemode-icons:hover {
-	transform: rotate(180deg);
 }
 
 #avatar {
@@ -427,6 +418,7 @@ body {
 	float: left;
 	box-sizing: border-box;
 	width: 10vw;
+	height: calc(10vh + 1em);
 	white-space: nowrap;
 	transition: padding 0.2s, width 0.2s, left 0.2s;
 	transition-timing-function: cubic-bezier(.0, .7, .65, 1.9);
@@ -437,9 +429,69 @@ body {
 	box-shadow: inset 5px 0px 5px -1px #0004;
 }
 
-.menu-bar-buttons {
+.menu-bar-anti-skew {
 	transform: skewX(20deg);
+}
+
+.menu-bar-buttons {
+	font-size: 2vh;
 	overflow: hidden;
+}
+
+.menu-bar-buttons-icon {
+	width: 4vh;
+	margin: auto;
+	transform-origin: center center;
+}
+.menu-bar-buttons-icon-animation {
+	animation-name: icon-rotate;
+	animation-duration: 1.6s;
+	animation-iteration-count: infinite;
+}
+
+@keyframes icon-rotate {
+	0% {
+		transform: rotate(15deg);
+	}
+	25% {
+		transform: rotate(-15deg);
+	}
+	50% {
+		transform: rotate(15deg);
+	}
+	75% {
+		transform: rotate(-15deg);
+	}
+	100% {
+		transform: rotate(15deg);
+	}
+}
+
+.menu-bar-image-move {
+	position: relative;
+	bottom: 1vh;
+}
+
+.menu-bar-image-move-animation {
+	animation-name: icon-bounce;
+	animation-duration: 0.4s;
+	animation-timing-function: ease-in-out;
+	animation-iteration-count: infinite;
+}
+
+@keyframes icon-bounce {
+	0% {
+		bottom: 1vh;
+		transform: scaleY(0.9);
+	}
+	50% {
+		bottom: 2.5vh;
+		transform: scaleY(1);
+	}
+	100% {
+		bottom: 1vh;
+		transform: scaleY(0.9);
+	}
 }
 
 #menu-right-side {

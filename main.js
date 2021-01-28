@@ -54,7 +54,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* osu!web version */
-	const version = "osu!web v2021.0.2.6";
+	const version = "osu!web v2021.0.2.7";
 	/* set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -358,6 +358,8 @@ define(function(require) {
 			menuHit.play();
 		});
 		buttons[i].addEventListener("mouseenter", function() {
+			this.getElementsByClassName("menu-bar-buttons-icon")[0].classList.add("menu-bar-buttons-icon-animation");
+			this.getElementsByClassName("menu-bar-image-move")[0].classList.add("menu-bar-image-move-animation");
 			let menuHover = AssetLoader.audio();
 			menuHover.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 			switch (this.id) {
@@ -378,6 +380,10 @@ define(function(require) {
 					break;
 			}
 			menuHover.play();
+		});
+		buttons[i].addEventListener("mouseleave", function() {
+			this.getElementsByClassName("menu-bar-buttons-icon")[0].classList.remove("menu-bar-buttons-icon-animation");
+			this.getElementsByClassName("menu-bar-image-move")[0].classList.remove("menu-bar-image-move-animation");
 		});
 	}
 	let sliders = document.getElementsByClassName("slider");
