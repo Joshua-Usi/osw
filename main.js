@@ -40,26 +40,26 @@ define(function(require) {
 		}
 		Options = OptionsTemp;
 	}
-	/* offline context checks, needed to ensure if effects are working */
+	/* Offline context checks, needed to ensure for some effects to work */
 	if (window.origin === null) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
-	/* osu!web version */
+	/* Osu!web version incremented manually */
 	const version = "osu!web v2021.0.2.7";
-	/* set element version numbers */
+	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].innerText = version;
 	}
-	/* initialise mouse module */
+	/* Initialise mouse module */
 	let mouse = new Mouse("body");
 	mouse.init();
-	/* initial menu song pool */
+	/* Initial menu song pool */
 	let songs = [
 		Song.create("cYsmix - Triangles.mp3", Song.bpm(160)),
 		Song.create("nekodex - circles.mp3", Song.bpm([185, 360, 600, 185], [0, 8, 10.5, 12])),
 	];
-	/* only add christmas songs to list if the month is december*/
+	/* Only add christmas songs to list if the month is December */
 	if (new Date().getMonth() === 11) {
 		songs.push(Song.create("nekodex - aureole.mp3", Song.bpm(140)));
 		songs.push(Song.create("nekodex - Little Drummer Girl.mp3", Song.bpm(140)));
@@ -71,25 +71,22 @@ define(function(require) {
 		document.getElementById("now-playing").innerText = "Now Playing: " + utils.replaceAll(songs[chosenSong].src, [".wav", ".mp3", ".ogg"]);
 	});
 	menuAudio.addEventListener("ended", function() {
-		// chosenSong = utils.randomInt(0, songs.length - 1);
-		// document.getElementById("now-playing").innerText = "Now Playing: " + songs[chosenSong].src;
-		// this.src = `src/audio/${songs[chosenSong].src}`;
 		this.play();
 	});
 	menuAudio.id = "menu-audio";
-	/* create canvas for audio visualizer */
+	/* Need to append for wave.js */
+	document.querySelector("body").appendChild(menuAudio);
+	/* Create canvas for audio visualizer */
 	let canvas = document.getElementById("audio-visualiser");
 	canvas.width = 0.9 * window.innerHeight;
 	canvas.height = 0.9 * window.innerHeight;
-	/* Need to append for wave.js */
-	document.querySelector("body").appendChild(menuAudio);
 	let settingsSet = false;
 	let isFirstClick = true;
 	let offset = 0;
 	let time = 0;
 	let lastTime = 0;
 	let accumulator = 0;
-	/* states:
+	/* States:
 	 * just-logo
 	 * first
 	 * play
@@ -100,10 +97,13 @@ define(function(require) {
 	let logoY = 50;
 	let logoSize = 50;
 	let logoPulseSize = 55;
-	/* Event Listeners ----------------------------------------------------------------------------------------- */
+	/* Profiling variables */
+	let times = [];
+	let frameRate = 0;
+	/* Event Listeners */
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
-			/* Setting settings -----------------------------------------------------------------------------------------*/
+			/* Setting settings */
 			/* Audio */
 			document.getElementById("settings-master-volume").value = Options.Audio.masterVolume * 100;
 			document.getElementById("settings-master-volume").dispatchEvent(new CustomEvent("input"));
@@ -126,7 +126,6 @@ define(function(require) {
 			/* Gameplay */
 			document.getElementById("settings-background-dim").value = Options.Gameplay.backgroundDim * 100;
 			document.getElementById("settings-background-dim").dispatchEvent(new CustomEvent("input"));
-
 			document.getElementById("settings-draw-300-hits").checked = Options.Gameplay.draw300Hits;
 			document.getElementById("settings-snaking-sliders").checked = Options.Gameplay.snakingSliders;
 			document.getElementById("settings-cursor-trails").getElementsByClassName("select-box-selected")[0].innerText = Options.Gameplay.cursorTrails;
@@ -134,10 +133,8 @@ define(function(require) {
 			document.getElementById("settings-low-power-mode").checked = Options.Performance.lowPowerMode;
 			document.getElementById("settings-max-frame-rate").getElementsByClassName("select-box-selected")[0].innerText = Options.Performance.maxFrameRate;
 			document.getElementById("settings-show-fps").checked = Options.Performance.ShowFPS;
-
 			document.getElementById("settings-slider-resolution").value = Options.Performance.sliderResolution;
 			document.getElementById("settings-slider-resolution").dispatchEvent(new CustomEvent("input"));
-
 			document.getElementById("settings-draw-hit-values").checked = Options.Performance.drawHitValues;
 			document.getElementById("settings-score-update-rate").getElementsByClassName("select-box-selected")[0].innerText = Options.Performance.scoreUpdateRate;
 			settingsSet = true;
@@ -158,80 +155,83 @@ define(function(require) {
 			(function animate() {
 				let backgroundImageParallax = document.getElementById("background-blur");
 				let menuParallax = document.getElementById("menu-parallax");
-				let enableLowPowerMode = false;
+				let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
+				let logo = document.getElementById("logo");
 				let logoSizeIncrease = 1.1;
-				if (enableLowPowerMode === false) {
-					/* style image parallax based on mouse position */
-					backgroundImageParallax.style.opacity = 1;
+				/* style image parallax based on mouse position */
+				backgroundImageParallax.style.opacity = 1;
+				if (Options.UserInterface.menuParallax === true) {
 					backgroundImageParallax.style.top = (mouse.position.y - window.innerHeight * 0.5) / 32 - window.innerHeight * 0.05 + "px";
 					backgroundImageParallax.style.left = (mouse.position.x - window.innerWidth * 0.5) / 32 - window.innerWidth * 0.05 + "px";
 					menuParallax.style.top = "calc(5vh + " + ((mouse.position.y - window.innerHeight * 0.5) / 64 - window.innerHeight * 0.05) + "px)";
 					menuParallax.style.left = "calc(" + ((mouse.position.x - window.innerWidth * 0.5) / 64 - window.innerWidth * 0.05) + "px)";
-					let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
-					/* triangle background moves */
-					offset -= 0.25;
-					for (let i = 0; i < triangleBackgroundMoves.length; i++) {
-						triangleBackgroundMoves[i].style.backgroundPositionY = offset + "px";
-					}
-					/* beat detection and accumulation */
-					bpm = songs[chosenSong].bpm.get(time);
-					lastTime = time;
-					time = menuAudio.currentTime;
-					if (accumulator < 0) {
-						accumulator = 0;
-					}
-					accumulator += time - lastTime;
-					let logo = document.getElementById("logo");
-					if (accumulator > 1 / (bpm / 60)) {
-						while (accumulator > 1 / (bpm / 60)) {
-							/* logo pulse*/
-							logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
-							logo.style.width = logoSize + "vh";
-							logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
-							logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
-							logo.style.backgroundSize = logoSize + "vh";
-							logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
-							/* logo background pulse, maximum 5 to prevent lag */
-							if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
-								let logoCircle = document.createElement("img");
-								logoCircle.src = "src/images/circle.png";
-								logoCircle.style.position = "absolute";
-								logoCircle.style.width = logoPulseSize + "vh";
-								logoCircle.style.top = "calc(" + logoY + "vh - " + logoPulseSize / 2 + "vh)";
-								logoCircle.style.left = "calc(" + logoX + "vw - " + logoPulseSize / 2 + "vh)";
-								logoCircle.style.opacity = 0.5;
-								document.getElementById("logo-beat").appendChild(logoCircle);
-							}
-							/* snow only in december, maximum 50 to prevent lag */
-							/* last tested:
-							 *	
-							 *	27/12/2020, works
-							 *	9/01/2021, works
-							 */
-							if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
-								let snowflake = document.createElement("img");
-								snowflake.src = "src/images/snowflake.png";
-								snowflake.style.position = "fixed";
-								snowflake.style.width = Math.random() * 2 + 1 + "vh";
-								snowflake.style.top = -10 + "vh";
-								snowflake.style.left = Math.random() * 100 + "vw";
-								snowflake.style.opacity = 0.4;
-								snowflake.style.zIndex = -5;
-								document.getElementById("snow").appendChild(snowflake);
-							}
-							accumulator -= 1 / (bpm / 60);
+				} else {
+					backgroundImageParallax.style.top = 0;
+					backgroundImageParallax.style.left = 0;
+					menuParallax.style.top = 0;
+					menuParallax.style.left = 0;
+				}
+
+				/* triangle background moves */
+				offset -= 0.25;
+				for (let i = 0; i < triangleBackgroundMoves.length; i++) {
+					triangleBackgroundMoves[i].style.backgroundPositionY = offset + "px";
+				}
+				/* beat detection and accumulation */
+				bpm = songs[chosenSong].bpm.get(time);
+				lastTime = time;
+				time = menuAudio.currentTime;
+				if (accumulator < 0) {
+					accumulator = 0;
+				}
+				accumulator += time - lastTime;
+				if (accumulator > 1 / (bpm / 60)) {
+					while (accumulator > 1 / (bpm / 60)) {
+						/* logo pulse*/
+						logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
+						logo.style.width = logoSize + "vh";
+						logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
+						logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
+						logo.style.backgroundSize = logoSize + "vh";
+						logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
+						/* logo background pulse, maximum 5 to prevent lag */
+						if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
+							let logoCircle = document.createElement("img");
+							logoCircle.src = "src/images/circle.png";
+							logoCircle.style.position = "absolute";
+							logoCircle.style.width = logoPulseSize + "vh";
+							logoCircle.style.top = "calc(" + logoY + "vh - " + logoPulseSize / 2 + "vh)";
+							logoCircle.style.left = "calc(" + logoX + "vw - " + logoPulseSize / 2 + "vh)";
+							logoCircle.style.opacity = 0.5;
+							document.getElementById("logo-beat").appendChild(logoCircle);
 						}
-					} else {
-						logo.style.transition = "width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s";
-						logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
-						logo.style.width = logoSize * logoSizeIncrease + "vh";
-						logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
-						logo.style.left = "calc(5vw + " + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
-						logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
-						logo.style.backgroundPositionY = offset % (1024 * 0.5) * logoSizeIncrease + "px";
+						/* snow only in december, maximum 50 to prevent lag */
+						/* last tested:
+						 *	
+						 *	27/12/2020, works
+						 *	9/01/2021, works
+						 */
+						if (new Date().getMonth() === 0 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
+							let snowflake = document.createElement("img");
+							snowflake.src = "src/images/snowflake.png";
+							snowflake.style.position = "fixed";
+							snowflake.style.width = Math.random() * 2 + 1 + "vh";
+							snowflake.style.top = -10 + "vh";
+							snowflake.style.left = Math.random() * 100 + "vw";
+							snowflake.style.opacity = 0.4;
+							snowflake.style.zIndex = -5;
+							document.getElementById("snow").appendChild(snowflake);
+						}
+						accumulator -= 1 / (bpm / 60);
 					}
 				} else {
-					backgroundImageParallax.style.opacity = 0;
+					logo.style.transition = "width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s";
+					logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
+					logo.style.width = logoSize * logoSizeIncrease + "vh";
+					logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
+					logo.style.left = "calc(5vw + " + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
+					logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
+					logo.style.backgroundPositionY = offset % (1024 * 0.5) * logoSizeIncrease + "px";
 				}
 				let logoCircles = document.getElementById("logo-beat").querySelectorAll("img");
 				for (let i = 0; i < logoCircles.length; i++) {
@@ -256,10 +256,36 @@ define(function(require) {
 						snow[i].style.transform = "rotate(" + parseFloat(snow[i].style.top) * parseFloat(snow[i].style.width) + "deg)";
 					}
 				}
+				/* Profiling */
+				const now = Date.now();
+				while (times.length > 0 && times[0] <= now - 1000) {
+					times.shift();
+				}
+				times.push(now);
+				frameRate = times.length;
+				let innerText = frameRate;
+				if (Options.Performance.maxFrameRate === "VSync") {
+					innerText += " / 60fps";
+				} else if (Options.Performance.maxFrameRate === "2x VSync") {
+					innerText += " / 120fps";
+				} else if (Options.Performance.maxFrameRate === "Browser Maximum (250fps)") {
+					innerText += " / 250fps";
+				}
+				document.getElementById("frame-rate").innerText = innerText;
+				if (frameRate > 60) {
+					document.getElementById("frame-rate").style.background = "#6d9eeb";
+				} else if (frameRate > 45) {
+					document.getElementById("frame-rate").style.background = "#39e639";
+				} else if (frameRate > 20) {
+					document.getElementById("frame-rate").style.background = "#ffa500";
+				} else {
+					document.getElementById("frame-rate").style.background = "#B00020";
+				}
 				requestAnimationFrame(animate);
 			})();
 		}
 	});
+	/* Omnipotent web listeners */
 	window.addEventListener("resize", function() {
 		let canvas = document.getElementById("audio-visualiser");
 		if (menuAudio === "just-logo") {
@@ -278,6 +304,7 @@ define(function(require) {
 		document.getElementById("splash-screen").style.animationDelay = "1s";
 		document.getElementById("heart-loader").style.display = "none";
 	});
+	/* Top bar event listeners */
 	document.getElementById("top-bar").addEventListener("mouseenter", function() {
 		utils.blurDiv("background-blur", 4);
 		utils.brighten("background-dim", 0.75);
@@ -288,6 +315,16 @@ define(function(require) {
 		utils.brighten("background-dim", 1);
 		utils.blurDiv("menu-parallax", 0);
 	});
+	document.getElementById("pause").addEventListener("click", function() {
+		if (menuAudio.paused) {
+			menuAudio.play();
+			this.innerHTML = "&#x275A;&#x275A;";
+		} else {
+			menuAudio.pause();
+			this.innerHTML = "&#x25BA;";
+		}
+	});
+	/* Sidenav event listener */
 	document.getElementById("close-btn").addEventListener("click", function() {
 		document.getElementById("sidenav").style.width = "0";
 		document.getElementById("sidenav").style.opacity = "0.2";
@@ -300,30 +337,7 @@ define(function(require) {
 		document.getElementById("sidenav").style.opacity = "1";
 		document.getElementById("menu-bar-settings").dispatchEvent(new CustomEvent("click"));
 	});
-	document.getElementById("menu-bar-settings").addEventListener("click", function() {
-		document.getElementById("sidenav").style.width = "25vw";
-		document.getElementById("sidenav").style.opacity = "1";
-	});
-	let checkbox = document.getElementsByClassName("checkbox");
-	for (let i = 0; i < checkbox.length; i++) {
-		checkbox[i].addEventListener("input", function() {
-			if (this.checked === true) {
-				let checkOn = AssetLoader.audio("./src/audio/effects/check-on.wav");
-				checkOn.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-				checkOn.play();
-			} else {
-				let checkOff = AssetLoader.audio("./src/audio/effects/check-off.wav");
-				checkOff.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-				checkOff.play();
-			}
-			setSettings();
-		});
-		checkbox[i].addEventListener("mouseenter", function() {
-			let menuClick = AssetLoader.audio("./src/audio/effects/menuclick.wav");
-			menuClick.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-			menuClick.play();
-		});
-	}
+	/* Menu bar buttons listeners */
 	let buttons = document.getElementsByClassName("menu-bar-buttons-parent");
 	for (let i = 0; i < buttons.length; i++) {
 		buttons[i].addEventListener("click", function() {
@@ -347,6 +361,8 @@ define(function(require) {
 					break;
 			}
 			menuHit.play();
+			clearTimeout(menuTimeout);
+			setTimeout(resetMenu, 10000);
 		});
 		buttons[i].addEventListener("mouseenter", function() {
 			this.getElementsByClassName("menu-bar-buttons-icon")[0].classList.add("menu-bar-buttons-icon-animation");
@@ -377,6 +393,41 @@ define(function(require) {
 			this.getElementsByClassName("menu-bar-image-move")[0].classList.remove("menu-bar-image-move-animation");
 		});
 	}
+	/* Specific menu bar button listeners */
+	document.getElementById("menu-bar-settings").addEventListener("click", function() {
+		document.getElementById("sidenav").style.width = "25vw";
+		document.getElementById("sidenav").style.opacity = "1";
+	});
+	/* All checkboxes listeners */
+	let checkbox = document.getElementsByClassName("checkbox");
+	for (let i = 0; i < checkbox.length; i++) {
+		checkbox[i].addEventListener("input", function() {
+			if (this.checked === true) {
+				let checkOn = AssetLoader.audio("./src/audio/effects/check-on.wav");
+				checkOn.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
+				checkOn.play();
+			} else {
+				let checkOff = AssetLoader.audio("./src/audio/effects/check-off.wav");
+				checkOff.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
+				checkOff.play();
+			}
+			setSettings();
+		});
+		checkbox[i].addEventListener("mouseenter", function() {
+			let menuClick = AssetLoader.audio("./src/audio/effects/menuclick.wav");
+			menuClick.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
+			menuClick.play();
+		});
+	}
+	/* Specific checkbox listeners */
+	document.getElementById("settings-show-fps").addEventListener("input", function() {
+		if (this.checked === true) {
+			document.getElementById("frame-rate").style.opacity = 1;
+		} else {
+			document.getElementById("frame-rate").style.opacity = 0;
+		}
+	});
+	/* All range slider listeners */
 	let sliders = document.getElementsByClassName("slider");
 	for (let i = 0; i < sliders.length; i++) {
 		sliders[i].addEventListener("input", function() {
@@ -391,6 +442,7 @@ define(function(require) {
 			menuClick.play();
 		});
 	}
+	/* Specific range slider listeners */
 	document.getElementById("settings-master-volume").addEventListener("input", function() {
 		document.getElementById("settings-master-volume-text").innerText = "Master volume: " + this.value + "%";
 		menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
@@ -429,6 +481,7 @@ define(function(require) {
 		document.getElementById("settings-slider-resolution-text").innerText = "Slider resolution: " + resolution;
 		setSettings();
 	});
+	/* All selectbox listeners */
 	let selectBoxes = document.getElementsByClassName("select-box");
 	for (let i = 0; i < selectBoxes.length; i++) {
 		let selectBoxSelections = selectBoxes[i].getElementsByClassName("select-box-selections")[0];
@@ -462,33 +515,41 @@ define(function(require) {
 			menuClick.play();
 		});
 	}
-	document.getElementById("pause").addEventListener("click", function() {
-		if (menuAudio.paused) {
-			menuAudio.play();
-			this.innerHTML = "&#x275A;&#x275A;";
-		} else {
-			menuAudio.pause();
-			this.innerHTML = "&#x25BA;";
+	/* Settings button listeners*/
+	document.getElementById("settings-button-clear-local-storage").addEventListener("click", function() {
+		if (window.confirm("Are you sure you want to delete local storage? you will lose all your set options")) {
+			window.localStorage.clear();
+			alert("local storage cleared, refresh for changes to take effect");	
 		}
 	});
-	document.getElementById("previous").addEventListener("click", function() {
-		// menuAudio.pause();
-		// chosenSong = utils.randomInt(0, songs.length - 1);
-		// bpm = songs[chosenSong].bpm.get();
-		// menuAudio.src = `src/audio/${songs[chosenSong].src}`;
-		// menuAudio.play();
-	});
-	document.getElementById("next").addEventListener("click", function() {
-		// menuAudio.pause();
-		// chosenSong = utils.randomInt(0, songs.length - 1);
-		// bpm = songs[chosenSong].bpm.get();
-		// menuAudio.src = `src/audio/${songs[chosenSong].src}`;
-		// menuAudio.play();
-	});
+	/* Splashscreen listener */
 	document.getElementById("splash-screen").addEventListener("click", function() {
 		this.style.opacity = 0;
-		setTimeout(none, 1000);
+		setTimeout(function() {
+			document.getElementById("splash-screen").style.display = "none";
+		}, 1000);
 	});
+	let menuTimeout;
+	function resetMenu() {
+		logoX = 50;
+		logoY = 50;
+		logoSize = 50;
+		logoPulseSize = 55;
+		let canvas = document.getElementById("audio-visualiser");
+		canvas.width = 0.9 * window.innerHeight;
+		canvas.height = 0.9 * window.innerHeight;
+		canvas.style.top = "calc(" + logoY + "vh - " + canvas.height + "px / 2)";
+		canvas.style.left = "calc(5vw + " + logoX + "vw - " + canvas.height + "px / 2)";
+		let menuBar = document.getElementById("menu-bar");
+		menuBar.style.opacity = 0;
+		let menuBarButtons = document.getElementsByClassName("menu-bar-buttons-parent");
+		for (let i = 0; i < menuBarButtons.length; i++) {
+			menuBarButtons[i].style.paddingTop = 0 + "vh";
+			menuBarButtons[i].style.paddingBottom = 0 + "vh";
+		}
+		menuBar.style.top = "calc(50vh)";
+	}
+	/* logo listener */
 	document.getElementById("logo").addEventListener("click", function() {
 		let menuHit = AssetLoader.audio("./src/audio/effects/menuHit.wav");
 		menuHit.play();
@@ -509,16 +570,13 @@ define(function(require) {
 			menuBarButtons[i].style.paddingBottom = 5 + "vh";
 		}
 		menuBar.style.top = "calc(50vh - 5vh * 1.5)";
+		clearTimeout(menuTimeout);
+		menuTimeout = setTimeout(resetMenu, 10000);
 	});
 	document.getElementById("standard-top-icon").addEventListener("click", function() {
 		document.getElementById("logo").dispatchEvent(new CustomEvent("click"));
 	});
-	/* Onload events --------------------------------------------------------------------------------------------*/
-	utils.blurDiv("background-blur", 0);
-	/* Helper -------------------------------------------------------------------------------------------------- */
-	function none() {
-		document.getElementById("splash-screen").style.display = "none";
-	}
+	/* Helper */
 	function setSettings() {
 		if (settingsSet === true) {
 			/* Audio */
@@ -549,7 +607,7 @@ define(function(require) {
 			console.log("settings saved!");
 		}
 	}
-	/* Library Stuff ------------------------------------------------------------------------------------------- */
+	/* Library Stuff */
 	if (window.origin !== "null") {
 		let wave = new Wave();
 		wave.fromElement("menu-audio", "audio-visualiser", {

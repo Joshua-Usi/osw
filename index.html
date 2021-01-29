@@ -27,6 +27,8 @@
 				<p class="sidenav-title-text">General</p>
 				<button type="button" class="settings-button triangle-background blue" onclick="window.open('https://github.com/Joshua-Usi/unofficial-osu-web', '_self');">Visit Github repository</button>
 				<button type="button" class="settings-button triangle-background blue" onclick="window.open('http://osu.ppy.sh/', '_self');">Visit official osu! website</button>
+				<p style="display: inline;">Release Stream:</p>
+				<p style="display: inline;" class="version-number"></p>
 				<!-- Audio Settings -->
 				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Audio</p>
@@ -158,7 +160,7 @@
 				</div>
 				<div class="sidenav-divider"></div>
 				<p class="sidenav-title-text">Maintenance</p>
-				<button type="button" class="settings-button triangle-background red">Clear Local Storage</button>
+				<button type="button" id="settings-button-clear-local-storage" class="settings-button triangle-background red">Clear Local Storage</button>
 			</div>
 		</div>
 		<div id="top-bar" class="triangle-background">
@@ -234,6 +236,7 @@
 		<div id="bottom-bar" class="triangle-background">
 			<p id="version" class="version-number"></p>
 		</div>
+		<p id="frame-rate">0 / 60 fps</p>
 		<!-- https://github.com/foobar404/Wave.js -->
 		<script type="text/javascript" src="src/scripts/wave.js"></script>
 		<script data-main="main" type="text/javascript" src=require.js></script>
