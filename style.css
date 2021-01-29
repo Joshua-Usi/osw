@@ -237,7 +237,7 @@ body {
 	height: 100%;
 	width: 0;
 	position: fixed;
-	z-index: 16;
+	z-index: 101;
 	height: 100vh;
 	left: 0;
 	background: #0d0d0d;

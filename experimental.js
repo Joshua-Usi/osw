@@ -4,7 +4,8 @@ define(function(require) {
 	const Formulas = require("./src/scripts/Formulas.js");
 	const Mouse = require("./src/scripts/Mouse.js");
 	const Keyboard = require("./src/scripts/Keyboard.js");
-	const beatmap = require("./src/scripts/BeatMap.js");
+	const beatmap = require("./src/scripts/DefaultBeatMaps.js")[4];
+	console.log(beatmap);
 	const Beizer = require("./src/scripts/Beizer.js");
 	const utils = require("./src/scripts/utils.js");
 	const HitObject = require("./src/scripts/HitObject.js");
@@ -332,8 +333,8 @@ define(function(require) {
 								}
 							}
 							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							// mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
-							// mouse.click();
+							mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
+							mouse.click();
 							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 								hitObjects[i].cache.onFollowCircle = true;
 							} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
@@ -367,8 +368,8 @@ define(function(require) {
 								}
 							}
 							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							// mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
-							// mouse.click();
+							mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
+							mouse.click();
 							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 								hitObjects[i].cache.onFollowCircle = true;
 							} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {

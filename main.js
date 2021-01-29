@@ -29,6 +29,7 @@ define(function(require) {
 	let Options = require("./src/scripts/Options.js");
 	const AssetLoader = require("./src/scripts/AssetLoader.js");
 	const utils = require("./src/scripts/utils.js");
+	const Beatmaps = require("./src/scripts/DefaultBeatMaps.js");
 	/* First time run setup */
 	if (window.localStorage.options === undefined) {
 		window.localStorage.setItem("options", JSON.stringify(Options));
@@ -45,7 +46,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.2.8a";
+	const version = "osu!web v2021.0.3.0a";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -211,7 +212,7 @@ define(function(require) {
 						 *	27/12/2020, works
 						 *	9/01/2021, works
 						 */
-						if (new Date().getMonth() === 0 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
+						if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
 							let snowflake = document.createElement("img");
 							snowflake.src = "src/images/snowflake.png";
 							snowflake.style.position = "fixed";
@@ -512,6 +513,7 @@ define(function(require) {
 		});
 		selectBoxes[i].addEventListener("mouseenter", function() {
 			let menuClick = AssetLoader.audio("./src/audio/effects/menuclick.wav");
+			menuClick.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 			menuClick.play();
 		});
 	}
@@ -544,14 +546,19 @@ define(function(require) {
 		menuBar.style.opacity = 0;
 		let menuBarButtons = document.getElementsByClassName("menu-bar-buttons-parent");
 		for (let i = 0; i < menuBarButtons.length; i++) {
-			menuBarButtons[i].style.paddingTop = 0 + "vh";
-			menuBarButtons[i].style.paddingBottom = 0 + "vh";
+			menuBarButtons[i].style.paddingTop = 0;
+			menuBarButtons[i].style.paddingBottom = 0;
 		}
 		menuBar.style.top = "calc(50vh)";
+		setTimeout(function() {
+			let menuBar = document.getElementById("menu-bar");
+			menuBar.style.visibility = "hidden";
+		})
 	}
 	/* logo listener */
 	document.getElementById("logo").addEventListener("click", function() {
 		let menuHit = AssetLoader.audio("./src/audio/effects/menuHit.wav");
+		menuHit.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 		menuHit.play();
 		logoX = 30;
 		logoY = 50;
@@ -563,6 +570,7 @@ define(function(require) {
 		canvas.style.top = "calc(" + logoY + "vh - " + canvas.height + "px / 2)";
 		canvas.style.left = "calc(5vw + " + logoX + "vw - " + canvas.height + "px / 2)";
 		let menuBar = document.getElementById("menu-bar");
+		menuBar.style.visibility = "visible";
 		menuBar.style.opacity = 1;
 		let menuBarButtons = document.getElementsByClassName("menu-bar-buttons-parent");
 		for (let i = 0; i < menuBarButtons.length; i++) {
@@ -575,6 +583,16 @@ define(function(require) {
 	});
 	document.getElementById("standard-top-icon").addEventListener("click", function() {
 		document.getElementById("logo").dispatchEvent(new CustomEvent("click"));
+	});
+	document.getElementById("back-button").addEventListener("click", function() {
+		let backButtonClick = AssetLoader.audio("./src/audio/effects/back-button-click.wav");
+		backButtonClick.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
+		backButtonClick.play();
+	});
+	document.getElementById("back-button").addEventListener("mouseenter", function() {
+		let backButtonHover = AssetLoader.audio("./src/audio/effects/back-button-hover.wav");
+		backButtonHover.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
+		backButtonHover.play();
 	});
 	/* Helper */
 	function setSettings() {
