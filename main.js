@@ -37,15 +37,6 @@ define(function(require) {
 		if (OptionsTemp.version < Options.version) {
 			localStorage.setItem("options", Options);
 			console.log("Your Options was reset due to new version");
-		// 	for (let key in Options) {
-		// 		if (typeof(key) === "object") {
-		// 			for (let key2 in Options[key]) {
-
-		// 			}
-		// 		} else {
-		// 			Options[key] ==
-		// 		}
-		// 	}
 		}
 		Options = OptionsTemp;
 	}
