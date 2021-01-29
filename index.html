@@ -9,7 +9,7 @@
 		<link rel="icon" href="src/images/osu.png">
 	</head>
 	<body id="body">
-		<div id="web-page-state-always">
+		<div class="web-page-state" id="web-page-state-always">
 			<!-- Prioritise loading splashscreen first -->
 			<div id="splash-screen">
 				<div id="heart-loader" class="lds-heart">
@@ -189,7 +189,7 @@
 			</div>
 			<p id="frame-rate">0 / 60 fps</p>
 		</div>
-		<div id="web-page-state-menu">
+		<div class="web-page-state" id="web-page-state-menu">
 			<div id="menu-parallax">
 				<img id="logo" src="src/images/osu.png">
 				<canvas id="audio-visualiser"></canvas>
@@ -244,9 +244,12 @@
 				<p id="version" class="version-number"></p>
 			</div>
 		</div>
-		<div id="web-page-state-beatmap-selection">
-			<!-- <button style="position: absolute; top: 30vh;" onclick="document.getElementById('web-page-state-menu').style.display = 'block';">Go Back</button> -->
+		<div class="web-page-state" id="web-page-state-beatmap-selection">
 			<div id="beatmap-selection-left"></div>
+			<div id="beatmap-selection-right">
+				<div class="beatmap-selection-pane"></div>
+			</div>
+			<img id="beatmap-selection-logo" src="src/images/osu.png">
 			<div id="beatmap-selection-bottom-bar">
 				<div id="back-button" onclick="document.getElementById('web-page-state-menu').style.display = 'block'; document.getElementById('web-page-state-beatmap-selection').style.display = 'none'; document.getElementById('menu-audio').play();">
 					<div id="back-button-anti-skew">
@@ -258,8 +261,8 @@
 				</div>
 			</div>
 		</div>
-		<div id="web-page-state-gameplay"></div>
-		<div id="web-page-state-beatmap-end-screen"></div>
+		<div class="web-page-state" id="web-page-state-gameplay"></div>
+		<div class="web-page-state" id="web-page-state-beatmap-end-screen"></div>
 		<!-- https://github.com/foobar404/Wave.js -->
 		<script type="text/javascript" src="src/scripts/wave.js"></script>
 		<script data-main="main" type="text/javascript" src=require.js></script>

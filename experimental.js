@@ -5,7 +5,6 @@ define(function(require) {
 	const Mouse = require("./src/scripts/Mouse.js");
 	const Keyboard = require("./src/scripts/Keyboard.js");
 	const beatmap = require("./src/scripts/DefaultBeatMaps.js")[4];
-	console.log(beatmap);
 	const Beizer = require("./src/scripts/Beizer.js");
 	const utils = require("./src/scripts/utils.js");
 	const HitObject = require("./src/scripts/HitObject.js");
