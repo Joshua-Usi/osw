@@ -5,238 +5,256 @@
 		<title>osu!web indev</title>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Varela Round">
 		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" type="text/css" href="web-page-state-beatmap-selection.css">
 		<link rel="icon" href="src/images/osu.png">
 	</head>
 	<body id="body">
-		<!-- Prioritise loading splashscreen first -->
-		<div id="splash-screen">
-			<div id="heart-loader" class="lds-heart"><div></div></div>
-			<p style="margin: 0;">osu!web is in heavy development</p>
-			<p style="margin: 0;" class="version-number"></p>
-			<p style="margin: 0;">click to continue...</p>
-		</div>
-		<div id="sidenav">
-			<div id="sidenav-padding">
-				<p style="font-size: 5vh; padding: 0;">settings</p>
-				<p style="padding: 0; color: #FD67AE;">change the way osu!web behaves</p>
-				<!-- Padding -->
-				<div style="padding-top: 5vh;"></div>
-				<a href="javascript:void(0)" id="close-btn">&times;</a>
-				<!-- General Settings -->
-				<div class="sidenav-divider"></div>
-				<p class="sidenav-title-text">General</p>
-				<button type="button" class="settings-button triangle-background blue" onclick="window.open('https://github.com/Joshua-Usi/unofficial-osu-web', '_self');">Visit Github repository</button>
-				<button type="button" class="settings-button triangle-background blue" onclick="window.open('http://osu.ppy.sh/', '_self');">Visit official osu! website</button>
-				<p style="display: inline;">Release Stream:</p>
-				<p style="display: inline;" class="version-number"></p>
-				<!-- Audio Settings -->
-				<div class="sidenav-divider"></div>
-				<p class="sidenav-title-text">Audio</p>
-				<p id="settings-master-volume-text">Master volume: 100%</p>
-				<input type="range" id="settings-master-volume" class="slider" min="0" max="100" value="100">
-				<p id="settings-music-volume-text">Music volume: 100%</p>
-				<input type="range" id="settings-music-volume" class="slider" min="0" max="100" value="100">
-				<p id="settings-effects-volume-text">Effects volume: 100%</p>
-				<input type="range" id="settings-effects-volume" class="slider" min="0" max="100" value="100">
-				<!-- I`nput Settings -->
-				<div class="sidenav-divider"></div>
-				<p class="sidenav-title-text">Inputs</p>
-				<p class="inline-block">Keyboard left button</p>
-				<p class="inline-block character float-right" id="settings-keyboard-left-button">z</p>
-				<p class="inline-block">Keyboard right button</p>
-				<p class="inline-block character float-right" id="settings-keyboard-right-button">x</p>
-				<p style="color: #999;">Note! osu!web does not support right clicks</p>
-				<p class="inline-block" style="letter-spacing: -0.01vw;">Enable mouse buttons in gameplay</p>
-				<input type="checkbox" id="settings-enable-mouse-buttons-in-gameplay" class="checkbox inline-block float-right" name="settings-enable-mouse-buttons-in-gameplay" checked>
-				<p style="color: #999;">Note! sensitivity only applies during gameplay</p>
-				<p id="settings-mouse-sensitivity-text">Mouse sensitivity: 1.0x</p>
-				<input type="range" id="settings-mouse-sensitivity" class="slider" min="1" max="60" value="10">
-				<!-- User Interface Settings -->
-				<div class="sidenav-divider"></div>
-				<p class="sidenav-title-text">User Interface</p>
-				<!-- Triangles or Circles -->
-				<p>Intro Sequence</p>
-				<div class="select-box" id="settings-intro-sequence">
-					<div class="select-box-selected-container">
-						<!-- Default option -->
-						<p class="select-box-selected">Triangles</p>
-						<p class="select-box-arrow">&#709;</p>
-					</div>
-					<div class="select-box-selections">
-						<p class="selected">Triangles</p>
-						<p>Circles</p>
-					</div>
+		<div id="web-page-state-always">
+			<!-- Prioritise loading splashscreen first -->
+			<div id="splash-screen">
+				<div id="heart-loader" class="lds-heart">
+					<div></div>
 				</div>
-				<div>
-					<p class="inline-block">Menu parallax</p>
-					<input type="checkbox" id="settings-menu-parallax" class="checkbox inline-block float-right" name="settings-menu-parallax" checked>
-				</div>
-				<!-- Gameplay Settings -->
-				<div class="sidenav-divider"></div>
-				<p class="sidenav-title-text">Gameplay</p>
-				<p id="settings-background-dim-text">Background dim: 80%</p>
-				<input type="range" id="settings-background-dim" class="slider" min="0" max="100" value="80">
-				<div>
-					<p class="inline-block">Draw 300 hits</p>
-					<input type="checkbox" id="settings-draw-300-hits" class="checkbox inline-block float-right" name="settings-draw-300-hits" checked>
-				</div>
-				<div>
-					<p class="inline-block">Snaking sliders</p>
-					<input type="checkbox" id="settings-snaking-sliders" class="checkbox inline-block float-right" name="settings-snaking-sliders" checked>
-				</div>
-				<p>Cursor Trails</p>
-				<div class="select-box" id="settings-cursor-trails">
-					<div class="select-box-selected-container">
-						<!-- Default option -->
-						<p class="select-box-selected">Interpolated</p>
-						<p class="select-box-arrow">&#709;</p>
-					</div>
-					<div class="select-box-selections">
-						<p class="selected">Interpolated</p>
-						<p>Positional</p>
-						<p>None</p>
-					</div>
-				</div>
-				<!-- Performance Settings -->
-				<div class="sidenav-divider"></div>
-				<p class="sidenav-title-text">Performance</p>
-				<div>
-					<p class="inline-block">Low power mode</p>
-					<input type="checkbox" id="settings-low-power-mode" class="checkbox inline-block float-right" name="settings-low-power-mode">
-				</div>
-				<!-- setTimeout has a minimum timeout time of 4ms, thus making 250fps the limit -->
-				<!-- Vsync, 2x Vsync, Browser Maximum (250fps) -->
-				<p>Max Frame Rate</p>
-				<div class="select-box" id="settings-max-frame-rate">
-					<div class="select-box-selected-container">
-						<!-- Default option -->
-						<p class="select-box-selected">VSync</p>
-						<p class="select-box-arrow">&#709;</p>
-					</div>
-					<div class="select-box-selections">
-						<p class="selected">VSync</p>
-						<p>2x VSync</p>
-						<p>Browser Maximum (250fps)</p>
-					</div>
-				</div>
-				<div>
-					<p class="inline-block">Show FPS</p>
-					<input type="checkbox" id="settings-show-fps" class="checkbox inline-block float-right" name="settings-show-fps">
-				</div>
-				<!-- Full, Half, Quarter, Eighth, Sixteenth -->
-				<p id="settings-slider-resolution-text">Slider Resolution: Full</p>
-				<input type="range" id="settings-slider-resolution" class="slider" min="1" max="5" value="1">
-				<p class="inline-block">Draw Hit Values</p>
-				<input type="checkbox" id="settings-draw-hit-values" class="checkbox inline-block float-right" name="settings-draw-hit-values" checked>
-				<p>Score Update Rate</p>
-				<div class="select-box" id="settings-score-update-rate">
-					<div class="select-box-selected-container">
-						<!-- Default option -->
-						<p class="select-box-selected">Equal to frame rate</p>
-						<p class="select-box-arrow">&#709;</p>
-					</div>
-					<div class="select-box-selections">
-						<p class="selected">Equal to frame rate</p>
-						<p>Only on Change (fastest)</p>
-						<p>15fps</p>
-						<p>30fps</p>
-						<p>60fps</p>
-						<p>Browser Maximum (250fps)</p>
-					</div>
-				</div>
-				<!-- Skin Settings -->
-				<div class="sidenav-divider"></div>
-				<p class="sidenav-title-text">Skin</p>
-				<p>Current Skin</p>
-				<div class="select-box" id="current-skin">
-					<div class="select-box-selected-container">
-						<!-- Default option -->
-						<p class="select-box-selected">Ajax Transparent</p>
-						<p class="select-box-arrow">&#709;</p>
-					</div>
-					<div class="select-box-selections">
-						<p class="selected">Ajax Transparent</p>
-					</div>
-				</div>
-				<div class="sidenav-divider"></div>
-				<p class="sidenav-title-text">Maintenance</p>
-				<button type="button" id="settings-button-clear-local-storage" class="settings-button triangle-background red">Clear Local Storage</button>
+				<p style="margin: 0;">osu!web is in heavy development</p>
+				<p style="margin: 0;" class="version-number"></p>
+				<p style="margin: 0;">click to continue...</p>
 			</div>
-		</div>
-		<div id="top-bar" class="triangle-background">
-			<span class="span-top-bar-text" style="float: left;">
-				<img id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/settings.png">
-				<img id="standard-top-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/standard.png">
-				<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/taiko.png">
-				<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/catch.png">
-				<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/mania.png">
-				<p class="top-bar-text" id="welcome-user">Welcome Guest</p>
-				<img id="avatar" src="src/images/default-avatar.png" onclick="window.location = 'https://osu.ppy.sh/users/13478347';">
-			</span>
-			<p class="top-bar-text" id="now-playing" style="float: right;">Now Playing: </p>
-			<p class="top-bar-text" id="previous" style="float: right;">&#x25BA;&#x275A;</p>
-			<p class="top-bar-text" id="pause" style="float: right;">&#x275A;&#x275A;</p>
-			<p class="top-bar-text" id="next" style="float: right;">&#x275A;&#x25C4;</p>
-		</div>
-		<div id="background-blur">
-			<div id="background-dim">
-				<img id="background" src="src/images/osu_background.jpg">
+			<div id="sidenav">
+				<div id="sidenav-padding">
+					<p style="font-size: 5vh; padding: 0;">settings</p>
+					<p style="padding: 0; color: #FD67AE;">change the way osu!web behaves</p>
+					<!-- Padding -->
+					<div style="padding-top: 5vh;"></div>
+					<a href="javascript:void(0)" id="close-btn">&times;</a>
+					<!-- General Settings -->
+					<div class="sidenav-divider"></div>
+					<p class="sidenav-title-text">General</p>
+					<button type="button" class="settings-button triangle-background blue" onclick="window.open('https://github.com/Joshua-Usi/unofficial-osu-web', '_self');">Visit Github repository</button>
+					<button type="button" class="settings-button triangle-background blue" onclick="window.open('http://osu.ppy.sh/', '_self');">Visit official osu! website</button>
+					<p style="display: inline;">Release Stream:</p>
+					<p style="display: inline;" class="version-number"></p>
+					<!-- Audio Settings -->
+					<div class="sidenav-divider"></div>
+					<p class="sidenav-title-text">Audio</p>
+					<p id="settings-master-volume-text">Master volume: 100%</p>
+					<input type="range" id="settings-master-volume" class="slider" min="0" max="100" value="100">
+					<p id="settings-music-volume-text">Music volume: 100%</p>
+					<input type="range" id="settings-music-volume" class="slider" min="0" max="100" value="100">
+					<p id="settings-effects-volume-text">Effects volume: 100%</p>
+					<input type="range" id="settings-effects-volume" class="slider" min="0" max="100" value="100">
+					<!-- I`nput Settings -->
+					<div class="sidenav-divider"></div>
+					<p class="sidenav-title-text">Inputs</p>
+					<p class="inline-block">Keyboard left button</p>
+					<p class="inline-block character float-right" id="settings-keyboard-left-button">z</p>
+					<p class="inline-block">Keyboard right button</p>
+					<p class="inline-block character float-right" id="settings-keyboard-right-button">x</p>
+					<p style="color: #999;">Note! osu!web does not support right clicks</p>
+					<p class="inline-block" style="letter-spacing: -0.01vw;">Enable mouse buttons in gameplay</p>
+					<input type="checkbox" id="settings-enable-mouse-buttons-in-gameplay" class="checkbox inline-block float-right" name="settings-enable-mouse-buttons-in-gameplay" checked>
+					<p style="color: #999;">Note! sensitivity only applies during gameplay</p>
+					<p id="settings-mouse-sensitivity-text">Mouse sensitivity: 1.0x</p>
+					<input type="range" id="settings-mouse-sensitivity" class="slider" min="1" max="60" value="10">
+					<!-- User Interface Settings -->
+					<div class="sidenav-divider"></div>
+					<p class="sidenav-title-text">User Interface</p>
+					<!-- Triangles or Circles -->
+					<p>Intro Sequence</p>
+					<div class="select-box" id="settings-intro-sequence">
+						<div class="select-box-selected-container">
+							<!-- Default option -->
+							<p class="select-box-selected">Triangles</p>
+							<p class="select-box-arrow">&#709;</p>
+						</div>
+						<div class="select-box-selections">
+							<p class="selected">Triangles</p>
+							<p>Circles</p>
+						</div>
+					</div>
+					<div>
+						<p class="inline-block">Menu parallax</p>
+						<input type="checkbox" id="settings-menu-parallax" class="checkbox inline-block float-right" name="settings-menu-parallax" checked>
+					</div>
+					<!-- Gameplay Settings -->
+					<div class="sidenav-divider"></div>
+					<p class="sidenav-title-text">Gameplay</p>
+					<p id="settings-background-dim-text">Background dim: 80%</p>
+					<input type="range" id="settings-background-dim" class="slider" min="0" max="100" value="80">
+					<div>
+						<p class="inline-block">Draw 300 hits</p>
+						<input type="checkbox" id="settings-draw-300-hits" class="checkbox inline-block float-right" name="settings-draw-300-hits" checked>
+					</div>
+					<div>
+						<p class="inline-block">Snaking sliders</p>
+						<input type="checkbox" id="settings-snaking-sliders" class="checkbox inline-block float-right" name="settings-snaking-sliders" checked>
+					</div>
+					<p>Cursor Trails</p>
+					<div class="select-box" id="settings-cursor-trails">
+						<div class="select-box-selected-container">
+							<!-- Default option -->
+							<p class="select-box-selected">Interpolated</p>
+							<p class="select-box-arrow">&#709;</p>
+						</div>
+						<div class="select-box-selections">
+							<p class="selected">Interpolated</p>
+							<p>Positional</p>
+							<p>None</p>
+						</div>
+					</div>
+					<!-- Performance Settings -->
+					<div class="sidenav-divider"></div>
+					<p class="sidenav-title-text">Performance</p>
+					<div>
+						<p class="inline-block">Low power mode</p>
+						<input type="checkbox" id="settings-low-power-mode" class="checkbox inline-block float-right" name="settings-low-power-mode">
+					</div>
+					<!-- setTimeout has a minimum timeout time of 4ms, thus making 250fps the limit -->
+					<!-- Vsync, 2x Vsync, Browser Maximum (250fps) -->
+					<p>Max Frame Rate</p>
+					<div class="select-box" id="settings-max-frame-rate">
+						<div class="select-box-selected-container">
+							<!-- Default option -->
+							<p class="select-box-selected">VSync</p>
+							<p class="select-box-arrow">&#709;</p>
+						</div>
+						<div class="select-box-selections">
+							<p class="selected">VSync</p>
+							<p>2x VSync</p>
+							<p>Browser Maximum (250fps)</p>
+						</div>
+					</div>
+					<div>
+						<p class="inline-block">Show FPS</p>
+						<input type="checkbox" id="settings-show-fps" class="checkbox inline-block float-right" name="settings-show-fps">
+					</div>
+					<!-- Full, Half, Quarter, Eighth, Sixteenth -->
+					<p id="settings-slider-resolution-text">Slider Resolution: Full</p>
+					<input type="range" id="settings-slider-resolution" class="slider" min="1" max="5" value="1">
+					<p class="inline-block">Draw Hit Values</p>
+					<input type="checkbox" id="settings-draw-hit-values" class="checkbox inline-block float-right" name="settings-draw-hit-values" checked>
+					<p>Score Update Rate</p>
+					<div class="select-box" id="settings-score-update-rate">
+						<div class="select-box-selected-container">
+							<!-- Default option -->
+							<p class="select-box-selected">Equal to frame rate</p>
+							<p class="select-box-arrow">&#709;</p>
+						</div>
+						<div class="select-box-selections">
+							<p class="selected">Equal to frame rate</p>
+							<p>Only on Change (fastest)</p>
+							<p>15fps</p>
+							<p>30fps</p>
+							<p>60fps</p>
+							<p>Browser Maximum (250fps)</p>
+						</div>
+					</div>
+					<!-- Skin Settings -->
+					<div class="sidenav-divider"></div>
+					<p class="sidenav-title-text">Skin</p>
+					<p>Current Skin</p>
+					<div class="select-box" id="current-skin">
+						<div class="select-box-selected-container">
+							<!-- Default option -->
+							<p class="select-box-selected">Ajax Transparent</p>
+							<p class="select-box-arrow">&#709;</p>
+						</div>
+						<div class="select-box-selections">
+							<p class="selected">Ajax Transparent</p>
+						</div>
+					</div>
+					<div class="sidenav-divider"></div>
+					<p class="sidenav-title-text">Maintenance</p>
+					<button type="button" id="settings-button-clear-local-storage" class="settings-button triangle-background red">Clear Local Storage</button>
+				</div>
 			</div>
+			<div id="top-bar" class="triangle-background">
+				<span class="span-top-bar-text" style="float: left;">
+					<img id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/settings.png">
+					<img id="standard-top-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/standard.png">
+					<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/taiko.png">
+					<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/catch.png">
+					<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/mania.png">
+					<p class="top-bar-text" id="welcome-user">Welcome Guest</p>
+					<img id="avatar" src="src/images/default-avatar.png" onclick="window.location = 'https://osu.ppy.sh/users/13478347';">
+				</span>
+				<p class="top-bar-text" id="now-playing" style="float: right;">Now Playing: </p>
+				<p class="top-bar-text" id="previous" style="float: right;">&#x25BA;&#x275A;</p>
+				<p class="top-bar-text" id="pause" style="float: right;">&#x275A;&#x275A;</p>
+				<p class="top-bar-text" id="next" style="float: right;">&#x275A;&#x25C4;</p>
+			</div>
+			<p id="frame-rate">0 / 60 fps</p>
 		</div>
-		<div id="menu-parallax">
-			<img id="logo" src="src/images/osu.png">
-			<canvas id="audio-visualiser"></canvas>
-			<span id="logo-beat"></span>
-			<div id="menu-bar">
-				<div class="menu-bar-buttons-parent" id="menu-bar-settings">
-					<div class="menu-bar-anti-skew">
-						<div class="menu-bar-image-move">
-							<img src="src/images/settings.png" class="menu-bar-buttons-icon">
+		<div id="web-page-state-menu">
+			<div id="background-blur">
+				<div id="background-dim">
+					<img id="background" src="src/images/osu_background.jpg">
+				</div>
+			</div>
+			<div id="menu-parallax">
+				<img id="logo" src="src/images/osu.png">
+				<canvas id="audio-visualiser"></canvas>
+				<span id="logo-beat"></span>
+				<div id="menu-bar">
+					<div class="menu-bar-buttons-parent" id="menu-bar-settings">
+						<div class="menu-bar-anti-skew">
+							<div class="menu-bar-image-move">
+								<img src="src/images/settings.png" class="menu-bar-buttons-icon">
+							</div>
+							<div class="menu-bar-buttons">settings</div>
+						</div>
+					</div>
+					<div id="menu-right-side">
+						<div class="menu-bar-buttons-parent" id="menu-bar-play" onclick="document.getElementById('web-page-state-menu').style.display = 'none'; document.getElementById('menu-audio').pause();">
+							<div class="menu-bar-anti-skew">
+								<div class="menu-bar-image-move">
+									<img src="src/images/osu.png" class="menu-bar-buttons-icon">
 								</div>
-						<div class="menu-bar-buttons">settings</div>
-					</div>
-				</div>
-				<div id="menu-right-side">
-					<div class="menu-bar-buttons-parent" id="menu-bar-play">
-						<div class="menu-bar-anti-skew">
-							<div class="menu-bar-image-move">
-								<img src="src/images/osu.png" class="menu-bar-buttons-icon">
-									</div>
-							<div class="menu-bar-buttons">play</div>
+								<div class="menu-bar-buttons">play</div>
+							</div>
 						</div>
-					</div>
-					<div class="menu-bar-buttons-parent" id="menu-bar-edit">
-						<div class="menu-bar-anti-skew">
-							<div class="menu-bar-image-move">
-								<img src="src/images/osu.png" class="menu-bar-buttons-icon">
-									</div>
-							<div class="menu-bar-buttons">edit</div>
+						<div class="menu-bar-buttons-parent" id="menu-bar-edit">
+							<div class="menu-bar-anti-skew">
+								<div class="menu-bar-image-move">
+									<img src="src/images/osu.png" class="menu-bar-buttons-icon">
+								</div>
+								<div class="menu-bar-buttons">edit</div>
+							</div>
 						</div>
-					</div>
-					<div class="menu-bar-buttons-parent" id="menu-bar-direct" onclick="window.open('https://osu.ppy.sh/home', '_self');">
-						<div class="menu-bar-anti-skew">
-							<div class="menu-bar-image-move">
-								<img src="src/images/osu.png" class="menu-bar-buttons-icon">
-									</div>
-							<div class="menu-bar-buttons">osu! official</div>
+						<div class="menu-bar-buttons-parent" id="menu-bar-direct" onclick="window.open('https://osu.ppy.sh/home', '_self');">
+							<div class="menu-bar-anti-skew">
+								<div class="menu-bar-image-move">
+									<img src="src/images/osu.png" class="menu-bar-buttons-icon">
+								</div>
+								<div class="menu-bar-buttons">osu! official</div>
+							</div>
 						</div>
-					</div>
-					<div class="menu-bar-buttons-parent" id="menu-bar-exit" onclick="window.close()">
-						<div class="menu-bar-anti-skew">
-							<div class="menu-bar-image-move">
-								<img src="src/images/exit.png" class="menu-bar-buttons-icon">
-									</div>
-							<div class="menu-bar-buttons">exit</div>
+						<div class="menu-bar-buttons-parent" id="menu-bar-exit" onclick="window.close()">
+							<div class="menu-bar-anti-skew">
+								<div class="menu-bar-image-move">
+									<img src="src/images/exit.png" class="menu-bar-buttons-icon">
+								</div>
+								<div class="menu-bar-buttons">exit</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
+			<span id="snow"></span>
+			<div id="bottom-bar" class="triangle-background">
+				<p id="version" class="version-number"></p>
+			</div>
 		</div>
-		<span id="snow"></span>
-		<div id="bottom-bar" class="triangle-background">
-			<p id="version" class="version-number"></p>
+		<div id="web-page-state-beatmap-selection">
+			<!-- <button style="position: absolute; top: 30vh;" onclick="document.getElementById('web-page-state-menu').style.display = 'block';">Go Back</button> -->
+			<div id="back-button">
+				<div id="back-button-image-container">
+					<img src="src/images/back.png" id="back-button-image">
+				</div>
+				<p id="back-button-text">Back</p>
+			</div>
 		</div>
-		<p id="frame-rate">0 / 60 fps</p>
+		<div id="web-page-state-gameplay"></div>
+		<div id="web-page-state-beatmap-end-screen"></div>
 		<!-- https://github.com/foobar404/Wave.js -->
 		<script type="text/javascript" src="src/scripts/wave.js"></script>
 		<script data-main="main" type="text/javascript" src=require.js></script>

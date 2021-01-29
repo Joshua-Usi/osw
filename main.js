@@ -45,7 +45,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.2.7";
+	const version = "osu!web v2021.0.2.8a";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -362,7 +362,7 @@ define(function(require) {
 			}
 			menuHit.play();
 			clearTimeout(menuTimeout);
-			setTimeout(resetMenu, 10000);
+			setTimeout(resetMenu, 15000);
 		});
 		buttons[i].addEventListener("mouseenter", function() {
 			this.getElementsByClassName("menu-bar-buttons-icon")[0].classList.add("menu-bar-buttons-icon-animation");
@@ -571,7 +571,7 @@ define(function(require) {
 		}
 		menuBar.style.top = "calc(50vh - 5vh * 1.5)";
 		clearTimeout(menuTimeout);
-		menuTimeout = setTimeout(resetMenu, 10000);
+		menuTimeout = setTimeout(resetMenu, 15000);
 	});
 	document.getElementById("standard-top-icon").addEventListener("click", function() {
 		document.getElementById("logo").dispatchEvent(new CustomEvent("click"));
