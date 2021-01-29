@@ -481,7 +481,7 @@ body {
 @keyframes icon-bounce {
 	0% {
 		bottom: 1vh;
-		transform: scaleY(0.9);
+		transform: scaleY(0.8);
 	}
 	50% {
 		bottom: 2.5vh;
@@ -489,7 +489,7 @@ body {
 	}
 	100% {
 		bottom: 1vh;
-		transform: scaleY(0.9);
+		transform: scaleY(0.8);
 	}
 }
 
