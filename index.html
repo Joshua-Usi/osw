@@ -4,12 +4,14 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>osu!web indev</title>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Varela Round">
-		<link rel="stylesheet" type="text/css" href="style.css">
-		<link rel="stylesheet" type="text/css" href="web-page-state-beatmap-selection.css">
+		<link rel="stylesheet" type="text/css" href="./style.css">
+		<link rel="stylesheet" type="text/css" href="./src/stylesheets/forms.css">
+		<link rel="stylesheet" type="text/css" href="./src/stylesheets/lib.css">
+		<link rel="stylesheet" type="text/css" href="./webpage-state-beatmap-selection.css">
 		<link rel="icon" href="./src/images/osu.png">
 	</head>
 	<body id="body">
-		<div class="web-page-state" id="web-page-state-always">
+		<div class="webpage-state" id="webpage-state-always">
 			<!-- Prioritise loading splashscreen first -->
 			<div id="splash-screen">
 				<div id="heart-loader" class="lds-heart">
@@ -189,7 +191,7 @@
 			</div>
 			<p id="frame-rate">0 / 60 fps</p>
 		</div>
-		<div class="web-page-state" id="web-page-state-menu">
+		<div class="webpage-state" id="webpage-state-menu">
 			<div id="menu-parallax">
 				<img id="logo" src="./src/images/osu.png">
 				<canvas id="audio-visualiser"></canvas>
@@ -205,7 +207,7 @@
 						</div>
 					</div>
 					<div id="menu-right-side">
-						<div class="menu-bar-buttons-parent" id="menu-bar-play" onclick="document.getElementById('web-page-state-menu').style.display = 'none'; document.getElementById('web-page-state-beatmap-selection').style.display = 'block'; document.getElementById('menu-audio').pause();">
+						<div class="menu-bar-buttons-parent" id="menu-bar-play" onclick="document.getElementById('webpage-state-menu').style.display = 'none'; document.getElementById('webpage-state-beatmap-selection').style.display = 'block'; document.getElementById('menu-audio').pause();">
 							<div class="menu-bar-anti-skew">
 								<div class="menu-bar-image-move">
 									<img src="./src/images/osu.png" class="menu-bar-buttons-icon">
@@ -244,7 +246,7 @@
 				<p id="version" class="version-number"></p>
 			</div>
 		</div>
-		<div class="web-page-state" id="web-page-state-beatmap-selection">
+		<div class="webpage-state" id="webpage-state-beatmap-selection">
 			<div id="beatmap-selection-left"></div>
 			<div id="beatmap-selection-right">
 				<div class="beatmap-selection-group-pane">
@@ -273,7 +275,7 @@
 			</div>
 			<img id="beatmap-selection-logo" src="./src/images/osu.png">
 			<div id="beatmap-selection-bottom-bar">
-				<div id="back-button" onclick="document.getElementById('web-page-state-menu').style.display = 'block'; document.getElementById('web-page-state-beatmap-selection').style.display = 'none'; document.getElementById('menu-audio').play();">
+				<div id="back-button" onclick="document.getElementById('webpage-state-menu').style.display = 'block'; document.getElementById('webpage-state-beatmap-selection').style.display = 'none'; document.getElementById('menu-audio').play();">
 					<div id="back-button-anti-skew">
 						<div id="back-button-image-container">
 							<img src="./src/images/back.png" id="back-button-image">
@@ -283,8 +285,8 @@
 				</div>
 			</div>
 		</div>
-		<div class="web-page-state" id="web-page-state-gameplay"></div>
-		<div class="web-page-state" id="web-page-state-beatmap-end-screen"></div>
+		<div class="webpage-state" id="webpage-state-gameplay"></div>
+		<div class="webpage-state" id="webpage-state-beatmap-end-screen"></div>
 		<!-- https://github.com/foobar404/Wave.js -->
 		<script type="text/javascript" src="./src/scripts/wave.js"></script>
 		<script data-main="main" type="text/javascript" src=require.js></script>

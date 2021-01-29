@@ -1,0 +1,110 @@
+.slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 4vw;
+	height: 1vw;
+	border-radius: 1vw;
+	border: 0.4vh solid #FD67AE;
+	background: #0d0d0d;
+	margin-top: calc(3.3vh / 2);
+	outline: none;
+	position: relative;
+	top: -1vh;
+	transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.1s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+	/*background: #FD67AE;*/
+	border-color: #ffc4ff;
+	box-shadow: -3px -3px 6px #FD67AE55, 3px -3px 6px #FD67AE55, 3px 3px 6px #FD67AE55, -3px 3px 6px #FD67AE55;
+}
+
+.slider::-webkit-slider-thumb:hover:active {
+	background: #ffc4ff;
+}
+
+.slider {
+	-webkit-appearance: none;
+	width: 100%;
+	outline: none;
+	height: 0.4vh;
+	border-radius: 2.5vh;
+	margin-top: 1vh;
+	background: linear-gradient(to right, #FD67AE 0%, #FD67AE 100%);
+}
+
+.checkbox {
+	width: 4vw;
+	height: 1vw;
+	background-color: rgba(0, 0, 0, 0);
+	border-radius: 1vw;
+	vertical-align: middle;
+	border: 0.4vh solid #FD67AE;
+	margin-top: 1.5vh;
+	-webkit-appearance: none;
+	outline: none;
+	transition: width 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.1s ease;
+}
+
+.checkbox:hover {
+	width: 5vw;
+	border-color: #ffc4ff;
+	box-shadow: -5px -5px 10px #FD67AE99, 5px -5px 10px #FD67AE99, 5px 5px 10px #FD67AE99, -5px 5px 10px #FD67AE99;
+}
+
+.checkbox:checked {
+	background-color: #FD67AE;
+}
+
+.checkbox:checked:hover {
+	background-color: #ffc4ff;
+}
+
+.select-box-selected-container {
+	background: #060606;
+	border-radius: 1vh;
+	margin-bottom: 1vh;
+	padding-top: 0.5vw;
+	padding-bottom: 0.5vw;
+	padding-right: 0.5vw;
+	transition: background 0.2s;
+}
+
+.select-box-selected-container:hover {
+	background: #FD67AE;
+}
+
+.select-box-selected {
+	display: inline-block;
+}
+
+.select-box-arrow {
+	display: inline-block;
+	float: right; 
+	transform: scale(2.25, 1.25);
+}
+
+.select-box-selections {
+	height: 0px;
+	opacity: 0;
+	padding: 2.5% 0 2.5% 0;
+	width: 100%;
+	background: #060606;
+	border-radius: 1vh;
+	overflow: hidden;
+	transition: height 0.3s, opacity 0.3s;
+}
+
+.select-box-selections p {
+	padding: 0.5vh !important;
+	margin: 0 1vh 0 1vh !important;
+	border-radius: 1vh;
+	transition: background 0.2s;
+}
+
+.select-box-selections p:hover {
+	background: #FD67AE;
+}
+
+.selected {
+	background: #FD67AE;
+}

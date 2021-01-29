@@ -1,0 +1,17 @@
+.red {
+	background: url("src/images/triangles.png"), #FD67AE;
+	background-size: 25vw;
+}
+
+.blue {
+	background: url("src/images/triangles.png"), #2ca4cc;
+	background-size: 25vw;
+}
+
+.inline-block {
+	display: inline-block;
+}
+
+.float-right {
+	float: right;
+}

@@ -76,7 +76,7 @@ define(function(require) {
 	});
 	menuAudio.id = "menu-audio";
 	/* Need to append for wave.js */
-	document.querySelector("body").appendChild(menuAudio);
+	document.getElementById("body").appendChild(menuAudio);
 	/* Create canvas for audio visualizer */
 	let canvas = document.getElementById("audio-visualiser");
 	canvas.width = 0.9 * window.innerHeight;
@@ -531,30 +531,6 @@ define(function(require) {
 			document.getElementById("splash-screen").style.display = "none";
 		}, 1000);
 	});
-	let menuTimeout;
-	function resetMenu() {
-		logoX = 50;
-		logoY = 50;
-		logoSize = 50;
-		logoPulseSize = 55;
-		let canvas = document.getElementById("audio-visualiser");
-		canvas.width = 0.9 * window.innerHeight;
-		canvas.height = 0.9 * window.innerHeight;
-		canvas.style.top = "calc(" + logoY + "vh - " + canvas.height + "px / 2)";
-		canvas.style.left = "calc(5vw + " + logoX + "vw - " + canvas.height + "px / 2)";
-		let menuBar = document.getElementById("menu-bar");
-		menuBar.style.opacity = 0;
-		let menuBarButtons = document.getElementsByClassName("menu-bar-buttons-parent");
-		for (let i = 0; i < menuBarButtons.length; i++) {
-			menuBarButtons[i].style.paddingTop = 0;
-			menuBarButtons[i].style.paddingBottom = 0;
-		}
-		menuBar.style.top = "calc(50vh)";
-		setTimeout(function() {
-			let menuBar = document.getElementById("menu-bar");
-			menuBar.style.visibility = "hidden";
-		})
-	}
 	/* logo listener */
 	document.getElementById("logo").addEventListener("click", function() {
 		let menuHit = AssetLoader.audio("./src/audio/effects/menuHit.wav");
@@ -595,6 +571,30 @@ define(function(require) {
 		backButtonHover.play();
 	});
 	/* Helper */
+	let menuTimeout;
+	function resetMenu() {
+		logoX = 50;
+		logoY = 50;
+		logoSize = 50;
+		logoPulseSize = 55;
+		let canvas = document.getElementById("audio-visualiser");
+		canvas.width = 0.9 * window.innerHeight;
+		canvas.height = 0.9 * window.innerHeight;
+		canvas.style.top = "calc(" + logoY + "vh - " + canvas.height + "px / 2)";
+		canvas.style.left = "calc(5vw + " + logoX + "vw - " + canvas.height + "px / 2)";
+		let menuBar = document.getElementById("menu-bar");
+		menuBar.style.opacity = 0;
+		let menuBarButtons = document.getElementsByClassName("menu-bar-buttons-parent");
+		for (let i = 0; i < menuBarButtons.length; i++) {
+			menuBarButtons[i].style.paddingTop = 0;
+			menuBarButtons[i].style.paddingBottom = 0;
+		}
+		menuBar.style.top = "calc(50vh)";
+		setTimeout(function() {
+			let menuBar = document.getElementById("menu-bar");
+			menuBar.style.visibility = "hidden";
+		})
+	}
 	function setSettings() {
 		if (settingsSet === true) {
 			/* Audio */
