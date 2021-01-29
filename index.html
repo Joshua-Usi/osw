@@ -6,7 +6,7 @@
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Varela Round">
 		<link rel="stylesheet" type="text/css" href="style.css">
 		<link rel="stylesheet" type="text/css" href="web-page-state-beatmap-selection.css">
-		<link rel="icon" href="src/images/osu.png">
+		<link rel="icon" href="./src/images/osu.png">
 	</head>
 	<body id="body">
 		<div class="web-page-state" id="web-page-state-always">
@@ -21,7 +21,7 @@
 			</div>
 			<div id="background-blur">
 				<div id="background-dim">
-					<img id="background" src="src/images/osu_background.jpg">
+					<img id="background" src="./src/images/osu_background.jpg">
 				</div>
 			</div>
 			<div id="sidenav">
@@ -174,13 +174,13 @@
 			</div>
 			<div id="top-bar" class="triangle-background">
 				<span class="span-top-bar-text" style="float: left;">
-					<img id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/settings.png">
-					<img id="standard-top-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/standard.png">
-					<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/taiko.png">
-					<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/catch.png">
-					<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="src/images/mania.png">
+					<img id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/settings.png">
+					<img id="standard-top-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/standard.png">
+					<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/taiko.png">
+					<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/catch.png">
+					<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/mania.png">
 					<p class="top-bar-text" id="welcome-user">Welcome Guest</p>
-					<img id="avatar" src="src/images/default-avatar.png" onclick="window.location = 'https://osu.ppy.sh/users/13478347';">
+					<img id="avatar" src="./src/images/default-avatar.png" onclick="window.location = 'https://osu.ppy.sh/users/13478347';">
 				</span>
 				<p class="top-bar-text" id="now-playing" style="float: right;">Now Playing: </p>
 				<p class="top-bar-text" id="previous" style="float: right;">&#x25BA;&#x275A;</p>
@@ -191,7 +191,7 @@
 		</div>
 		<div class="web-page-state" id="web-page-state-menu">
 			<div id="menu-parallax">
-				<img id="logo" src="src/images/osu.png">
+				<img id="logo" src="./src/images/osu.png">
 				<canvas id="audio-visualiser"></canvas>
 				<span id="logo-beat"></span>
 				<span id="snow"></span>
@@ -199,7 +199,7 @@
 					<div class="menu-bar-buttons-parent" id="menu-bar-settings">
 						<div class="menu-bar-anti-skew">
 							<div class="menu-bar-image-move">
-								<img src="src/images/settings.png" class="menu-bar-buttons-icon">
+								<img src="./src/images/settings.png" class="menu-bar-buttons-icon">
 							</div>
 							<div class="menu-bar-buttons">settings</div>
 						</div>
@@ -208,7 +208,7 @@
 						<div class="menu-bar-buttons-parent" id="menu-bar-play" onclick="document.getElementById('web-page-state-menu').style.display = 'none'; document.getElementById('web-page-state-beatmap-selection').style.display = 'block'; document.getElementById('menu-audio').pause();">
 							<div class="menu-bar-anti-skew">
 								<div class="menu-bar-image-move">
-									<img src="src/images/osu.png" class="menu-bar-buttons-icon">
+									<img src="./src/images/osu.png" class="menu-bar-buttons-icon">
 								</div>
 								<div class="menu-bar-buttons">play</div>
 							</div>
@@ -216,7 +216,7 @@
 						<div class="menu-bar-buttons-parent" id="menu-bar-edit">
 							<div class="menu-bar-anti-skew">
 								<div class="menu-bar-image-move">
-									<img src="src/images/osu.png" class="menu-bar-buttons-icon">
+									<img src="./src/images/osu.png" class="menu-bar-buttons-icon">
 								</div>
 								<div class="menu-bar-buttons">edit</div>
 							</div>
@@ -224,7 +224,7 @@
 						<div class="menu-bar-buttons-parent" id="menu-bar-direct" onclick="window.open('https://osu.ppy.sh/home', '_self');">
 							<div class="menu-bar-anti-skew">
 								<div class="menu-bar-image-move">
-									<img src="src/images/osu.png" class="menu-bar-buttons-icon">
+									<img src="./src/images/osu.png" class="menu-bar-buttons-icon">
 								</div>
 								<div class="menu-bar-buttons">osu! official</div>
 							</div>
@@ -232,7 +232,7 @@
 						<div class="menu-bar-buttons-parent" id="menu-bar-exit" onclick="window.close()">
 							<div class="menu-bar-anti-skew">
 								<div class="menu-bar-image-move">
-									<img src="src/images/exit.png" class="menu-bar-buttons-icon">
+									<img src="./src/images/exit.png" class="menu-bar-buttons-icon">
 								</div>
 								<div class="menu-bar-buttons">exit</div>
 							</div>
@@ -251,23 +251,32 @@
 					<div class="beatmap-selection-group-pane-name"></div>
 					<div class="beatmap-selection-group-pane-artist-name"></div>
 					<div class="beatmap-selection-group-pane-status"></div>
-					<div class="beatmap-selection-group-pane-difficulties"></div>
-				</div>
-				<div class="beatmap-selection-map-pane">
-					<div class="beatmap-selection-group-map-difficulty-name"></div>
-					<div class="beatmap-selection-group-pane-mapper-name"></div>
-					<div class="beatmap-selection-group-pane-"></div>
-					<div class="beatmap-selection-group-pane-difficulty-icon"></div>
-					<div class="beatmap-selection-group-pane-stars"></div>
-					<div class="beatmap-selection-group-rank"></div>
+					<div class="beatmap-selection-group-pane-difficulties">
+						<img class="beatmap-selection-group-pane-difficulties-icon" src="./src/images/easy-difficulty-icon.png">
+						<img class="beatmap-selection-group-pane-difficulties-icon" src="./src/images/normal-difficulty-icon.png">
+						<img class="beatmap-selection-group-pane-difficulties-icon" src="./src/images/hard-difficulty-icon.png">
+						<img class="beatmap-selection-group-pane-difficulties-icon" src="./src/images/insane-difficulty-icon.png">
+						<img class="beatmap-selection-group-pane-difficulties-icon" src="./src/images/expert-difficulty-icon.png">
+						<img class="beatmap-selection-group-pane-difficulties-icon" src="./src/images/expert+-difficulty-icon.png">
+					</div>
+					<div class="beatmap-selection-group-pane-beatmaps">
+						<div class="beatmap-selection-map-pane">
+							<div class="beatmap-selection-group-map-difficulty-name"></div>
+							<div class="beatmap-selection-group-pane-mapper-name"></div>
+							<div class="beatmap-selection-group-pane-"></div>
+							<div class="beatmap-selection-group-pane-difficulty-icon"></div>
+							<div class="beatmap-selection-group-pane-stars"></div>
+							<div class="beatmap-selection-group-rank"></div>
+						</div>	
+					</div>
 				</div>
 			</div>
-			<img id="beatmap-selection-logo" src="src/images/osu.png">
+			<img id="beatmap-selection-logo" src="./src/images/osu.png">
 			<div id="beatmap-selection-bottom-bar">
 				<div id="back-button" onclick="document.getElementById('web-page-state-menu').style.display = 'block'; document.getElementById('web-page-state-beatmap-selection').style.display = 'none'; document.getElementById('menu-audio').play();">
 					<div id="back-button-anti-skew">
 						<div id="back-button-image-container">
-							<img src="src/images/back.png" id="back-button-image">
+							<img src="./src/images/back.png" id="back-button-image">
 						</div>
 						<p id="back-button-text">Back</p>
 					</div>
@@ -277,7 +286,7 @@
 		<div class="web-page-state" id="web-page-state-gameplay"></div>
 		<div class="web-page-state" id="web-page-state-beatmap-end-screen"></div>
 		<!-- https://github.com/foobar404/Wave.js -->
-		<script type="text/javascript" src="src/scripts/wave.js"></script>
+		<script type="text/javascript" src="./src/scripts/wave.js"></script>
 		<script data-main="main" type="text/javascript" src=require.js></script>
 	</body>
 </html>

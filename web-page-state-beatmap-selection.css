@@ -87,3 +87,7 @@
 	top: calc(100vh - 16vh);
 	left: calc(100vw - 22vh);
 }
+
+.beatmap-selection-group-pane-difficulties-icon {
+	width: 4vh;
+}
