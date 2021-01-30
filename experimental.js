@@ -1,14 +1,14 @@
 define(function(require) {
 	"use strict";
 	/* RequireJS Module Loading */
-	const Formulas = require("./src/scripts/Formulas.js");
-	const Mouse = require("./src/scripts/Mouse.js");
-	const Keyboard = require("./src/scripts/Keyboard.js");
-	const beatmap = require("./src/scripts/DefaultBeatMaps.js")[4];
-	const Beizer = require("./src/scripts/Beizer.js");
-	const utils = require("./src/scripts/utils.js");
-	const HitObject = require("./src/scripts/HitObject.js");
-	const AssetLoader = require("./src/scripts/AssetLoader.js");
+	const Formulas = require("src/scripts/Formulas.js");
+	const Mouse = require("src/scripts/Mouse.js");
+	const Keyboard = require("src/scripts/Keyboard.js");
+	const beatmap = require("src/scripts/DefaultBeatMaps.js")[4];
+	const Beizer = require("src/scripts/Beizer.js");
+	const utils = require("src/scripts/utils.js");
+	const HitObject = require("src/scripts/HitObject.js");
+	const AssetLoader = require("src/scripts/AssetLoader.js");
 	/* canvas setup */
 	let canvas = document.createElement("canvas");
 	canvas.id = "gameplay";

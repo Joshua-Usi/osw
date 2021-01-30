@@ -24,29 +24,19 @@
 define(function(require) {
 	"use strict";
 	/* RequireJS Module Loading */
-	const Mouse = require("./src/scripts/Mouse.js");
-	const Song = require("./src/scripts/Song.js");
-	let Options = require("./src/scripts/Options.js");
-	const AssetLoader = require("./src/scripts/AssetLoader.js");
-	const utils = require("./src/scripts/utils.js");
-	const Beatmaps = require("./src/scripts/DefaultBeatMaps.js");
-	/* First time run setup */
-	if (window.localStorage.options === undefined) {
-		window.localStorage.setItem("options", JSON.stringify(Options));
-	} else {
-		let OptionsTemp = JSON.parse(window.localStorage.getItem("options"));
-		if (OptionsTemp.version < Options.version) {
-			localStorage.setItem("options", Options);
-			console.log("Your Options was reset due to new version");
-		}
-		Options = OptionsTemp;
-	}
+	const Mouse = require("src/scripts/Mouse.js");
+	const Song = require("src/scripts/Song.js");
+	let Options = require("src/scripts/Options.js");
+	const AssetLoader = require("src/scripts/AssetLoader.js");
+	const utils = require("src/scripts/utils.js");
+	const Beatmaps = require("src/scripts/DefaultBeatMaps.js");
+	const AttachAudio = require("src/scripts/AttachAudio.js");
 	/* Offline context checks, needed to ensure for some effects to work */
 	if (window.origin === null) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.3.2a";
+	const version = "osu!web v2021.0.3.3a";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -286,18 +276,13 @@ define(function(require) {
 			})();
 		}
 	});
-	/* Omnipotent web listeners */
+/* Omnipotent web listeners */
 	window.addEventListener("resize", function() {
 		let canvas = document.getElementById("audio-visualiser");
-		if (menuAudio === "just-logo") {
 			canvas.width = 0.9 * window.innerHeight;
 			canvas.height = 0.9 * window.innerHeight;
-		} else {
-			canvas.width = 0.5 * window.innerHeight;
-			canvas.height = 0.5 * window.innerHeight;
-			canvas.style.top = "calc(" + logoY + "vh - " + canvas.height + "px / 2)";
-			canvas.style.left = "calc(" + logoX + "vw - " + canvas.height + "px / 2)";
-		}
+			// canvas.width = 0.5 * window.innerHeight;
+			// canvas.height = 0.5 * window.innerHeight;
 	});
 	window.addEventListener("load", function() {
 		document.getElementById("splash-screen").style.animation = "splash-screen-text forwards";
@@ -317,77 +302,55 @@ define(function(require) {
 		utils.blurDiv("menu-parallax", 0);
 	});
 	document.getElementById("pause").addEventListener("click", function() {
-		if (menuAudio.paused) {
-			menuAudio.play();
+		if (document.getElementById("menu-audio").paused) {
+			document.getElementById("menu-audio").play();
 			this.innerHTML = "&#x275A;&#x275A;";
 		} else {
-			menuAudio.pause();
+			document.getElementById("menu-audio").pause();
 			this.innerHTML = "&#x25BA;";
 		}
 	});
 	/* Sidenav event listener */
+	AttachAudio(document.getElementById("close-btn"), "click", "src/audio/effects/back-button-click.wav", "settings-master-volume", "settings-effects-volume");
 	document.getElementById("close-btn").addEventListener("click", function() {
 		document.getElementById("sidenav").style.width = "0";
 		document.getElementById("sidenav").style.opacity = "0.2";
-		let backButtonClick = AssetLoader.audio("./src/audio/effects/back-button-click.wav");
-		backButtonClick.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-		backButtonClick.play();
 	});
 	document.getElementById("settings-icon").addEventListener("click", function() {
-		document.getElementById("sidenav").style.width = "25vw";
-		document.getElementById("sidenav").style.opacity = "1";
 		document.getElementById("menu-bar-settings").dispatchEvent(new CustomEvent("click"));
 	});
 	/* Menu bar buttons listeners */
 	let buttons = document.getElementsByClassName("menu-bar-buttons-parent");
 	for (let i = 0; i < buttons.length; i++) {
-		buttons[i].addEventListener("click", function() {
-			let menuHit = AssetLoader.audio();
-			menuHit.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-			switch (this.id) {
-				case "menu-bar-settings":
-					menuHit.src = "./src/audio/effects/menu-options-click.wav";
-					break;
-				case "menu-bar-play":
-					menuHit.src = "./src/audio/effects/menu-freeplay-click.wav";
-					break;
-				case "menu-bar-edit":
-					menuHit.src = "./src/audio/effects/menu-edit-click.wav";
-					break;
-				case "menu-bar-direct":
-					menuHit.src = "./src/audio/effects/menu-direct-click.wav";
-					break;
-				case "menu-bar-exit":
-					menuHit.src = "./src/audio/effects/menu-exit-click.wav";
-					break;
-			}
-			menuHit.play();
-			clearTimeout(menuTimeout);
-			setTimeout(resetMenu, 15000);
-		});
+		let clickSrc = "";
+		let hoverSrc = "";
+		switch (buttons[i].id) {
+			case "menu-bar-settings":
+				clickSrc = "src/audio/effects/menu-options-click.wav";
+				hoverSrc = "src/audio/effects/menu-options-hover.wav";
+				break;
+			case "menu-bar-play":
+				clickSrc = "src/audio/effects/menu-freeplay-click.wav";
+				hoverSrc = "src/audio/effects/menu-freeplay-hover.wav";
+				break;
+			case "menu-bar-edit":
+				clickSrc = "src/audio/effects/menu-edit-click.wav";
+				hoverSrc = "src/audio/effects/menu-edit-hover.wav";
+				break;
+			case "menu-bar-direct":
+				clickSrc = "src/audio/effects/menu-direct-click.wav";
+				hoverSrc = "src/audio/effects/menu-direct-hover.wav";
+				break;
+			case "menu-bar-exit":
+				clickSrc = "src/audio/effects/menu-exit-click.wav";
+				hoverSrc = "src/audio/effects/menu-exit-hover.wav";
+				break;
+		}
+		AttachAudio(buttons[i], "click", clickSrc, "settings-master-volume", "settings-effects-volume");
+		AttachAudio(buttons[i], "mouseenter", hoverSrc, "settings-master-volume", "settings-effects-volume");
 		buttons[i].addEventListener("mouseenter", function() {
 			this.getElementsByClassName("menu-bar-buttons-icon")[0].classList.add("menu-bar-buttons-icon-animation");
 			this.getElementsByClassName("menu-bar-image-move")[0].classList.add("menu-bar-image-move-animation");
-			let menuHover = AssetLoader.audio();
-			menuHover.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-			switch (this.id) {
-				case "menu-bar-settings":
-					menuHover.src = "./src/audio/effects/menu-options-hover.wav";
-					break;
-				case "menu-bar-play":
-					menuHover.src = "./src/audio/effects/menu-freeplay-hover.wav";
-					break;
-				case "menu-bar-edit":
-					menuHover.src = "./src/audio/effects/menu-edit-hover.wav";
-					break;
-				case "menu-bar-direct":
-					menuHover.src = "./src/audio/effects/menu-direct-hover.wav";
-					break;
-				case "menu-bar-exit":
-					menuHover.src = "./src/audio/effects/menu-exit-hover.wav";
-					break;
-			}
-			menuHover.play();
 		});
 		buttons[i].addEventListener("mouseleave", function() {
 			this.getElementsByClassName("menu-bar-buttons-icon")[0].classList.remove("menu-bar-buttons-icon-animation");
@@ -402,23 +365,19 @@ define(function(require) {
 	/* All checkboxes listeners */
 	let checkbox = document.getElementsByClassName("checkbox");
 	for (let i = 0; i < checkbox.length; i++) {
-		checkbox[i].addEventListener("input", function() {
+		checkbox[i].addEventListener("change", function() {
 			if (this.checked === true) {
-				let checkOn = AssetLoader.audio("./src/audio/effects/check-on.wav");
+				let checkOn = AssetLoader.audio("src/audio/effects/check-on.wav");
 				checkOn.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 				checkOn.play();
 			} else {
-				let checkOff = AssetLoader.audio("./src/audio/effects/check-off.wav");
+				let checkOff = AssetLoader.audio("src/audio/effects/check-off.wav");
 				checkOff.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 				checkOff.play();
 			}
 			setSettings();
 		});
-		checkbox[i].addEventListener("mouseenter", function() {
-			let menuClick = AssetLoader.audio("./src/audio/effects/menuclick.wav");
-			menuClick.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-			menuClick.play();
-		});
+		AttachAudio(checkbox[i], "mouseenter", "src/audio/effects/menuclick.wav", "settings-master-volume", "settings-effects-volume");
 	}
 	/* Specific checkbox listeners */
 	document.getElementById("settings-show-fps").addEventListener("input", function() {
@@ -433,25 +392,19 @@ define(function(require) {
 	for (let i = 0; i < sliders.length; i++) {
 		sliders[i].addEventListener("input", function() {
 			this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
-			let sliderBar = AssetLoader.audio("./src/audio/effects/sliderbar.wav");
-			sliderBar.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-			sliderBar.play();
 		});
-		sliders[i].addEventListener("mouseenter", function() {
-			let menuClick = AssetLoader.audio("./src/audio/effects/menuclick.wav");
-			menuClick.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-			menuClick.play();
-		});
+		AttachAudio(sliders[i], "input", "src/audio/effects/sliderbar.wav", "settings-master-volume", "settings-effects-volume");
+		AttachAudio(sliders[i], "mouseenter", "src/audio/effects/menuclick.wav", "settings-master-volume", "settings-effects-volume");
 	}
 	/* Specific range slider listeners */
 	document.getElementById("settings-master-volume").addEventListener("input", function() {
 		document.getElementById("settings-master-volume-text").innerText = "Master volume: " + this.value + "%";
-		menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
+		document.getElementById("menu-audio").volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 		setSettings();
 	});
 	document.getElementById("settings-music-volume").addEventListener("input", function() {
 		document.getElementById("settings-music-volume-text").innerText = "Music volume: " + this.value + "%";
-		menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
+		document.getElementById("menu-audio").volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 		setSettings();
 	});
 	document.getElementById("settings-effects-volume").addEventListener("input", function() {
@@ -511,11 +464,7 @@ define(function(require) {
 				selectBoxSelections.style.opacity = 0;
 			}
 		});
-		selectBoxes[i].addEventListener("mouseenter", function() {
-			let menuClick = AssetLoader.audio("./src/audio/effects/menuclick.wav");
-			menuClick.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-			menuClick.play();
-		});
+		AttachAudio(selectBoxes[i], "mouseenter", "src/audio/effects/menuclick.wav", "settings-master-volume", "settings-effects-volume");
 	}
 	/* Settings button listeners*/
 	document.getElementById("settings-button-clear-local-storage").addEventListener("click", function() {
@@ -532,10 +481,8 @@ define(function(require) {
 		}, 1000);
 	});
 	/* logo listener */
+	AttachAudio(document.getElementById("logo"), "click", "src/audio/effects/menuHit.wav", "settings-master-volume", "settings-effects-volume");
 	document.getElementById("logo").addEventListener("click", function() {
-		let menuHit = AssetLoader.audio("./src/audio/effects/menuHit.wav");
-		menuHit.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-		menuHit.play();
 		logoX = 30;
 		logoY = 50;
 		logoSize = 25;
@@ -557,19 +504,8 @@ define(function(require) {
 		clearTimeout(menuTimeout);
 		menuTimeout = setTimeout(resetMenu, 15000);
 	});
-	document.getElementById("standard-top-icon").addEventListener("click", function() {
-		document.getElementById("logo").dispatchEvent(new CustomEvent("click"));
-	});
-	document.getElementById("back-button").addEventListener("click", function() {
-		let backButtonClick = AssetLoader.audio("./src/audio/effects/back-button-click.wav");
-		backButtonClick.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-		backButtonClick.play();
-	});
-	document.getElementById("back-button").addEventListener("mouseenter", function() {
-		let backButtonHover = AssetLoader.audio("./src/audio/effects/back-button-hover.wav");
-		backButtonHover.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-		backButtonHover.play();
-	});
+	AttachAudio(document.getElementById("back-button"), "click", "src/audio/effects/back-button-click.wav", "settings-master-volume", "settings-effects-volume");
+	AttachAudio(document.getElementById("back-button"), "mouseenter", "src/audio/effects/back-button-hover.wav", "settings-master-volume", "settings-effects-volume");
 	/* Helper */
 	let menuTimeout;
 	function resetMenu() {
