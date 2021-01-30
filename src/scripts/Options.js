@@ -1,6 +1,6 @@
 define(function(require) {
 	"use strict";
-	return {
+	let defaultOptions = {
 		version: 1,
 		Audio: {
 			masterVolume: 1,
@@ -35,4 +35,15 @@ define(function(require) {
 			currentSkin: "Ajax Transparent",
 		},
 	};
+	if (window.localStorage.options === undefined) {
+		window.localStorage.setItem("options", JSON.stringify(defaultOptions));
+	} else {
+		let optionsTemp = JSON.parse(window.localStorage.getItem("options"));
+		if (optionsTemp.version < defaultOptions.version) {
+			localStorage.setItem("options", defaultOptions);
+			console.log("Your Options was reset due to new version");
+		}
+		defaultOptions = optionsTemp;
+	}
+	return defaultOptions;
 });
