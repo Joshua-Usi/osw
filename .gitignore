@@ -2,9 +2,3 @@
 **/vendor
 
 **/tests
-
-experimental.old.js
-experimental.new.temp.js
-
-# ignore api key, in order to hide key
-apikey.js
