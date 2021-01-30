@@ -4,7 +4,8 @@ define(function(require) {
 	const Formulas = require("src/scripts/Formulas.js");
 	const Mouse = require("src/scripts/Mouse.js");
 	const Keyboard = require("src/scripts/Keyboard.js");
-	const beatmap = require("src/scripts/DefaultBeatMaps.js")[4];
+	// const beatmap = require("src/scripts/DefaultBeatMaps.js")[4];
+	const beatmap = require("src/scripts/BeatMap.js");
 	const Beizer = require("src/scripts/Beizer.js");
 	const utils = require("src/scripts/utils.js");
 	const HitObject = require("src/scripts/HitObject.js");
@@ -136,10 +137,12 @@ define(function(require) {
 	/* Hit events */
 	let hitEvents = [];
 	/* spinner tests */
+	let previousAngle = 0;
+	let angle = 0;
 	let spins = 0;
 	let spinSpeed = 0;
+	let mouseOctant = 0;
 	let o = 0;
-	let inc = 0.01;
 	window.addEventListener("click", function() {
 		if (firstClick) {
 			firstClick = false;
@@ -156,19 +159,39 @@ define(function(require) {
 			ctx.rect(playfieldXOffset + canvas.width / 2 - canvas.height * playfieldSize * (4 / 3) / 2, playfieldYOffset + canvas.height / 2 - canvas.height * playfieldSize / 2, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize);
 			ctx.stroke();
 			ctx.closePath();
-			o += inc;
 			let hitObjectOffsetX = playfieldXOffset + canvas.width / 2 - canvas.height * playfieldSize * (4 / 3) / 2;
 			let hitObjectOffsetY = playfieldYOffset + canvas.height / 2 - canvas.height * playfieldSize / 2;
+			ctx.strokeStyle = "#fff";
+			ctx.lineWidth = 5;
+			o += 0.5 / 6;
 			let b = utils.mapToOsuPixels(256, 192, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-			let c = {
-				x: mouse.previousPositions.x[0],
-				y: mouse.previousPositions.y[0],
+			// mouse.setPosition(b.x + Math.cos(o) * 50, b.y + Math.sin(o) * 50);
+			for (var i = 0; i < Math.PI * 2; i += Math.PI / 4) {
+				ctx.beginPath()
+				ctx.moveTo(b.x, b.y);
+				ctx.lineTo(b.x + Math.cos(i) * 500, b.y + Math.sin(i) * 500);
+				ctx.stroke();
+				ctx.fillText(utils.map(i, 0, Math.PI * 2, 0, 8), b.x + Math.cos((i + i - Math.PI / 4) / 2) * 50, b.y + Math.sin((i + i - Math.PI / 4) / 2) * 50);
 			}
-			mouse.setPosition(b.x + Math.sin(o) * 50, b.y + Math.cos(o) * 50);
-			spinSpeed = utils.angle(mouse.position, b, c);
-				spins += spinSpeed * (audio.currentTime - previousTime);
-			ctx.fillText(spinSpeed, 10, 300);
-			ctx.fillText(spins, 10, 320);
+			previousAngle = angle;
+			angle = Math.atan2(mouse.position.y - b.y, mouse.position.x - b.x);
+			ctx.beginPath()
+			ctx.moveTo(b.x, b.y);
+			ctx.lineTo(b.x + Math.cos(angle) * 500, b.y + Math.sin(angle) * 500);
+			ctx.stroke();
+			if (Math.sign(angle) === -1) {
+				angle = Math.PI * 2 + angle;
+			}
+			let angleChange = Math.abs(((angle - previousAngle) / (16.666 / 1000)));
+			/* hard limit spinner speed */
+			if (angleChange >= 50) {
+				angleChange = 50;
+			}
+			spins += angleChange;
+			ctx.fillText("Absolute Angle: " + angle, 10, 320);
+			ctx.fillText("Angle Change: " + angleChange + " radians per second", 10, 340);
+			ctx.fillText(mouseOctant, 10, 360);
+			ctx.fillText("Spins: " + Math.floor(spins * (16.666 / 1000) / (Math.PI * 2)), 10, 380);
 			if (currentHP >= 1) {
 				currentHP = 1;
 			}
@@ -216,7 +239,7 @@ define(function(require) {
 						gameplayDetails.totalSliderTicks++;
 						break;
 				}
-				if (hitEvents[0].score >= 50 && hitEvents[0].type === "hit-circle") {
+				if ((hitEvents[0].score >= 50 || hitEvents[0].score === 0) && hitEvents[0].type === "hit-circle") {
 					score += utils.hitScore(hitEvents[0].score, combo, difficultyMultiplier, 1);
 					scoreObjects.push(new HitObject.ScoreObject(hitEvents[0].score, hitEvents[0].x, hitEvents[0].y, audio.currentTime + 1));
 				}
@@ -371,7 +394,7 @@ define(function(require) {
 						hitObjects[i].cache.hitTime = audio.currentTime;
 						hitEvents.push(new HitEvent("hit-circle", hitWindowScore, "increasing", hitObjectMapped.x, hitObjectMapped.y));
 					} else {
-						hitEvents.push(new HitEvent("hit-circle", hitWindowScore, "reset", hitObjectMapped.x, hitObjectMapped.y));
+						hitEvents.push(new HitEvent("hit-circle", 0, "reset", hitObjectMapped.x, hitObjectMapped.y));
 					}
 					hitObjects.splice(i, 1);
 					i--;
@@ -795,8 +818,8 @@ define(function(require) {
 			} else {
 				document.getElementById("frame-rate").style.background = "#B00020";
 			}
-			setTimeout(animate, 4);
-			// requestAnimationFrame(animate);
+			// setTimeout(animate, 4);
+			requestAnimationFrame(animate);
 		})();
 	});
 });
