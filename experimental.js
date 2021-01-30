@@ -9,6 +9,7 @@ define(function(require) {
 	const utils = require("src/scripts/utils.js");
 	const HitObject = require("src/scripts/HitObject.js");
 	const AssetLoader = require("src/scripts/AssetLoader.js");
+	const HitEvent = require("src/scripts/HitEvent.js");
 	/* canvas setup */
 	let canvas = document.createElement("canvas");
 	canvas.id = "gameplay";
@@ -42,6 +43,9 @@ define(function(require) {
 	let spinnerApproachCircle = AssetLoader.image(`src/images/skins/${skin}/spinner-approachcircle.png`);
 	let spinnerRPM = AssetLoader.image(`src/images/skins/${skin}/spinner-rpm.png`);
 	let spinnerTop = AssetLoader.image(`src/images/skins/${skin}/spinner-top.png`);
+	/* healthbar assets */
+	let scoreBarBg = AssetLoader.image(`src/images/skins/${skin}/scorebar-bg.png`);
+	let scoreBarColour = AssetLoader.image(`src/images/skins/${skin}/scorebar-colour.png`);
 	/* combo number assets */
 	let comboNumbers = [
 		AssetLoader.image(`src/images/skins/${skin}/fonts/aller/default-0.png`),
@@ -79,6 +83,10 @@ define(function(require) {
 	let circleDiameter = utils.map(Formulas.CS(beatmap.CircleSize) * 2, 0, 512, 0, canvas.height * playfieldSize * (4 / 3));
 	let difficultyMultiplier = utils.difficultyPoints(beatmap.CircleSize, beatmap.HPDrainRate, beatmap.OverallDifficulty);
 	let odTime = Formulas.ODHitWindow(beatmap.OverallDifficulty);
+	/**/
+	let currentHP = 1;
+	let hpDisplay = 1;
+	let previousTime = 0;
 	/* Applied Mods*/
 	let mods = {
 		easy: false,
@@ -102,14 +110,18 @@ define(function(require) {
 	let timingPointUninheritedIndex = 0;
 	let currentTimingPoint = 0;
 	/* Score variables */
+	let gameplayDetails = {
+		total300s: 0,
+		total100s: 0,
+		total50s: 0,
+		totalMisses: 0,
+		totalSliderElements: 0,
+		totalSliderTicks: 0,
+		totalSpinnerSpins: 0,
+		totalSpinnerBonusSpin: 0,
+	}
 	let score = 0;
 	let scoreDisplay = 0;
-	let total300 = 0;
-	let total300g = 0;
-	let total100 = 0;
-	let total100g = 0;
-	let total50 = 0;
-	let totalMisses = 0;
 	/* Combo variables */
 	let combo = 0;
 	let comboPulseSize = 1;
@@ -121,6 +133,8 @@ define(function(require) {
 	/* Profiling variables */
 	let times = [];
 	let frameRate = 0;
+	/* Hit events */
+	let hitEvents = [];
 	window.addEventListener("click", function() {
 		if (firstClick) {
 			firstClick = false;
@@ -137,6 +151,67 @@ define(function(require) {
 			ctx.rect(playfieldXOffset + canvas.width / 2 - canvas.height * playfieldSize * (4 / 3) / 2, playfieldYOffset + canvas.height / 2 - canvas.height * playfieldSize / 2, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize);
 			ctx.stroke();
 			ctx.closePath();
+			if (currentHP >= 1) {
+				currentHP = 1;
+			}
+			if (currentHP <= 0) {
+				currentHP = 0;
+			}
+			currentHP -= Formulas.HPDrain(beatmap.HPDrainRate, audio.currentTime - previousTime);
+			hpDisplay += (currentHP - hpDisplay) / 8;
+			previousTime = audio.currentTime;
+			ctx.drawImage(scoreBarBg, 10, 10, window.innerWidth / 2, scoreBarBg.height);
+			ctx.drawImage(scoreBarColour, 0, 0, utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2), scoreBarColour.height, 15, 10 + scoreBarColour.height / 1.5, utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2), scoreBarColour.height);
+			/* Hit Events */
+			while (hitEvents.length > 0) {
+				switch (hitEvents[0].score) {
+					/* slider bonus spin */
+					case 1000:
+						gameplayDetails.totalSliderBonusSpin++;
+						break;
+					/* great*/
+					case 300:
+						gameplayDetails.total300s++;
+						break;
+					/* good or spinner spin */
+					case 100:
+						if (hitEvents[0].type === "hit-circle") {
+							gameplayDetails.total100s++;
+						} else {
+							gameplayDetails.totalSpinnerSpins++;
+						}
+						break;
+					/* meh */
+					case 50:
+						gameplayDetails.total50s++;
+						break;
+					/* complete miss */
+					case 0:
+						gameplayDetails.totalMisses++;
+						break;
+					/* Slider head, repeat and end */
+					case 30:
+						gameplayDetails.totalSliderElements++;
+						break;
+					/* Slider tick */
+					case 10:
+						gameplayDetails.totalSliderTicks++;
+						break;
+				}
+				if (hitEvents[0].score >= 50 && hitEvents[0].type === "hit-circle") {
+					score += utils.hitScore(hitEvents[0].score, combo, difficultyMultiplier, 1);
+					scoreObjects.push(new HitObject.ScoreObject(hitEvents[0].score, hitEvents[0].x, hitEvents[0].y, audio.currentTime + 1));
+				}
+				if (hitEvents[0].combo === "increasing") {
+					combo++;
+					comboPulseSize = 1;
+				} else if (hitEvents[0].combo === "reset") {
+					combo = 0;
+					document.getElementById("combo-container").innerHTML = "";
+				}
+				currentHP += Formulas.HP(beatmap.HPDrainRate, hitEvents[0].score);
+				hitEvents.splice(0, 1);
+			}
 			while (currentHitObject < beatmap.hitObjectsParsed.length && audio.currentTime >= beatmap.hitObjectsParsed[currentHitObject].time - arTime) {
 				hitObjects.push(beatmap.hitObjectsParsed[currentHitObject]);
 				currentHitObject++;
@@ -270,27 +345,18 @@ define(function(require) {
 					let hitWindowScore = 0;
 					if (utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[0])) {
 						if (utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[2])) {
-							total300++;
 							hitWindowScore = 300;
 						} else if (utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[1])) {
-							total100++;
 							hitWindowScore = 100;
 						} else if (utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[0])) {
-							total50++;
 							hitWindowScore = 50;
 						}
-						combo++;
-						comboPulseSize = 1;
 						hitObjects[i].cache.hasHit = true;
 						hitObjects[i].cache.hitTime = audio.currentTime;
+						hitEvents.push(new HitEvent("hit-circle", hitWindowScore, "increasing", hitObjectMapped.x, hitObjectMapped.y));
 					} else {
-						totalMisses++;
-						hitWindowScore = 0;
-						combo = 0;
-						document.getElementById("combo-container").innerHTML = "";
+						hitEvents.push(new HitEvent("hit-circle", hitWindowScore, "reset", hitObjectMapped.x, hitObjectMapped.y));
 					}
-					score += utils.hitScore(hitWindowScore, combo, difficultyMultiplier, 1);
-					scoreObjects.push(new HitObject.ScoreObject(hitWindowScore, hitObjectMapped.x, hitObjectMapped.y, audio.currentTime + 1));
 					hitObjects.splice(i, 1);
 					i--;
 				}
@@ -325,9 +391,7 @@ define(function(require) {
 									if (utils.dist(mapped.x, mapped.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true) {
 										hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j] = true;
 										hitObjects[i].cache.sliderTicksHit++;
-										score += 10;
-										combo++;
-										comboPulseSize = 1;
+										hitEvents.push(new HitEvent("slider-tick", 10, "increasing", mapped.x, mapped.y));
 									}
 								}
 							}
@@ -360,9 +424,7 @@ define(function(require) {
 									if (utils.dist(mapped.x, mapped.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true) {
 										hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j] = true;
 										hitObjects[i].cache.sliderTicksHit++;
-										score += 10;
-										combo++;
-										comboPulseSize = 1;
+										hitEvents.push(new HitEvent("slider-tick", 10, "increasing", mapped.x, mapped.y));
 									}
 								}
 							}
@@ -381,15 +443,12 @@ define(function(require) {
 							hitObjects[i].cache.currentSlide++;
 							if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
 								hitObjects[i].cache.repeatsHit++;
-							}
-							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true) {
-								score += 30;
-								combo++;
-								comboPulseSize = 1;
-							} else if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
-								combo = 0;
-								document.getElementById("combo-container").innerHTML = "";
+								let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+								if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true) {
+									hitEvents.push(new HitEvent("slider-element", 30, "increasing", sliderBodyPos.x, sliderBodyPos.y));
+								} else if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
+									hitEvents.push(new HitEvent("slider-element-miss", 0, "reset", sliderBodyPos.x, sliderBodyPos.y));
+								}
 							}
 						}
 					} else {
@@ -409,9 +468,7 @@ define(function(require) {
 				}
 				/* Slider Head Hit Handling ---------------------------------------------------------------- */
 				if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hitHead === false && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[0])) {
-					score += 30;
-					combo++;
-					comboPulseSize = 1;
+					hitEvents.push(new HitEvent("slider-element", 30, "increasing", hitObjectMapped.x, hitObjectMapped.y));
 					hitObjects[i].cache.hitHead = true;
 					hitObjects[i].cache.hasHitAtAll = true;
 				}
@@ -474,23 +531,15 @@ define(function(require) {
 					let hitScore = 0;
 					if (sliderElementsHit === totalSliderElements) {
 						hitScore = 300;
-						total300++;
 					} else if (sliderElementsHit >= 0.5 * totalSliderElements) {
 						hitScore = 100;
-						total100++;
 					} else if (sliderElementsHit > 0) {
 						hitScore = 50;
-						total50++;
 					}
-					// combo++;
 					if (hitScore !== 0) {
-						comboPulseSize = 1;
-						score += utils.hitScore(hitScore, combo, difficultyMultiplier, 1);
-						scoreObjects.push(new HitObject.ScoreObject(hitScore, mapped.x, mapped.y, audio.currentTime + 1));
+						hitEvents.push(new HitEvent("hit-circle", hitScore, "increasing", mapped.x, mapped.y));
 					} else {
-						totalMisses++;
-						combo = 0;
-						document.getElementById("combo-container").innerHTML = "";
+						hitEvents.push(new HitEvent("hit-circle", 0, "reset", mapped.x, mapped.y));
 					}
 					hitObjects.splice(i, 1);
 					i--;
@@ -504,9 +553,9 @@ define(function(require) {
 				}
 				/* Miss (Outside OD window) calculation ---------------------------------------------------------------- */
 				let miss = false;
+				let mapped = hitObjectMapped;
 				if (hitObjects[i].type[0] === "1" && audio.currentTime >= hitObjects[i].time + odTime[0] / 2) {
 					miss = true;
-					scoreObjects.push(new HitObject.ScoreObject(0, hitObjectMapped.x, hitObjectMapped.y, audio.currentTime + 1));
 				} else if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hasEnded === true && hitObjects[i].cache.hasHitAtAll === false) {
 					miss = true;
 					let mapped;
@@ -515,17 +564,15 @@ define(function(require) {
 					} else {
 						mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					}
-					scoreObjects.push(new HitObject.ScoreObject(0, mapped.x, mapped.y, audio.currentTime + 1));
 				} else if (hitObjects[i].type[3] === "1" && audio.currentTime >= hitObjects[i].endTime) {
 					// miss = true;
-					scoreObjects.push(new HitObject.ScoreObject(300, hitObjectMapped.x, hitObjectMapped.y, audio.currentTime + 1));
-					combo++;
+					hitEvents.push(new HitEvent("hit-circle", 300, "increasing", mapped.x, mapped.y));
 					hitObjects.splice(i, 1);
 					i--;
 				}
 				if (miss === true) {
 					// combo = 0;
-					totalMisses++;
+					hitEvents.push(new HitEvent("hit-circle", 0, "reset", mapped.x, mapped.y));
 					hitObjects.splice(i, 1);
 					i--;
 					document.getElementById("combo-container").innerHTML = "";
@@ -544,7 +591,6 @@ define(function(require) {
 				}
 				/* approach circle min size */
 				if (approachCircleSize <= 1.6) {
-					approachCircleSize = 1.6;
 					if (hitObjects[i].type[0] === "1") {
 						mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y)
 						mouse.click();
@@ -619,6 +665,7 @@ define(function(require) {
 						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 						ctx.translate(mapped.x, mapped.y);
 						ctx.rotate(-utils.direction(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 4].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 3].y, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 2].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y) + Math.PI / 2);
+						ctx.drawImage(hitCircle, -circleDiameter / 2, -circleDiameter / 2, circleDiameter, circleDiameter);
 						ctx.drawImage(reverseArrow, -circleDiameter / 2, -circleDiameter / 2, circleDiameter, circleDiameter);
 						ctx.resetTransform();
 					} else {
@@ -698,9 +745,9 @@ define(function(require) {
 			/* update combo html element */
 			utils.htmlCounter(utils.reverse(combo + "x"), "combo-container", "combo-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "top", "calc(100vh - 52 / 32 * " + 2 * (comboPulseSize + 1) + "vw)");
 			/* update accuracy html element */
-			utils.htmlCounter("%" + utils.reverse("" + (utils.accuracy(total300, total100, total50, totalMisses) * 100).toPrecision(4)), "accuracy-container", "accuracy-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
+			utils.htmlCounter("%" + utils.reverse("" + (utils.accuracy(gameplayDetails.total300s, gameplayDetails.total100s, gameplayDetails.total50s, gameplayDetails.totalMisses) * 100).toPrecision(4)), "accuracy-container", "accuracy-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
 			/* rank grade */
-			document.getElementById("grade").src = `src/images/skins/${skin}/ranking-` + utils.grade(total300, total100, total50, totalMisses, false) + "-small.png";
+			document.getElementById("grade").src = `src/images/skins/${skin}/ranking-` + utils.grade(gameplayDetails.total300s, gameplayDetails.total100s, gameplayDetails.total50s, gameplayDetails.totalMisses, false) + "-small.png";
 			/* combo pulse size */
 			let els = document.getElementById("combo-container").querySelectorAll("img");
 			for (let i = 0; i < els.length; i++) {

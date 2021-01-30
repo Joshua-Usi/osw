@@ -85,19 +85,44 @@ define(function(require) {
 			}
 			return od;
 		},
-		/* returns loss and gain per note in array*/
-		HP: function(n) {
-			let LossPerNote = 0.75 * n + 0.75;
-			let GainPerNote;
-			if (n >= 9) {
-				GainPerNote = -0.4 * (n + ((n - 9) / 180)) + 4;
-			} else {
-				GainPerNote = -0.4 * n + 4;
+		/* Natural HP drain */
+		HPDrain: function(n, time) {
+			if (time === 0) {
+				return 0;
 			}
-			return [
-				LossPerNote,
-				GainPerNote,
-			];
+			return (time / 500) * (100 / (11 - n));
+		},
+		HP: function(n, hitScore) {
+			switch (hitScore) {
+					/* slider bonus spin */
+					case 1000:
+						return 0;
+						break;
+					/* great*/
+					case 300:
+						return 0.5 / ((n / 4) + 1);
+						break;
+					/* good or spinner spin */
+					case 100:
+						return 0.2 / ((n / 4) + 1);
+						break;
+					/* meh */
+					case 50:
+						return 0;
+						break;
+					/* complete miss */
+					case 0:
+						return -(n + 1) / 55;
+						break;
+					/* Slider head, repeat and end */
+					case 30:
+						return 0.05 / ((n / 4) + 1);
+						break;
+					/* Slider tick */
+					case 10:
+						return 0.01 / ((n / 4) + 1);
+						break;
+				}
 		}
 	};
 });

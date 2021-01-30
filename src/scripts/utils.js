@@ -168,6 +168,12 @@ define(function(require) {
 			// clock or counterclock wise 
 			return (val > 0) ? 1 : 2; 
 		},
+		angle: function(a, b, c) {
+			let ab = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
+			let bc = Math.sqrt(Math.pow(b.x - c.x, 2) + Math.pow(b.y - c.y, 2));
+			let ac = Math.sqrt(Math.pow(c.x - a.x, 2) + Math.pow(c.y - a.y, 2));
+			return Math.acos((bc * bc + ab * ab - ac * ac) / (2 * bc * ab));
+		},
 		/* 90 sided circle */
 		circleToPoints: function(x, y, r, length, startingAngle, clockwise) {
 			let points = [];
