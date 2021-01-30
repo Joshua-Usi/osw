@@ -140,8 +140,6 @@ define(function(require) {
 	let previousAngle = 0;
 	let angle = 0;
 	let spins = 0;
-	let spinSpeed = 0;
-	let mouseOctant = 0;
 	let o = 0;
 	window.addEventListener("click", function() {
 		if (firstClick) {
@@ -150,7 +148,6 @@ define(function(require) {
 			setTimeout(function() {
 				audio.play();
 			}, 0);
-		}
 		(function animate() {
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			ctx.strokeStyle = "#000";
@@ -163,22 +160,11 @@ define(function(require) {
 			let hitObjectOffsetY = playfieldYOffset + canvas.height / 2 - canvas.height * playfieldSize / 2;
 			ctx.strokeStyle = "#fff";
 			ctx.lineWidth = 5;
-			o += 0.5 / 6;
+			o += 3 / 6;
 			let b = utils.mapToOsuPixels(256, 192, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 			// mouse.setPosition(b.x + Math.cos(o) * 50, b.y + Math.sin(o) * 50);
-			for (var i = 0; i < Math.PI * 2; i += Math.PI / 4) {
-				ctx.beginPath()
-				ctx.moveTo(b.x, b.y);
-				ctx.lineTo(b.x + Math.cos(i) * 500, b.y + Math.sin(i) * 500);
-				ctx.stroke();
-				ctx.fillText(utils.map(i, 0, Math.PI * 2, 0, 8), b.x + Math.cos((i + i - Math.PI / 4) / 2) * 50, b.y + Math.sin((i + i - Math.PI / 4) / 2) * 50);
-			}
 			previousAngle = angle;
 			angle = Math.atan2(mouse.position.y - b.y, mouse.position.x - b.x);
-			ctx.beginPath()
-			ctx.moveTo(b.x, b.y);
-			ctx.lineTo(b.x + Math.cos(angle) * 500, b.y + Math.sin(angle) * 500);
-			ctx.stroke();
 			if (Math.sign(angle) === -1) {
 				angle = Math.PI * 2 + angle;
 			}
@@ -187,10 +173,10 @@ define(function(require) {
 			if (angleChange >= 50) {
 				angleChange = 50;
 			}
+			console.log(angleChange);
 			spins += angleChange;
 			ctx.fillText("Absolute Angle: " + angle, 10, 320);
 			ctx.fillText("Angle Change: " + angleChange + " radians per second", 10, 340);
-			ctx.fillText(mouseOctant, 10, 360);
 			ctx.fillText("Spins: " + Math.floor(spins * (16.666 / 1000) / (Math.PI * 2)), 10, 380);
 			if (currentHP >= 1) {
 				currentHP = 1;
@@ -372,6 +358,9 @@ define(function(require) {
 						hitObjects[i].cache.cacheSet = true;
 						/* Cache Setup for Spinner ---------------------------------------------------------------- */
 						hitObjects[i].cache.spins = 0;
+						/* in rad/s */
+						hitObjects[i].cache.velocity = 0;
+						hitObjects[i].spinnerBonus = false;
 						hitObjects[i].cache.currentAngle = 0;
 					}
 				}
@@ -821,5 +810,6 @@ define(function(require) {
 			// setTimeout(animate, 4);
 			requestAnimationFrame(animate);
 		})();
+	}
 	});
 });
