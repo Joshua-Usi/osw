@@ -135,6 +135,11 @@ define(function(require) {
 	let frameRate = 0;
 	/* Hit events */
 	let hitEvents = [];
+	/* spinner tests */
+	let spins = 0;
+	let spinSpeed = 0;
+	let o = 0;
+	let inc = 0.01;
 	window.addEventListener("click", function() {
 		if (firstClick) {
 			firstClick = false;
@@ -151,6 +156,19 @@ define(function(require) {
 			ctx.rect(playfieldXOffset + canvas.width / 2 - canvas.height * playfieldSize * (4 / 3) / 2, playfieldYOffset + canvas.height / 2 - canvas.height * playfieldSize / 2, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize);
 			ctx.stroke();
 			ctx.closePath();
+			o += inc;
+			let hitObjectOffsetX = playfieldXOffset + canvas.width / 2 - canvas.height * playfieldSize * (4 / 3) / 2;
+			let hitObjectOffsetY = playfieldYOffset + canvas.height / 2 - canvas.height * playfieldSize / 2;
+			let b = utils.mapToOsuPixels(256, 192, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+			let c = {
+				x: mouse.previousPositions.x[0],
+				y: mouse.previousPositions.y[0],
+			}
+			mouse.setPosition(b.x + Math.sin(o) * 50, b.y + Math.cos(o) * 50);
+			spinSpeed = utils.angle(mouse.position, b, c);
+				spins += spinSpeed * (audio.currentTime - previousTime);
+			ctx.fillText(spinSpeed, 10, 300);
+			ctx.fillText(spins, 10, 320);
 			if (currentHP >= 1) {
 				currentHP = 1;
 			}
@@ -161,7 +179,7 @@ define(function(require) {
 			hpDisplay += (currentHP - hpDisplay) / 8;
 			previousTime = audio.currentTime;
 			ctx.drawImage(scoreBarBg, 10, 10, window.innerWidth / 2, scoreBarBg.height);
-			ctx.drawImage(scoreBarColour, 0, 0, utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2), scoreBarColour.height, 15, 10 + scoreBarColour.height / 1.5, utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2), scoreBarColour.height);
+			ctx.drawImage(scoreBarColour, 0, 0, utils.map(hpDisplay, 0, 1, 0, scoreBarColour.width), scoreBarColour.height, 15, 10 + scoreBarColour.height / 1.5, utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2 - 0.01 * window.innerWidth), scoreBarColour.height);
 			/* Hit Events */
 			while (hitEvents.length > 0) {
 				switch (hitEvents[0].score) {
@@ -223,8 +241,6 @@ define(function(require) {
 					timingPointUninheritedIndex = currentTimingPoint;
 				}
 			}
-			let hitObjectOffsetX = playfieldXOffset + canvas.width / 2 - canvas.height * playfieldSize * (4 / 3) / 2;
-			let hitObjectOffsetY = playfieldYOffset + canvas.height / 2 - canvas.height * playfieldSize / 2;
 			/* Cache Loop ---------------------------------------------------------------- */
 			for (let i = 0; i < hitObjects.length; i++) {
 				/* Cache Setup ---------------------------------------------------------------- */
@@ -396,8 +412,8 @@ define(function(require) {
 								}
 							}
 							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
-							mouse.click();
+							// mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
+							// mouse.click();
 							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 								hitObjects[i].cache.onFollowCircle = true;
 							} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
@@ -429,8 +445,8 @@ define(function(require) {
 								}
 							}
 							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
-							mouse.click();
+							// mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
+							// mouse.click();
 							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 								hitObjects[i].cache.onFollowCircle = true;
 							} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
@@ -592,8 +608,8 @@ define(function(require) {
 				/* approach circle min size */
 				if (approachCircleSize <= 1.6) {
 					if (hitObjects[i].type[0] === "1") {
-						mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y)
-						mouse.click();
+						// mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y)
+						// mouse.click();
 					}
 				}
 				/* Alpha Calculations ---------------------------------------------------------------- */
