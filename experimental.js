@@ -564,11 +564,6 @@ define(function(require) {
 						} else {
 							mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 						}
-					} else if (hitObjects[i].type[3] === "1" && audio.currentTime >= hitObjects[i].endTime) {
-						// miss = true;
-						hitEvents.push(new HitEvent("hit-circle", 300, "increasing", mapped.x, mapped.y));
-						hitObjects.splice(i, 1);
-						i--;
 					}
 					if (miss === true) {
 						// combo = 0;
@@ -614,6 +609,21 @@ define(function(require) {
 								hitEvents.push(new HitEvent("spinner-bonus-spin", 1000, "no-increase", mapped.x, mapped.y));
 							}
 						}
+					}
+					/* Spinner end handling ---------------------------------------------------------------- */
+					if (hitObjects[i].type[3] === "1" && audio.currentTime > hitObjects[i].endTime) {
+						let mapped = utils.mapToOsuPixels(256, 192, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+						if (hitObjects[i].cache.cleared) {
+							hitEvents.push(new HitEvent("hit-circle", 300, "increasing", mapped.x, mapped.y));
+						} else if (hitObjects[i].cache.timeSpentAboveSpinnerMinimum >= (hitObjects[i].endTime - hitObjects[i].time) * 0.25 * 0.75) {
+							hitEvents.push(new HitEvent("hit-circle", 100, "increasing", mapped.x, mapped.y));
+						} else if (hitObjects[i].cache.timeSpentAboveSpinnerMinimum >= (hitObjects[i].endTime - hitObjects[i].time) * 0.25 * 0.25) {
+							hitEvents.push(new HitEvent("hit-circle", 50, "increasing", mapped.x, mapped.y));
+						} else if (hitObjects[i].cache.timeSpentAboveSpinnerMinimum < (hitObjects[i].endTime - hitObjects[i].time) * 0.25 * 0.25) {
+							hitEvents.push(new HitEvent("hit-circle", 0, "reset", mapped.x, mapped.y));
+						}
+						hitObjects.splice(i, 1);
+						i--;
 					}
 				}
 				/* Render Loop ---------------------------------------------------------------- */
