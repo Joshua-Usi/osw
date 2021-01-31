@@ -617,7 +617,8 @@ define(function(require) {
 					}
 				}
 				/* Render Loop ---------------------------------------------------------------- */
-				for (let i = 0; i < hitObjects.length; i++) {
+				for (let i = hitObjects.length - 1; i >= 0; i--) {
+				// for (let i = 0; i < hitObjects.length; i++) {
 					/* Approach Circle Calculations ---------------------------------------------------------------- */
 					let approachCircleSize = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 5, 1.6);
 					let hitObjectMapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
