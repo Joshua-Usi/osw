@@ -727,9 +727,13 @@ define(function(require) {
 					}
 				} else if (hitObjects[i].type[3] === "1") {
 					/* draw spinner */
+					let mapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].x, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+					ctx.translate(mapped.x, mapped.y);
+					ctx.rotate(-utils.direction(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 4].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 3].y, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 2].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y) + Math.PI / 2);
 					let size = utils.map(hitObjects[i].endTime - audio.currentTime, 0, hitObjects[i].endTime - (hitObjects[i].time - arTime), 0, 0.8);
 					ctx.drawImage(spinnerApproachCircle, hitObjectMapped.x - size * window.innerHeight / 2, hitObjectMapped.y - size * window.innerHeight / 2, size * window.innerHeight, size * window.innerHeight);
 					ctx.drawImage(spinnerTop, hitObjectMapped.x - 0.2 * window.innerHeight / 2, hitObjectMapped.y - 0.2 * window.innerHeight / 2, 0.2 * window.innerHeight, 0.2 * window.innerHeight);
+					ctx.resetTranform();
 				}
 				if (hitObjects[i].cache.hasHit === true && audio.currentTime >= hitObjects[i].time) {
 					// continue;
