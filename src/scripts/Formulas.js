@@ -92,11 +92,11 @@ define(function(require) {
 			}
 			return (time / 500) * (100 / (11 - n));
 		},
-		HP: function(n, hitScore) {
+		HP: function(n, hitScore, type) {
 			switch (hitScore) {
 					/* slider bonus spin */
 					case 1000:
-						return 0;
+						return 0.025;
 						break;
 					/* great*/
 					case 300:
@@ -104,7 +104,11 @@ define(function(require) {
 						break;
 					/* good or spinner spin */
 					case 100:
-						return 0.2 / ((n / 4) + 1);
+						if (type === "hit-circle") {
+							return 0.2 / ((n / 4) + 1);
+						} else {
+							return 0.01;
+						}
 						break;
 					/* meh */
 					case 50:

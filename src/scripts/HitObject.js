@@ -60,7 +60,10 @@ define(function(require) {
 				this.hitSound = hitSound;
 				this.endTime = endTime / 1000;
 				this.hitSample = hitSample;
-				this.cache = {};
+				this.cache = {
+					cacheSet: false,
+					cacheSetAfterHit: false,
+				};
 			}
 		},
 		TimingPoint: class TimingPoint {

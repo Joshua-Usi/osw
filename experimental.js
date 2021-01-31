@@ -44,6 +44,7 @@ define(function(require) {
 	let spinnerApproachCircle = AssetLoader.image(`src/images/skins/${skin}/spinner-approachcircle.png`);
 	let spinnerRPM = AssetLoader.image(`src/images/skins/${skin}/spinner-rpm.png`);
 	let spinnerTop = AssetLoader.image(`src/images/skins/${skin}/spinner-top.png`);
+	let spinnerClear = AssetLoader.image(`src/images/skins/${skin}/spinner-clear.png`);
 	/* healthbar assets */
 	let scoreBarBg = AssetLoader.image(`src/images/skins/${skin}/scorebar-bg.png`);
 	let scoreBarColour = AssetLoader.image(`src/images/skins/${skin}/scorebar-colour.png`);
@@ -137,6 +138,7 @@ define(function(require) {
 	/* Hit events */
 	let hitEvents = [];
 	/* spinner tests */
+	let previousSigns = [];
 	let previousAngle = 0;
 	let angle = 0;
 	let spins = 0;
@@ -160,24 +162,35 @@ define(function(require) {
 			let hitObjectOffsetY = playfieldYOffset + canvas.height / 2 - canvas.height * playfieldSize / 2;
 			ctx.strokeStyle = "#fff";
 			ctx.lineWidth = 5;
-			o += 3 / 6;
+			o += 2 / 6;
 			let b = utils.mapToOsuPixels(256, 192, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-			// mouse.setPosition(b.x + Math.cos(o) * 50, b.y + Math.sin(o) * 50);
+			mouse.setPosition(b.x + Math.cos(o) * 50, b.y + Math.sin(o) * 50);
 			previousAngle = angle;
 			angle = Math.atan2(mouse.position.y - b.y, mouse.position.x - b.x);
 			if (Math.sign(angle) === -1) {
 				angle = Math.PI * 2 + angle;
 			}
-			let angleChange = Math.abs(((angle - previousAngle) / (16.666 / 1000)));
+			let angleChange = ((angle - previousAngle) / (16.666 / 1000));
 			/* hard limit spinner speed */
 			if (angleChange >= 50) {
 				angleChange = 50;
 			}
-			console.log(angleChange);
+			if (angleChange <= -50) {
+				angleChange = -50;
+			}
+			/* Detect sudden sign changes */
+			if (previousSigns.length > 10) {
+				previousSigns.splice(0, 1);
+			}
+			previousSigns.push(Math.sign(angleChange));
+			let averageSign = 0;
+			for (var i = 0; i < previousSigns.length; i++) {
+				averageSign += previousSigns[i];
+			}
+			if (Math.sign(averageSign) !== Math.sign(angleChange)) {
+				angleChange *= -1;
+			}
 			spins += angleChange;
-			ctx.fillText("Absolute Angle: " + angle, 10, 320);
-			ctx.fillText("Angle Change: " + angleChange + " radians per second", 10, 340);
-			ctx.fillText("Spins: " + Math.floor(spins * (16.666 / 1000) / (Math.PI * 2)), 10, 380);
 			if (currentHP >= 1) {
 				currentHP = 1;
 			}
@@ -186,7 +199,6 @@ define(function(require) {
 			}
 			currentHP -= Formulas.HPDrain(beatmap.HPDrainRate, audio.currentTime - previousTime);
 			hpDisplay += (currentHP - hpDisplay) / 8;
-			previousTime = audio.currentTime;
 			ctx.drawImage(scoreBarBg, 10, 10, window.innerWidth / 2, scoreBarBg.height);
 			ctx.drawImage(scoreBarColour, 0, 0, utils.map(hpDisplay, 0, 1, 0, scoreBarColour.width), scoreBarColour.height, 15, 10 + scoreBarColour.height / 1.5, utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2 - 0.01 * window.innerWidth), scoreBarColour.height);
 			/* Hit Events */
@@ -228,6 +240,8 @@ define(function(require) {
 				if ((hitEvents[0].score >= 50 || hitEvents[0].score === 0) && hitEvents[0].type === "hit-circle") {
 					score += utils.hitScore(hitEvents[0].score, combo, difficultyMultiplier, 1);
 					scoreObjects.push(new HitObject.ScoreObject(hitEvents[0].score, hitEvents[0].x, hitEvents[0].y, audio.currentTime + 1));
+				} else {
+					score += hitEvents[0].score;
 				}
 				if (hitEvents[0].combo === "increasing") {
 					combo++;
@@ -236,7 +250,7 @@ define(function(require) {
 					combo = 0;
 					document.getElementById("combo-container").innerHTML = "";
 				}
-				currentHP += Formulas.HP(beatmap.HPDrainRate, hitEvents[0].score);
+				currentHP += Formulas.HP(beatmap.HPDrainRate, hitEvents[0].score,hitEvents[0].type);
 				hitEvents.splice(0, 1);
 			}
 			while (currentHitObject < beatmap.hitObjectsParsed.length && audio.currentTime >= beatmap.hitObjectsParsed[currentHitObject].time - arTime) {
@@ -360,8 +374,11 @@ define(function(require) {
 						hitObjects[i].cache.spins = 0;
 						/* in rad/s */
 						hitObjects[i].cache.velocity = 0;
-						hitObjects[i].spinnerBonus = false;
+						hitObjects[i].cache.spinnerBonus = false;
 						hitObjects[i].cache.currentAngle = 0;
+						hitObjects[i].cache.spinAngle = 0;
+						hitObjects[i].cache.timeSpentAboveSpinnerMinimum = 0;
+						hitObjects[i].cache.cleared = false;
 					}
 				}
 			}
@@ -605,6 +622,45 @@ define(function(require) {
 					i--;
 					document.getElementById("combo-container").innerHTML = "";
 				}
+				/* Out of Index Handling ---------------------------------------------------------------- */
+				if (i <= -1) {
+					i = 0;
+					if (hitObjects.length === 0) {
+						continue;
+					}
+				}
+				/* Spinner handling ---------------------------------------------------------------- */
+				if (hitObjects[i].type[3] === "1") {
+					if ((mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+					}
+					hitObjects[i].cache.velocity += (angleChange - hitObjects[i].cache.velocity) / 8;
+					hitObjects[i].cache.currentAngle += hitObjects[i].cache.velocity * (16.666 / 1000);
+					hitObjects[i].cache.spinAngle += hitObjects[i].cache.velocity * (16.666 / 1000);
+					if ((hitObjects[i].cache.velocity / (Math.PI * 2) >= Formulas.ODSpinner(beatmap.OverallDifficulty))) {
+						hitObjects[i].cache.timeSpentAboveSpinnerMinimum += audio.currentTime - previousTime;
+					}
+					if (hitObjects[i].cache.timeSpentAboveSpinnerMinimum > (hitObjects[i].endTime - hitObjects[i].time) * 0.25) {
+						hitObjects[i].cache.cleared = true;
+					}
+					while (hitObjects[i].cache.spinAngle >= Math.PI * 2) {
+						hitObjects[i].cache.spins++;
+						hitObjects[i].cache.spinAngle -= Math.PI * 2;
+						if (hitObjects[i].cache.cleared === false) {
+							hitEvents.push(new HitEvent("spinner-spin", 100, "no-increase", mapped.x, mapped.y));
+						} else {
+							hitEvents.push(new HitEvent("spinner-bonus-spin", 1000, "no-increase", mapped.x, mapped.y));
+						}
+					}
+					while (hitObjects[i].cache.spinAngle <= -Math.PI * 2) {
+						hitObjects[i].cache.spins++;
+						hitObjects[i].cache.spinAngle += Math.PI * 2;
+						if (hitObjects[i].cache.cleared === false) {
+							hitEvents.push(new HitEvent("spinner-spin", 100, "no-increase", mapped.x, mapped.y));
+						} else {
+							hitEvents.push(new HitEvent("spinner-bonus-spin", 1000, "no-increase", mapped.x, mapped.y));
+						}
+					}
+				}
 				mouse.unClick();
 			}
 			mouse.unClick();
@@ -726,17 +782,17 @@ define(function(require) {
 						}
 					}
 				} else if (hitObjects[i].type[3] === "1") {
+					if (hitObjects[i].cache.cleared === true) {
+						ctx.drawImage(spinnerClear, window.innerWidth / 2 - spinnerClear.width / 2, window.innerHeight / 4 - spinnerClear.height / 2);
+					}
 					/* draw spinner */
-					let mapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].x, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+					let mapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					ctx.translate(mapped.x, mapped.y);
-					ctx.rotate(-utils.direction(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 4].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 3].y, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 2].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y) + Math.PI / 2);
-					let size = utils.map(hitObjects[i].endTime - audio.currentTime, 0, hitObjects[i].endTime - (hitObjects[i].time - arTime), 0, 0.8);
-					ctx.drawImage(spinnerApproachCircle, hitObjectMapped.x - size * window.innerHeight / 2, hitObjectMapped.y - size * window.innerHeight / 2, size * window.innerHeight, size * window.innerHeight);
-					ctx.drawImage(spinnerTop, hitObjectMapped.x - 0.2 * window.innerHeight / 2, hitObjectMapped.y - 0.2 * window.innerHeight / 2, 0.2 * window.innerHeight, 0.2 * window.innerHeight);
-					ctx.resetTranform();
-				}
-				if (hitObjects[i].cache.hasHit === true && audio.currentTime >= hitObjects[i].time) {
-					// continue;
+					ctx.rotate(hitObjects[i].cache.currentAngle);
+					let size = utils.map(hitObjects[i].endTime - audio.currentTime, 0, hitObjects[i].endTime - (hitObjects[i].time - arTime), 0, 0.8) * utils.map(Math.abs(hitObjects[i].cache.velocity), 0, 50, 1, 1.2);
+					ctx.drawImage(spinnerApproachCircle, -size * window.innerHeight / 2, -size * window.innerHeight / 2, size * window.innerHeight, size * window.innerHeight);
+					ctx.drawImage(spinnerTop, -0.2 * window.innerHeight / 2, -0.2 * window.innerHeight / 2, 0.2 * window.innerHeight, 0.2 * window.innerHeight);
+					ctx.resetTransform();
 				}
 				ctx.globalAlpha = 1;
 			}
@@ -811,6 +867,7 @@ define(function(require) {
 			} else {
 				document.getElementById("frame-rate").style.background = "#B00020";
 			}
+			previousTime = audio.currentTime;
 			// setTimeout(animate, 4);
 			requestAnimationFrame(animate);
 		})();
