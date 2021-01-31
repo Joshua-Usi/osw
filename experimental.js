@@ -4,7 +4,8 @@ define(function(require) {
 	const Formulas = require("src/scripts/Formulas.js");
 	const Mouse = require("src/scripts/Mouse.js");
 	const Keyboard = require("src/scripts/Keyboard.js");
-	const beatmap = require("src/scripts/DefaultBeatMaps.js")[2];
+	// const beatmap = require("src/scripts/DefaultBeatMaps.js")[2];
+	const beatmap = require("src/scripts/BeatMap.js")
 	const Beizer = require("src/scripts/Beizer.js");
 	const utils = require("src/scripts/utils.js");
 	const HitObject = require("src/scripts/HitObject.js");
@@ -130,6 +131,9 @@ define(function(require) {
 					angle = Math.PI * 2 + angle;
 				}
 				let angleChange = ((angle - previousAngle) / (audio.currentTime - previousTime));
+				if (isNaN(angleChange)) {
+					angleChange = 0;
+				}
 				/* hard limit spinner speed */
 				if (angleChange >= 50) {
 					angleChange = 50;
@@ -581,7 +585,6 @@ define(function(require) {
 					}
 					/* Spinner handling ---------------------------------------------------------------- */
 					if (hitObjects[i].type[3] === "1") {
-						if (keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) {}
 						hitObjects[i].cache.velocity += (angleChange - hitObjects[i].cache.velocity) / 32;
 						hitObjects[i].cache.currentAngle += hitObjects[i].cache.velocity * (audio.currentTime - previousTime);
 						hitObjects[i].cache.spinAngle += hitObjects[i].cache.velocity * (audio.currentTime - previousTime);
