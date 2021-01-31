@@ -36,7 +36,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.3.3a";
+	const version = "osu!web v2021.0.3.4a";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -490,7 +490,9 @@ define(function(require) {
 		let canvas = document.getElementById("audio-visualiser");
 		canvas.width = 0.5 * window.innerHeight;
 		canvas.height = 0.5 * window.innerHeight;
-		canvas.style.top = "calc(" + logoY + "vh - " + canvas.height + "px / 2)";
+		canvas.style.width = 0.5 * window.innerHeight;
+		canvas.style.height = 0.5 * window.innerHeight;
+		canvas.style.top = "calc(" + logoY + "vh - " + canvas.width + "px / 2)";
 		canvas.style.left = "calc(5vw + " + logoX + "vw - " + canvas.height + "px / 2)";
 		let menuBar = document.getElementById("menu-bar");
 		menuBar.style.visibility = "visible";
@@ -516,7 +518,9 @@ define(function(require) {
 		let canvas = document.getElementById("audio-visualiser");
 		canvas.width = 0.9 * window.innerHeight;
 		canvas.height = 0.9 * window.innerHeight;
-		canvas.style.top = "calc(" + logoY + "vh - " + canvas.height + "px / 2)";
+		canvas.style.width = 0.9 * window.innerHeight;
+		canvas.style.height = 0.9 * window.innerHeight;
+		canvas.style.top = "calc(" + logoY + "vh - " + canvas.width + "px / 2)";
 		canvas.style.left = "calc(5vw + " + logoX + "vw - " + canvas.height + "px / 2)";
 		let menuBar = document.getElementById("menu-bar");
 		menuBar.style.opacity = 0;
