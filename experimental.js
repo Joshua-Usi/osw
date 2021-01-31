@@ -4,8 +4,8 @@ define(function(require) {
 	const Formulas = require("src/scripts/Formulas.js");
 	const Mouse = require("src/scripts/Mouse.js");
 	const Keyboard = require("src/scripts/Keyboard.js");
-	// const beatmap = require("src/scripts/DefaultBeatMaps.js")[4];
-	const beatmap = require("src/scripts/BeatMap.js");
+	const beatmap = require("src/scripts/DefaultBeatMaps.js")[0];
+	// const beatmap = require("src/scripts/BeatMap.js");
 	const Beizer = require("src/scripts/Beizer.js");
 	const utils = require("src/scripts/utils.js");
 	const HitObject = require("src/scripts/HitObject.js");
@@ -162,9 +162,7 @@ define(function(require) {
 			let hitObjectOffsetY = playfieldYOffset + canvas.height / 2 - canvas.height * playfieldSize / 2;
 			ctx.strokeStyle = "#fff";
 			ctx.lineWidth = 5;
-			o += 2 / 6;
 			let b = utils.mapToOsuPixels(256, 192, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-			mouse.setPosition(b.x + Math.cos(o) * 50, b.y + Math.sin(o) * 50);
 			previousAngle = angle;
 			angle = Math.atan2(mouse.position.y - b.y, mouse.position.x - b.x);
 			if (Math.sign(angle) === -1) {
@@ -441,8 +439,8 @@ define(function(require) {
 								}
 							}
 							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							// mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
-							// mouse.click();
+							mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
+							mouse.click();
 							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 								hitObjects[i].cache.onFollowCircle = true;
 							} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
@@ -474,8 +472,8 @@ define(function(require) {
 								}
 							}
 							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							// mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
-							// mouse.click();
+							mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
+							mouse.click();
 							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 								hitObjects[i].cache.onFollowCircle = true;
 							} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2 && (mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
@@ -631,6 +629,8 @@ define(function(require) {
 				}
 				/* Spinner handling ---------------------------------------------------------------- */
 				if (hitObjects[i].type[3] === "1") {
+					o += 5 / 6;
+					mouse.setPosition(b.x + Math.cos(o) * 50, b.y + Math.sin(o) * 50);
 					if ((mouse.isLeftButtonDown || keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 					}
 					hitObjects[i].cache.velocity += (angleChange - hitObjects[i].cache.velocity) / 8;
@@ -676,8 +676,8 @@ define(function(require) {
 				/* approach circle min size */
 				if (approachCircleSize <= 1.6) {
 					if (hitObjects[i].type[0] === "1") {
-						// mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y)
-						// mouse.click();
+						mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y)
+						mouse.click();
 					}
 				}
 				/* Alpha Calculations ---------------------------------------------------------------- */
