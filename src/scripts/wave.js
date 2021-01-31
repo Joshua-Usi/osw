@@ -461,7 +461,7 @@ var Wave = (function () {
         let breakpoint = Math.floor(point_count / options.colors.length);
 
         for (let point = 1; point <= point_count; point++) {
-            let p = (data[point] + min) ** 3 * percent;
+            let p = (data[point] + min) ** 3.05 * percent;
             let a = point * increase;
 
             let sx = cx + (r - (p + offset)) * Math.cos(a);
