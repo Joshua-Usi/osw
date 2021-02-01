@@ -27,7 +27,7 @@ define(function(require) {
 				this.hitSound = hitSound;
 				this.curveType = curveTypecurvePoints[0];
 				this.curvePoints = curveTypecurvePoints.substr(1).split("|");
-				/* also push hit object origin point for simiplicity*/
+				/* also push hit object origin point for simplicity*/
 				this.curvePoints.unshift(x + ":" + y);
 				for (var i = 0; i < this.curvePoints.length; i++) {
 					if (this.curvePoints[i] === "") {
@@ -51,7 +51,7 @@ define(function(require) {
 			}
 		},
 		Spinner: class Spinner {
-			constructor(x ,y, time, type, hitSound, endTime, hitSample) {
+			constructor(x, y, time, type, hitSound, endTime, hitSample) {
 				this.x = x;
 				this.y = y;
 				/* convert to seconds */

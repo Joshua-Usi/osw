@@ -4,20 +4,20 @@ define(function(require) {
 	const utils = require("./utils.js");
 	return {
 		parseBeatMap: function(data) {
+			let now = window.performance.now();
 			let splited = data.split("\n");
 			if (splited[0] !== "osu file format v14") {
 				console.warn("Currently parsed beatmap uses \"" + splited[0] + "\" which may be incompatible with the current parser");
 			}
 			let beatmap = {
 				version: splited[0],
-				hitObjects: [],
 				hitObjectsParsed: [],
-				timingPoints: [],
 				timingPointsParsed: [],
 			};
 			let section = "";
 			/* start from 1 to ignore version */
-			for (var i = 1; i < splited.length; i++) {
+			let len = splited.length;
+			for (var i = 1; i < len; i++) {
 				if (splited[i] === "" || splited[i].substr(0, 2) === "//") {
 					continue;
 				}
@@ -25,17 +25,15 @@ define(function(require) {
 					section = splited[i];
 					continue;
 				}
-				let l = splited[i].split(/:(.+)/);
 				if (section === "[TimingPoints]" && /[,]/g.test(splited[i])) {
-					beatmap.timingPoints.push(splited[i]);
 					beatmap.timingPointsParsed.push(this.parseTimingPoint(splited[i]));
 					continue;
 				}
 				if (section === "[HitObjects]" && /[,]/g.test(splited[i])) {
-					beatmap.hitObjects.push(splited[i]);
 					beatmap.hitObjectsParsed.push(this.parseHitObject(splited[i]));
 					continue;
 				}
+				let l = splited[i].split(/:(.+)/);
 				if (l.length === 1) {
 					continue;
 				}
@@ -55,11 +53,13 @@ define(function(require) {
 					beatmap[l[0]] = parseFloat(l[1]);
 				}
 			}
+			console.log("Parse Time: " + (window.performance.now() - now) + "ms");
 			return beatmap;
 		},
 		parseHitObject: function(data) {
 			let splited = data.split(",");
-			for (var i = 0; i < splited.length; i++) {
+			let len = splited.length;
+			for (var i = 0; i < len; i++) {
 				if (/^[0-9]+$/.test(splited[i])) {
 					splited[i] = parseFloat(splited[i]);
 				}
@@ -79,8 +79,9 @@ define(function(require) {
 		},
 		parseTimingPoint: function(data) {
 			let splited = data.split(",");
-			for (var i = 0; i < splited.length; i++) {
-				if (/[0-9.]/g.test(splited[i])) {
+			let len = splited.length;
+			for (var i = 0; i < len; i++) {
+				if (/^[0-9]+$/.test(splited[i])) {
 					splited[i] = parseFloat(splited[i]);
 				}
 			}
