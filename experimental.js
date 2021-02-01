@@ -4,8 +4,8 @@ define(function(require) {
 	const Formulas = require("src/scripts/Formulas.js");
 	const Mouse = require("src/scripts/Mouse.js");
 	const Keyboard = require("src/scripts/Keyboard.js");
-	const beatmap = require("src/scripts/DefaultBeatMaps.js")[2];
-	// const beatmap = require("src/scripts/BeatMap.js");
+	// const beatmap = require("src/scripts/DefaultBeatMaps.js")[2];
+	const beatmap = require("src/scripts/BeatMap.js");
 	const Beizer = require("src/scripts/Beizer.js");
 	const utils = require("src/scripts/utils.js");
 	const HitObject = require("src/scripts/HitObject.js");
@@ -58,7 +58,7 @@ define(function(require) {
 		mods: {
 			easy: false,
 			noFail: false,
-			halfTime: false,
+			halfTime: true,
 			hardRock: false,
 			suddenDeath: false,
 			perfect: false,
@@ -361,6 +361,12 @@ define(function(require) {
 					let hitObjectMapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					/* Hit Circle Hit Handling ---------------------------------------------------------------- */
 					if (hitObjects[i].type[0] === "1" && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) < circleDiameter / 2 && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased))) {
+						if (keyboard.getKeyDown("z") && keyboardLeftReleased) {
+							keyboardLeftReleased = false;
+						}
+						if (keyboard.getKeyDown("x") && keyboardRightReleased) {
+							keyboardRightReleased = false;
+						}
 						let hitWindowScore = 0;
 						if (utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[0])) {
 							if (utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[2])) {
@@ -484,35 +490,41 @@ define(function(require) {
 					}
 					/* Slider Head Hit Handling ---------------------------------------------------------------- */
 					if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hitHead === false && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) < circleDiameter / 2 && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased)) && utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[0])) {
+						if (keyboard.getKeyDown("z") && keyboardLeftReleased) {
+							keyboardLeftReleased = false;
+						}
+						if (keyboard.getKeyDown("x") && keyboardRightReleased) {
+							keyboardRightReleased = false;
+						}
 						hitErrors.push(audio.currentTime - hitObjects[i].time);
 						hitEvents.push(new HitEvent("slider-element", 30, "increasing", hitObjectMapped.x, hitObjectMapped.y));
 						hitObjects[i].cache.hitHead = true;
 						hitObjects[i].cache.hasHitAtAll = true;
 					}
 					/* Slider Tick Miss Check ---------------------------------------------------------------- */
-					if (hitObjects[i].type[1] === "1" && audio.currentTime >= hitObjects[i].time) {
-						let copy = [];
-						let matches = 0;
-						let totalOccurences = 0;
-						for (let j = 0; j < hitObjects[i].cache.specificSliderTicksHit.length; j++) {
-							copy.push(hitObjects[i].cache.specificSliderTicksHit[j]);
-						}
-						copy.sort(function(x, y) {
-							return (x === y) ? 0 : x ? -1 : 1;
-						});
-						for (let j = 0; j < copy.length; j++) {
-							if (copy[j]) {
-								totalOccurences++;
-							}
-							if (copy[j] === hitObjects[i].cache.specificSliderTicksHit[j] && copy[j]) {
-								matches++;
-							}
-						}
-						if (matches !== totalOccurences) {
-							combo = 0;
-							document.getElementById("combo-container").innerHTML = "";
-						}
-					}
+					// if (hitObjects[i].type[1] === "1" && audio.currentTime >= hitObjects[i].time) {
+					// 	let copy = [];
+					// 	let matches = 0;
+					// 	let totalOccurences = 0;
+					// 	for (let j = 0; j < hitObjects[i].cache.specificSliderTicksHit.length; j++) {
+					// 		copy.push(hitObjects[i].cache.specificSliderTicksHit[j]);
+					// 	}
+					// 	copy.sort(function(x, y) {
+					// 		return (x === y) ? 0 : x ? -1 : 1;
+					// 	});
+					// 	for (let j = 0; j < copy.length; j++) {
+					// 		if (copy[j]) {
+					// 			totalOccurences++;
+					// 		}
+					// 		if (copy[j] === hitObjects[i].cache.specificSliderTicksHit[j] && copy[j]) {
+					// 			matches++;
+					// 		}
+					// 	}
+					// 	if (matches !== totalOccurences) {
+					// 		combo = 0;
+					// 		document.getElementById("combo-container").innerHTML = "";
+					// 	}
+					// }
 					/* Slider Score Calculations ---------------------------------------------------------------- */
 					if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hasEnded) {
 						let sliderElementsHit = 0;
@@ -583,7 +595,6 @@ define(function(require) {
 						}
 					}
 					if (miss) {
-						// combo = 0;
 						hitEvents.push(new HitEvent("hit-circle", 0, "reset", mapped.x, mapped.y));
 						hitObjects.splice(i, 1);
 						i--;
@@ -790,14 +801,8 @@ define(function(require) {
 				if (keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) {
 					size = 0.8;
 				}
-				if (keyboard.getKeyDown("z") && keyboardLeftReleased) {
-					keyboardLeftReleased = false;
-				}
 				if (keyboard.getKeyDown("z") === false) {
 					keyboardLeftReleased = true;
-				}
-				if (keyboard.getKeyDown("x") && keyboardRightReleased) {
-					keyboardRightReleased = false;
 				}
 				if (keyboard.getKeyDown("x") === false) {
 					keyboardRightReleased = true;
@@ -835,6 +840,11 @@ define(function(require) {
 				ctx.fillStyle = "#66ccff";
 				ctx.fillRect(window.innerWidth / 2 - odTime[2] * 1000 / 2, window.innerHeight * 0.950, odTime[2] * 1000, window.innerHeight * 0.005);
 				for (var i = 0; i < hitErrors.length; i++) {
+					let alpha = utils.map(i, 40, 0, 0, 1);
+					if (alpha <= 0) {
+						alpha = 0;
+					}
+					ctx.globalAlpha = alpha;
 					if (utils.withinRange(hitErrors[i], 0, odTime[2])) {
 						ctx.fillStyle = "#66ccff";
 					} else if (utils.withinRange(hitErrors[i], 0, odTime[1])) {
@@ -844,6 +854,7 @@ define(function(require) {
 					}
 					ctx.fillRect(window.innerWidth / 2 + hitErrors[i] * 1000, window.innerHeight * 0.950 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.025);
 				}
+				ctx.globalAlpha = 1;
 				ctx.fillStyle = "#fff";
 				ctx.fillText(utils.standardDeviation(hitErrors) * 1000 * 10, innerWidth / 2, window.innerHeight * 0.9);
 				comboPulseSize -= comboPulseSize / 8;
@@ -888,7 +899,7 @@ define(function(require) {
 					document.getElementById("frame-rate").style.background = "#B00020";
 				}
 				previousTime = audio.currentTime;
-				setTimeout(animate, 4);
+				setTimeout(animate, 0);
 				// requestAnimationFrame(animate);
 			})();
 		}
