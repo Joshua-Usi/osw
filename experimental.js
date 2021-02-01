@@ -457,7 +457,7 @@ define(function(require) {
 								hitObjects[i].cache.currentSlide++;
 								if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
 									let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-									if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased))) {
+									if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle === true && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 										hitObjects[i].cache.repeatsHit++;
 										hitEvents.push(new HitEvent("slider-element", 30, "increasing", sliderBodyPos.x, sliderBodyPos.y));
 									} else if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
@@ -518,8 +518,8 @@ define(function(require) {
 						/* 1 follow circle */
 						/* n repeats */
 						/* m * n ticks */
-						let totalSliderElements = hitObjects[i].slides + (hitObjects[i].slides) * hitObjects[i].cache.totalTicks;
-						if (hitObjects[i].cache.headHit === true) {
+						let totalSliderElements = 1 + hitObjects[i].slides + hitObjects[i].slides * hitObjects[i].cache.totalTicks;
+						if (hitObjects[i].cache.hitHead === true) {
 							sliderElementsHit++;
 						}
 						if (hitObjects[i].cache.hitEnd === true) {
@@ -542,8 +542,9 @@ define(function(require) {
 						} else {
 							mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 						}
+						console.log(sliderElementsHit + ":" + totalSliderElements);
 						let hitScore = 0;
-						if (sliderElementsHit === totalSliderElements) {
+						if (sliderElementsHit >= totalSliderElements) {
 							hitScore = 300;
 						} else if (sliderElementsHit >= 0.5 * totalSliderElements) {
 							hitScore = 100;
