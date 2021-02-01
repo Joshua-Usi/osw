@@ -654,7 +654,7 @@ define(function(require) {
 						approachCircleSize = 1.6;
 					}
 					/* Alpha Calculations ---------------------------------------------------------------- */
-					// if (hitObjects[i].type[0] === "1") {
+					if (hitObjects[i].type[0] === "1") {
 						if (playDetails.mods.hidden) {
 							/* hidden fade in and out for hit circle */
 							if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) < 0.4) {
@@ -676,13 +676,13 @@ define(function(require) {
 								ctx.globalAlpha = alpha;
 							}
 						}
-					// } else if (hitObjects[i].type[1] === "1") {
-					// 	if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= 1) {
-					// 		ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arFadeIn, 0, 1);
-					// 	} else {
-					// 		ctx.globalAlpha = 1;
-					// 	}
-					// }
+					} else if (hitObjects[i].type[1] === "1") {
+						if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= 1) {
+							ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arFadeIn, 0, 1);
+						} else {
+							ctx.globalAlpha = 1;
+						}
+					}
 					/* Object Draw ---------------------------------------------------------------- */
 					if (hitObjects[i].type[0] === "1") {
 						/* Draw Hit Circle ---------------------------------------------------------------- */
