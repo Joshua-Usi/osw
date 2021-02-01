@@ -5,7 +5,7 @@ define(function(require) {
 	const Mouse = require("src/scripts/Mouse.js");
 	const Keyboard = require("src/scripts/Keyboard.js");
 	const beatmap = require("src/scripts/DefaultBeatMaps.js")[2];
-	// const beatmap = require("src/scripts/BeatMap.js")
+	// const beatmap = require("src/scripts/BeatMap.js");
 	const Beizer = require("src/scripts/Beizer.js");
 	const utils = require("src/scripts/utils.js");
 	const HitObject = require("src/scripts/HitObject.js");
@@ -601,7 +601,7 @@ define(function(require) {
 						hitObjects[i].cache.velocity += (angleChange - hitObjects[i].cache.velocity) / 32;
 						hitObjects[i].cache.currentAngle += hitObjects[i].cache.velocity * (audio.currentTime - previousTime);
 						hitObjects[i].cache.spinAngle += hitObjects[i].cache.velocity * (audio.currentTime - previousTime);
-						if (Math.abs(hitObjects[i].cache.velocity / (Math.PI * 2)) >= Formulas.ODSpinner(beatmap.OverallDifficulty, playDetails.mods)) {
+						if (Math.abs(hitObjects[i].cache.velocity / (Math.PI)) >= Formulas.ODSpinner(beatmap.OverallDifficulty, playDetails.mods)) {
 							hitObjects[i].cache.timeSpentAboveSpinnerMinimum += audio.currentTime - previousTime;
 						}
 						if (hitObjects[i].cache.timeSpentAboveSpinnerMinimum > (hitObjects[i].endTime - hitObjects[i].time) * 0.25) {
