@@ -4,8 +4,8 @@ define(function(require) {
 	const Formulas = require("src/scripts/Formulas.js");
 	const Mouse = require("src/scripts/Mouse.js");
 	const Keyboard = require("src/scripts/Keyboard.js");
-	// const beatmap = require("src/scripts/DefaultBeatMaps.js")[2];
-	const beatmap = require("src/scripts/BeatMap.js")
+	const beatmap = require("src/scripts/DefaultBeatMaps.js")[2];
+	// const beatmap = require("src/scripts/BeatMap.js")
 	const Beizer = require("src/scripts/Beizer.js");
 	const utils = require("src/scripts/utils.js");
 	const HitObject = require("src/scripts/HitObject.js");
@@ -37,54 +37,59 @@ define(function(require) {
 	let hitObjects = [];
 	let scoreObjects = [];
 	let firstClick = true;
+	/* Details about the play, save to replays */
+	let playDetails = {
+		score: 0,
+		accuracy: 0,
+		maxCombo: 0,
+		hitDetails: {
+			total300s: 0,
+			total100s: 0,
+			total50s: 0,
+			totalMisses: 0,
+			totalSliderElements: 0,
+			totalSliderTicks: 0,
+			totalSpinnerSpins: 0,
+			totalSpinnerBonusSpin: 0,
+		},
+		mods: {
+			easy: false,
+			noFail: false,
+			halfTime: false,
+			hardRock: false,
+			suddenDeath: false,
+			perfect: false,
+			doubleTime: false,
+			nightCore: false,
+			hidden: false,
+			flashLight: false,
+			relax: false,
+			autoPilot: false,
+			spunOut: false,
+			auto: false,
+			cinema: false,
+			scoreV2: false,
+		},
+	};
 	/* Playfield calculations and data */
 	let playfieldSize = 0.8;
 	let playfieldXOffset = 0;
 	let playfieldYOffset = canvas.height / 50;
 	/* Beatmap difficulty data */
-	let arTime = Formulas.AR(beatmap.ApproachRate);
-	let arFadeIn = Formulas.ARFadeIn(beatmap.ApproachRate);
+	let arTime = Formulas.AR(beatmap.ApproachRate, playDetails.mods);
+	let arFadeIn = Formulas.ARFadeIn(beatmap.ApproachRate, playDetails.mods);
 	/* Map from osu!pixels to screen pixels */
-	let circleDiameter = utils.map(Formulas.CS(beatmap.CircleSize) * 2, 0, 512, 0, canvas.height * playfieldSize * (4 / 3));
+	let circleDiameter = utils.map(Formulas.CS(beatmap.CircleSize, playDetails.mods) * 2, 0, 512, 0, canvas.height * playfieldSize * (4 / 3));
 	let difficultyMultiplier = utils.difficultyPoints(beatmap.CircleSize, beatmap.HPDrainRate, beatmap.OverallDifficulty);
-	let odTime = Formulas.ODHitWindow(beatmap.OverallDifficulty);
+	let odTime = Formulas.ODHitWindow(beatmap.OverallDifficulty, playDetails.mods);
 	/**/
 	let currentHP = 1;
 	let hpDisplay = 1;
 	let previousTime = 0;
-	/* Applied Mods*/
-	let mods = {
-		easy: false,
-		noFail: false,
-		halfTime: false,
-		hardRock: false,
-		suddenDeath: false,
-		perfect: false,
-		doubleTime: false,
-		nightCore: false,
-		hidden: false,
-		flashLight: false,
-		relax: false,
-		autoPilot: false,
-		spunOut: false,
-		auto: false,
-		cinema: false,
-		scoreV2: false,
-	};
 	/* Timing point indexes */
 	let timingPointUninheritedIndex = 0;
 	let currentTimingPoint = 0;
 	/* Score variables */
-	let gameplayDetails = {
-		total300s: 0,
-		total100s: 0,
-		total50s: 0,
-		totalMisses: 0,
-		totalSliderElements: 0,
-		totalSliderTicks: 0,
-		totalSpinnerSpins: 0,
-		totalSpinnerBonusSpin: 0,
-	};
 	let score = 0;
 	let displayedScore = 0;
 	/* Combo variables */
@@ -95,6 +100,11 @@ define(function(require) {
 	audio.currentTime = beatmap.hitObjectsParsed[0].time - 5;
 	// audio.currentTime = 0;
 	audio.playbackRate = 1;
+	if (playDetails.mods.doubleTime) {
+		audio.playbackRate = 1.5;
+	} else if (playDetails.mods.halfTime) {
+		audio.playbackRate = 0.75;
+	}
 	/* Profiling variables */
 	let times = [];
 	let frameRate = 0;
@@ -169,35 +179,35 @@ define(function(require) {
 					switch (hitEvents[0].score) {
 						/* slider bonus spin */
 						case 1000:
-							gameplayDetails.totalSliderBonusSpin++;
+							playDetails.hitDetails.totalSliderBonusSpin++;
 							break;
 							/* great*/
 						case 300:
-							gameplayDetails.total300s++;
+							playDetails.hitDetails.total300s++;
 							break;
 							/* good or spinner spin */
 						case 100:
 							if (hitEvents[0].type === "hit-circle") {
-								gameplayDetails.total100s++;
+								playDetails.hitDetails.total100s++;
 							} else {
-								gameplayDetails.totalSpinnerSpins++;
+								playDetails.hitDetails.totalSpinnerSpins++;
 							}
 							break;
 							/* meh */
 						case 50:
-							gameplayDetails.total50s++;
+							playDetails.hitDetails.total50s++;
 							break;
 							/* complete miss */
 						case 0:
-							gameplayDetails.totalMisses++;
+							playDetails.hitDetails.totalMisses++;
 							break;
 							/* Slider head, repeat and end */
 						case 30:
-							gameplayDetails.totalSliderElements++;
+							playDetails.hitDetails.totalSliderElements++;
 							break;
 							/* Slider tick */
 						case 10:
-							gameplayDetails.totalSliderTicks++;
+							playDetails.hitDetails.totalSliderTicks++;
 							break;
 					}
 					if ((hitEvents[0].score >= 50 || hitEvents[0].score === 0) && hitEvents[0].type === "hit-circle") {
@@ -213,7 +223,7 @@ define(function(require) {
 						combo = 0;
 						document.getElementById("combo-container").innerHTML = "";
 					}
-					currentHP += Formulas.HP(beatmap.HPDrainRate, hitEvents[0].score, hitEvents[0].type);
+					currentHP += Formulas.HP(beatmap.HPDrainRate, hitEvents[0].score, hitEvents[0].type, playDetails.mods);
 					hitEvents.splice(0, 1);
 				}
 				while (currentHitObject < beatmap.hitObjectsParsed.length && audio.currentTime >= beatmap.hitObjectsParsed[currentHitObject].time - arTime) {
@@ -588,7 +598,7 @@ define(function(require) {
 						hitObjects[i].cache.velocity += (angleChange - hitObjects[i].cache.velocity) / 32;
 						hitObjects[i].cache.currentAngle += hitObjects[i].cache.velocity * (audio.currentTime - previousTime);
 						hitObjects[i].cache.spinAngle += hitObjects[i].cache.velocity * (audio.currentTime - previousTime);
-						if (Math.abs(hitObjects[i].cache.velocity / (Math.PI * 2)) >= Formulas.ODSpinner(beatmap.OverallDifficulty)) {
+						if (Math.abs(hitObjects[i].cache.velocity / (Math.PI * 2)) >= Formulas.ODSpinner(beatmap.OverallDifficulty, playDetails.mods)) {
 							hitObjects[i].cache.timeSpentAboveSpinnerMinimum += audio.currentTime - previousTime;
 						}
 						if (hitObjects[i].cache.timeSpentAboveSpinnerMinimum > (hitObjects[i].endTime - hitObjects[i].time) * 0.25) {
@@ -644,8 +654,8 @@ define(function(require) {
 						approachCircleSize = 1.6;
 					}
 					/* Alpha Calculations ---------------------------------------------------------------- */
-					if (hitObjects[i].type[0] === "1") {
-						if (mods.hidden) {
+					// if (hitObjects[i].type[0] === "1") {
+						if (playDetails.mods.hidden) {
 							/* hidden fade in and out for hit circle */
 							if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) < 0.4) {
 								ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime * 0.4, 0, 1);
@@ -666,13 +676,13 @@ define(function(require) {
 								ctx.globalAlpha = alpha;
 							}
 						}
-					} else if (hitObjects[i].type[1] === "1") {
-						if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= 1) {
-							ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arFadeIn, 0, 1);
-						} else {
-							ctx.globalAlpha = 1;
-						}
-					}
+					// } else if (hitObjects[i].type[1] === "1") {
+					// 	if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= 1) {
+					// 		ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arFadeIn, 0, 1);
+					// 	} else {
+					// 		ctx.globalAlpha = 1;
+					// 	}
+					// }
 					/* Object Draw ---------------------------------------------------------------- */
 					if (hitObjects[i].type[0] === "1") {
 						/* Draw Hit Circle ---------------------------------------------------------------- */
@@ -682,7 +692,9 @@ define(function(require) {
 						}
 						ctx.drawImage(Assets.hitCircle, hitObjectMapped.x - size / 2, hitObjectMapped.y - size / 2, size, size);
 						ctx.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x - size / 2, hitObjectMapped.y - size / 2, size, size);
-						ctx.drawImage(Assets.approachCircle, hitObjectMapped.x - (size * approachCircleSize) / 2, hitObjectMapped.y - (size * approachCircleSize) / 2, size * approachCircleSize, size * approachCircleSize);
+						if (playDetails.mods.hidden === false) {
+							ctx.drawImage(Assets.approachCircle, hitObjectMapped.x - (size * approachCircleSize) / 2, hitObjectMapped.y - (size * approachCircleSize) / 2, size * approachCircleSize, size * approachCircleSize);
+						}
 						ctx.drawImage(Assets.comboNumbers[1], hitObjectMapped.x - Assets.comboNumbers[1].width / 2, hitObjectMapped.y - Assets.comboNumbers[1].width / 1.25);
 					} else if (hitObjects[i].type[1] === "1") {
 						/* Draw Slider ---------------------------------------------------------------- */
@@ -734,12 +746,17 @@ define(function(require) {
 						if (hitObjects[i].cache.hitHead === false) {
 							ctx.drawImage(Assets.hitCircle, hitObjectMapped.x - circleDiameter / 2, hitObjectMapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
 							ctx.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x - circleDiameter / 2, hitObjectMapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
-							ctx.drawImage(Assets.approachCircle, hitObjectMapped.x - (circleDiameter * approachCircleSize) / 2, hitObjectMapped.y - (circleDiameter * approachCircleSize) / 2, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
+							if (playDetails.mods.hidden === false) {
+								ctx.drawImage(Assets.approachCircle, hitObjectMapped.x - (circleDiameter * approachCircleSize) / 2, hitObjectMapped.y - (circleDiameter * approachCircleSize) / 2, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
+							}
 							ctx.drawImage(Assets.comboNumbers[1], hitObjectMapped.x - Assets.comboNumbers[1].width / 2, hitObjectMapped.y - Assets.comboNumbers[1].width / 1.25);
 						}
 						if (hitObjects[i].cache.sliderBodyPosition !== undefined && audio.currentTime >= hitObjects[i].time) {
 							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+							let tempAlpha = ctx.globalAlpha;
+							ctx.globalAlpha = 1;
 							ctx.drawImage(Assets.sliderBody, mapped.x - circleDiameter / 2, mapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
+							ctx.globalAlpha = tempAlpha;
 							if (hitObjects[i].cache.onFollowCircle === true) {
 								ctx.drawImage(Assets.sliderFollowCircle, mapped.x - circleDiameter * 2.4 / 2, mapped.y - circleDiameter * 2.4 / 2, circleDiameter * 2.4, circleDiameter * 2.4);
 							}
@@ -754,7 +771,10 @@ define(function(require) {
 						ctx.rotate(hitObjects[i].cache.currentAngle);
 						let size = utils.map(hitObjects[i].endTime - audio.currentTime, 0, hitObjects[i].endTime - (hitObjects[i].time - arTime), 0, 0.8) * utils.map(Math.abs(hitObjects[i].cache.velocity), 0, 50, 1, 1.2);
 						ctx.drawImage(Assets.spinnerApproachCircle, -size * window.innerHeight / 2, -size * window.innerHeight / 2, size * window.innerHeight, size * window.innerHeight);
+						let tempAlpha = ctx.globalAlpha;
+						ctx.globalAlpha = 1;
 						ctx.drawImage(Assets.spinnerTop, -0.2 * window.innerHeight / 2, -0.2 * window.innerHeight / 2, 0.2 * window.innerHeight, 0.2 * window.innerHeight);
+						ctx.globalAlpha = tempAlpha;
 						ctx.resetTransform();
 					}
 					ctx.globalAlpha = 1;
@@ -810,9 +830,9 @@ define(function(require) {
 				/* update combo html element */
 				utils.htmlCounter(utils.reverse(combo + "x"), "combo-container", "combo-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "top", "calc(100vh - 52 / 32 * " + 2 * (comboPulseSize + 1) + "vw)");
 				/* update accuracy html element */
-				utils.htmlCounter("%" + utils.reverse("" + (utils.accuracy(gameplayDetails.total300s, gameplayDetails.total100s, gameplayDetails.total50s, gameplayDetails.totalMisses) * 100).toPrecision(4)), "accuracy-container", "accuracy-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
+				utils.htmlCounter("%" + utils.reverse("" + (utils.accuracy(playDetails.hitDetails.total300s, playDetails.hitDetails.total100s, playDetails.hitDetails.total50s, playDetails.hitDetails.totalMisses) * 100).toPrecision(4)), "accuracy-container", "accuracy-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
 				/* rank grade */
-				document.getElementById("grade").src = `src/images/skins/${skin}/ranking-` + utils.grade(gameplayDetails.total300s, gameplayDetails.total100s, gameplayDetails.total50s, gameplayDetails.totalMisses, false) + "-small.png";
+				document.getElementById("grade").src = `src/images/skins/${skin}/ranking-` + utils.grade(playDetails.hitDetails.total300s, playDetails.hitDetails.total100s, playDetails.hitDetails.total50s, playDetails.hitDetails.totalMisses, false) + "-small.png";
 				/* combo pulse size */
 				let els = document.getElementById("combo-container").querySelectorAll("img");
 				for (let i = 0; i < els.length; i++) {

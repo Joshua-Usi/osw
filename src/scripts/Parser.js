@@ -6,7 +6,7 @@ define(function(require) {
 		parseBeatMap: function(data) {
 			let splited = data.split("\n");
 			if (splited[0] !== "osu file format v14") {
-				console.warn("Currently Parsed Beatmap uses \"" + splited[0] + "\" which may be incompatible with the current parser");
+				console.warn("Currently parsed beatmap uses \"" + splited[0] + "\" which may be incompatible with the current parser");
 			}
 			let beatmap = {
 				version: splited[0],
@@ -23,6 +23,7 @@ define(function(require) {
 				}
 				if (splited[i][0] === "[") {
 					section = splited[i];
+					continue;
 				}
 				let l = splited[i].split(/:(.+)/);
 				if (section === "[TimingPoints]" && /[,]/g.test(splited[i])) {

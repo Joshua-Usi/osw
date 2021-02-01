@@ -1,13 +1,14 @@
 define(function(require) {
   "use strict";
 	return {
-		AR: function(n, timingMod) {
-			if (timingMod === "easy") {
+		AR: function(n, mods) {
+			if (mods.easy) {
 				n *= 0.5;
-			} else if (timingMod === "hardrock") {
+			}
+			if (mods.hardRock) {
 				n *= 1.4;
-				if (n > 10) {
-					n = 10;
+				if (n >= 10) {
+					n = 0;
 				}
 			}
 			let ar;
@@ -20,13 +21,14 @@ define(function(require) {
 			}
 			return ar;
 		},
-		ARFadeIn: function(n, timingMod) {
-			if (timingMod === "easy") {
+		ARFadeIn: function(n, mods) {
+			if (mods.easy) {
 				n *= 0.5;
-			} else if (timingMod === "hardrock") {
+			}
+			if (mods.hardRock) {
 				n *= 1.4;
-				if (n > 10) {
-					n = 10;
+				if (n >= 10) {
+					n = 0;
 				}
 			}
 			let ar;
@@ -39,23 +41,27 @@ define(function(require) {
 			}
 			return ar;
 		},
-		CS: function (n, timingMod) {
-			let radius = 54.4 - 4.48 * n;
-			if (timingMod === "easy") {
-				radius /= 0.5;
-			} else if (timingMod === "hardrock") {
-				radius /= 1.3;
+		CS: function (n, mods) {
+			if (mods.easy) {
+				n *= 0.5;
 			}
-			return radius;
+			if (mods.hardRock) {
+				n *= 1.3;
+				if (n >= 10) {
+					n = 0;
+				}
+			}
+			return 54.4 - 4.48 * n;
 		},
 		/* values for hit windows (centered around hit object time for 50, 100, 300)*/
-		ODHitWindow: function(n, timingMod) {
-			if (timingMod === "easy") {
+		ODHitWindow: function(n, mods) {
+			if (mods.easy) {
 				n *= 0.5;
-			} else if (timingMod === "hardrock") {
+			}
+			if (mods.hardRock) {
 				n *= 1.4;
-				if (n > 10) {
-					n = 10;
+				if (n >= 10) {
+					n = 0;
 				}
 			}
 			/* in order 50, 100, 300*/
@@ -66,13 +72,14 @@ define(function(require) {
 			];
 		},
 		/* measured in spins per second required for clear*/
-		ODSpinner: function(n, timingMod) {
-			if (timingMod === "easy") {
+		ODSpinner: function(n, mods) {
+			if (mods.easy) {
 				n *= 0.5;
-			} else if (timingMod === "hardrock") {
+			}
+			if (mods.hardRock) {
 				n *= 1.4;
-				if (n > 10) {
-					n = 10;
+				if (n >= 10) {
+					n = 0;
 				}
 			}
 			let od;
@@ -92,7 +99,13 @@ define(function(require) {
 			}
 			return (time / 500) * (100 / (11 - n));
 		},
-		HP: function(n, hitScore, type) {
+		HP: function(n, hitScore, type, mod) {
+			if (mod.suddenDeath && hitScore === 0) {
+				return -1;
+			}
+			if (mod.perfect && hitScore != 300 && type === "hit-circle") {
+				return -1;
+			}
 			switch (hitScore) {
 					/* slider bonus spin */
 					case 1000:
