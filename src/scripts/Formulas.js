@@ -2,13 +2,15 @@ define(function(require) {
   "use strict";
 	return {
 		AR: function(n, mods) {
-			if (mods.easy) {
-				n *= 0.5;
-			}
-			if (mods.hardRock) {
-				n *= 1.4;
-				if (n >= 10) {
-					n = 0;
+			if (mods) {
+				if (mods.easy) {
+					n *= 0.5;
+				}
+				if (mods.hardRock) {
+					n *= 1.4;
+					if (n >= 10) {
+						n = 0;
+					}
 				}
 			}
 			let ar;
@@ -22,13 +24,15 @@ define(function(require) {
 			return ar;
 		},
 		ARFadeIn: function(n, mods) {
-			if (mods.easy) {
-				n *= 0.5;
-			}
-			if (mods.hardRock) {
-				n *= 1.4;
-				if (n >= 10) {
-					n = 0;
+			if (mods) {
+				if (mods.easy) {
+					n *= 0.5;
+				}
+				if (mods.hardRock) {
+					n *= 1.4;
+					if (n >= 10) {
+						n = 0;
+					}
 				}
 			}
 			let ar;
@@ -42,26 +46,30 @@ define(function(require) {
 			return ar;
 		},
 		CS: function (n, mods) {
-			if (mods.easy) {
-				n *= 0.5;
-			}
-			if (mods.hardRock) {
-				n *= 1.3;
-				if (n >= 10) {
-					n = 0;
+			if (mods) {
+				if (mods.easy) {
+					n *= 0.5;
+				}
+				if (mods.hardRock) {
+					n *= 1.4;
+					if (n >= 10) {
+						n = 0;
+					}
 				}
 			}
 			return 54.4 - 4.48 * n;
 		},
 		/* values for hit windows (centered around hit object time for 50, 100, 300)*/
 		ODHitWindow: function(n, mods) {
-			if (mods.easy) {
-				n *= 0.5;
-			}
-			if (mods.hardRock) {
-				n *= 1.4;
-				if (n >= 10) {
-					n = 0;
+			if (mods) {
+				if (mods.easy) {
+					n *= 0.5;
+				}
+				if (mods.hardRock) {
+					n *= 1.4;
+					if (n >= 10) {
+						n = 0;
+					}
 				}
 			}
 			/* in order 50, 100, 300*/
@@ -73,13 +81,15 @@ define(function(require) {
 		},
 		/* measured in spins per second required for clear*/
 		ODSpinner: function(n, mods) {
-			if (mods.easy) {
-				n *= 0.5;
-			}
-			if (mods.hardRock) {
-				n *= 1.4;
-				if (n >= 10) {
-					n = 0;
+			if (mods) {
+				if (mods.easy) {
+					n *= 0.5;
+				}
+				if (mods.hardRock) {
+					n *= 1.4;
+					if (n >= 10) {
+						n = 0;
+					}
 				}
 			}
 			let od;
