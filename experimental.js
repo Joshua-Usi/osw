@@ -34,7 +34,9 @@ define(function(require) {
 	ctx.font = "16px Arial";
 	ctx.fillStyle = "#fff";
 	let currentHitObject = 0;
+	let hitEvents = [];
 	let hitObjects = [];
+	let hitErrors = [];
 	let scoreObjects = [];
 	let firstClick = true;
 	/* Details about the play, save to replays */
@@ -42,6 +44,7 @@ define(function(require) {
 		score: 0,
 		accuracy: 0,
 		maxCombo: 0,
+		unstableRate: 0,
 		hitDetails: {
 			total300s: 0,
 			total100s: 0,
@@ -108,8 +111,6 @@ define(function(require) {
 	/* Profiling variables */
 	let times = [];
 	let frameRate = 0;
-	/* Hit events */
-	let hitEvents = [];
 	/* spinner tests */
 	let previousSigns = [];
 	let previousAngle = 0;
@@ -369,6 +370,7 @@ define(function(require) {
 							} else if (utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[0])) {
 								hitWindowScore = 50;
 							}
+							hitErrors.push(audio.currentTime - hitObjects[i].time);
 							hitObjects[i].cache.hasHit = true;
 							hitObjects[i].cache.hitTime = audio.currentTime;
 							hitEvents.push(new HitEvent("hit-circle", hitWindowScore, "increasing", hitObjectMapped.x, hitObjectMapped.y));
@@ -482,6 +484,7 @@ define(function(require) {
 					}
 					/* Slider Head Hit Handling ---------------------------------------------------------------- */
 					if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hitHead === false && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) < circleDiameter / 2 && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased)) && utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[0])) {
+						hitErrors.push(audio.currentTime - hitObjects[i].time);
 						hitEvents.push(new HitEvent("slider-element", 30, "increasing", hitObjectMapped.x, hitObjectMapped.y));
 						hitObjects[i].cache.hitHead = true;
 						hitObjects[i].cache.hasHitAtAll = true;
@@ -542,7 +545,6 @@ define(function(require) {
 						} else {
 							mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, canvas.height * playfieldSize * (4 / 3), canvas.height * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 						}
-						console.log(sliderElementsHit + ":" + totalSliderElements);
 						let hitScore = 0;
 						if (sliderElementsHit >= totalSliderElements) {
 							hitScore = 300;
@@ -786,14 +788,12 @@ define(function(require) {
 				}
 				if (keyboard.getKeyDown("z") === true && keyboardLeftReleased === true) {
 					keyboardLeftReleased = false;
-					console.log("z");
 				}
 				if (keyboard.getKeyDown("z") === false) {
 					keyboardLeftReleased = true;
 				}
 				if (keyboard.getKeyDown("x") === true && keyboardRightReleased === true) {
 					keyboardRightReleased = false;
-					console.log("x");
 				}
 				if (keyboard.getKeyDown("x") === false) {
 					keyboardRightReleased = true;
@@ -824,6 +824,24 @@ define(function(require) {
 					}
 				}
 				ctx.globalAlpha = 1;
+				ctx.fillStyle = "#ffcc22";
+				ctx.fillRect(window.innerWidth / 2 - odTime[0] * 1000 / 2, window.innerHeight * 0.950, odTime[0] * 1000, window.innerHeight * 0.005);
+				ctx.fillStyle = "#88b300";
+				ctx.fillRect(window.innerWidth / 2 - odTime[1] * 1000 / 2, window.innerHeight * 0.950, odTime[1] * 1000, window.innerHeight * 0.005);
+				ctx.fillStyle = "#66ccff";
+				ctx.fillRect(window.innerWidth / 2 - odTime[2] * 1000 / 2, window.innerHeight * 0.950, odTime[2] * 1000, window.innerHeight * 0.005);
+				for (var i = 0; i < hitErrors.length; i++) {
+					if (utils.withinRange(hitErrors[i], 0, odTime[2])) {
+						ctx.fillStyle = "#66ccff";
+					} else if (utils.withinRange(hitErrors[i], 0, odTime[1])) {
+						ctx.fillStyle = "#88b300";
+					} else if (utils.withinRange(hitErrors[i], 0, odTime[0])) {
+						ctx.fillStyle = "#ffcc22";
+					}
+					ctx.fillRect(window.innerWidth / 2 + hitErrors[i] * 1000, window.innerHeight * 0.950 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.025);
+				}
+				ctx.fillStyle = "#fff";
+				ctx.fillText(utils.standardDeviation(hitErrors) * 1000 * 10, innerWidth / 2, window.innerHeight * 0.9);
 				comboPulseSize -= comboPulseSize / 8;
 				displayedScore += (score - displayedScore) / 8;
 				/* update score html element */

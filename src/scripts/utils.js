@@ -279,6 +279,16 @@ define(function(require) {
 				}
 			}
 			document.getElementById(container).style[positionTag] = positioning;
+		},
+		standardDeviation: function(arr, usePopulation) {
+			if (usePopulation === undefined) {
+				usePopulation = false;
+			}
+			if (arr.length === 1) {
+				return arr[0];
+			}
+			const mean = arr.reduce((acc, val) => acc + val, 0) / arr.length;
+			return Math.sqrt(arr.reduce((acc, val) => acc.concat((val - mean) ** 2), []).reduce((acc, val) => acc + val, 0) / (arr.length - (usePopulation ? 0 : 1)));
 		}
 	};
 });
