@@ -866,7 +866,6 @@ define(function(require) {
 				}
 				ctx.globalAlpha = 1;
 				ctx.fillStyle = "#fff";
-				ctx.fillText(utils.standardDeviation(hitErrors) * 1000 * 10, innerWidth / 2, window.innerHeight * 0.9);
 				comboPulseSize -= comboPulseSize / 8;
 				displayedScore += (score - displayedScore) / 8;
 				/* update score html element */
