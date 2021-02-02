@@ -20,28 +20,28 @@ define(function(require) {
 			}
 			for (var i = 0; i < callbackArguments.length; i++) {
 				if (typeof callbackArguments[i] === "object") {
-					let evaluation = (callback(...callbackArguments[i]) === expected[i]);
+					let evaluation = (JSON.stringify(callback(...callbackArguments[i])) === JSON.stringify(expected[i]));
 					let diff = callback(...callbackArguments[i]) - expected[i];
 					if (Math.abs(diff) <= Number.EPSILON) {
 						evaluation = true;
 					}
 					let tableRow = `<tr>
 						<th>${callback.name}</th>
-						<th>${callbackArguments[i]}</th>
+						<th>${JSON.stringify(callbackArguments[i])}</th>
 						<th>${expected[i]}</th>
 						<th>${callback(...callbackArguments[i])}</th>
 						<th style=\"background-color: ${(evaluation) ? "#0f0" : "#f00"};\">Passed: ${evaluation}</th>
 					</tr>`;
 					document.querySelector("table").innerHTML += tableRow;
 				} else {
-					let evaluation = (callback(callbackArguments[i]) === expected[i]);
+					let evaluation = (JSON.stringify(callback(callbackArguments[i])) === JSON.stringify(expected[i]));
 					let diff = callback(callbackArguments[i]) - expected[i];
 					if (Math.abs(diff) <= Number.EPSILON) {
 						evaluation = true;
 					}
 					let tableRow = `<tr>
 						<th>${callback.name}</th>
-						<th>${callbackArguments[i]}</th>
+						<th>${JSON.stringify(callbackArguments[i])}</th>
 						<th>${expected[i]}</th>
 						<th>${callback(callbackArguments[i])}</th>
 						<th style=\"background-color: ${(evaluation) ? "#0f0" : "#f00"};\">Passed: ${evaluation}</th>

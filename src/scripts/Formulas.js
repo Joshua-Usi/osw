@@ -15,6 +15,20 @@ define(function(require) {
 		}
 		return n;
 	}
+	function applyModMultiplierCS(n, mods) {
+		if (mods) {
+			if (mods.easy) {
+				n *= 0.5;
+			}
+			if (mods.hardRock) {
+				n *= 1.3;
+				if (n >= 10) {
+					n = 10;
+				}
+			}
+		}
+		return n;
+	}
 	return {
 		AR: function(n, mods) {
 			n = applyModMultiplier(n, mods);
@@ -41,7 +55,7 @@ define(function(require) {
 			return ar;
 		},
 		CS: function(n, mods) {
-			n = applyModMultiplier(n, mods);
+			n = applyModMultiplierCS(n, mods);
 			return 54.4 - 4.48 * n;
 		},
 		/* values for hit windows (centered around hit object time for 50, 100, 300)*/
