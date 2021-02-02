@@ -1,5 +1,5 @@
 define(function(require) {
-	let Test = require("testTables.js");
+	let Test = require("test.js");
 	Formulas = require("../src/scripts/Formulas.js");
 	Test.table(Formulas.CS, [
 		0,
