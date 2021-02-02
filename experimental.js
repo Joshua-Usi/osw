@@ -12,6 +12,7 @@ define(function(require) {
 	const HitEvent = require("src/scripts/HitEvent.js");
 	const AssetLoader = require("src/scripts/AssetLoader.js");
 	const Assets = require("src/scripts/GameplayAssets.js");
+	const Canvas = require("src/scripts/Canvas.js");
 	const skin = require("src/scripts/DefaultSkin.js");
 	/* canvas setup */
 	let canvas = document.createElement("canvas");

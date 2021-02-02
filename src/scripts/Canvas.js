@@ -6,42 +6,48 @@ define(function(require) {
 			document.getElementById(append).append(canvas);
 			this.context = canvas.getContext("2d");
 			this.customProperties = {
-				textAlign: "left";
+				/* 
+				 *
+				 */
+				textAlign: "left",
+				imageAling: "center";
 			}
 		}
 		setStrokeStyle(style) {
 			this.context.strokeStyle = style;
 		}
-		getStrokeStyle(style) {
+		getStrokeStyle() {
 			return this.context.strokeStyle;
 		}
 		setFillStyle(style) {
 			this.context.fillStyle = style;	
 		}
-		getFillStyle(style) {
+		getFillStyle() {
 			return this.context.fillStyle;
 		}
 		setlineCap(style) {
 			this.context.lineCap = style;
 		}
-		getlineCap(style) {
+		getlineCap() {
 			return this.context.lineCap;	
 		}
 		setlineJoin(style) {
 			this.context.lineJoin = style;
 		}
-		getlineJoin(style) {
+		getlineJoin() {
 			return this.context.lineJoin;	
 		}
 		setStrokeWidth(style) {
 			this.context.lineWidth = style;
 		}
-		getStrokeWidth(style) {
+		getStrokeWidth() {
 			return this.context.lineWidth;	
 		}
 		setGlobalAlpha(alpha) {
-
+			this.context.globalAlpha = alpha;
 		}
-		getGlobalAlpha()
+		getGlobalAlpha() {
+			return this.context.globalAlpha;
+		}
 	}
 });
