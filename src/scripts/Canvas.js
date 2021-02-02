@@ -1,17 +1,24 @@
 define(function(require) {
 	return class Canvas {
 		constructor(canvasId, append) {
-			let canvas = document.createElement("canvas");
-			canvas.id = canvasId;
-			document.getElementById(append).append(canvas);
-			this.context = canvas.getContext("2d");
+			this.canvas = document.createElement("canvas");
+			this.canvas.id = canvasId;
+			this.canvas.style.margin = 0;
+			document.getElementById(append).append(this.canvas);
+			this.context = this.canvas.getContext("2d");
 			this.customProperties = {
 				/* 
 				 *
 				 */
 				textAlign: "left",
-				imageAling: "center";
+				imageAling: "center",
 			}
+		}
+		setWidth(width) {
+			this.canvas.width = width;
+		}
+		setHeight(height) {
+			this.canvas.height = height;
 		}
 		setStrokeStyle(style) {
 			this.context.strokeStyle = style;

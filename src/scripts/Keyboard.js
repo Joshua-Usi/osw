@@ -73,6 +73,26 @@ define(function(require) {
 			}
 			return this.keys[key];
 		}
+		emulateKeyDown(keyName) {
+			let key = -1;
+			for (var i = 0; i < this.keyData.length; i++) {
+				if (this.keyData[i] === keyName) {
+					key = i;
+					break;
+				}
+			}
+			this.keys[key] = true;
+		}
+		emulateKeyUp(keyName) {
+			let key = -1;
+			for (var i = 0; i < this.keyData.length; i++) {
+				if (this.keyData[i] === keyName) {
+					key = i;
+					break;
+				}
+			}
+			this.keys[key] = false;
+		}
 		init() {
 			document.getElementById(this.element).addEventListener("keydown", this.keydown);
 			document.getElementById(this.element).addEventListener("keyup", this.keyup);
