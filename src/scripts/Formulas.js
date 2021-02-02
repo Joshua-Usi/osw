@@ -9,7 +9,7 @@ define(function(require) {
 			if (mods.hardRock) {
 				n *= 1.4;
 				if (n >= 10) {
-					n = 0;
+					n = 10;
 				}
 			}
 		}
