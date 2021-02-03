@@ -1,5 +1,5 @@
 #webpage-state-beatmap-selection {
-	display: none;
+	display: block;
 }
 
 #back-button {
@@ -88,6 +88,72 @@
 	left: calc(100vw - 22vh);
 }
 
+.beatmap-selection-group-pane {
+	position: absolute;
+	top: 30vh;
+	right: 0;
+	color: #e4ecef;
+	width: 40vw;
+	border-radius: 1.25vw 0 0 1.25vw;
+	padding: 1vh;
+	background: url("src/images/triangles.png"), linear-gradient(to right, #2e6373, #204653);
+	background-size: 100%;
+}
+
+.beatmap-selection-map-pane {
+	position: absolute;
+	top: 50vh;
+	right: 0;
+	color: #e4ecef;
+	width: 40vw;
+	border-radius: 1.25vw 0 0 1.25vw;
+	padding: 1vh;
+	background: url("src/images/triangles.png"), linear-gradient(to right, #2e6373, #204653);
+	background-size: 100%;
+}
+
+
+.beatmap-selection-group-pane-artist-name {
+	font-size: 2vh;
+}
+
 .beatmap-selection-group-pane-difficulties-icon {
-	width: 4vh;
+	width: 3vh;
+	position: relative;
+	top: calc(1vh / 3);
+}
+
+.beatmap-selection-group-pane-status {
+	display: inline;
+	position: relative;
+	bottom: 1vh;
+	padding: 0.5vw;
+	font-size: 1.75vh;
+	background: #19191955;
+	border-radius: 1vw;
+}
+
+.beatmap-selection-group-pane-difficulties {
+	display: inline;
+}
+
+.beatmap-selection-map-pane-star-wrapper img {
+	width: 3vh;
+}
+
+.beatmap-selection-map-pane-difficulty-icon {
+	display: inline;
+	height: 10vh;
+}
+
+.beatmap-selection-map-pane-right-pane {
+	display: inline-block;	
+}
+
+.beatmap-selection-group-map-difficulty-name {
+	display: inline;
+}
+
+.beatmap-selection-map-pane-mapper-name {
+	display: inline;
 }

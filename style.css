@@ -1,3 +1,7 @@
+#webpage-state-menu {
+	display: none;
+}
+
 * {
 	cursor: url("src/images/cursor.png"), default;
 }
