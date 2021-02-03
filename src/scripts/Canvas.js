@@ -56,5 +56,17 @@ define(function(require) {
 		getGlobalAlpha() {
 			return this.context.globalAlpha;
 		}
+		fillText(text, x, y, offsetOveride) {
+
+		}
+		drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {
+			if (arguments.length === 3) {
+				this.context.drawImage(image, sx, sy);
+			} else if (arguments.length === 5) {
+				this.context.drawImage(image, sx, sy, sWidth, sHeight);
+			} else if (arguments.length === 9) {
+				this.context.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+			}
+		}
 	}
 });
