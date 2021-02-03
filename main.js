@@ -166,7 +166,7 @@ define(function(require) {
 				/* triangle background moves */
 				offset -= 0.25;
 				for (let i = 0; i < triangleBackgroundMoves.length; i++) {
-					triangleBackgroundMoves[i].style.backgroundPositionY = offset + "px";
+					triangleBackgroundMoves[i].style.backgroundPositionY = triangleBackgroundMoves[i].getBoundingClientRect().bottom + offset + "px";
 				}
 				/* beat detection and accumulation */
 				bpm = songs[chosenSong].bpm.get(time);
