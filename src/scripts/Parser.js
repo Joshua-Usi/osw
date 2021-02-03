@@ -4,15 +4,14 @@ define(function(require) {
 	const utils = require("./utils.js");
 	return {
 		parseBeatMap: function(data) {
-			let now = window.performance.now();
 			let splited = data.split("\n");
 			if (splited[0] !== "osu file format v14") {
 				console.warn("Currently parsed beatmap uses \"" + splited[0] + "\" which may be incompatible with the current parser");
 			}
 			let beatmap = {
 				version: splited[0],
-				hitObjectsParsed: [],
-				timingPointsParsed: [],
+				hitObjects: [],
+				timingPoints: [],
 			};
 			let section = "";
 			/* start from 1 to ignore version */
@@ -26,11 +25,11 @@ define(function(require) {
 					continue;
 				}
 				if (section === "[TimingPoints]" && /[,]/g.test(splited[i])) {
-					beatmap.timingPointsParsed.push(this.parseTimingPoint(splited[i]));
+					beatmap.timingPoints.push(this.parseTimingPoint(splited[i]));
 					continue;
 				}
 				if (section === "[HitObjects]" && /[,]/g.test(splited[i])) {
-					beatmap.hitObjectsParsed.push(this.parseHitObject(splited[i]));
+					beatmap.hitObjects.push(this.parseHitObject(splited[i]));
 					continue;
 				}
 				let l = splited[i].split(/:(.+)/);
@@ -53,7 +52,6 @@ define(function(require) {
 					beatmap[l[0]] = parseFloat(l[1]);
 				}
 			}
-			console.log("Parse Time: " + (window.performance.now() - now) + "ms");
 			return beatmap;
 		},
 		parseHitObject: function(data) {
