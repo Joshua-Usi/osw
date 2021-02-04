@@ -11,7 +11,7 @@ define(function(require) {
 				 *
 				 */
 				textAlign: "left",
-				imageAling: "center",
+				imageAlign: "top-left",
 			}
 		}
 		setWidth(width) {
@@ -56,16 +56,38 @@ define(function(require) {
 		getGlobalAlpha() {
 			return this.context.globalAlpha;
 		}
+		setImageAlignment(alignment) {
+			this.customProperties.imageAlign = alignment;
+		}
+		getImageAlignment() {
+			return this.customProperties.imageAlign;
+		}
 		fillText(text, x, y, offsetOveride) {
-
+			let offset = 0;
+			if (this.customProperties.textAlign === "center") {
+				offset = this.context.measureText(text).width;
+			}
+			this.context.fillText(text, x + offset, y);
 		}
 		drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {
 			if (arguments.length === 3) {
-				this.context.drawImage(image, sx, sy);
+				if (this.customProperties.imageAlign === "center") {
+					this.context.drawImage(image, sx - image.width / 2, sy - image.height / 2);
+				} else {
+					this.context.drawImage(image, sx, sy);
+				}
 			} else if (arguments.length === 5) {
-				this.context.drawImage(image, sx, sy, sWidth, sHeight);
+				if (this.customProperties.imageAlign === "center") {
+					this.context.drawImage(image, sx - sWidth / 2, sy - sHeight / 2, sWidth, sHeight);
+				} else {
+					this.context.drawImage(image, sx, sy, sWidth, sHeight);
+				}
 			} else if (arguments.length === 9) {
-				this.context.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+				if (this.customProperties.imageAlign === "center") {
+					this.context.drawImage(image, sx, sy, sWidth, sHeight, dx - dWidth / 2, dy - dHeight / 2, dWidth, dHeight);
+				} else {
+					this.context.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+				}
 			}
 		}
 	}
