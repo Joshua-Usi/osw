@@ -145,25 +145,25 @@ body {
 	text-align: center;
 }
 
-#sidenav::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
 	background-color: #222;
 	/*border-radius: 10px;*/
 }
 
-#sidenav::-webkit-scrollbar {
+::-webkit-scrollbar {
 	width: 1vw;
 }
 
-#sidenav::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
 	border-radius: 1vw;
 	background: #555;
 }
 
-#sidenav::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
 	background: #666;
 }
 
-#sidenav::-webkit-scrollbar-thumb:hover:active {
+::-webkit-scrollbar-thumb:hover:active {
 	background: #777;
 }
 

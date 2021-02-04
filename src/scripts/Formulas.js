@@ -130,19 +130,19 @@ define(function(require) {
 					break;
 			}
 		},
-		beatMapDifficulty: function(starRating) {
+		beatmapDifficultyIcon: function(starRating) {
 			if (starRating <= 1.99) {
-				return "Easy";
+				return "easy";
 			} else if (starRating <= 2.69) {
-				return "Normal";
+				return "normal";
 			} else if (starRating <= 3.99) {
-				return "Hard";
+				return "hard";
 			} else if (starRating <= 5.29) {
-				return "Insane";
+				return "insane";
 			} else if (starRating <= 6.49) {
-				return "Expert";
+				return "expert";
 			} else {
-				return "Expert+";
+				return "expert+";
 			}
 		},
 		difficultyPoints: function(cs, hp, od) {

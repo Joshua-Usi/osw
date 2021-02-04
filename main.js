@@ -31,12 +31,17 @@ define(function(require) {
 	const utils = require("src/scripts/utils.js");
 	const Beatmaps = require("src/scripts/DefaultBeatMaps.js");
 	const AttachAudio = require("src/scripts/AttachAudio.js");
+
+	const BeatMapSelectionPaneTemplate = require("src/scripts/BeatMapSelectionPane.js");
+	for (let i = 0; i < Beatmaps.length; i++) {
+		document.getElementById("beatmap-selection-right").innerHTML += BeatMapSelectionPaneTemplate.group(Beatmaps[i]);
+	}
 	/* Offline context checks, needed to ensure for some effects to work */
 	if (window.origin === null) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.3.4a";
+	const version = "osu!web v2021.0.4.0a";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -166,7 +171,7 @@ define(function(require) {
 				/* triangle background moves */
 				offset -= 0.25;
 				for (let i = 0; i < triangleBackgroundMoves.length; i++) {
-					triangleBackgroundMoves[i].style.backgroundPositionY = triangleBackgroundMoves[i].getBoundingClientRect().bottom + offset + "px";
+					triangleBackgroundMoves[i].style.backgroundPositionY = offset + "px";
 				}
 				/* beat detection and accumulation */
 				bpm = songs[chosenSong].bpm.get(time);

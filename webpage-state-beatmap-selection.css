@@ -97,7 +97,7 @@
 	color: #e4ecef;
 	width: 40vw;
 	border-radius: 1.25vw 0 0 1.25vw;
-	margin-bottom: 2vh;
+	margin-bottom: 1vh;
 	padding: 1vh;
 	background: url("src/images/triangles.png"), linear-gradient(to right, #2e6373, #204653);
 	background-size: 100%;
@@ -106,8 +106,11 @@
 
 .beatmap-selection-map-pane {
 	color: #e4ecef;
+	width: 35vw;
+	position: relative;
+	left: 5vw;
 	border-radius: 1.25vw 0 0 1.25vw;
-	margin-bottom: 2vh;
+	margin-bottom: 1vh;
 	padding: 1vh;
 	background: url("src/images/triangles.png"), linear-gradient(to right, #2e6373, #204653);
 	background-size: 100%;
@@ -132,8 +135,10 @@
 
 .beatmap-selection-group-pane-difficulties-icon {
 	width: 3vh;
+	padding: 0 0.2vw 0 0.2vw;
 	position: relative;
 	top: calc(1vh / 3);
+	transform-origin: center center;
 }
 
 .beatmap-selection-group-pane-status {
@@ -166,6 +171,7 @@
 .beatmap-selection-group-map-difficulty-name {
 	display: inline;
 	font-size: 3vh;
+	font-weight: 600;
 }
 
 .beatmap-selection-map-pane-mapper-name {

@@ -12,11 +12,13 @@ define(function(require) {
 			d = utils.dist(hitObject1.x, hitObject1.y, hitObject2.x, hitObject2.y);
 		}
 		let t = (hitObject2.time - hitObject1.time);
-		if (mods.doubleTime) {
-			t /= 1.5;
-		}
-		if (mods.halfTime) {
-			t /= 0.75;
+		if (mods) {
+			if (mods.doubleTime) {
+				t /= 1.5;
+			}
+			if (mods.halfTime) {
+				t /= 0.75;
+			}
 		}
 		if (t === 0) {
 			t = 1 / 60;
@@ -44,14 +46,16 @@ define(function(require) {
 				total++;
 			}
 			let modMultiplier = 1;
-			if (mods.hardRock) {
-				modMultiplier += 0.06;
-			}
-			if (mods.hidden) {
-				modMultiplier += 0.06;
-			}
-			if (mods.flashLight) {
-				modMultiplier += 0.19;
+			if (mods) {
+				if (mods.hardRock) {
+					modMultiplier += 0.06;
+				}
+				if (mods.hidden) {
+					modMultiplier += 0.06;
+				}
+				if (mods.flashLight) {
+					modMultiplier += 0.19;
+				}
 			}
 			return (starRatingSum * modMultiplier / total / 2 + highest / 1.5) / 2;
 		},
