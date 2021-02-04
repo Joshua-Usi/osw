@@ -373,7 +373,7 @@ define(function(require) {
 						angleChange = 50;
 					}
 					/* Hit Circle Hit Handling ---------------------------------------------------------------- */
-					if (hitObjects[i].type[0] === "1" && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) < circleDiameter / 2 && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased))) {
+					if (hitObjects[i].type[0] === "1" && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased))) {
 						if (keyboard.getKeyDown("z") && keyboardLeftReleased) {
 							keyboardLeftReleased = false;
 						}
@@ -427,7 +427,7 @@ define(function(require) {
 									if (hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j] === false && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 										let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].x, hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 										let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-										if (utils.dist(mapped.x, mapped.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle) {
+										if (utils.dist(mapped.x, mapped.y, sliderBodyPos.x, sliderBodyPos.y) <= circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) <= circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle) {
 											hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j] = true;
 											hitObjects[i].cache.sliderTicksHit++;
 											hitEvents.push(new HitEvent("slider-tick", 10, "increasing", mapped.x, mapped.y));
@@ -435,9 +435,9 @@ define(function(require) {
 									}
 								}
 								let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-								if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+								if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) <= circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 									hitObjects[i].cache.onFollowCircle = true;
-								} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+								} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) <= circleDiameter / 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 									hitObjects[i].cache.onFollowCircle = true;
 								} else {
 									hitObjects[i].cache.onFollowCircle = false;
@@ -458,7 +458,7 @@ define(function(require) {
 									if (hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j] === false && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 										let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].x, hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 										let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-										if (utils.dist(mapped.x, mapped.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle) {
+										if (utils.dist(mapped.x, mapped.y, sliderBodyPos.x, sliderBodyPos.y) <= circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) <= circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle) {
 											hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j] = true;
 											hitObjects[i].cache.sliderTicksHit++;
 											hitEvents.push(new HitEvent("slider-tick", 10, "increasing", mapped.x, mapped.y));
@@ -466,9 +466,9 @@ define(function(require) {
 									}
 								}
 								let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-								if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+								if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) <= circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 									hitObjects[i].cache.onFollowCircle = true;
-								} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter / 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+								} else if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) <= circleDiameter / 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 									hitObjects[i].cache.onFollowCircle = true;
 								} else {
 									hitObjects[i].cache.onFollowCircle = false;
@@ -478,7 +478,7 @@ define(function(require) {
 								hitObjects[i].cache.currentSlide++;
 								if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
 									let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-									if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) < circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+									if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) <= circleDiameter * 2.4 / 2 && hitObjects[i].cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 										hitObjects[i].cache.repeatsHit++;
 										hitEvents.push(new HitEvent("slider-element", 30, "increasing", sliderBodyPos.x, sliderBodyPos.y));
 									} else if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
@@ -489,12 +489,12 @@ define(function(require) {
 						} else {
 							hitObjects[i].cache.hasEnded = true;
 							if (hitObjects[i].cache.currentSlide % 2 === 0) {
-								if (utils.dist(mouse.position.x, mouse.position.y, hitObjects[i].cache.points[0].x, hitObjects[i].cache.points[0].y) < circleDiameter / 2) {
+								if (utils.dist(mouse.position.x, mouse.position.y, hitObjects[i].cache.points[0].x, hitObjects[i].cache.points[0].y) <= circleDiameter / 2) {
 									hitObjects[i].cache.hitEnd = true;
 									hitObjects[i].cache.hasHitAtAll = true;
 								}
 							} else if (hitObjects[i].cache.currentSlide % 2 === 1) {
-								if (utils.dist(mouse.position.x, mouse.position.y, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y) < circleDiameter / 2) {
+								if (utils.dist(mouse.position.x, mouse.position.y, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y) <= circleDiameter / 2) {
 									hitObjects[i].cache.hitEnd = true;
 									hitObjects[i].cache.hasHitAtAll = true;
 								}
@@ -502,7 +502,7 @@ define(function(require) {
 						}
 					}
 					/* Slider Head Hit Handling ---------------------------------------------------------------- */
-					if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hitHead === false && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) < circleDiameter / 2 && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased)) && utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[0])) {
+					if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hitHead === false && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased)) && utils.withinRange(audio.currentTime, hitObjects[i].time, odTime[0])) {
 						if (keyboard.getKeyDown("z") && keyboardLeftReleased) {
 							keyboardLeftReleased = false;
 						}
@@ -628,7 +628,7 @@ define(function(require) {
 						if (Math.abs(hitObjects[i].cache.velocity / (Math.PI)) >= Formulas.ODSpinner(beatmap[useBeatmap].OverallDifficulty, playDetails.mods)) {
 							hitObjects[i].cache.timeSpentAboveSpinnerMinimum += audio.currentTime - previousTime;
 						}
-						if (hitObjects[i].cache.timeSpentAboveSpinnerMinimum > (hitObjects[i].endTime - hitObjects[i].time) * 0.25) {
+						if (hitObjects[i].cache.timeSpentAboveSpinnerMinimum >= (hitObjects[i].endTime - hitObjects[i].time) * 0.25) {
 							hitObjects[i].cache.cleared = true;
 						}
 						while (hitObjects[i].cache.spinAngle >= Math.PI * 2) {
@@ -651,7 +651,7 @@ define(function(require) {
 						}
 					}
 					/* Spinner end handling ---------------------------------------------------------------- */
-					if (hitObjects[i].type[3] === "1" && audio.currentTime > hitObjects[i].endTime) {
+					if (hitObjects[i].type[3] === "1" && audio.currentTime >= hitObjects[i].endTime) {
 						let mapped = utils.mapToOsuPixels(256, 192, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 						if (hitObjects[i].cache.cleared) {
 							hitEvents.push(new HitEvent("hit-circle", 300, "increasing", mapped.x, mapped.y));
@@ -676,7 +676,6 @@ define(function(require) {
 				/* Render Loop ---------------------------------------------------------------- */
 				canvas.setImageAlignment("center");
 				for (let i = hitObjects.length - 1; i >= 0; i--) {
-					// for (let i = 0; i < hitObjects.length; i++) {
 					/* Approach Circle Calculations ---------------------------------------------------------------- */
 					let approachCircleSize = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 5, 1.6);
 					let hitObjectMapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
@@ -692,9 +691,9 @@ define(function(require) {
 					if (hitObjects[i].type[0] === "1") {
 						if (playDetails.mods.hidden) {
 							/* hidden fade in and out for hit circle */
-							if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) < 0.4) {
+							if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= 0.4) {
 								canvas.setGlobalAlpha(utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime * 0.4, 0, 1));
-							} else if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) < 0.7) {
+							} else if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= 0.7) {
 								canvas.setGlobalAlpha(utils.map(audio.currentTime - (hitObjects[i].time - arTime), arTime * 0.4, arTime * 0.7, 1, 0));
 							} else {
 								canvas.setGlobalAlpha(0);
@@ -705,7 +704,7 @@ define(function(require) {
 								canvas.setGlobalAlpha(utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arFadeIn, 0, 1));
 							} else {
 								let alpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), arTime, arTime + odTime[0] / 2, 1, 0);
-								if (alpha < 0) {
+								if (alpha <= 0) {
 									alpha = 0;
 								}
 								canvas.setGlobalAlpha(alpha);
@@ -823,7 +822,7 @@ define(function(require) {
 					size = 0.8;
 				}
 				for (let i = 0; i < scoreObjects.length; i++) {
-					if (scoreObjects[i].lifetime - audio.currentTime > 0) {
+					if (scoreObjects[i].lifetime - audio.currentTime >= 0) {
 						let useImage = -1;
 						switch (scoreObjects[i].score) {
 							case 300:
