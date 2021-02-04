@@ -4,8 +4,9 @@ define(function(require) {
 	const Formulas = require("src/scripts/Formulas.js");
 	const Mouse = require("src/scripts/Mouse.js");
 	const Keyboard = require("src/scripts/Keyboard.js");
-	const beatmap = require("src/scripts/DefaultBeatMaps.js")[0];
-	// const beatmap = require("src/scripts/BeatMap.js");
+	const beatmap = require("src/scripts/DefaultBeatMaps.js");
+	let useBeatmap = 4;
+	// const beatmap[useBeatmap] = require("src/scripts/BeatMap.js");
 	const StarRating = require("src/scripts/StarRating.js");
 	const Beizer = require("src/scripts/Beizer.js");
 	const utils = require("src/scripts/utils.js");
@@ -31,7 +32,7 @@ define(function(require) {
 	let keyboardLeftReleased = false;
 	let keyboardRightReleased = false;
 	ctx.font = "16px Arial";
-	ctx.fillStyle = "#fff";
+	canvas.setFillStyle("#fff");
 	let currentHitObject = 0;
 	let hitEvents = [];
 	let hitObjects = [];
@@ -74,18 +75,18 @@ define(function(require) {
 		},
 		replay: "TODO",
 	};
-	StarRating(beatmap, playDetails.mods);
+	console.log(StarRating.calculate(beatmap[useBeatmap], playDetails.mods));
 	/* Playfield calculations and data */
 	let playfieldSize = 0.8;
 	let playfieldXOffset = 0;
 	let playfieldYOffset = window.innerHeight / 50;
 	/* Beatmap difficulty data */
-	let arTime = Formulas.AR(beatmap.ApproachRate, playDetails.mods);
-	let arFadeIn = Formulas.ARFadeIn(beatmap.ApproachRate, playDetails.mods);
+	let arTime = Formulas.AR(beatmap[useBeatmap].ApproachRate, playDetails.mods);
+	let arFadeIn = Formulas.ARFadeIn(beatmap[useBeatmap].ApproachRate, playDetails.mods);
 	/* Map from osu!pixels to screen pixels */
-	let circleDiameter = utils.map(Formulas.CS(beatmap.CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * playfieldSize * (4 / 3));
-	let difficultyMultiplier = Formulas.difficultyPoints(beatmap.CircleSize, beatmap.HPDrainRate, beatmap.OverallDifficulty);
-	let odTime = Formulas.ODHitWindow(beatmap.OverallDifficulty, playDetails.mods);
+	let circleDiameter = utils.map(Formulas.CS(beatmap[useBeatmap].CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * playfieldSize * (4 / 3));
+	let difficultyMultiplier = Formulas.difficultyPoints(beatmap[useBeatmap].CircleSize, beatmap[useBeatmap].HPDrainRate, beatmap[useBeatmap].OverallDifficulty);
+	let odTime = Formulas.ODHitWindow(beatmap[useBeatmap].OverallDifficulty, playDetails.mods);
 	/**/
 	let currentHP = 1;
 	let hpDisplay = 1;
@@ -100,8 +101,8 @@ define(function(require) {
 	let combo = 0;
 	let comboPulseSize = 1;
 	/* Audio variables */
-	let audio = AssetLoader.audio(`src/audio/${beatmap.AudioFilename}`);
-	audio.currentTime = beatmap.hitObjects[0].time - 5;
+	let audio = AssetLoader.audio(`src/audio/${beatmap[useBeatmap].AudioFilename}`);
+	audio.currentTime = beatmap[useBeatmap].hitObjects[0].time - 5;
 	// audio.currentTime = 0;
 	audio.playbackRate = 1;
 	if (playDetails.mods.doubleTime) {
@@ -125,7 +126,7 @@ define(function(require) {
 			}, 0);
 			(function animate() {
 				ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-				ctx.strokeStyle = "#000";
+				canvas.setStrokeStyle("#000");
 				ctx.lineWidth = 2;
 				ctx.beginPath();
 				ctx.rect(playfieldXOffset + window.innerWidth / 2 - window.innerHeight * playfieldSize * (4 / 3) / 2, playfieldYOffset + window.innerHeight / 2 - window.innerHeight * playfieldSize / 2, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize);
@@ -133,7 +134,7 @@ define(function(require) {
 				ctx.closePath();
 				let hitObjectOffsetX = playfieldXOffset + window.innerWidth / 2 - window.innerHeight * playfieldSize * (4 / 3) / 2;
 				let hitObjectOffsetY = playfieldYOffset + window.innerHeight / 2 - window.innerHeight * playfieldSize / 2;
-				ctx.strokeStyle = "#fff";
+				canvas.setStrokeStyle("#fff");
 				ctx.lineWidth = 5;
 				let b = utils.mapToOsuPixels(256, 192, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 				previousAngle = angle;
@@ -170,8 +171,9 @@ define(function(require) {
 				if (currentHP <= 0) {
 					currentHP = 0;
 				}
-				currentHP -= Formulas.HPDrain(beatmap.HPDrainRate, audio.currentTime - previousTime);
+				currentHP -= Formulas.HPDrain(beatmap[useBeatmap].HPDrainRate, audio.currentTime - previousTime);
 				hpDisplay += (currentHP - hpDisplay) / 8;
+				canvas.setImageAlignment("top-left");
 				canvas.drawImage(Assets.scoreBarBg, 10, 10, window.innerWidth / 2, Assets.scoreBarBg.height);
 				canvas.drawImage(Assets.scoreBarColour, 0, 0, utils.map(hpDisplay, 0, 1, 0, Assets.scoreBarColour.width), Assets.scoreBarColour.height, 15, 10 + Assets.scoreBarColour.height / 1.5, utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2 - 0.01 * window.innerWidth), Assets.scoreBarColour.height);
 				/* Hit Events */
@@ -223,24 +225,24 @@ define(function(require) {
 						combo = 0;
 						document.getElementById("combo-container").innerHTML = "";
 					}
-					currentHP += Formulas.HP(beatmap.HPDrainRate, hitEvents[0].score, hitEvents[0].type, playDetails.mods);
+					currentHP += Formulas.HP(beatmap[useBeatmap].HPDrainRate, hitEvents[0].score, hitEvents[0].type, playDetails.mods);
 					hitEvents.splice(0, 1);
 				}
-				while (currentHitObject < beatmap.hitObjects.length && audio.currentTime >= beatmap.hitObjects[currentHitObject].time - arTime) {
-					hitObjects.push(beatmap.hitObjects[currentHitObject]);
+				while (currentHitObject < beatmap[useBeatmap].hitObjects.length && audio.currentTime >= beatmap[useBeatmap].hitObjects[currentHitObject].time - arTime) {
+					hitObjects.push(beatmap[useBeatmap].hitObjects[currentHitObject]);
 					currentHitObject++;
 				}
 				/* +1 because the given time is beginning time, not end time */
-				while (currentTimingPoint < beatmap.timingPoints.length - 1 && audio.currentTime >= beatmap.timingPoints[currentTimingPoint + 1].time) {
+				while (currentTimingPoint < beatmap[useBeatmap].timingPoints.length - 1 && audio.currentTime >= beatmap[useBeatmap].timingPoints[currentTimingPoint + 1].time) {
 					currentTimingPoint++;
-					if (beatmap.timingPoints[currentTimingPoint].uninherited === 1) {
+					if (beatmap[useBeatmap].timingPoints[currentTimingPoint].uninherited === 1) {
 						timingPointUninheritedIndex = currentTimingPoint;
 					}
 				}
 				/* Cache Loop ---------------------------------------------------------------- */
 				for (let i = 0; i < hitObjects.length; i++) {
 					/* Cache Setup ---------------------------------------------------------------- */
-					let sliderSpeedMultiplier = beatmap.SliderMultiplier;
+					let sliderSpeedMultiplier = beatmap[useBeatmap].SliderMultiplier;
 					if (hitObjects[i].cache.cacheSet === false) {
 						/* Immediate Cache Setup ---------------------------------------------------------------- */
 						if (hitObjects[i].type[0] === "1") {
@@ -302,8 +304,8 @@ define(function(require) {
 						}
 					}
 					/* inherited timing point */
-					if (beatmap.timingPoints[currentTimingPoint].uninherited === 0) {
-						sliderSpeedMultiplier *= Formulas.sliderMultiplier(beatmap.timingPoints[currentTimingPoint].beatLength);
+					if (beatmap[useBeatmap].timingPoints[currentTimingPoint].uninherited === 0) {
+						sliderSpeedMultiplier *= Formulas.sliderMultiplier(beatmap[useBeatmap].timingPoints[currentTimingPoint].beatLength);
 					}
 					/* Cache Setup ---------------------------------------------------------------- */
 					if (audio.currentTime >= hitObjects[i].time) {
@@ -316,11 +318,11 @@ define(function(require) {
 							/* Cache Setup for Slider ---------------------------------------------------------------- */
 							hitObjects[i].cache.sliderInheritedMultiplier = sliderSpeedMultiplier;
 							hitObjects[i].cache.timingPointUninheritedIndex = timingPointUninheritedIndex;
-							hitObjects[i].cache.sliderOnceTime = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * beatmap.timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
+							hitObjects[i].cache.sliderOnceTime = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * beatmap[useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
 							hitObjects[i].cache.sliderTotalTime = hitObjects[i].cache.sliderOnceTime * hitObjects[i].slides;
-							let time = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * beatmap.timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
+							let time = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * beatmap[useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
 							/* Actual ticks is -1 due to unexplicable phenomenon */
-							hitObjects[i].cache.totalTicks = time / beatmap.timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength * beatmap.SliderTickRate;
+							hitObjects[i].cache.totalTicks = time / beatmap[useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength * beatmap[useBeatmap].SliderTickRate;
 							hitObjects[i].cache.specificSliderTicksHit = [];
 							for (let j = 0; j < hitObjects[i].slides; j++) {
 								let tempArray = [];
@@ -408,7 +410,7 @@ define(function(require) {
 					if (hitObjects[i].type[1] === "1" && audio.currentTime >= hitObjects[i].time) {
 						if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
 							let sliderRepeat = false;
-							let time = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * beatmap.timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
+							let time = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * beatmap[useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
 							if (hitObjects[i].cache.currentSlide % 2 === 0) {
 								hitObjects[i].cache.sliderBodyPosition = Math.floor(utils.map(audio.currentTime, hitObjects[i].time + time * hitObjects[i].cache.currentSlide, hitObjects[i].time + time * (hitObjects[i].cache.currentSlide + 1), 0, hitObjects[i].cache.points.length - 1));
 								/* Prevent Index Errors */
@@ -623,7 +625,7 @@ define(function(require) {
 						hitObjects[i].cache.velocity += (angleChange - hitObjects[i].cache.velocity) / 32;
 						hitObjects[i].cache.currentAngle += hitObjects[i].cache.velocity * (audio.currentTime - previousTime);
 						hitObjects[i].cache.spinAngle += hitObjects[i].cache.velocity * (audio.currentTime - previousTime);
-						if (Math.abs(hitObjects[i].cache.velocity / (Math.PI)) >= Formulas.ODSpinner(beatmap.OverallDifficulty, playDetails.mods)) {
+						if (Math.abs(hitObjects[i].cache.velocity / (Math.PI)) >= Formulas.ODSpinner(beatmap[useBeatmap].OverallDifficulty, playDetails.mods)) {
 							hitObjects[i].cache.timeSpentAboveSpinnerMinimum += audio.currentTime - previousTime;
 						}
 						if (hitObjects[i].cache.timeSpentAboveSpinnerMinimum > (hitObjects[i].endTime - hitObjects[i].time) * 0.25) {
@@ -672,6 +674,7 @@ define(function(require) {
 					}
 				}
 				/* Render Loop ---------------------------------------------------------------- */
+				canvas.setImageAlignment("center");
 				for (let i = hitObjects.length - 1; i >= 0; i--) {
 					// for (let i = 0; i < hitObjects.length; i++) {
 					/* Approach Circle Calculations ---------------------------------------------------------------- */
@@ -690,29 +693,29 @@ define(function(require) {
 						if (playDetails.mods.hidden) {
 							/* hidden fade in and out for hit circle */
 							if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) < 0.4) {
-								ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime * 0.4, 0, 1);
+								canvas.setGlobalAlpha(utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime * 0.4, 0, 1));
 							} else if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) < 0.7) {
-								ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), arTime * 0.4, arTime * 0.7, 1, 0);
+								canvas.setGlobalAlpha(utils.map(audio.currentTime - (hitObjects[i].time - arTime), arTime * 0.4, arTime * 0.7, 1, 0));
 							} else {
-								ctx.globalAlpha = 0;
+								canvas.setGlobalAlpha(0);
 							}
 						} else {
 							/* normal fade in and out for hit circle */
 							if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= 1) {
-								ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arFadeIn, 0, 1);
+								canvas.setGlobalAlpha(utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arFadeIn, 0, 1));
 							} else {
 								let alpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), arTime, arTime + odTime[0] / 2, 1, 0);
 								if (alpha < 0) {
 									alpha = 0;
 								}
-								ctx.globalAlpha = alpha;
+								canvas.setGlobalAlpha(alpha);
 							}
 						}
 					} else if (hitObjects[i].type[1] === "1") {
 						if (utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= 1) {
-							ctx.globalAlpha = utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arFadeIn, 0, 1);
+							canvas.setGlobalAlpha(utils.map(audio.currentTime - (hitObjects[i].time - arTime), 0, arFadeIn, 0, 1));
 						} else {
-							ctx.globalAlpha = 1;
+							canvas.setGlobalAlpha(1);
 						}
 					}
 					/* Object Draw ---------------------------------------------------------------- */
@@ -722,12 +725,12 @@ define(function(require) {
 						if (hitObjects[i].cache.hasHit || hitObjects[i].cache.hasMiss) {
 							size *= utils.map(hitObjects[i].cache.hitTime - audio.currentTime, 0, 1, 1, 1.2);
 						}
-						canvas.drawImage(Assets.hitCircle, hitObjectMapped.x - size / 2, hitObjectMapped.y - size / 2, size, size);
-						canvas.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x - size / 2, hitObjectMapped.y - size / 2, size, size);
+						canvas.drawImage(Assets.hitCircle, hitObjectMapped.x, hitObjectMapped.y, size, size);
+						canvas.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, size, size);
 						if (playDetails.mods.hidden === false) {
-							canvas.drawImage(Assets.approachCircle, hitObjectMapped.x - (size * approachCircleSize) / 2, hitObjectMapped.y - (size * approachCircleSize) / 2, size * approachCircleSize, size * approachCircleSize);
+							canvas.drawImage(Assets.approachCircle, hitObjectMapped.x, hitObjectMapped.y, size * approachCircleSize, size * approachCircleSize);
 						}
-						canvas.drawImage(Assets.comboNumbers[1], hitObjectMapped.x - Assets.comboNumbers[1].width / 2, hitObjectMapped.y - Assets.comboNumbers[1].width / 1.25);
+						canvas.drawImage(Assets.comboNumbers[1], hitObjectMapped.x, hitObjectMapped.y);
 					} else if (hitObjects[i].type[1] === "1") {
 						/* Draw Slider ---------------------------------------------------------------- */
 						/* Slider Curve calculated the at the hitobject time - ar time */
@@ -735,7 +738,7 @@ define(function(require) {
 						ctx.lineJoin = 'round';
 						/* Draw Outer Slider Body ---------------------------------------------------------------- */
 						ctx.lineWidth = circleDiameter;
-						ctx.strokeStyle = "rgba(255, 255, 255, " + ctx.globalAlpha + ")";
+						canvas.setStrokeStyle("rgba(255, 255, 255, " + canvas.getGlobalAlpha() + ")");
 						ctx.beginPath();
 						for (let j = 0; j < hitObjects[i].cache.points.length - 1; j += 1) {
 							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[j].x, hitObjects[i].cache.points[j].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
@@ -746,7 +749,7 @@ define(function(require) {
 						ctx.stroke();
 						/* Draw Inner Slider Body ---------------------------------------------------------------- */
 						ctx.lineWidth = circleDiameter / 1.1;
-						ctx.strokeStyle = "#222";
+						canvas.setStrokeStyle("#222");
 						ctx.beginPath();
 						for (let j = 0; j < hitObjects[i].cache.points.length - 1; j += 1) {
 							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[j].x, hitObjects[i].cache.points[j].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
@@ -760,13 +763,13 @@ define(function(require) {
 							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 							ctx.translate(mapped.x, mapped.y);
 							ctx.rotate(-utils.direction(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 4].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 3].y, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 2].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y) + Math.PI / 2);
-							canvas.drawImage(Assets.hitCircle, -circleDiameter / 2, -circleDiameter / 2, circleDiameter, circleDiameter);
-							canvas.drawImage(Assets.reverseArrow, -circleDiameter / 2, -circleDiameter / 2, circleDiameter, circleDiameter);
+							canvas.drawImage(Assets.hitCircle, 0, 0, circleDiameter, circleDiameter);
+							canvas.drawImage(Assets.reverseArrow, 0, 0, circleDiameter, circleDiameter);
 							ctx.resetTransform();
 						} else {
 							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							canvas.drawImage(Assets.hitCircle, mapped.x - circleDiameter / 2, mapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
-							canvas.drawImage(Assets.hitCircleOverlay, mapped.x - circleDiameter / 2, mapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
+							canvas.drawImage(Assets.hitCircle, mapped.x, mapped.y, circleDiameter, circleDiameter);
+							canvas.drawImage(Assets.hitCircleOverlay, mapped.x, mapped.y, circleDiameter, circleDiameter);
 						}
 						/* Draw Slider Ticks ---------------------------------------------------------------- */
 						if (hitObjects[i].cache.totalTicks >= 1 && hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide]) {
@@ -775,45 +778,45 @@ define(function(require) {
 									continue;
 								}
 								let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].x, hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-								canvas.drawImage(Assets.sliderScorePoint, mapped.x - Assets.sliderScorePoint.width / 2, mapped.y - Assets.sliderScorePoint.height / 2);
+								canvas.drawImage(Assets.sliderScorePoint, mapped.x, mapped.y);
 							}
 						}
 						/* Draw Slider Head */
 						if (hitObjects[i].cache.hitHead === false) {
-							canvas.drawImage(Assets.hitCircle, hitObjectMapped.x - circleDiameter / 2, hitObjectMapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
-							canvas.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x - circleDiameter / 2, hitObjectMapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
+							canvas.drawImage(Assets.hitCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
+							canvas.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
 							if (playDetails.mods.hidden === false) {
-								canvas.drawImage(Assets.approachCircle, hitObjectMapped.x - (circleDiameter * approachCircleSize) / 2, hitObjectMapped.y - (circleDiameter * approachCircleSize) / 2, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
+								canvas.drawImage(Assets.approachCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
 							}
-							canvas.drawImage(Assets.comboNumbers[1], hitObjectMapped.x - Assets.comboNumbers[1].width / 2, hitObjectMapped.y - Assets.comboNumbers[1].width / 1.25);
+							canvas.drawImage(Assets.comboNumbers[1], hitObjectMapped.x, hitObjectMapped.y);
 						}
 						if (hitObjects[i].cache.sliderBodyPosition !== undefined && audio.currentTime >= hitObjects[i].time) {
 							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							let tempAlpha = ctx.globalAlpha;
-							ctx.globalAlpha = 1;
-							canvas.drawImage(Assets.sliderBody, mapped.x - circleDiameter / 2, mapped.y - circleDiameter / 2, circleDiameter, circleDiameter);
-							ctx.globalAlpha = tempAlpha;
+							let tempAlpha = canvas.getGlobalAlpha();
+							canvas.setGlobalAlpha(1);
+							canvas.drawImage(Assets.sliderBody, mapped.x, mapped.y, circleDiameter, circleDiameter);
+							canvas.setGlobalAlpha(tempAlpha);
 							if (hitObjects[i].cache.onFollowCircle) {
-								canvas.drawImage(Assets.sliderFollowCircle, mapped.x - circleDiameter * 2.4 / 2, mapped.y - circleDiameter * 2.4 / 2, circleDiameter * 2.4, circleDiameter * 2.4);
+								canvas.drawImage(Assets.sliderFollowCircle, mapped.x, mapped.y, circleDiameter * 2.4, circleDiameter * 2.4);
 							}
 						}
 					} else if (hitObjects[i].type[3] === "1") {
 						if (hitObjects[i].cache.cleared) {
-							canvas.drawImage(Assets.spinnerClear, window.innerWidth / 2 - Assets.spinnerClear.width / 2, window.innerHeight / 4 - Assets.spinnerClear.height / 2);
+							canvas.drawImage(Assets.spinnerClear, window.innerWidth / 2, window.innerHeight / 4);
 						}
 						/* draw spinner */
 						let mapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 						ctx.translate(mapped.x, mapped.y);
 						ctx.rotate(hitObjects[i].cache.currentAngle);
 						let size = utils.map(hitObjects[i].endTime - audio.currentTime, 0, hitObjects[i].endTime - (hitObjects[i].time - arTime), 0, 0.8) * utils.map(Math.abs(hitObjects[i].cache.velocity), 0, 50, 1, 1.2);
-						canvas.drawImage(Assets.spinnerApproachCircle, -size * window.innerHeight / 2, -size * window.innerHeight / 2, size * window.innerHeight, size * window.innerHeight);
+						canvas.drawImage(Assets.spinnerApproachCircle, 0, 0, size * window.innerHeight, size * window.innerHeight);
 						let tempAlpha = ctx.globalAlpha;
-						ctx.globalAlpha = 1;
-						canvas.drawImage(Assets.spinnerTop, -0.2 * window.innerHeight / 2, -0.2 * window.innerHeight / 2, 0.2 * window.innerHeight, 0.2 * window.innerHeight);
-						ctx.globalAlpha = tempAlpha;
+						canvas.setGlobalAlpha(1);
+						canvas.drawImage(Assets.spinnerTop, 0, 0, 0.2 * window.innerHeight, 0.2 * window.innerHeight);
+						canvas.setGlobalAlpha(tempAlpha);
 						ctx.resetTransform();
 					}
-					ctx.globalAlpha = 1;
+					canvas.setGlobalAlpha(1);
 				}
 				let size = 1;
 				if (keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) {
@@ -836,38 +839,38 @@ define(function(require) {
 								useImage = 3;
 								break;
 						}
-						ctx.globalAlpha = utils.map(scoreObjects[i].lifetime - audio.currentTime, 1, 0, 1, 0);
+						canvas.setGlobalAlpha(utils.map(scoreObjects[i].lifetime - audio.currentTime, 1, 0, 1, 0));
 						let size = circleDiameter * 0.75 * utils.map(scoreObjects[i].lifetime - audio.currentTime, 1, 0, 1, 1.1);
-						canvas.drawImage(Assets.scoreNumbers[useImage], scoreObjects[i].x - size / 2, scoreObjects[i].y - size / 2, size, size);
+						canvas.drawImage(Assets.scoreNumbers[useImage], scoreObjects[i].x, scoreObjects[i].y, size, size);
 					} else {
 						scoreObjects.splice(i, 1);
 						i--;
 					}
 				}
-				ctx.globalAlpha = 1;
-				ctx.fillStyle = "#ffcc22";
+				canvas.setGlobalAlpha(1);
+				canvas.setFillStyle("#ffcc22");
 				ctx.fillRect(window.innerWidth / 2 - odTime[0] * 1000 / 2, window.innerHeight * 0.950, odTime[0] * 1000, window.innerHeight * 0.005);
-				ctx.fillStyle = "#88b300";
+				canvas.setFillStyle("#88b300");
 				ctx.fillRect(window.innerWidth / 2 - odTime[1] * 1000 / 2, window.innerHeight * 0.950, odTime[1] * 1000, window.innerHeight * 0.005);
-				ctx.fillStyle = "#66ccff";
+				canvas.setFillStyle("#66ccff");
 				ctx.fillRect(window.innerWidth / 2 - odTime[2] * 1000 / 2, window.innerHeight * 0.950, odTime[2] * 1000, window.innerHeight * 0.005);
 				for (let i = 0; i < hitErrors.length; i++) {
 					let alpha = utils.map(i, 40, 0, 0, 1);
 					if (alpha <= 0) {
 						alpha = 0;
 					}
-					ctx.globalAlpha = alpha;
+					canvas.setGlobalAlpha(alpha);
 					if (utils.withinRange(hitErrors[i], 0, odTime[2])) {
-						ctx.fillStyle = "#66ccff";
+						canvas.setFillStyle("#66ccff");
 					} else if (utils.withinRange(hitErrors[i], 0, odTime[1])) {
-						ctx.fillStyle = "#88b300";
+						canvas.setFillStyle("#88b300");
 					} else if (utils.withinRange(hitErrors[i], 0, odTime[0])) {
-						ctx.fillStyle = "#ffcc22";
+						canvas.setFillStyle("#ffcc22");
 					}
 					ctx.fillRect(window.innerWidth / 2 + hitErrors[i] * 1000, window.innerHeight * 0.950 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.025);
 				}
-				ctx.globalAlpha = 1;
-				ctx.fillStyle = "#fff";
+				canvas.setGlobalAlpha(1);
+				canvas.setFillStyle("#fff");
 				comboPulseSize -= comboPulseSize / 8;
 				displayedScore += (score - displayedScore) / 8;
 				/* update score html element */
@@ -885,13 +888,13 @@ define(function(require) {
 				}
 				/* mouse trails */
 				for (let i = 0; i < mouse.previousPositions.x.length - 1; i++) {
-					ctx.globalAlpha = utils.map(i, 0, mouse.previousPositions.x.length - 1, 0, 1);
+					canvas.setGlobalAlpha(utils.map(i, 0, mouse.previousPositions.x.length - 1, 0, 1));
 					for (let j = 0; j < utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]) / (Assets.cursorTrail.width / 2); j++) {
-						canvas.drawImage(Assets.cursorTrail, utils.map(j, 0, utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]) / (Assets.cursorTrail.width / 2), mouse.previousPositions.x[i], mouse.previousPositions.x[i + 1]) - Assets.cursorTrail.width / 2, utils.map(j, 0, utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]) / (Assets.cursorTrail.width / 2), mouse.previousPositions.y[i], mouse.previousPositions.y[i + 1]) - Assets.cursorTrail.height / 2);
+						canvas.drawImage(Assets.cursorTrail, utils.map(j, 0, utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]) / (Assets.cursorTrail.width / 2), mouse.previousPositions.x[i], mouse.previousPositions.x[i + 1]) - Assets.cursorTrail.width / 2, utils.map(j, 0, utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]) / (Assets.cursorTrail.width / 2), mouse.previousPositions.y[i], mouse.previousPositions.y[i + 1]));
 					}
 				}
-				ctx.globalAlpha = 1;
-				canvas.drawImage(Assets.cursor, mouse.position.x - (Assets.cursor.width * size) / 2, mouse.position.y - (Assets.cursor.height * size) / 2, Assets.cursor.width * size, Assets.cursor.height * size);
+				canvas.setGlobalAlpha(1);
+				canvas.drawImage(Assets.cursor, mouse.position.x, mouse.position.y, Assets.cursor.width * size, Assets.cursor.height * size);
 				/* Profiling ----------------------------------------------------------------------------------------------- */
 				const now = Date.now();
 				while (times.length > 0 && times[0] <= now - 1000) {
@@ -909,7 +912,7 @@ define(function(require) {
 				} else {
 					document.getElementById("frame-rate").style.background = "#B00020";
 				}
-				ctx.fillText(audio.currentTime, 10, 200);
+				canvas.fillText(audio.currentTime, 10, 200);
 				previousTime = audio.currentTime;
 				setTimeout(animate, 0);
 				// requestAnimationFrame(animate);
