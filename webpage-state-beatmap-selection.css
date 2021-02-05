@@ -120,7 +120,7 @@
 .beatmap-selection-selected {
 	background: url("src/images/triangles.png"), linear-gradient(to right, #4c95ae, #061b24);
 	background-size: 100%;
-	box-shadow: -1vh -1vh 2vh #d5fbff99, 1vh -1vh 2vh #d5fbff99, 1vh 1vh 2vh #d5fbff99, -1vh 1vh 2vh #d5fbff99;
+	box-shadow: -0.5vh -0.5vh 1vh #d5fbff99, 0.5vh -0.5vh 1vh #d5fbff99, 0.5vh 0.5vh 1vh #d5fbff99, -0.5vh 0.5vh 1vh #d5fbff99;
 }
 
 .beatmap-selection-map-pane:hover, .beatmap-selection-group-pane:hover {
