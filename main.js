@@ -64,11 +64,16 @@ define(function(require) {
 	let bpm;
 	let menuAudio = new Audio();
 	menuAudio.addEventListener("play", function() {
-		document.getElementById("now-playing").innerText = "Now Playing: " + utils.replaceAll(songs[chosenSong].src, [".wav", ".mp3", ".ogg"]);
+		document.getElementById("now-playing").innerText = "Now Playing: " + utils.replaceAll(this.src, [window.origin, "/src/audio/", ".wav", ".mp3", ".ogg"]).replaceAll("%20", " ");
 	});
 	menuAudio.addEventListener("ended", function() {
 		this.play();
 	});
+	menuAudio.addEventListener("DOMAttrModified", function(event) {
+    if (event.attrName == "src") {
+       document.getElementById("now-playing").innerText = "Now Playing: " + utils.replaceAll(this[src], [".wav", ".mp3", ".ogg"]);
+    }
+});
 	menuAudio.id = "menu-audio";
 	/* Need to append for wave.js */
 	document.getElementById("body").appendChild(menuAudio);
@@ -513,6 +518,33 @@ define(function(require) {
 	});
 	AttachAudio(document.getElementById("back-button"), "click", "src/audio/effects/back-button-click.wav", "settings-master-volume", "settings-effects-volume");
 	AttachAudio(document.getElementById("back-button"), "mouseenter", "src/audio/effects/back-button-hover.wav", "settings-master-volume", "settings-effects-volume");
+	let beatMapGroups = document.getElementsByClassName("beatmap-selection-group-pane");
+	for (let i = 0; i < beatMapGroups.length; i++) {
+		beatMapGroups[i].addEventListener("click", function() {
+			let maps = this.parentNode.getElementsByClassName("beatmap-selection-group-pane-maps");
+			if (maps[0].style.display === "block") {
+				maps[0].style.display = "none";
+				this.classList.remove("beatmap-selection-selected");
+				let mapsChildren = maps[0].getElementsByClassName("beatmap-selection-map-pane");
+				for (let i = 0; i < mapsChildren.length; i++) {
+					mapsChildren[i].classList.remove("beatmap-selection-selected");
+				}
+			} else {
+				maps[0].style.display = "block";
+				this.classList.add("beatmap-selection-selected");
+				let mapsChildren = maps[0].getElementsByClassName("beatmap-selection-map-pane");
+				for (let i = 0; i < mapsChildren.length; i++) {
+					mapsChildren[i].classList.add("beatmap-selection-selected");
+				}
+				let menuAudio = document.getElementById("menu-audio");
+				if (menuAudio.src.replaceAll("%20", " ") !== window.origin + "/src/audio/" + this.dataset.audiosource) {
+					menuAudio.src = "src/audio/" + this.dataset.audiosource;
+					menuAudio.currentTime = 0;
+					menuAudio.play();
+				}
+			}
+		});
+	}
 	/* Helper */
 	let menuTimeout;
 	function resetMenu() {

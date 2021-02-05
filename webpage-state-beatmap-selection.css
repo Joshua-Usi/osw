@@ -99,7 +99,7 @@
 	border-radius: 1.25vw 0 0 1.25vw;
 	margin-bottom: 1vh;
 	padding: 1vh;
-	background: url("src/images/triangles.png"), linear-gradient(to right, #2e6373, #204653);
+	background: url("src/images/triangles.png"), linear-gradient(to right, #396f82, #061b24);
 	background-size: 100%;
 	transition: filter 2s;
 }
@@ -112,13 +112,14 @@
 	border-radius: 1.25vw 0 0 1.25vw;
 	margin-bottom: 1vh;
 	padding: 1vh;
-	background: url("src/images/triangles.png"), linear-gradient(to right, #2e6373, #204653);
+	background: url("src/images/triangles.png"), linear-gradient(to right, #396f82, #061b24);
 	background-size: 100%;
 	transition: filter 2s;
 }
 
 .beatmap-selection-selected {
-	border: 0.2vw solid #d5fbff;
+	background: url("src/images/triangles.png"), linear-gradient(to right, #4c95ae, #061b24);
+	background-size: 100%;
 	box-shadow: -1vh -1vh 2vh #d5fbff99, 1vh -1vh 2vh #d5fbff99, 1vh 1vh 2vh #d5fbff99, -1vh 1vh 2vh #d5fbff99;
 }
 
@@ -176,4 +177,8 @@
 
 .beatmap-selection-map-pane-mapper-name {
 	display: inline;
+}
+
+.beatmap-selection-group-pane-maps {
+	transition: opacity 0.2s, height 0.2s;
 }

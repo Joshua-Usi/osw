@@ -12,6 +12,7 @@ define(function(require) {
 				version: splited[0],
 				hitObjects: [],
 				timingPoints: [],
+				source: data,
 			};
 			let section = "";
 			/* start from 1 to ignore version */

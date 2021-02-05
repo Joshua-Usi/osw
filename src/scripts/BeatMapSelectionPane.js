@@ -11,7 +11,7 @@ define(function(require) {
 				mapsHTML += this.map(maps[i]);
 			}
 			return `<div class="beatmap-selection-group">
-					<div class="beatmap-selection-group-pane triangle-background">
+					<div data-audiosource="${maps[0].AudioFilename}" class="beatmap-selection-group-pane triangle-background">
 						<div class="beatmap-selection-group-pane-name">${maps[0].Title}</div>
 						<div class="beatmap-selection-group-pane-artist-name">${maps[0].Artist}</div>
 						<div>
@@ -21,21 +21,27 @@ define(function(require) {
 							</div>
 						</div>
 					</div>
-					${mapsHTML}
+					<div class="beatmap-selection-group-pane-maps" style="display: none;">
+						${mapsHTML}
+					</div>
 				</div>`;
 		},
 		map: function(beatmap) {
 			let starRating = StarRating.calculate(beatmap);
 			let stars = "";
-			for (var i = 0; i < 10; i++) {
-				let size = utils.map(starRating - i, 1, 0, 1, 0.25);
-				if (size >= 1) {
-					size = 1;
+			if (starRating <= 10) {
+				for (var i = 0; i < 10; i++) {
+					let size = utils.map(starRating - i, 1, 0, 1, 0.25);
+					if (size >= 1) {
+						size = 1;
+					}
+					if (size <= 0.25) {
+						size = 0.25;
+					}
+					stars += `<img style="transform: scale(${size}); opacity: ${size};" class="beatmap-selection-map-pane-star" src="./src/images/star.png">`;
 				}
-				if (size <= 0.25) {
-					size = 0.25;
-				}
-				stars += `<img style="transform: scale(${size}); opacity: ${size};" class="beatmap-selection-map-pane-star" src="./src/images/star.png">`;
+			} else {
+				stars = `<img class="beatmap-selection-map-pane-star" src="./src/images/star.png"><p style="display: inline;">${"x" + (Math.round(starRating * 100) / 100)}</p>`
 			}
 			return `<div class="beatmap-selection-map-pane triangle-background">
 					<img class="beatmap-selection-map-pane-difficulty-icon" src="./src/images/${Formulas.beatmapDifficultyIcon(starRating)}-difficulty-icon.png">
