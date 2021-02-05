@@ -101,7 +101,7 @@
 	padding: 1vh;
 	background: url("src/images/triangles.png"), linear-gradient(to right, #396f82, #061b24);
 	background-size: 100%;
-	transition: filter 2s;
+	transition: filter 2s, box-shadow 0.2s;
 }
 
 .beatmap-selection-map-pane {
@@ -114,7 +114,7 @@
 	padding: 1vh;
 	background: url("src/images/triangles.png"), linear-gradient(to right, #396f82, #061b24);
 	background-size: 100%;
-	transition: filter 2s;
+	transition: filter 2s, box-shadow 0.2s;
 }
 
 .beatmap-selection-selected {
@@ -126,7 +126,7 @@
 .beatmap-selection-map-pane:hover, .beatmap-selection-group-pane:hover {
 	filter: brightness(125%);
 
-	transition: filter 0.2s;
+	transition: filter 0.2s, box-shadow 0.2s;
 }
 
 

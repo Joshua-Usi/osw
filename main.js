@@ -462,12 +462,13 @@ define(function(require) {
 			});
 		}
 		selectBoxSelections.style.height = "auto";
-		selectBoxSelections.style.cacheHeight = document.defaultView.getComputedStyle(selectBoxSelections).height;
+		selectBoxSelections.style.cacheHeight = parseFloat(document.defaultView.getComputedStyle(selectBoxSelections).height) / window.innerHeight * 100;
 		selectBoxSelections.style.height = "0px";
 		selectBoxes[i].addEventListener("click", function() {
 			let selectBoxSelections = this.getElementsByClassName("select-box-selections")[0];
 			if (selectBoxSelections.style.height === "0px" || selectBoxSelections.style.height === "") {
-				selectBoxSelections.style.height = "calc(" + selectBoxSelections.style.cacheHeight + " + 1px)";
+				console.log(selectBoxSelections.style.cacheHeight);
+				selectBoxSelections.style.height = "calc(" + selectBoxSelections.style.cacheHeight + "vh + 1px)";
 				selectBoxSelections.style.opacity = 1;
 			} else {
 				selectBoxSelections.style.height = 0;
