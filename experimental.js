@@ -361,6 +361,7 @@ define(function(require) {
 				/* Processing Loop ---------------------------------------------------------------- */
 				for (let i = 0; i < hitObjects.length; i++) {
 					let hitObjectMapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+					if (playDetails.mods.auto) {
 					if (hitObjects[i].type[0] === "1" && audio.currentTime >= hitObjects[i].time) {
 						mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y);
 						keyboard.emulateKeyDown("z");
@@ -373,6 +374,7 @@ define(function(require) {
 					if (hitObjects[i].type[3] === "1" && audio.currentTime >= hitObjects[i].time) {
 						angleChange = 50;
 					}
+				}
 					/* Hit Circle Hit Handling ---------------------------------------------------------------- */
 					if (hitObjects[i].type[0] === "1" && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased))) {
 						if (keyboard.getKeyDown("z") && keyboardLeftReleased) {
@@ -666,7 +668,9 @@ define(function(require) {
 						hitObjects.splice(i, 1);
 						i--;
 					}
-					keyboard.emulateKeyUp("z");
+					if (playDetails.mods.auto) {
+						keyboard.emulateKeyUp("z");
+					}
 					if (keyboard.getKeyDown("z") === false) {
 						keyboardLeftReleased = true;
 					}
