@@ -5,7 +5,10 @@ define(["require", "./Parser.js",
 	"../beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Hard].js",
 	"../beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Insane].js",
 	"../beatmaps/Kurokotei - Galaxy Collapse (Doomsday is Bad) [Galaxy].js",
-	"../beatmaps/Kurokotei - Galaxy Collapse (Doomsday is Bad) [Galactic].js"], function(require) {
+	"../beatmaps/Kurokotei - Galaxy Collapse (Doomsday is Bad) [Galactic].js",
+	"../beatmaps/Soleily - Renatus (Gamu) [Normal].js",
+	"../beatmaps/Soleily - Renatus (Gamu) [Hard].js",
+	"../beatmaps/Soleily - Renatus (Gamu) [Insane].js"], function(require) {
 	let Parser = require("./Parser.js");
 	let array = [
 		[
@@ -20,6 +23,11 @@ define(["require", "./Parser.js",
 		[
 		Parser.parseBeatMap(require("../beatmaps/Kurokotei - Galaxy Collapse (Doomsday is Bad) [Galaxy].js")),
 		Parser.parseBeatMap(require("../beatmaps/Kurokotei - Galaxy Collapse (Doomsday is Bad) [Galactic].js")),
+		],
+		[
+		Parser.parseBeatMap(require("../beatmaps/Soleily - Renatus (Gamu) [Normal].js")),
+		Parser.parseBeatMap(require("../beatmaps/Soleily - Renatus (Gamu) [Hard].js")),
+		Parser.parseBeatMap(require("../beatmaps/Soleily - Renatus (Gamu) [Insane].js")),
 		],
 	];
 	return array;
