@@ -31,12 +31,12 @@ define(function(require) {
 			let stars = "";
 			if (starRating <= 10) {
 				for (var i = 0; i < 10; i++) {
-					let size = utils.map(starRating - i, 1, 0, 1, 0.25);
+					let size = utils.map(starRating - i, 1, 0, 1, 0.5);
 					if (size >= 1) {
 						size = 1;
 					}
-					if (size <= 0.25) {
-						size = 0.25;
+					if (size <= 0.5) {
+						size = 0.5;
 					}
 					stars += `<img style="transform: scale(${size}); opacity: ${size};" class="beatmap-selection-map-pane-star" src="./src/images/star.png">`;
 				}
@@ -45,7 +45,7 @@ define(function(require) {
 			}
 			return `<div class="beatmap-selection-map-pane triangle-background">
 					<img class="beatmap-selection-map-pane-difficulty-icon" src="./src/images/${Formulas.beatmapDifficultyIcon(starRating)}-difficulty-icon.png">
-					<div class="beatmap-selection-map-pane-right-pane">
+					<div class="beatmap-selection-map-pane-right-pane">	
 						<div class="beatmap-selection-group-map-details">
 							<div class="beatmap-selection-group-map-difficulty-name">${beatmap.Version}</div>
 							<div class="beatmap-selection-map-pane-mapper-name">mapped by ${beatmap.Creator}</div>
