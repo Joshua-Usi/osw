@@ -194,7 +194,7 @@ define(function(require) {
 						logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
 						logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
 						logo.style.backgroundSize = logoSize + "vh";
-						logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
+						// logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
 						/* logo background pulse, maximum 5 to prevent lag */
 						if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
 							let logoCircle = document.createElement("img");
@@ -232,7 +232,7 @@ define(function(require) {
 					logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
 					logo.style.left = "calc(5vw + " + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
 					logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
-					logo.style.backgroundPositionY = offset % (1024 * 0.5) * logoSizeIncrease + "px";
+					// logo.style.backgroundPositionY = offset % (1024 * 0.5) * logoSizeIncrease + "px";
 				}
 				let logoCircles = document.getElementById("logo-beat").querySelectorAll("img");
 				for (let i = 0; i < logoCircles.length; i++) {
