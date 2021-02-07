@@ -197,5 +197,32 @@ define(function(require) {
 		sliderMultiplier: function(multiplier) {
 			return 1 / (-multiplier / 100);
 		},
+		modScoreMultiplier: function(mods) {
+			let multiplier = 1;
+			/* increases */
+			if (mods.hardRock) {
+				multiplier += 1.06;
+			}
+			if (mods.hiddden) {
+				multiplier += 1.06;
+			}
+			if (mods.doubleTime) {
+				multiplier += 1.12;
+			}
+			if (mods.flashLight) {
+				multiplier += 1.12;
+			}
+			/* decreases */
+			if (mods.easy) {
+				multiplier *= 0.5;
+			}
+			if (mods.noFail) {
+				multiplier *= 0.5;
+			}
+			if (mods.halfTime) {
+				multiplier *= 0.3;
+			}
+			return multiplier;
+		}
 	};
 });

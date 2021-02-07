@@ -70,7 +70,7 @@ define(function(require) {
 			relax: false,
 			autoPilot: false,
 			spunOut: false,
-			auto: false,
+			auto: true,
 			cinema: false,
 			scoreV2: false,
 		},
@@ -96,6 +96,7 @@ define(function(require) {
 	let timingPointUninheritedIndex = 0;
 	let currentTimingPoint = 0;
 	/* Score variables */
+	let scoreMultiplier = Formulas.modScoreMultiplier(playDetails.mods);
 	let score = 0;
 	let displayedScore = 0;
 	/* Combo variables */
@@ -229,7 +230,7 @@ define(function(require) {
 							break;
 					}
 					if ((hitEvents[0].score >= 50 || hitEvents[0].score === 0) && hitEvents[0].type === "hit-circle") {
-						score += Formulas.hitScore(hitEvents[0].score, combo, difficultyMultiplier, 1);
+						score += Formulas.hitScore(hitEvents[0].score, combo, difficultyMultiplier, scoreMultiplier);
 						scoreObjects.push(new HitObject.ScoreObject(hitEvents[0].score, hitEvents[0].x, hitEvents[0].y, useTime + 1));
 					} else {
 						score += hitEvents[0].score;
