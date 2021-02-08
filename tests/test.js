@@ -13,10 +13,10 @@ define(function(require) {
 	return {
 		table: function(callback, callbackArguments, expected) {
 			if (typeof(callback) !== "function") {
-				return new TypeError("callback needs to be a function");
+				throw new TypeError("callback needs to be a function");
 			}
 			if (callbackArguments.length != expected.length) {
-				return new Error("argument length and expected values length are not the same");
+				throw new Error("argument length (" + callbackArguments.length + ") and expected values (" + expected.length + ") length are not the same");
 			}
 			for (var i = 0; i < callbackArguments.length; i++) {
 				if (typeof callbackArguments[i] === "object") {

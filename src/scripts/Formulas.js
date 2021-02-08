@@ -155,7 +155,7 @@ define(function(require) {
 				return 4;
 			} else if (total < 24) {
 				return 5;
-			} else if (total < 30) {
+			} else {
 				return 6;
 			}
 		},
@@ -192,7 +192,6 @@ define(function(require) {
 				return 1;
 			}
 			return (50 * bads + 100 * goods + 300 * perfects) / (300 * total);
-
 		},
 		sliderMultiplier: function(multiplier) {
 			return 1 / (-multiplier / 100);

@@ -5,8 +5,8 @@ define(function(require) {
 	const Mouse = require("src/scripts/Mouse.js");
 	const Keyboard = require("src/scripts/Keyboard.js");
 	const beatmap = require("src/scripts/DefaultBeatMaps.js");
-	let useBeatmapSet = 2;
-	let useBeatmap = 0;
+	let useBeatmapSet = 1;
+	let useBeatmap = 1;
 	// const beatmap[useBeatmapSet][useBeatmap] = require("src/scripts/BeatMap.js");
 	const StarRating = require("src/scripts/StarRating.js");
 	const Beizer = require("src/scripts/Beizer.js");
@@ -17,6 +17,7 @@ define(function(require) {
 	const Assets = require("src/scripts/GameplayAssets.js");
 	const Canvas = require("src/scripts/Canvas.js");
 	const skin = require("src/scripts/DefaultSkin.js");
+	const Mods = require("src/scripts/Mods.js");
 	/* canvas setup */
 	let canvas = new Canvas("gameplay", "body");
 	canvas.setHeight(window.innerHeight);
@@ -56,24 +57,7 @@ define(function(require) {
 			totalSpinnerSpins: 0,
 			totalSpinnerBonusSpin: 0,
 		},
-		mods: {
-			easy: false,
-			noFail: false,
-			halfTime: false,
-			hardRock: false,
-			suddenDeath: false,
-			perfect: false,
-			doubleTime: false,
-			nightCore: false,
-			hidden: false,
-			flashLight: false,
-			relax: false,
-			autoPilot: false,
-			spunOut: false,
-			auto: true,
-			cinema: false,
-			scoreV2: false,
-		},
+		mods: Mods(),
 		replay: "TODO",
 	};
 	console.log(StarRating.calculate(beatmap[useBeatmapSet][useBeatmap], playDetails.mods));
@@ -378,19 +362,19 @@ define(function(require) {
 				for (let i = 0; i < hitObjects.length; i++) {
 					let hitObjectMapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					if (playDetails.mods.auto) {
-					if (hitObjects[i].type[0] === "1" && useTime >= hitObjects[i].time) {
-						mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y);
-						keyboard.emulateKeyDown("z");
+						if (hitObjects[i].type[0] === "1" && useTime >= hitObjects[i].time) {
+							mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y);
+							keyboard.emulateKeyDown("z");
+						}
+						if (hitObjects[i].type[1] === "1" && useTime >= hitObjects[i].time) {
+							let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+							mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
+							keyboard.emulateKeyDown("z");
+						}
+						if (hitObjects[i].type[3] === "1" && useTime >= hitObjects[i].time) {
+							angleChange = 50;
+						}
 					}
-					if (hitObjects[i].type[1] === "1" && useTime >= hitObjects[i].time) {
-						let sliderBodyPos = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-						mouse.setPosition(sliderBodyPos.x, sliderBodyPos.y);
-						keyboard.emulateKeyDown("z");
-					}
-					if (hitObjects[i].type[3] === "1" && useTime >= hitObjects[i].time) {
-						angleChange = 50;
-					}
-				}
 					/* Hit Circle Hit Handling ---------------------------------------------------------------- */
 					if (hitObjects[i].type[0] === "1" && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased))) {
 						if (keyboard.getKeyDown("z") && keyboardLeftReleased) {
