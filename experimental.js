@@ -5,8 +5,9 @@ define(function(require) {
 	const Mouse = require("src/scripts/Mouse.js");
 	const Keyboard = require("src/scripts/Keyboard.js");
 	const beatmap = require("src/scripts/DefaultBeatMaps.js");
-	let useBeatmapSet = 1;
-	let useBeatmap = 1;
+	let useBeatmapSet = 2;
+	let useBeatmap = 0;
+	console.log(beatmap[useBeatmapSet][useBeatmap]);
 	// const beatmap[useBeatmapSet][useBeatmap] = require("src/scripts/BeatMap.js");
 	const StarRating = require("src/scripts/StarRating.js");
 	const Beizer = require("src/scripts/Beizer.js");
@@ -628,7 +629,7 @@ define(function(require) {
 						hitObjects[i].cache.velocity += (angleChange - hitObjects[i].cache.velocity) / 32;
 						hitObjects[i].cache.currentAngle += hitObjects[i].cache.velocity * (useTime - previousTime);
 						hitObjects[i].cache.spinAngle += hitObjects[i].cache.velocity * (useTime - previousTime);
-						if (Math.abs(hitObjects[i].cache.velocity / (Math.PI)) >= Formulas.ODSpinner(beatmap[useBeatmapSet][useBeatmap].OverallDifficulty, playDetails.mods)) {
+						if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && Math.abs(hitObjects[i].cache.velocity / (Math.PI)) >= Formulas.ODSpinner(beatmap[useBeatmapSet][useBeatmap].OverallDifficulty, playDetails.mods)) {
 							hitObjects[i].cache.timeSpentAboveSpinnerMinimum += useTime - previousTime;
 						}
 						if (hitObjects[i].cache.timeSpentAboveSpinnerMinimum >= (hitObjects[i].endTime - hitObjects[i].time) * 0.25) {
@@ -822,10 +823,6 @@ define(function(require) {
 					}
 					canvas.setGlobalAlpha(1);
 				}
-				let size = 1;
-				if (keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) {
-					size = 0.8;
-				}
 				for (let i = 0; i < scoreObjects.length; i++) {
 					if (scoreObjects[i].lifetime - useTime >= 0) {
 						let useImage = -1;
@@ -851,6 +848,7 @@ define(function(require) {
 						i--;
 					}
 				}
+				/* hit errors */
 				canvas.setGlobalAlpha(1);
 				canvas.setFillStyle("#ffcc22");
 				ctx.fillRect(window.innerWidth / 2 - odTime[0] * 1000 / 2, window.innerHeight * 0.950, odTime[0] * 1000, window.innerHeight * 0.005);
@@ -898,7 +896,7 @@ define(function(require) {
 					}
 				}
 				canvas.setGlobalAlpha(1);
-				canvas.drawImage(Assets.cursor, mouse.position.x, mouse.position.y, Assets.cursor.width * size, Assets.cursor.height * size);
+				canvas.drawImage(Assets.cursor, mouse.position.x, mouse.position.y, Assets.cursor.width, Assets.cursor.height);
 				/* Profiling ----------------------------------------------------------------------------------------------- */
 				const now = Date.now();
 				while (times.length > 0 && times[0] <= now - 1000) {
