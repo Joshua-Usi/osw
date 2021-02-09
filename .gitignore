@@ -1,2 +1,5 @@
 # ignore vendor folder, contains assets
 **/vendor
+
+#shhh top secret!
+**/framework
