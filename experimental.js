@@ -759,7 +759,7 @@ define(function(require) {
 						ctx.lineTo(mapped.x, mapped.y);
 						ctx.stroke();
 						/* Draw Slider Head */
-						if (hitObjects[i].slides >= 1 && hitObjects[i].cache.hitHead === true) {
+						if (hitObjects[i].slides > 1 && hitObjects[i].cache.hitHead === true) {
 							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[0].x, hitObjects[i].cache.points[0].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 							ctx.translate(mapped.x, mapped.y);
 							ctx.rotate(-utils.direction(hitObjects[i].cache.points[1].x, hitObjects[i].cache.points[1].y, hitObjects[i].cache.points[0].x, hitObjects[i].cache.points[0].y) + Math.PI / 2);
