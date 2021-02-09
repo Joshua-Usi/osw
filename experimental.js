@@ -61,6 +61,7 @@ define(function(require) {
 		mods: Mods(),
 		replay: "TODO",
 	};
+	playDetails.mods.auto = true;
 	console.log(StarRating.calculate(beatmap[useBeatmapSet][useBeatmap], playDetails.mods));
 	/* Playfield calculations and data */
 	let playfieldSize = 0.8;
@@ -128,12 +129,6 @@ define(function(require) {
 					useTime = (window.performance.now() - backupStartTime) / 1000;
 				}
 				ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-				canvas.setStrokeStyle("#000");
-				ctx.lineWidth = 2;
-				ctx.beginPath();
-				ctx.rect(playfieldXOffset + window.innerWidth / 2 - window.innerHeight * playfieldSize * (4 / 3) / 2, playfieldYOffset + window.innerHeight / 2 - window.innerHeight * playfieldSize / 2, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize);
-				ctx.stroke();
-				ctx.closePath();
 				let hitObjectOffsetX = playfieldXOffset + window.innerWidth / 2 - window.innerHeight * playfieldSize * (4 / 3) / 2;
 				let hitObjectOffsetY = playfieldYOffset + window.innerHeight / 2 - window.innerHeight * playfieldSize / 2;
 				canvas.setStrokeStyle("#fff");
@@ -763,8 +758,25 @@ define(function(require) {
 						mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 						ctx.lineTo(mapped.x, mapped.y);
 						ctx.stroke();
+						/* Draw Slider Head */
+						if (hitObjects[i].slides >= 1 && hitObjects[i].cache.hitHead === true) {
+							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[0].x, hitObjects[i].cache.points[0].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+							ctx.translate(mapped.x, mapped.y);
+							ctx.rotate(-utils.direction(hitObjects[i].cache.points[1].x, hitObjects[i].cache.points[1].y, hitObjects[i].cache.points[0].x, hitObjects[i].cache.points[0].y) + Math.PI / 2);
+							canvas.drawImage(Assets.hitCircle, 0, 0, circleDiameter, circleDiameter);
+							canvas.drawImage(Assets.reverseArrow, 0, 0, circleDiameter, circleDiameter);
+							ctx.resetTransform();
+						}
+						else if (hitObjects[i].cache.hitHead === false) {
+							canvas.drawImage(Assets.hitCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
+							canvas.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
+							if (playDetails.mods.hidden === false) {
+								canvas.drawImage(Assets.approachCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
+							}
+							canvas.drawImage(Assets.comboNumbers[1], hitObjectMapped.x, hitObjectMapped.y);
+						}
 						/* Draw Slider End ---------------------------------------------------------------- */
-						if (hitObjects[i].slides > 1) {
+						if (hitObjects[i].slides > 1 && hitObjects[i].cache.currentSlide < hitObjects[i].slides - 1) {
 							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 							ctx.translate(mapped.x, mapped.y);
 							ctx.rotate(-utils.direction(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 4].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 3].y, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 2].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y) + Math.PI / 2);
@@ -785,15 +797,6 @@ define(function(require) {
 								let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].x, hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 								canvas.drawImage(Assets.sliderScorePoint, mapped.x, mapped.y);
 							}
-						}
-						/* Draw Slider Head */
-						if (hitObjects[i].cache.hitHead === false) {
-							canvas.drawImage(Assets.hitCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
-							canvas.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
-							if (playDetails.mods.hidden === false) {
-								canvas.drawImage(Assets.approachCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
-							}
-							canvas.drawImage(Assets.comboNumbers[1], hitObjectMapped.x, hitObjectMapped.y);
 						}
 						if (hitObjects[i].cache.sliderBodyPosition !== undefined && useTime >= hitObjects[i].time) {
 							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
@@ -851,11 +854,11 @@ define(function(require) {
 				/* hit errors */
 				canvas.setGlobalAlpha(1);
 				canvas.setFillStyle("#ffcc22");
-				ctx.fillRect(window.innerWidth / 2 - odTime[0] * 1000 / 2, window.innerHeight * 0.950, odTime[0] * 1000, window.innerHeight * 0.005);
+				ctx.fillRect(window.innerWidth / 2 - odTime[0] * 1000 / 2, window.innerHeight * 0.975, odTime[0] * 1000, window.innerHeight * 0.005);
 				canvas.setFillStyle("#88b300");
-				ctx.fillRect(window.innerWidth / 2 - odTime[1] * 1000 / 2, window.innerHeight * 0.950, odTime[1] * 1000, window.innerHeight * 0.005);
+				ctx.fillRect(window.innerWidth / 2 - odTime[1] * 1000 / 2, window.innerHeight * 0.975, odTime[1] * 1000, window.innerHeight * 0.005);
 				canvas.setFillStyle("#66ccff");
-				ctx.fillRect(window.innerWidth / 2 - odTime[2] * 1000 / 2, window.innerHeight * 0.950, odTime[2] * 1000, window.innerHeight * 0.005);
+				ctx.fillRect(window.innerWidth / 2 - odTime[2] * 1000 / 2, window.innerHeight * 0.975, odTime[2] * 1000, window.innerHeight * 0.005);
 				for (let i = 0; i < hitErrors.length; i++) {
 					let alpha = utils.map(i, 40, 0, 0, 1);
 					if (alpha <= 0) {
@@ -869,7 +872,7 @@ define(function(require) {
 					} else if (utils.withinRange(hitErrors[i], 0, odTime[0])) {
 						canvas.setFillStyle("#ffcc22");
 					}
-					ctx.fillRect(window.innerWidth / 2 + hitErrors[i] * 1000, window.innerHeight * 0.950 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.025);
+					ctx.fillRect(window.innerWidth / 2 + hitErrors[i] * 1000, window.innerHeight * 0.975 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.025);
 				}
 				canvas.setGlobalAlpha(1);
 				canvas.setFillStyle("#fff");
