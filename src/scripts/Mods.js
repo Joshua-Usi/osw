@@ -17,7 +17,7 @@ define(function(require) {
 			relax: relax || false,
 			autoPilot: autoPilot || false,
 			spunOut: spunOut || false,
-			auto: autoPilot || false,
+			auto: auto || false,
 			cinema: cinema || false,
 			scoreV2: scoreV2 || false,
 		};
