@@ -5,11 +5,9 @@ define(function(require) {
 	const Mouse = require("src/scripts/Mouse.js");
 	const Keyboard = require("src/scripts/Keyboard.js");
 	const beatmap = require("src/scripts/DefaultBeatMaps.js");
-	let useBeatmapSet = 2;
+	let useBeatmapSet = 0;
 	let useBeatmap = 0;
-	console.log(beatmap[useBeatmapSet][useBeatmap]);
 	// const beatmap[useBeatmapSet][useBeatmap] = require("src/scripts/BeatMap.js");
-	const StarRating = require("src/scripts/StarRating.js");
 	const Beizer = require("src/scripts/Beizer.js");
 	const utils = require("src/scripts/utils.js");
 	const HitObject = require("src/scripts/HitObject.js");
@@ -62,7 +60,6 @@ define(function(require) {
 		replay: "TODO",
 	};
 	playDetails.mods.auto = true;
-	console.log(StarRating.calculate(beatmap[useBeatmapSet][useBeatmap], playDetails.mods));
 	/* Playfield calculations and data */
 	let playfieldSize = 0.8;
 	let playfieldXOffset = 0;
@@ -91,7 +88,7 @@ define(function(require) {
 	/* Audio variables */
 	let backupStartTime = 0;
 	let audio = AssetLoader.audio(`src/audio/${beatmap[useBeatmapSet][useBeatmap].AudioFilename}`);
-	audio.currentTime = beatmap[useBeatmapSet][useBeatmap].hitObjects[0].time - 5;
+	audio.currentTime = beatmap[useBeatmapSet][useBeatmap].hitObjects[7].time - 5;
 	audio.playbackRate = 1;
 	if (playDetails.mods.doubleTime) {
 		audio.playbackRate = 1.5;
@@ -369,6 +366,7 @@ define(function(require) {
 						}
 						if (hitObjects[i].type[3] === "1" && useTime >= hitObjects[i].time) {
 							angleChange = 50;
+							keyboard.emulateKeyDown("z");
 						}
 					}
 					/* Hit Circle Hit Handling ---------------------------------------------------------------- */
@@ -630,7 +628,7 @@ define(function(require) {
 						if (hitObjects[i].cache.timeSpentAboveSpinnerMinimum >= (hitObjects[i].endTime - hitObjects[i].time) * 0.25) {
 							hitObjects[i].cache.cleared = true;
 						}
-						while (hitObjects[i].cache.spinAngle >= Math.PI * 2) {
+						while (hitObjects[i].cache.spinAngle >= Math.PI * 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 							hitObjects[i].cache.spins++;
 							hitObjects[i].cache.spinAngle -= Math.PI * 2;
 							if (hitObjects[i].cache.cleared === false) {
@@ -639,7 +637,7 @@ define(function(require) {
 								hitEvents.push(new HitEvent("spinner-bonus-spin", 1000, "no-increase", mapped.x, mapped.y));
 							}
 						}
-						while (hitObjects[i].cache.spinAngle <= -Math.PI * 2) {
+						while (hitObjects[i].cache.spinAngle <= -Math.PI * 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 							hitObjects[i].cache.spins++;
 							hitObjects[i].cache.spinAngle += Math.PI * 2;
 							if (hitObjects[i].cache.cleared === false) {
