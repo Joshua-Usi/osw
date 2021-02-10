@@ -99,6 +99,7 @@
 	border-radius: 1.25vw 0 0 1.25vw;
 	margin-bottom: 1vh;
 	padding: 1vh;
+	border: 0.5vh solid #0000;
 	background: url("src/images/triangles.png"), linear-gradient(to right, #396f82, #061b24);
 	background-size: 100%;
 	transition: filter 2s, box-shadow 0.2s;
@@ -110,6 +111,7 @@
 	position: relative;
 	left: 5vw;
 	border-radius: 1.25vw 0 0 1.25vw;
+	border: 0.5vh solid #0000;
 	margin-bottom: 1vh;
 	padding: 1vh;
 	background: url("src/images/triangles.png"), linear-gradient(to right, #396f82, #061b24);
@@ -120,6 +122,7 @@
 .beatmap-selection-selected {
 	background: url("src/images/triangles.png"), linear-gradient(to right, #4c95ae, #061b24);
 	background-size: 100%;
+	border: 0.5vh solid #e4ecef;
 	box-shadow: -0.5vh -0.5vh 1vh #d5fbff99, 0.5vh -0.5vh 1vh #d5fbff99, 0.5vh 0.5vh 1vh #d5fbff99, -0.5vh 0.5vh 1vh #d5fbff99;
 }
 
