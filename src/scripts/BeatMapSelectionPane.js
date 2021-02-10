@@ -3,12 +3,12 @@ define(function(require) {
 	const Formulas = require("src/scripts/Formulas.js");
 	const StarRating = require("src/scripts/StarRating.js");
 	return {
-		group: function(maps) {
+		group: function(maps, i) {
 			let mapsHTML = "";
 			let iconsHTML = "";
-			for (var i = 0; i < maps.length; i++) {
-				iconsHTML += `<img class="beatmap-selection-group-pane-difficulties-icon" src="./src/images/${Formulas.beatmapDifficultyIcon(StarRating.calculate(maps[i]))}-difficulty-icon.png">`
-				mapsHTML += this.map(maps[i]);
+			for (let j = 0; j < maps.length; j++) {
+				iconsHTML += `<img class="beatmap-selection-group-pane-difficulties-icon" src="./src/images/${Formulas.beatmapDifficultyIcon(StarRating.calculate(maps[j]))}-difficulty-icon.png">`
+				mapsHTML += this.map(maps[j], i, j);
 			}
 			return `<div class="beatmap-selection-group">
 					<div data-audiosource="${maps[0].AudioFilename}" class="beatmap-selection-group-pane triangle-background">
@@ -26,7 +26,7 @@ define(function(require) {
 					</div>
 				</div>`;
 		},
-		map: function(beatmap) {
+		map: function(beatmap, groupIndex, mapIndex) {
 			let starRating = StarRating.calculate(beatmap);
 			let stars = "";
 			if (starRating <= 10) {
@@ -43,7 +43,7 @@ define(function(require) {
 			} else {
 				stars = `<img class="beatmap-selection-map-pane-star" src="./src/images/star.png"><p style="display: inline;">${"x" + (Math.round(starRating * 100) / 100)}</p>`
 			}
-			return `<div class="beatmap-selection-map-pane triangle-background">
+			return `<div data-groupindex="${groupIndex}" data-map-index="${mapIndex}" class="beatmap-selection-map-pane triangle-background">
 					<img class="beatmap-selection-map-pane-difficulty-icon" src="./src/images/${Formulas.beatmapDifficultyIcon(starRating)}-difficulty-icon.png">
 					<div class="beatmap-selection-map-pane-right-pane">	
 						<div class="beatmap-selection-group-map-details">

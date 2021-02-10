@@ -34,7 +34,7 @@ define(function(require) {
 
 	const BeatMapSelectionPaneTemplate = require("src/scripts/BeatMapSelectionPane.js");
 	for (let i = 0; i < Beatmaps.length; i++) {
-		document.getElementById("beatmap-selection-right").innerHTML += BeatMapSelectionPaneTemplate.group(Beatmaps[i]);
+		document.getElementById("beatmap-selection-right").innerHTML += BeatMapSelectionPaneTemplate.group(Beatmaps[i], i);
 	}
 	/* Offline context checks, needed to ensure for some effects to work */
 	if (window.origin === null) {

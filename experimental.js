@@ -922,4 +922,12 @@ define(function(require) {
 			})();
 		}
 	});
+	return {
+		playMap: function(groupIndex, mapIndex) {
+
+		},
+		playDetails: function() {
+			return playDetails;
+		}
+	}
 });
