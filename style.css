@@ -187,7 +187,7 @@ body {
 	margin: 0;
 	white-space: nowrap;
 	text-decoration: none;
-	font-size: 1vw;
+	font-size: 2.2vh;
 	color: #e4ecef;
 }
 
@@ -195,13 +195,13 @@ body {
 	position: absolute;
 	top: 0;
 	right: 1vw;
-	font-size: 2vw;
+	font-size: 3.3vh;
 	margin-left: 50px;
 }
 
 .sidenav-title-text {
 	color: #f8c621 !important;
-	font-size: 2vw !important;
+	font-size: 3.3vh !important;
 }
 
 #sidenav-padding {
@@ -457,7 +457,7 @@ body {
 	position: absolute;
 	bottom: 1vh;
 	right: 1vh;
-	font-size: 0.75vw;
+	font-size: 1.25vh;
 	font-family: Varela Round, Helvetica;
 	color: #fff;
 	margin: 0;

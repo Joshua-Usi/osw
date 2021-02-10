@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
+		<meta name="description" content="a standalone osu clone for web browsers">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>osu!web indev</title>
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Varela Round">
 		<link rel="stylesheet" type="text/css" href="./style.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/forms.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/lib.css">
@@ -23,7 +23,7 @@
 			</div>
 			<div id="background-blur">
 				<div id="background-dim">
-					<img id="background" src="./src/images/osu_background.jpg">
+					<img alt="osu background parallax" id="background" src="./src/images/osu_background.jpg">
 				</div>
 			</div>
 			<div id="sidenav">
@@ -176,13 +176,13 @@
 			</div>
 			<div id="top-bar" class="triangle-background">
 				<span class="span-top-bar-text" style="float: left;">
-					<img id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/settings.png">
-					<img id="standard-top-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/standard.png">
-					<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/taiko.png">
+					<img alt="settings icon" id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/settings.png">
+					<img alt="osu!standard icon" id="standard-top-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/standard.png">
+					<!-- <img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/taiko.png">
 					<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/catch.png">
-					<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/mania.png">
+					<img class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/mania.png"> -->
 					<p class="top-bar-text" id="welcome-user">Welcome Guest</p>
-					<img id="avatar" src="./src/images/default-avatar.png" onclick="window.location = 'https://osu.ppy.sh/users/13478347';">
+					<img alt="user avatar" id="avatar" src="./src/images/default-avatar.png" onclick="window.location = 'https://osu.ppy.sh/users/13478347';">
 				</span>
 				<p class="top-bar-text" id="now-playing" style="float: right;">Now Playing: </p>
 				<p class="top-bar-text" id="previous" style="float: right;">&#x25BA;&#x275A;</p>
@@ -193,7 +193,7 @@
 		</div>
 		<div class="webpage-state" id="webpage-state-menu">
 			<div id="menu-parallax">
-				<img id="logo" src="./src/images/osu.png">
+				<img alt="osu! logo" id="logo" src="./src/images/osu.png">
 				<canvas id="audio-visualiser"></canvas>
 				<span id="logo-beat"></span>
 				<span id="snow"></span>
@@ -201,7 +201,7 @@
 					<div class="menu-bar-buttons-parent" id="menu-bar-settings">
 						<div class="menu-bar-anti-skew">
 							<div class="menu-bar-image-move">
-								<img src="./src/images/settings.png" class="menu-bar-buttons-icon">
+								<img alt="menu open settings" src="./src/images/settings.png" class="menu-bar-buttons-icon">
 							</div>
 							<div class="menu-bar-buttons">settings</div>
 						</div>
@@ -210,7 +210,7 @@
 						<div class="menu-bar-buttons-parent" id="menu-bar-play" onclick="document.getElementById('webpage-state-menu').style.display = 'none'; document.getElementById('webpage-state-beatmap-selection').style.display = 'block'; document.getElementById('menu-audio').pause();">
 							<div class="menu-bar-anti-skew">
 								<div class="menu-bar-image-move">
-									<img src="./src/images/osu.png" class="menu-bar-buttons-icon">
+									<img alt="small osu logo" src="./src/images/osu.png" class="menu-bar-buttons-icon">
 								</div>
 								<div class="menu-bar-buttons">play</div>
 							</div>
@@ -218,7 +218,7 @@
 						<div class="menu-bar-buttons-parent" id="menu-bar-edit">
 							<div class="menu-bar-anti-skew">
 								<div class="menu-bar-image-move">
-									<img src="./src/images/osu.png" class="menu-bar-buttons-icon">
+									<img alt="small osu logo" src="./src/images/osu.png" class="menu-bar-buttons-icon">
 								</div>
 								<div class="menu-bar-buttons">edit</div>
 							</div>
@@ -226,7 +226,7 @@
 						<div class="menu-bar-buttons-parent" id="menu-bar-direct" onclick="window.open('https://osu.ppy.sh/home', '_self');">
 							<div class="menu-bar-anti-skew">
 								<div class="menu-bar-image-move">
-									<img src="./src/images/osu.png" class="menu-bar-buttons-icon">
+									<img alt="small osu logo" src="./src/images/osu.png" class="menu-bar-buttons-icon">
 								</div>
 								<div class="menu-bar-buttons">osu! official</div>
 							</div>
@@ -234,7 +234,7 @@
 						<div class="menu-bar-buttons-parent" id="menu-bar-exit" onclick="window.close()">
 							<div class="menu-bar-anti-skew">
 								<div class="menu-bar-image-move">
-									<img src="./src/images/exit.png" class="menu-bar-buttons-icon">
+									<img alt="small exit logo" src="./src/images/exit.png" class="menu-bar-buttons-icon">
 								</div>
 								<div class="menu-bar-buttons">exit</div>
 							</div>
@@ -251,12 +251,12 @@
 			<div id="beatmap-selection-right" style="height: 90vh; overflow-y: scroll; overflow-x: hidden; padding-top: 10vh;">
 				
 			</div>
-			<img id="beatmap-selection-logo" src="./src/images/osu.png">
+			<img alt="play beatmap" id="beatmap-selection-logo" src="./src/images/osu.png">
 			<div id="beatmap-selection-bottom-bar">
 				<div id="back-button" onclick="document.getElementById('webpage-state-menu').style.display = 'block'; document.getElementById('webpage-state-beatmap-selection').style.display = 'none'; document.getElementById('menu-audio').play();">
 					<div id="back-button-anti-skew">
 						<div id="back-button-image-container">
-							<img src="./src/images/back.png" id="back-button-image">
+							<img alt="go back" src="./src/images/back.png" id="back-button-image">
 						</div>
 						<p id="back-button-text">Back</p>
 					</div>
@@ -269,4 +269,5 @@
 		<script type="text/javascript" src="./src/scripts/wave.js"></script>
 		<script data-main="main" type="text/javascript" src=require.js></script>
 	</body>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Varela Round">
 </html>
