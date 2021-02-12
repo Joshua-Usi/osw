@@ -18,7 +18,7 @@ define(function(require) {
 	const skin = require("src/scripts/DefaultSkin.js");
 	const Mods = require("src/scripts/Mods.js");
 	/* canvas setup */
-	let canvas = new Canvas("gameplay", "body");
+	let canvas = new Canvas("gameplay");
 	canvas.setHeight(window.innerHeight);
 	canvas.setWidth(window.innerWidth);
 	let ctx = canvas.context;

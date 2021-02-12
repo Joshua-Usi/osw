@@ -1,10 +1,8 @@
 define(function(require) {
 	return class Canvas {
-		constructor(canvasId, append) {
-			this.canvas = document.createElement("canvas");
-			this.canvas.id = canvasId;
+		constructor(canvasId) {
+			this.canvas = document.getElementById(canvasId);
 			this.canvas.style.margin = 0;
-			document.getElementById(append).append(this.canvas);
 			this.context = this.canvas.getContext("2d");
 			this.customProperties = {
 				/* 
