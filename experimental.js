@@ -7,7 +7,6 @@ define(function(require) {
 	const beatmap = require("src/scripts/DefaultBeatMaps.js");
 	let useBeatmapSet = 0;
 	let useBeatmap = 0;
-	// const beatmap[useBeatmapSet][useBeatmap] = require("src/scripts/BeatMap.js");
 	const Beizer = require("src/scripts/Beizer.js");
 	const utils = require("src/scripts/utils.js");
 	const HitObject = require("src/scripts/HitObject.js");
@@ -924,10 +923,10 @@ define(function(require) {
 	});
 	return {
 		playMap: function(groupIndex, mapIndex) {
-
+			
 		},
 		playDetails: function() {
 			return playDetails;
 		}
-	}
+	};
 });
