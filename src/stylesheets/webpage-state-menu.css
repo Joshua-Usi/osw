@@ -1,8 +1,10 @@
 #audio-visualiser {
 	z-index: 5;
 	position: absolute;
-	top: calc(50vh - 90vh / 2);
-	left: calc(5vw + 50vw - 90vh / 2);
+	width: calc(70vh * 2);
+	width: calc(70vh * 2);
+	top: calc(50vh - 70vh);
+	left: calc(5vw + 50vw - 59vh);
 	transition: left 0.29s, width 0.5s, height 0.5s;
 	transition-timing-function: ease;
 }
