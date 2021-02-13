@@ -28,18 +28,13 @@ let files = [
 let beautifiedFiles = [];
 
 for (var i = 0; i < files.length; i++) {
-	let data = fs.readFileSync(files[i], 'utf8', function (err, data) {
-		if (err) {
-			throw err;
-		}
-	});
-	beautifiedFiles.push(data);
+	let data = fs.readFileSync(files[i], {encoding:'utf8', flag:'r'});
+	beautifiedFiles.push(beautify(data, {
+		indent_size: 4,
+		indent_with_tabs: true,
+	}));
 }
-
 for (var i = 0; i < files.length; i++) {
-	fs.writeFileSync(files[i], beautifiedFiles[i], function (err) {
-		if (err) {
-			throw err;
-		}
-	});
+	fs.writeFileSync(files[i], beautifiedFiles[i], {encoding:'utf8', flag:'w'});
+	console.log("beautified file " + files[i]);
 }
