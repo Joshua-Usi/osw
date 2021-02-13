@@ -18,14 +18,11 @@
 	display: none;
 }
 
-* {
-	cursor: url("src/images/cursor.png"), default;
-}
-
 body {
 	cursor: url("src/images/cursor.png"), default;
 	/* Helvetica for fallback*/
 	font-family: Varela Round, Helvetica;
+	font-display: fallback;
 	font-size: 2.5vh;
 	background: #444;
 	margin: 0;
