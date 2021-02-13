@@ -78,8 +78,6 @@ define(function(require) {
 	document.getElementById("body").appendChild(menuAudio);
 	/* Create audioVisualiser for audio visualizer */
 	let audioVisualiser = document.getElementById("audio-visualiser");
-	audioVisualiser.width = 0.9 * window.innerHeight;
-	audioVisualiser.height = 0.9 * window.innerHeight;
 	let settingsSet = false;
 	let isFirstClick = true;
 	let offset = 0;
