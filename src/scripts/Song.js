@@ -1,5 +1,5 @@
 define(function(require) {
-  "use strict";
+	"use strict";
 	class Song {
 		constructor(src, bpm) {
 			this.src = src;

@@ -15,6 +15,7 @@ define(function(require) {
 		}
 		return n;
 	}
+
 	function applyModMultiplierCS(n, mods) {
 		if (mods) {
 			if (mods.easy) {

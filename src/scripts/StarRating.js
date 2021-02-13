@@ -1,5 +1,6 @@
 define(function(require) {
 	let utils = require("./utils.js");
+
 	function difficulty(hitObject1, hitObject2, mods) {
 		let d = 0;
 		if (hitObject1.type[1] === "1") {

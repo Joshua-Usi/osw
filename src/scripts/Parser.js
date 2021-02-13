@@ -1,5 +1,5 @@
 define(function(require) {
-  "use strict";
+	"use strict";
 	const HitObject = require("./HitObject.js");
 	const utils = require("./utils.js");
 	return {
@@ -72,8 +72,7 @@ define(function(require) {
 			} else if (asBinary[3] === "1") {
 				/* spinner */
 				return new HitObject.Spinner(...splited);
-			} else {
-			}
+			} else {}
 		},
 		parseTimingPoint: function(data) {
 			let splited = data.split(",");

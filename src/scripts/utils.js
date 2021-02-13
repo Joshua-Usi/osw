@@ -5,9 +5,11 @@ define(function(require) {
 		openFullscreen: function() {
 			if (document.documentElement.requestFullscreen) {
 				document.documentElement.requestFullscreen();
-			} else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+			} else if (document.documentElement.webkitRequestFullscreen) {
+				/* Safari */
 				document.documentElement.webkitRequestFullscreen();
-			} else if (document.documentElement.msRequestFullscreen) { /* IE11 */
+			} else if (document.documentElement.msRequestFullscreen) {
+				/* IE11 */
 				document.documentElement.msRequestFullscreen();
 			}
 		},
@@ -15,9 +17,11 @@ define(function(require) {
 		closeFullscreen: function() {
 			if (document.exitFullscreen) {
 				document.exitFullscreen();
-			} else if (document.webkitExitFullscreen) { /* Safari */
+			} else if (document.webkitExitFullscreen) {
+				/* Safari */
 				document.webkitExitFullscreen();
-			} else if (document.msExitFullscreen) { /* IE11 */
+			} else if (document.msExitFullscreen) {
+				/* IE11 */
 				document.msExitFullscreen();
 			}
 		},
@@ -91,15 +95,14 @@ define(function(require) {
 		// 0 --> p, q and r are colinear 
 		// 1 --> Clockwise 
 		// 2 --> Counterclockwise 
-		orientation: function(p1, p2, p3) 
-		{ 
-			let val = (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y); 
+		orientation: function(p1, p2, p3) {
+			let val = (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y);
 			// colinear
 			if (val == 0) {
 				return 0;
 			}
 			// clock or counterclock wise 
-			return (val > 0) ? 1 : 2; 
+			return (val > 0) ? 1 : 2;
 		},
 		angle: function(a, b, c) {
 			let ab = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));

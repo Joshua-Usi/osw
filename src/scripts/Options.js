@@ -15,7 +15,7 @@ define(function(require) {
 		},
 		UserInterface: {
 			introSequence: "Triangles",
-			menuParallax: true,	
+			menuParallax: true,
 		},
 		Gameplay: {
 			backgroundDim: 0.8,

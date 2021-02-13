@@ -763,8 +763,7 @@ define(function(require) {
 							canvas.drawImage(Assets.hitCircle, 0, 0, circleDiameter, circleDiameter);
 							canvas.drawImage(Assets.reverseArrow, 0, 0, circleDiameter, circleDiameter);
 							ctx.resetTransform();
-						}
-						else if (hitObjects[i].cache.hitHead === false) {
+						} else if (hitObjects[i].cache.hitHead === false) {
 							canvas.drawImage(Assets.hitCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
 							canvas.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
 							if (playDetails.mods.hidden === false) {
@@ -923,7 +922,7 @@ define(function(require) {
 	});
 	return {
 		playMap: function(groupIndex, mapIndex) {
-			
+
 		},
 		playDetails: function() {
 			return playDetails;

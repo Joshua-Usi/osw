@@ -1,5 +1,5 @@
 define(function(require) {
-  "use strict";
+	"use strict";
 	return class Keyboard {
 		constructor(element) {
 			this.element = element;

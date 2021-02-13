@@ -25,7 +25,7 @@ define(function(require) {
 			return this.context.strokeStyle;
 		}
 		setFillStyle(style) {
-			this.context.fillStyle = style;	
+			this.context.fillStyle = style;
 		}
 		getFillStyle() {
 			return this.context.fillStyle;
@@ -34,19 +34,19 @@ define(function(require) {
 			this.context.lineCap = style;
 		}
 		getlineCap() {
-			return this.context.lineCap;	
+			return this.context.lineCap;
 		}
 		setlineJoin(style) {
 			this.context.lineJoin = style;
 		}
 		getlineJoin() {
-			return this.context.lineJoin;	
+			return this.context.lineJoin;
 		}
 		setStrokeWidth(style) {
 			this.context.lineWidth = style;
 		}
 		getStrokeWidth() {
-			return this.context.lineWidth;	
+			return this.context.lineWidth;
 		}
 		setGlobalAlpha(alpha) {
 			this.context.globalAlpha = alpha;

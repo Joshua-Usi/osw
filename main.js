@@ -70,10 +70,10 @@ define(function(require) {
 		this.play();
 	});
 	menuAudio.addEventListener("DOMAttrModified", function(event) {
-    if (event.attrName == "src") {
-       document.getElementById("now-playing").innerText = "Now Playing: " + utils.replaceAll(this[src], [".wav", ".mp3", ".ogg"]);
-    }
-});
+		if (event.attrName == "src") {
+			document.getElementById("now-playing").innerText = "Now Playing: " + utils.replaceAll(this[src], [".wav", ".mp3", ".ogg"]);
+		}
+	});
 	menuAudio.id = "menu-audio";
 	/* Need to append for wave.js */
 	document.getElementById("body").appendChild(menuAudio);
@@ -286,13 +286,13 @@ define(function(require) {
 			})();
 		}
 	});
-/* Omnipotent web listeners */
+	/* Omnipotent web listeners */
 	window.addEventListener("resize", function() {
 		let canvas = document.getElementById("audio-visualiser");
-			canvas.width = 0.9 * window.innerHeight;
-			canvas.height = 0.9 * window.innerHeight;
-			// canvas.width = 0.5 * window.innerHeight;
-			// canvas.height = 0.5 * window.innerHeight;
+		canvas.width = 0.9 * window.innerHeight;
+		canvas.height = 0.9 * window.innerHeight;
+		// canvas.width = 0.5 * window.innerHeight;
+		// canvas.height = 0.5 * window.innerHeight;
 	});
 	window.addEventListener("load", function() {
 		document.getElementById("splash-screen").style.animation = "splash-screen-text forwards";
@@ -481,7 +481,7 @@ define(function(require) {
 	document.getElementById("settings-button-clear-local-storage").addEventListener("click", function() {
 		if (window.confirm("Are you sure you want to delete local storage? you will lose all your set options")) {
 			window.localStorage.clear();
-			alert("local storage cleared, refresh for changes to take effect");	
+			alert("local storage cleared, refresh for changes to take effect");
 		}
 	});
 	/* Splashscreen listener */
@@ -553,6 +553,7 @@ define(function(require) {
 	});
 	/* Helper */
 	let menuTimeout;
+
 	function resetMenu() {
 		logoX = 50;
 		logoY = 50;
@@ -578,6 +579,7 @@ define(function(require) {
 			menuBar.style.visibility = "hidden";
 		})
 	}
+
 	function setSettings() {
 		if (settingsSet === true) {
 			/* Audio */
