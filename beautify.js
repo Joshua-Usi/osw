@@ -36,5 +36,5 @@ for (var i = 0; i < files.length; i++) {
 }
 for (var i = 0; i < files.length; i++) {
 	fs.writeFileSync(files[i], beautifiedFiles[i], {encoding:'utf8', flag:'w'});
-	console.log("beautified file " + files[i]);
+	console.log("Successfully beautified file " + files[i]);
 }
