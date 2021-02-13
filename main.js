@@ -61,17 +61,16 @@ define(function(require) {
 		songs.push(Song.create("nekodex - Little Drummer Girl.mp3", Song.bpm(140)));
 	}
 	let chosenSong;
-	let bpm;
 	let menuAudio = new Audio();
 	menuAudio.addEventListener("play", function() {
-		document.getElementById("now-playing").innerText = "Now Playing: " + utils.replaceAll(this.src, [window.origin, "/src/audio/", ".wav", ".mp3", ".ogg"]).replaceAll("%20", " ");
+		document.getElementById("now-playing").innerText = "Now Playing: " + utils.removeInstances(this.src, [window.origin, "/src/audio/", ".wav", ".mp3", ".ogg"]).replaceAll("%20", " ");
 	});
 	menuAudio.addEventListener("ended", function() {
 		this.play();
 	});
 	menuAudio.addEventListener("DOMAttrModified", function(event) {
 		if (event.attrName == "src") {
-			document.getElementById("now-playing").innerText = "Now Playing: " + utils.replaceAll(this[src], [".wav", ".mp3", ".ogg"]);
+			document.getElementById("now-playing").innerText = "Now Playing: " + utils.removeInstances(this[src], [".wav", ".mp3", ".ogg"]);
 		}
 	});
 	menuAudio.id = "menu-audio";
@@ -142,11 +141,9 @@ define(function(require) {
 			if (document.getElementById("settings-intro-sequence").getElementsByClassName("select-box-selected")[0].innerText === "Triangles") {
 				chosenSong = 0;
 				menuAudio.src = `src/audio/${songs[chosenSong].src}`;
-				bpm = songs[chosenSong].bpm.get();
 			} else {
 				chosenSong = 1;
 				menuAudio.src = `src/audio/${songs[chosenSong].src}`;
-				bpm = songs[chosenSong].bpm.get();
 			}
 			menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);;
 			menuAudio.play();
@@ -176,18 +173,17 @@ define(function(require) {
 				/* triangle background moves */
 				offset -= 0.25;
 				for (let i = 0; i < triangleBackgroundMoves.length; i++) {
-					triangleBackgroundMoves[i].style.backgroundPositionY = triangleBackgroundMoves[i].getBoundingClientRect().bottom - window.scrollY + offset + "px";
+					triangleBackgroundMoves[i].style.backgroundPositionY = triangleBackgroundMoves[i].getBoundingClientRect().bottom + offset + "px";
 				}
 				/* beat detection and accumulation */
-				bpm = songs[chosenSong].bpm.get(time);
 				lastTime = time;
 				time = menuAudio.currentTime;
 				if (accumulator < 0) {
 					accumulator = 0;
 				}
 				accumulator += time - lastTime;
-				if (accumulator > 1 / (bpm / 60)) {
-					while (accumulator > 1 / (bpm / 60)) {
+				if (accumulator > 1 / (songs[chosenSong].bpm.get(time) / 60)) {
+					while (accumulator > 1 / (songs[chosenSong].bpm.get(time) / 60)) {
 						/* logo pulse*/
 						logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
 						logo.style.width = logoSize + "vh";
@@ -223,7 +219,7 @@ define(function(require) {
 							snowflake.style.zIndex = -5;
 							document.getElementById("snow").appendChild(snowflake);
 						}
-						accumulator -= 1 / (bpm / 60);
+						accumulator -= 1 / (songs[chosenSong].bpm.get(time) / 60);
 					}
 				} else {
 					logo.style.transition = "width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s";
@@ -610,6 +606,19 @@ define(function(require) {
 			console.log("settings saved!");
 		}
 	}
+	window.addEventListener("orientationchange", function(event) {
+		if (event.target.screen.orientation.angle === 0 && window.screen.width < window.screen.height) {
+			document.getElementById("orientation-vertical").style.display = "block"
+		} else {
+			document.getElementById("orientation-vertical").style.display = "none";
+		}
+	});
+	document.body.addEventListener("touchmove", function(e) {
+		e.preventDefault();
+	}, {
+		passive: false
+	});
+	window.dispatchEvent(new CustomEvent("orientationchange"));
 	/* Library Stuff */
 	if (window.origin !== "null") {
 		let wave = new Wave();

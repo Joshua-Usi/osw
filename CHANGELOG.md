@@ -1,6 +1,9 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to slightly modified [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [v2021.0.5.2a] - 2021-02-12
+### Added
+- horizontal device support, ensures that devices are horizontal to be compatible
+- disabled mobile device scrolling
 ### Changed
 - separated css into files based on their respective sections
 - stars in beatmap star rating have 100% opacity
@@ -8,6 +11,7 @@ and this project adheres to slightly modified [Semantic Versioning](https://semv
 - Massively reduced image sizes to reduce image load times and project size
 - Moved stylesheets other than style.css from root to src/stylesheet
 - Moved inline css to external stylesheets
+- utils.replaceAll renamed to utils.removeInstances
 ### Removed
 - Beatmap.js (beatmap testing file)
 ---

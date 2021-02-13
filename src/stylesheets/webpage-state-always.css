@@ -93,6 +93,20 @@
 	transition: opacity 1s;
 }
 
+#orientation-vertical {
+	position: absolute;
+	display: none;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	text-align: center;
+	padding-top: calc(50vh - 1em);
+	background: #000;
+	z-index: 1500;
+	color: #fff;
+}
+
 @keyframes splash-screen-text {
 	0% {
 		color: #000;
