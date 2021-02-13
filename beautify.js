@@ -25,15 +25,21 @@ let files = [
 	"./src/scripts/StarRating.js",
 	"./src/scripts/utils.js",
 ];
+let beautifiedFiles = [];
+
 for (var i = 0; i < files.length; i++) {
-	fs.readFile(files[i], 'utf8', function (err, data) {
+	let data = fs.readFileSync(files[i], 'utf8', function (err, data) {
 		if (err) {
 			throw err;
 		}
-		console.log(beautify(data, {
-			indent_size: 4,
-			space_in_empty_paren: true,
-			indent_with_tabs: true,
-		}));
+	});
+	beautifiedFiles.push(data);
+}
+
+for (var i = 0; i < files.length; i++) {
+	fs.writeFileSync(files[i], beautifiedFiles[i], function (err) {
+		if (err) {
+			throw err;
+		}
 	});
 }
