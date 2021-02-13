@@ -1,4 +1,20 @@
-#webpage-state-menu {
+#webpage-state-beatmap-selection {
+	display: none;
+}
+
+#webpage-state-gameplay {
+	display: none;
+}
+
+#webpage-state-pause-screen {
+	display: none;
+}
+
+#webpage-state-fail-screen {
+	display: none;
+}
+
+#webpage-state-beatmap-end-screen {
 	display: none;
 }
 
@@ -18,6 +34,14 @@ body {
 	-moz-user-select: -moz-none;
 	-ms-user-select: none;
 	user-select: none;
+}
+
+img {
+	-webkit-user-drag: none;
+	-khtml-user-drag: none;
+	-moz-user-drag: none;
+	-o-user-drag: none;
+	user-drag: none;
 }
 
 #version {

@@ -16,7 +16,7 @@
 	top: -5vh;
 	left: -5vh;
 	width: 110vw;
-	height: 110vh
+	height: 110vh;
 }
 
 .top-bar-text {
@@ -75,7 +75,7 @@
 	z-index: 10;
 	width: 100vw;
 	height: 7.5vh;
-	background: url("src/images/triangles.png"), #191919;
+	background: #191919;
 	background-size: 25vw;
 }
 
