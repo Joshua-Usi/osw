@@ -1,6 +1,5 @@
 ---
-## [vyear.major.minor.patch|a,b,rc|] - 2020-12-20
-Start Of Changelog
+## [vyear.major.minor.patch|a,b,rc|] - year-month-day
 ### Added
 -
 ### Changed
