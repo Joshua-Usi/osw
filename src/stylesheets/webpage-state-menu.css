@@ -22,7 +22,7 @@
 #logo {
 	z-index: 50;
 	width: 40vh;
-	background: url('src/images/triangles.png'), #FD67AE;
+	background: url('../../src/images/triangles.png'), #FD67AE;
 	background-size: 50vh;
 	border-radius: 50%;
 	transition: width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s;
