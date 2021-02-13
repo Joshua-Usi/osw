@@ -12,8 +12,11 @@ and this project adheres to slightly modified [Semantic Versioning](https://semv
 - Moved stylesheets other than style.css from root to src/stylesheet
 - Moved inline css to external stylesheets
 - utils.replaceAll renamed to utils.removeInstances
+- Increased osu!logo size from 50% of screen height to 70%
 ### Removed
 - Beatmap.js (beatmap testing file)
+### Fixed
+- audio visualiser responsiveness
 ---
 ## [v2021.0.5.1a] - 2021-02-12
 ### Changed
