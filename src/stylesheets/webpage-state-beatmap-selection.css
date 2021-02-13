@@ -84,12 +84,25 @@
 	left: calc(100vw - 22vh);
 }
 
+#beatmap-selection-right {
+	display: inline-block;
+	position: absolute;
+	width: 50vw;
+	right: 0;
+	margin: 0;
+	height: 90vh;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-top: 10vh;
+}
+
 .beatmap-selection-group {
 	position: relative;
-	left: calc(60vw + 1vh * 2);
+	left: 10vw;
 }
 
 .beatmap-selection-group-pane {
+	position: relative;
 	color: #e4ecef;
 	width: 40vw;
 	border-radius: 1.25vw 0 0 1.25vw;
