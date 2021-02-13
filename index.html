@@ -59,7 +59,7 @@
 					<p class="inline-block">Keyboard right button</p>
 					<p class="inline-block character float-right" id="settings-keyboard-right-button">x</p>
 					<p style="color: #999;">Note! osu!web does not support right clicks</p>
-					<p class="inline-block" style="letter-spacing: -0.01vw;">Enable mouse buttons in gameplay</p>
+					<p class="inline-block" style="letter-spacing: -0.075vw;">Enable mouse buttons in gameplay</p>
 					<input type="checkbox" id="settings-enable-mouse-buttons-in-gameplay" class="checkbox inline-block float-right" name="settings-enable-mouse-buttons-in-gameplay" checked>
 					<p style="color: #999;">Note! sensitivity only applies during gameplay</p>
 					<p id="settings-mouse-sensitivity-text">Mouse sensitivity: 1.0x</p>
@@ -176,7 +176,7 @@
 					<button type="button" id="settings-button-clear-local-storage" class="settings-button triangle-background red">Clear Local Storage</button>
 				</div>
 			</div>
-			<div id="top-bar" class="triangle-background">
+			<div id="top-bar">
 				<span class="span-top-bar-text" style="float: left;">
 					<img alt="settings icon" id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/settings.png">
 					<p class="top-bar-text" id="welcome-user">Welcome Guest</p>
@@ -205,7 +205,7 @@
 						</div>
 					</div>
 					<div id="menu-right-side">
-						<div class="menu-bar-buttons-parent" id="menu-bar-play" onclick="document.getElementById('webpage-state-menu').style.display = 'none'; document.getElementById('webpage-state-beatmap-selection').style.display = 'block'; document.getElementById('menu-audio').pause();">
+						<div class="menu-bar-buttons-parent" id="menu-bar-play">
 							<div class="menu-bar-anti-skew">
 								<div class="menu-bar-image-move">
 									<img alt="small osu logo" src="./src/images/osu-small.png" class="menu-bar-buttons-icon">
@@ -240,7 +240,7 @@
 					</div>
 				</div>
 			</div>
-			<div id="bottom-bar" class="triangle-background">
+			<div id="bottom-bar">
 				<p id="version" class="version-number"></p>
 			</div>
 		</div>
@@ -264,6 +264,8 @@
 		<div class="webpage-state" id="webpage-state-gameplay">
 			<canvas id="gameplay"></canvas>
 		</div>
+		<div class="webpage-state" id="webpage-state-pause-screen"></div>
+		<div class="webpage-state" id="webpage-state-fail-screen"></div>
 		<div class="webpage-state" id="webpage-state-beatmap-end-screen"></div>
 		<!-- https://github.com/foobar404/Wave.js -->
 		<script type="text/javascript" src="./src/scripts/libs/wave.js"></script>

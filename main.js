@@ -29,13 +29,9 @@ define(function(require) {
 	let Options = require("src/scripts/Options.js");
 	const AssetLoader = require("src/scripts/AssetLoader.js");
 	const utils = require("src/scripts/utils.js");
-	const Beatmaps = require("src/scripts/DefaultBeatMaps.js");
 	const AttachAudio = require("src/scripts/AttachAudio.js");
-
+	const Beatmaps = require("src/scripts/DefaultBeatMaps.js");
 	const BeatMapSelectionPaneTemplate = require("src/scripts/BeatMapSelectionPane.js");
-	for (let i = 0; i < Beatmaps.length; i++) {
-		document.getElementById("beatmap-selection-right").innerHTML += BeatMapSelectionPaneTemplate.group(Beatmaps[i], i);
-	}
 	/* Offline context checks, needed to ensure for some effects to work */
 	if (window.origin === null) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
@@ -46,6 +42,10 @@ define(function(require) {
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].innerText = version;
+	}
+	/* Beatmap loading and adding to dom */
+	for (let i = 0; i < Beatmaps.length; i++) {
+		document.getElementById("beatmap-selection-right").innerHTML += BeatMapSelectionPaneTemplate.group(Beatmaps[i], i);
 	}
 	/* Initialise mouse module */
 	let mouse = new Mouse("body");
@@ -546,6 +546,11 @@ define(function(require) {
 			}
 		});
 	}
+	document.getElementById("menu-bar-play").addEventListener("click", function() {
+		document.getElementById("webpage-state-menu").style.display = "none";
+		document.getElementById("webpage-state-beatmap-selection").style.display = "block";
+		document.getElementById("menu-audio").pause();
+	});
 	/* Helper */
 	let menuTimeout;
 	function resetMenu() {
