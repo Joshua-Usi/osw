@@ -38,7 +38,7 @@ define(function(require) {
 					if (size <= 0.5) {
 						size = 0.5;
 					}
-					stars += `<img style="transform: scale(${size}); opacity: ${size};" class="beatmap-selection-map-pane-star" src="./src/images/star.png">`;
+					stars += `<img style="transform: scale(${size}); opacity: ${(size > 0.5) ? 1 : 0.5};" class="beatmap-selection-map-pane-star" src="./src/images/star.png">`;
 				}
 			} else {
 				stars = `<img class="beatmap-selection-map-pane-star" src="./src/images/star.png"><p style="display: inline;">${"x" + (Math.round(starRating * 100) / 100)}</p>`
