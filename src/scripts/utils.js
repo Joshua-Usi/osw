@@ -45,7 +45,7 @@ define(function(require) {
 			let dim = document.getElementById(element);
 			dim.style.filter = "brightness(" + value + ")";
 		},
-		replaceAll: function(str, items) {
+		removeInstances: function(str, items) {
 			let s = str;
 			for (let i = 0; i < items.length; i++) {
 				s = s.replace(items[i], "");
