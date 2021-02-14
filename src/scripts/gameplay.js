@@ -33,6 +33,7 @@ define(function(require) {
 	let keyboardRightReleased = false;
 	ctx.font = "16px Arial";
 	canvas.setFillStyle("#fff");
+	canvas.setImageAlignment("center");
 	let currentHitObject = 0;
 	let hitEvents = [];
 	let hitObjects = [];
@@ -678,7 +679,6 @@ define(function(require) {
 					}
 				}
 				/* Render Loop ---------------------------------------------------------------- */
-				canvas.setImageAlignment("center");
 				for (let i = hitObjects.length - 1; i >= 0; i--) {
 					/* Approach Circle Calculations ---------------------------------------------------------------- */
 					let approachCircleSize = utils.map(useTime - (hitObjects[i].time - arTime), 0, arTime, 5, 1.6);
