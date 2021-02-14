@@ -106,6 +106,9 @@ define(function(require) {
 				backupStartTime = window.performance.now();
 				console.warn("failed to load audio, switching to window.performance for timing");
 			});
+			audio.addEventListener("canplaythrough", function() {
+				audio.play();
+			});
 			/* Beatmap difficulty data */
 			let arTime = Formulas.AR(beatmap[useBeatmapSet][useBeatmap].ApproachRate, playDetails.mods);
 			let arFadeIn = Formulas.ARFadeIn(beatmap[useBeatmapSet][useBeatmap].ApproachRate, playDetails.mods);
@@ -114,9 +117,6 @@ define(function(require) {
 			let difficultyMultiplier = Formulas.difficultyPoints(beatmap[useBeatmapSet][useBeatmap].CircleSize, beatmap[useBeatmapSet][useBeatmap].HPDrainRate, beatmap[useBeatmapSet][useBeatmap].OverallDifficulty);
 			let odTime = Formulas.ODHitWindow(beatmap[useBeatmapSet][useBeatmap].OverallDifficulty, playDetails.mods);
 			mouse.lockPointer();
-			if (failedToLoadAudio === false) {
-				audio.play();
-			}
 			(function animate() {
 				if (document.getElementById("webpage-state-gameplay").style.display !== "block" && document.getElementById("webpage-state-gameplay").style.display !== "") {
 					return;

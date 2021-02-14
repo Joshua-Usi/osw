@@ -3,7 +3,6 @@ var fs = require('fs');
 
 let files = [
 	"./main.js",
-	"./experimental.js",
 	"./main.js",
 	"./src/scripts/AssetLoader.js",
 	"./src/scripts/AttachAudio.js",
@@ -14,6 +13,7 @@ let files = [
 	"./src/scripts/DefaultSkin.js",
 	"./src/scripts/Formulas.js",
 	"./src/scripts/GameplayAssets.js",
+	"./src/scripts/gameplay.js",
 	"./src/scripts/HitEvent.js",
 	"./src/scripts/HitObject.js",
 	"./src/scripts/Keyboard.js",
