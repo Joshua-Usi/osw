@@ -96,13 +96,13 @@ define(function(require) {
 	let logoY = 50;
 	let logoSize = 70;
 	let logoPulseSize = 75;
-	let audioVisualiserSize = 1.9
+	let audioVisualiserSize = 1.6;
 	audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 	audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 	audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";
 	audioVisualiser.style.height = logoSize * audioVisualiserSize + "vh";
-	audioVisualiser.style.top = "calc(" + logoY + "vh - " + logoSize + "vh)";
-	audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + logoSize + "vh)";
+	audioVisualiser.style.top = "calc(" + logoY + "vh - " + (logoSize * audioVisualiserSize / 2) + "vh)";
+	audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + (logoSize * audioVisualiserSize / 2) + "vh)";
 	/* Profiling variables */
 	let times = [];
 	let frameRate = 0;
@@ -505,8 +505,8 @@ define(function(require) {
 		audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";
 		audioVisualiser.style.height = logoSize * audioVisualiserSize + "vh";
-		audioVisualiser.style.top = "calc(" + logoY + "vh - " + logoSize + "vh)";
-		audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + logoSize + "vh)";
+		audioVisualiser.style.top = "calc(" + logoY + "vh - " + (logoSize * audioVisualiserSize / 2) + "vh)";
+		audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + (logoSize * audioVisualiserSize / 2) + "vh)";
 		let menuBar = document.getElementById("menu-bar");
 		menuBar.style.visibility = "visible";
 		menuBar.style.opacity = 1;
@@ -582,8 +582,8 @@ define(function(require) {
 		audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";
 		audioVisualiser.style.height = logoSize * audioVisualiserSize + "vh";
-		audioVisualiser.style.top = "calc(" + logoY + "vh - " + logoSize + "vh)";
-		audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + logoSize + "vh)";
+		audioVisualiser.style.top = "calc(" + logoY + "vh - " + (logoSize * audioVisualiserSize / 2) + "vh)";
+		audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + (logoSize * audioVisualiserSize / 2) + "vh)";
 		let menuBar = document.getElementById("menu-bar");
 		menuBar.style.opacity = 0;
 		let menuBarButtons = document.getElementsByClassName("menu-bar-buttons-parent");

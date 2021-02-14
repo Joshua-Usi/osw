@@ -38,7 +38,6 @@ define(function(require) {
 	let hitObjects = [];
 	let hitErrors = [];
 	let scoreObjects = [];
-	let firstClick = true;
 	/* Details about the play, including replays */
 	let playDetails = {
 		score: 0,
@@ -58,7 +57,6 @@ define(function(require) {
 		mods: Mods(),
 		replay: "TODO",
 	};
-	playDetails.mods.auto = true;
 	/* Profiling variables */
 	let times = [];
 	let frameRate = 0;
