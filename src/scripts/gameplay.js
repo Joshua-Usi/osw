@@ -1,21 +1,21 @@
 define(function(require) {
 	"use strict";
 	/* RequireJS Module Loading */
-	const Formulas = require("src/scripts/Formulas.js");
-	const Mouse = require("src/scripts/Mouse.js");
-	const Keyboard = require("src/scripts/Keyboard.js");
-	const beatmap = require("src/scripts/DefaultBeatMaps.js");
-	let useBeatmapSet = 0;
-	let useBeatmap = 0;
-	const Beizer = require("src/scripts/Beizer.js");
-	const utils = require("src/scripts/utils.js");
-	const HitObject = require("src/scripts/HitObject.js");
-	const HitEvent = require("src/scripts/HitEvent.js");
-	const AssetLoader = require("src/scripts/AssetLoader.js");
-	const Assets = require("src/scripts/GameplayAssets.js");
-	const Canvas = require("src/scripts/Canvas.js");
-	const skin = require("src/scripts/DefaultSkin.js");
-	const Mods = require("src/scripts/Mods.js");
+	const Formulas = require("./Formulas.js");
+	const Mouse = require("./Mouse.js");
+	const Keyboard = require("./Keyboard.js");
+	const beatmap = require("./DefaultBeatMaps.js");
+	const Beizer = require("./Beizer.js");
+	const utils = require("./utils.js");
+	const HitObject = require("./HitObject.js");
+	const HitEvent = require("./HitEvent.js");
+	const AssetLoader = require("./AssetLoader.js");
+	const Assets = require("./GameplayAssets.js");
+	const Canvas = require("./Canvas.js");
+	const skin = require("./DefaultSkin.js");
+	const Mods = require("./Mods.js");
+	let useBeatmapSet;
+	let useBeatmap;
 	/* canvas setup */
 	let canvas = new Canvas("gameplay");
 	canvas.setHeight(window.innerHeight);
@@ -59,49 +59,6 @@ define(function(require) {
 		replay: "TODO",
 	};
 	playDetails.mods.auto = true;
-	/* Playfield calculations and data */
-	let playfieldSize = 0.8;
-	let playfieldXOffset = 0;
-	let playfieldYOffset = window.innerHeight / 50;
-	/* Beatmap difficulty data */
-	let arTime = Formulas.AR(beatmap[useBeatmapSet][useBeatmap].ApproachRate, playDetails.mods);
-	let arFadeIn = Formulas.ARFadeIn(beatmap[useBeatmapSet][useBeatmap].ApproachRate, playDetails.mods);
-	/* Map from osu!pixels to screen pixels */
-	let circleDiameter = utils.map(Formulas.CS(beatmap[useBeatmapSet][useBeatmap].CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * playfieldSize * (4 / 3));
-	let difficultyMultiplier = Formulas.difficultyPoints(beatmap[useBeatmapSet][useBeatmap].CircleSize, beatmap[useBeatmapSet][useBeatmap].HPDrainRate, beatmap[useBeatmapSet][useBeatmap].OverallDifficulty);
-	let odTime = Formulas.ODHitWindow(beatmap[useBeatmapSet][useBeatmap].OverallDifficulty, playDetails.mods);
-	/**/
-	let currentHP = 1;
-	let hpDisplay = 1;
-	let previousTime = 0;
-	/* Timing point indexes */
-	let timingPointUninheritedIndex = 0;
-	let currentTimingPoint = 0;
-	/* Score variables */
-	let scoreMultiplier = Formulas.modScoreMultiplier(playDetails.mods);
-	let score = 0;
-	let displayedScore = 0;
-	/* Combo variables */
-	let combo = 0;
-	let comboPulseSize = 1;
-	/* Audio variables */
-	let backupStartTime = 0;
-	let audio = AssetLoader.audio(`src/audio/${beatmap[useBeatmapSet][useBeatmap].AudioFilename}`);
-	audio.currentTime = beatmap[useBeatmapSet][useBeatmap].hitObjects[7].time - 5;
-	audio.playbackRate = 1;
-	if (playDetails.mods.doubleTime) {
-		audio.playbackRate = 1.5;
-	} else if (playDetails.mods.halfTime) {
-		audio.playbackRate = 0.75;
-	}
-	let failedToLoadAudio = false;
-	/* 	attempting to run in offline on a chromebook causes audio loading errors
-	 *	switch to performance.now instead
-	 */
-	audio.addEventListener("error", function() {
-		failedToLoadAudio = true;
-		console.log("failed to load audio");
-	});
 	/* Profiling variables */
 	let times = [];
 	let frameRate = 0;
@@ -109,9 +66,53 @@ define(function(require) {
 	let previousSigns = [];
 	let previousAngle = 0;
 	let angle = 0;
-	window.addEventListener("click", function() {
-		if (firstClick) {
-			firstClick = false;
+	return {
+		playMap: function(groupIndex, mapIndex) {
+			useBeatmapSet = groupIndex;
+			useBeatmap = mapIndex;
+			/* Playfield calculations and data */
+			let playfieldSize = 0.8;
+			let playfieldXOffset = 0;
+			let playfieldYOffset = window.innerHeight / 50;
+			/* HP values */
+			let currentHP = 1;
+			let hpDisplay = 1;
+			let previousTime = 0;
+			/* Timing point indexes */
+			let timingPointUninheritedIndex = 0;
+			let currentTimingPoint = 0;
+			/* Score variables */
+			let scoreMultiplier = Formulas.modScoreMultiplier(playDetails.mods);
+			let score = 0;
+			let displayedScore = 0;
+			/* Combo variables */
+			let combo = 0;
+			let comboPulseSize = 1;
+			/* Audio variables */
+			let backupStartTime = 0;
+			let audio = AssetLoader.audio(`src/audio/${beatmap[useBeatmapSet][useBeatmap].AudioFilename}`);
+			audio.currentTime = 0;
+			audio.playbackRate = 1;
+			if (playDetails.mods.doubleTime) {
+				audio.playbackRate = 1.5;
+			} else if (playDetails.mods.halfTime) {
+				audio.playbackRate = 0.75;
+			}
+			let failedToLoadAudio = false;
+			/* 	attempting to run in offline on a chromebook causes audio loading errors
+			 *	switch to performance.now instead
+			 */
+			audio.addEventListener("error", function() {
+				failedToLoadAudio = true;
+				console.warn("failed to load audio, switching to window.performance for timing");
+			});
+			/* Beatmap difficulty data */
+			let arTime = Formulas.AR(beatmap[useBeatmapSet][useBeatmap].ApproachRate, playDetails.mods);
+			let arFadeIn = Formulas.ARFadeIn(beatmap[useBeatmapSet][useBeatmap].ApproachRate, playDetails.mods);
+			/* Map from osu!pixels to screen pixels */
+			let circleDiameter = utils.map(Formulas.CS(beatmap[useBeatmapSet][useBeatmap].CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * playfieldSize * (4 / 3));
+			let difficultyMultiplier = Formulas.difficultyPoints(beatmap[useBeatmapSet][useBeatmap].CircleSize, beatmap[useBeatmapSet][useBeatmap].HPDrainRate, beatmap[useBeatmapSet][useBeatmap].OverallDifficulty);
+			let odTime = Formulas.ODHitWindow(beatmap[useBeatmapSet][useBeatmap].OverallDifficulty, playDetails.mods);
 			mouse.lockPointer();
 			if (failedToLoadAudio === false) {
 				audio.play();
@@ -120,6 +121,9 @@ define(function(require) {
 				backupStartTime = window.performance.now();
 			}
 			(function animate() {
+				if (document.getElementById("webpage-state-gameplay").style.display !== "block" && document.getElementById("webpage-state-gameplay").style.display !== "") {
+					return;
+				}
 				let useTime = audio.currentTime;
 				if (failedToLoadAudio) {
 					useTime = (window.performance.now() - backupStartTime) / 1000;
@@ -913,16 +917,10 @@ define(function(require) {
 				} else {
 					document.getElementById("frame-rate").style.background = "#B00020";
 				}
-				canvas.fillText(useTime, 10, 200);
 				previousTime = useTime;
 				setTimeout(animate, 0);
 				// requestAnimationFrame(animate);
 			})();
-		}
-	});
-	return {
-		playMap: function(groupIndex, mapIndex) {
-
 		},
 		playDetails: function() {
 			return playDetails;

@@ -32,12 +32,13 @@ define(function(require) {
 	const AttachAudio = require("src/scripts/AttachAudio.js");
 	const Beatmaps = require("src/scripts/DefaultBeatMaps.js");
 	const BeatMapSelectionPaneTemplate = require("src/scripts/BeatMapSelectionPane.js");
+	const gameplay = require("src/scripts/gameplay.js");
 	/* Offline context checks, needed to ensure for some effects to work */
 	if (window.origin === null) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.5.2a";
+	const version = "osu!web v2021.0.6.0b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -95,10 +96,11 @@ define(function(require) {
 	let logoY = 50;
 	let logoSize = 70;
 	let logoPulseSize = 75;
-	audioVisualiser.width = (logoSize / 100) * 2 * window.innerHeight;
-	audioVisualiser.height = (logoSize / 100) * 2 * window.innerHeight;
-	audioVisualiser.style.width = logoSize * 2 + "vh";
-	audioVisualiser.style.height = logoSize * 2 + "vh";
+	let audioVisualiserSize = 1.9
+	audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
+	audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
+	audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";
+	audioVisualiser.style.height = logoSize * audioVisualiserSize + "vh";
 	audioVisualiser.style.top = "calc(" + logoY + "vh - " + logoSize + "vh)";
 	audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + logoSize + "vh)";
 	/* Profiling variables */
@@ -155,132 +157,134 @@ define(function(require) {
 			time = 0;
 			lastTime = 0;
 			(function animate() {
-				let backgroundImageParallax = document.getElementById("background-blur");
-				let menuParallax = document.getElementById("menu-parallax");
-				let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
-				let logo = document.getElementById("logo");
-				let logoSizeIncrease = 1.1;
-				/* style image parallax based on mouse position */
-				backgroundImageParallax.style.opacity = 1;
-				if (Options.UserInterface.menuParallax === true) {
-					backgroundImageParallax.style.top = (mouse.position.y - window.innerHeight * 0.5) / 128 - window.innerHeight * 0.05 + "px";
-					backgroundImageParallax.style.left = (mouse.position.x - window.innerWidth * 0.5) / 128 - window.innerWidth * 0.05 + "px";
-					menuParallax.style.top = "calc(5vh + " + ((mouse.position.y - window.innerHeight * 0.5) / 256 - window.innerHeight * 0.05) + "px)";
-					menuParallax.style.left = "calc(" + ((mouse.position.x - window.innerWidth * 0.5) / 256 - window.innerWidth * 0.05) + "px)";
-				} else {
-					backgroundImageParallax.style.top = 0;
-					backgroundImageParallax.style.left = 0;
-					menuParallax.style.top = 0;
-					menuParallax.style.left = 0;
-				}
+				if (document.getElementById("webpage-state-menu").style.display === "block" || document.getElementById("webpage-state-menu").style.display === "") {
+					let backgroundImageParallax = document.getElementById("background-blur");
+					let menuParallax = document.getElementById("menu-parallax");
+					let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
+					let logo = document.getElementById("logo");
+					let logoSizeIncrease = 1.1;
+					/* style image parallax based on mouse position */
+					backgroundImageParallax.style.opacity = 1;
+					if (Options.UserInterface.menuParallax === true) {
+						backgroundImageParallax.style.top = (mouse.position.y - window.innerHeight * 0.5) / 128 - window.innerHeight * 0.05 + "px";
+						backgroundImageParallax.style.left = (mouse.position.x - window.innerWidth * 0.5) / 128 - window.innerWidth * 0.05 + "px";
+						menuParallax.style.top = "calc(5vh + " + ((mouse.position.y - window.innerHeight * 0.5) / 256 - window.innerHeight * 0.05) + "px)";
+						menuParallax.style.left = "calc(" + ((mouse.position.x - window.innerWidth * 0.5) / 256 - window.innerWidth * 0.05) + "px)";
+					} else {
+						backgroundImageParallax.style.top = 0;
+						backgroundImageParallax.style.left = 0;
+						menuParallax.style.top = 0;
+						menuParallax.style.left = 0;
+					}
 
-				/* triangle background moves */
-				offset -= 0.25;
-				for (let i = 0; i < triangleBackgroundMoves.length; i++) {
-					triangleBackgroundMoves[i].style.backgroundPositionY = triangleBackgroundMoves[i].getBoundingClientRect().bottom + offset + "px";
-				}
-				/* beat detection and accumulation */
-				lastTime = time;
-				time = menuAudio.currentTime;
-				if (accumulator < 0) {
-					accumulator = 0;
-				}
-				accumulator += time - lastTime;
-				if (accumulator > 1 / (songs[chosenSong].bpm.get(time) / 60)) {
-					while (accumulator > 1 / (songs[chosenSong].bpm.get(time) / 60)) {
-						/* logo pulse*/
-						logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
-						logo.style.width = logoSize + "vh";
-						logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
-						logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
-						logo.style.backgroundSize = logoSize + "vh";
-						// logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
-						/* logo background pulse, maximum 5 to prevent lag */
-						if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
-							let logoCircle = document.createElement("img");
-							logoCircle.src = "src/images/circle.png";
-							logoCircle.style.position = "absolute";
-							logoCircle.style.width = logoPulseSize + "vh";
-							logoCircle.style.top = "calc(" + logoY + "vh - " + logoPulseSize / 2 + "vh)";
-							logoCircle.style.left = "calc(" + logoX + "vw - " + logoPulseSize / 2 + "vh)";
-							logoCircle.style.opacity = 0.5;
-							document.getElementById("logo-beat").appendChild(logoCircle);
-						}
-						/* snow only in december, maximum 50 to prevent lag */
-						/* last tested:
-						 *	
-						 *	27/12/2020, works
-						 *	9/01/2021, works
-						 */
-						if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
-							let snowflake = document.createElement("img");
-							snowflake.src = "src/images/snowflake.png";
-							snowflake.style.position = "fixed";
-							snowflake.style.width = Math.random() * 2 + 1 + "vh";
-							snowflake.style.top = -10 + "vh";
-							snowflake.style.left = Math.random() * 100 + "vw";
-							snowflake.style.opacity = 0.4;
-							snowflake.style.zIndex = -5;
-							document.getElementById("snow").appendChild(snowflake);
-						}
-						accumulator -= 1 / (songs[chosenSong].bpm.get(time) / 60);
+					/* triangle background moves */
+					offset -= 0.25;
+					for (let i = 0; i < triangleBackgroundMoves.length; i++) {
+						triangleBackgroundMoves[i].style.backgroundPositionY = triangleBackgroundMoves[i].getBoundingClientRect().bottom + offset + "px";
 					}
-				} else {
-					logo.style.transition = "width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s";
-					logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
-					logo.style.width = logoSize * logoSizeIncrease + "vh";
-					logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
-					logo.style.left = "calc(5vw + " + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
-					logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
-					// logo.style.backgroundPositionY = offset % (1024 * 0.5) * logoSizeIncrease + "px";
-				}
-				let logoCircles = document.getElementById("logo-beat").querySelectorAll("img");
-				for (let i = 0; i < logoCircles.length; i++) {
-					if (parseFloat(logoCircles[i].style.opacity) <= 0) {
-						logoCircles[i].remove();
-						break;
+					/* beat detection and accumulation */
+					lastTime = time;
+					time = menuAudio.currentTime;
+					if (accumulator < 0) {
+						accumulator = 0;
 					}
-					logoCircles[i].style.opacity = parseFloat(logoCircles[i].style.opacity) - 0.05;
-					logoCircles[i].style.width = parseFloat(logoCircles[i].style.width) + 0.5 + "vh";
-					logoCircles[i].style.top = "calc(" + logoY + "vh - " + logoCircles[i].style.width + " / 2)";
-					logoCircles[i].style.left = "calc(5vw + " + logoX + "vw - " + logoCircles[i].style.width + " / 2)";
-				}
-				if (new Date().getMonth() === 11) {
-					let snow = document.getElementById("snow").querySelectorAll("img");
-					for (let i = 0; i < snow.length; i++) {
-						if (parseFloat(snow[i].style.top) >= 100) {
-							snow[i].remove();
+					accumulator += time - lastTime;
+					if (accumulator > 1 / (songs[chosenSong].bpm.get(time) / 60)) {
+						while (accumulator > 1 / (songs[chosenSong].bpm.get(time) / 60)) {
+							/* logo pulse*/
+							logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
+							logo.style.width = logoSize + "vh";
+							logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
+							logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
+							logo.style.backgroundSize = logoSize + "vh";
+							// logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
+							/* logo background pulse, maximum 5 to prevent lag */
+							if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
+								let logoCircle = document.createElement("img");
+								logoCircle.src = "src/images/circle.png";
+								logoCircle.style.position = "absolute";
+								logoCircle.style.width = logoPulseSize + "vh";
+								logoCircle.style.top = "calc(" + logoY + "vh - " + logoPulseSize / 2 + "vh)";
+								logoCircle.style.left = "calc(" + logoX + "vw - " + logoPulseSize / 2 + "vh)";
+								logoCircle.style.opacity = 0.5;
+								document.getElementById("logo-beat").appendChild(logoCircle);
+							}
+							/* snow only in december, maximum 50 to prevent lag */
+							/* last tested:
+							 *	
+							 *	27/12/2020, works
+							 *	9/01/2021, works
+							 */
+							if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
+								let snowflake = document.createElement("img");
+								snowflake.src = "src/images/snowflake.png";
+								snowflake.style.position = "fixed";
+								snowflake.style.width = Math.random() * 2 + 1 + "vh";
+								snowflake.style.top = -10 + "vh";
+								snowflake.style.left = Math.random() * 100 + "vw";
+								snowflake.style.opacity = 0.4;
+								snowflake.style.zIndex = -5;
+								document.getElementById("snow").appendChild(snowflake);
+							}
+							accumulator -= 1 / (songs[chosenSong].bpm.get(time) / 60);
+						}
+					} else {
+						logo.style.transition = "width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s";
+						logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
+						logo.style.width = logoSize * logoSizeIncrease + "vh";
+						logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
+						logo.style.left = "calc(5vw + " + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
+						logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
+						// logo.style.backgroundPositionY = offset % (1024 * 0.5) * logoSizeIncrease + "px";
+					}
+					let logoCircles = document.getElementById("logo-beat").querySelectorAll("img");
+					for (let i = 0; i < logoCircles.length; i++) {
+						if (parseFloat(logoCircles[i].style.opacity) <= 0) {
+							logoCircles[i].remove();
 							break;
 						}
-						snow[i].style.top = parseFloat(snow[i].style.top) + parseFloat(snow[i].style.width) / 10 + "vh";
-						snow[i].style.left = parseFloat(snow[i].style.left) + Math.sin(parseFloat(snow[i].style.width) * 9 + parseFloat(snow[i].style.top) / 10) / 25 + "vw";
-						snow[i].style.transform = "rotate(" + parseFloat(snow[i].style.top) * parseFloat(snow[i].style.width) + "deg)";
+						logoCircles[i].style.opacity = parseFloat(logoCircles[i].style.opacity) - 0.05;
+						logoCircles[i].style.width = parseFloat(logoCircles[i].style.width) + 0.5 + "vh";
+						logoCircles[i].style.top = "calc(" + logoY + "vh - " + logoCircles[i].style.width + " / 2)";
+						logoCircles[i].style.left = "calc(5vw + " + logoX + "vw - " + logoCircles[i].style.width + " / 2)";
 					}
-				}
-				/* Profiling */
-				const now = Date.now();
-				while (times.length > 0 && times[0] <= now - 1000) {
-					times.shift();
-				}
-				times.push(now);
-				frameRate = times.length;
-				let innerText = frameRate;
-				if (Options.Performance.maxFrameRate === "VSync") {
-					innerText += " / 60fps";
-				} else if (Options.Performance.maxFrameRate === "2x VSync") {
-					innerText += " / 120fps";
-				} else if (Options.Performance.maxFrameRate === "Browser Maximum (250fps)") {
-					innerText += " / 250fps";
-				}
-				document.getElementById("frame-rate").innerText = innerText;
-				if (frameRate > 60) {
-					document.getElementById("frame-rate").style.background = "#6d9eeb";
-				} else if (frameRate > 45) {
-					document.getElementById("frame-rate").style.background = "#39e639";
-				} else if (frameRate > 20) {
-					document.getElementById("frame-rate").style.background = "#ffa500";
-				} else {
-					document.getElementById("frame-rate").style.background = "#B00020";
+					if (new Date().getMonth() === 11) {
+						let snow = document.getElementById("snow").querySelectorAll("img");
+						for (let i = 0; i < snow.length; i++) {
+							if (parseFloat(snow[i].style.top) >= 100) {
+								snow[i].remove();
+								break;
+							}
+							snow[i].style.top = parseFloat(snow[i].style.top) + parseFloat(snow[i].style.width) / 10 + "vh";
+							snow[i].style.left = parseFloat(snow[i].style.left) + Math.sin(parseFloat(snow[i].style.width) * 9 + parseFloat(snow[i].style.top) / 10) / 25 + "vw";
+							snow[i].style.transform = "rotate(" + parseFloat(snow[i].style.top) * parseFloat(snow[i].style.width) + "deg)";
+						}
+					}
+					/* Profiling */
+					const now = Date.now();
+					while (times.length > 0 && times[0] <= now - 1000) {
+						times.shift();
+					}
+					times.push(now);
+					frameRate = times.length;
+					let innerText = frameRate;
+					if (Options.Performance.maxFrameRate === "VSync") {
+						innerText += " / 60fps";
+					} else if (Options.Performance.maxFrameRate === "2x VSync") {
+						innerText += " / 120fps";
+					} else if (Options.Performance.maxFrameRate === "Browser Maximum (250fps)") {
+						innerText += " / 250fps";
+					}
+					document.getElementById("frame-rate").innerText = innerText;
+					if (frameRate > 60) {
+						document.getElementById("frame-rate").style.background = "#6d9eeb";
+					} else if (frameRate > 45) {
+						document.getElementById("frame-rate").style.background = "#39e639";
+					} else if (frameRate > 20) {
+						document.getElementById("frame-rate").style.background = "#ffa500";
+					} else {
+						document.getElementById("frame-rate").style.background = "#B00020";
+					}
 				}
 				requestAnimationFrame(animate);
 			})();
@@ -289,8 +293,8 @@ define(function(require) {
 	/* Omnipotent web listeners */
 	window.addEventListener("resize", function() {
 		let audioVisualiser = document.getElementById("audio-visualiser");
-		audioVisualiser.width = (logoSize / 100) * 2 * window.innerHeight;
-		audioVisualiser.height = (logoSize / 100) * 2 * window.innerHeight;
+		audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
+		audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 	});
 	window.addEventListener("load", function() {
 		document.getElementById("splash-screen").style.animation = "splash-screen-text forwards";
@@ -497,10 +501,10 @@ define(function(require) {
 		logoSize = 25;
 		logoPulseSize = 26;
 		let audioVisualiser = document.getElementById("audio-visualiser");
-		audioVisualiser.width = (logoSize / 100) * 2 * window.innerHeight;
-		audioVisualiser.height = (logoSize / 100) * 2 * window.innerHeight;
-		audioVisualiser.style.width = logoSize * 2 + "vh";
-		audioVisualiser.style.height = logoSize * 2 + "vh";
+		audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
+		audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
+		audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";
+		audioVisualiser.style.height = logoSize * audioVisualiserSize + "vh";
 		audioVisualiser.style.top = "calc(" + logoY + "vh - " + logoSize + "vh)";
 		audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + logoSize + "vh)";
 		let menuBar = document.getElementById("menu-bar");
@@ -544,6 +548,21 @@ define(function(require) {
 			}
 		});
 	}
+	let beatmapSelectionPanes = document.getElementsByClassName("beatmap-selection-map-pane");
+	for (var i = 0; i < beatmapSelectionPanes.length; i++) {
+		beatmapSelectionPanes[i].addEventListener("click", function() {
+			let elements = document.getElementsByClassName("webpage-state");
+			for (var i = 0; i < elements.length; i++) {
+				if (elements[i].id === "webpage-state-always") {
+					continue;
+				}
+				elements[i].style.display = "none";
+			}
+			document.getElementById("top-bar").style.display = "none";
+			document.getElementById("webpage-state-gameplay").style.display = "block";
+			gameplay.playMap(this.dataset.groupIndex, this.dataset.mapIndex);
+		});
+	}
 	document.getElementById("menu-bar-play").addEventListener("click", function() {
 		document.getElementById("webpage-state-menu").style.display = "none";
 		document.getElementById("webpage-state-beatmap-selection").style.display = "block";
@@ -558,10 +577,10 @@ define(function(require) {
 		logoSize = 70;
 		logoPulseSize = 75;
 		let audioVisualiser = document.getElementById("audio-visualiser");
-		audioVisualiser.width = (logoSize / 100) * 2 * window.innerHeight;
-		audioVisualiser.height = (logoSize / 100) * 2 * window.innerHeight;
-		audioVisualiser.style.width = logoSize * 2 + "vh";
-		audioVisualiser.style.height = logoSize * 2 + "vh";
+		audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
+		audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
+		audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";
+		audioVisualiser.style.height = logoSize * audioVisualiserSize + "vh";
 		audioVisualiser.style.top = "calc(" + logoY + "vh - " + logoSize + "vh)";
 		audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + logoSize + "vh)";
 		let menuBar = document.getElementById("menu-bar");
@@ -621,6 +640,29 @@ define(function(require) {
 		passive: false
 	});
 	window.dispatchEvent(new CustomEvent("orientationchange"));
+	document.getElementById("back-button").addEventListener("click", function() {
+		let elements = document.getElementsByClassName("webpage-state");
+		for (var i = 0; i < elements.length; i++) {
+			if (elements[i].id === "webpage-state-always") {
+				continue;
+			}
+			elements[i].style.display = "none";
+		}
+		document.getElementById("webpage-state-menu").style.display = "block";
+		document.getElementById("menu-audio").play();
+	});
+	document.getElementById("beatmap-selection-play").addEventListener("click", function() {
+		let elements = document.getElementsByClassName("webpage-state");
+		for (var i = 0; i < elements.length; i++) {
+			if (elements[i].id === "webpage-state-always") {
+				continue;
+			}
+			elements[i].style.display = "none";
+		}
+		document.getElementById("top-bar").style.display = "none";
+		document.getElementById("webpage-state-gameplay").style.display = "block";
+		gameplay.playMap(2, 0);
+	});
 	/* Library Stuff */
 	if (window.origin !== "null") {
 		let wave = new Wave();

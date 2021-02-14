@@ -10,6 +10,7 @@
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-always.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-menu.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-beatmap-selection.css">
+		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-gameplay.css">
 		<link rel="icon" href="./src/images/osu-small.png">
 	</head>
 	<body id="body">
@@ -252,9 +253,9 @@
 			<div id="beatmap-selection-right">
 				
 			</div>
-			<img alt="play beatmap" id="beatmap-selection-logo" src="./src/images/osu.png">
+			<img alt="play beatmap" id="beatmap-selection-play" src="./src/images/osu.png">
 			<div id="beatmap-selection-bottom-bar">
-				<div id="back-button" onclick="document.getElementById('webpage-state-menu').style.display = 'block'; document.getElementById('webpage-state-beatmap-selection').style.display = 'none'; document.getElementById('menu-audio').play();">
+				<div id="back-button">
 					<div id="back-button-anti-skew">
 						<div id="back-button-image-container">
 							<img alt="go back" src="./src/images/back.png" id="back-button-image">
@@ -265,6 +266,10 @@
 			</div>
 		</div>
 		<div class="webpage-state" id="webpage-state-gameplay">
+			<img id="grade" src="">
+			<span id="score-container"></span>
+			<span id="accuracy-container"></span>
+			<span id="combo-container"></span>
 			<canvas id="gameplay"></canvas>
 		</div>
 		<div class="webpage-state" id="webpage-state-pause-screen"></div>

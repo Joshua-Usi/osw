@@ -43,7 +43,7 @@ define(function(require) {
 			} else {
 				stars = `<img class="beatmap-selection-map-pane-star" src="./src/images/star.png"><p style="display: inline;">${"x" + (Math.round(starRating * 100) / 100)}</p>`
 			}
-			return `<div data-groupindex="${groupIndex}" data-map-index="${mapIndex}" class="beatmap-selection-map-pane triangle-background">
+			return `<div data-group-index="${groupIndex}" data-map-index="${mapIndex}" class="beatmap-selection-map-pane triangle-background">
 					<img class="beatmap-selection-map-pane-difficulty-icon" src="./src/images/${Formulas.beatmapDifficultyIcon(starRating)}-difficulty-icon.png">
 					<div class="beatmap-selection-map-pane-right-pane">	
 						<div class="beatmap-selection-group-map-details">

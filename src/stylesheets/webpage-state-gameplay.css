@@ -1,0 +1,43 @@
+#score-container {
+	z-index: 100;
+	position: absolute;
+	top: 0vh;
+	left: 100vh;
+}
+
+#combo-container {
+	z-index: 100;
+	position: absolute;
+	top: calc(100vh - 2vh);
+}
+
+#accuracy-container {
+	position: absolute;
+	top: 5vh;
+}
+
+#grade {
+	position: absolute;
+	z-index: 100;
+	width: 2vw;
+	top: 7.5vh;
+	left: 92vw;
+}
+
+#score-container img {
+	width: 2vw;
+}
+
+#combo-container img {
+	width: 2vw;
+}
+
+#accuracy-container img {
+	width: 1vw;
+}
+
+#gameplay {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+}

@@ -70,7 +70,7 @@
 	clip-path: polygon(60% 0, 55% 50%, 60% 100%, 0 100%, 0 0);
 }
 
-#beatmap-selection-logo {
+#beatmap-selection-play {
 	z-index: 103;
 	width: 25vh;
 	background: url('../../src/images/triangles.png'), #FD67AE;

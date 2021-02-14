@@ -1,6 +1,22 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to slightly modified [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
-## [v2021.0.5.2a] - 2021-02-12
+---
+## [v2021.0.6.0b] - 2021-02-14
+### Moved into Beta
+### Added
+- Gameplay
+- Selecting beatmaps through the beatmap selection screen
+### Changed
+- renamed experimental.js to gameplay.js
+- moved gameplay.js to src/scripts
+### Removed
+- Old gameplay files
+- experimental.js
+- experimental.html
+### Fixed
+- dependency references in gameplay.js
+---
+## [v2021.0.5.2a] - 2021-02-13
 ### Added
 - horizontal device support, ensures that devices are horizontal to be compatible
 - disabled mobile device scrolling
