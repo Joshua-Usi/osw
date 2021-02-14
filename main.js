@@ -560,6 +560,7 @@ define(function(require) {
 			}
 			document.getElementById("top-bar").style.display = "none";
 			document.getElementById("webpage-state-gameplay").style.display = "block";
+			document.getElementById("menu-audio").pause();
 			gameplay.playMap(this.dataset.groupIndex, this.dataset.mapIndex);
 		});
 	}

@@ -5,7 +5,7 @@
 	width: calc(70vh * 1.9);
 	top: calc(50vh - 70vh * 1.9 / 2);
 	left: calc(5vw + 50vw - 70vh * 1.9 / 2);
-	transition: left 0.29s, width 0.5s, height 0.5s;
+	transition: left 0.29s, top 0.29s, width 0.5s, height 0.5s;
 	transition-timing-function: ease;
 }
 

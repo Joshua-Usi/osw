@@ -15,6 +15,7 @@ and this project adheres to slightly modified [Semantic Versioning](https://semv
 - experimental.html
 ### Fixed
 - dependency references in gameplay.js
+- audio in the main menu playing while playing a beatmap
 ---
 ## [v2021.0.5.2a] - 2021-02-13
 ### Added
