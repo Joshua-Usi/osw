@@ -17,6 +17,7 @@ and this project adheres to slightly modified [Semantic Versioning](https://semv
 - Dependency references in gameplay.js
 - Audio in the main menu playing while playing a beatmap
 - Centerised audio visualiser
+- Fixed backup time (when audio fails to load) from referencing when page first loads
 ---
 ## [v2021.0.5.2a] - 2021-02-13
 ### Added

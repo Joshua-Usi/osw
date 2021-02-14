@@ -32,7 +32,7 @@ define(function(require) {
 	const AttachAudio = require("src/scripts/AttachAudio.js");
 	const Beatmaps = require("src/scripts/DefaultBeatMaps.js");
 	const BeatMapSelectionPaneTemplate = require("src/scripts/BeatMapSelectionPane.js");
-	const gameplay = require("src/scripts/gameplay.js");
+	let gameplay = require("src/scripts/gameplay.js");
 	/* Offline context checks, needed to ensure for some effects to work */
 	if (window.origin === null) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
@@ -652,18 +652,18 @@ define(function(require) {
 		document.getElementById("webpage-state-menu").style.display = "block";
 		document.getElementById("menu-audio").play();
 	});
-	document.getElementById("beatmap-selection-play").addEventListener("click", function() {
-		let elements = document.getElementsByClassName("webpage-state");
-		for (var i = 0; i < elements.length; i++) {
-			if (elements[i].id === "webpage-state-always") {
-				continue;
-			}
-			elements[i].style.display = "none";
-		}
-		document.getElementById("top-bar").style.display = "none";
-		document.getElementById("webpage-state-gameplay").style.display = "block";
-		gameplay.playMap(2, 0);
-	});
+	// document.getElementById("beatmap-selection-play").addEventListener("click", function() {
+	// 	let elements = document.getElementsByClassName("webpage-state");
+	// 	for (var i = 0; i < elements.length; i++) {
+	// 		if (elements[i].id === "webpage-state-always") {
+	// 			continue;
+	// 		}
+	// 		elements[i].style.display = "none";
+	// 	}
+	// 	document.getElementById("top-bar").style.display = "none";
+	// 	document.getElementById("webpage-state-gameplay").style.display = "block";
+	// 	gameplay.playMap(2, 0);
+	// });
 	/* Library Stuff */
 	if (window.origin !== "null") {
 		let wave = new Wave();

@@ -57,13 +57,7 @@ define(function(require) {
 		mods: Mods(),
 		replay: "TODO",
 	};
-	/* Profiling variables */
-	let times = [];
-	let frameRate = 0;
-	/* spinner tests */
-	let previousSigns = [];
-	let previousAngle = 0;
-	let angle = 0;
+	playDetails.mods.doubleTime = false;
 	return {
 		playMap: function(groupIndex, mapIndex) {
 			useBeatmapSet = groupIndex;
@@ -86,6 +80,13 @@ define(function(require) {
 			/* Combo variables */
 			let combo = 0;
 			let comboPulseSize = 1;
+			/* Profiling variables */
+			let times = [];
+			let frameRate = 0;
+			/* spinner tests */
+			let previousSigns = [];
+			let previousAngle = 0;
+			let angle = 0;
 			/* Audio variables */
 			let backupStartTime = 0;
 			let audio = AssetLoader.audio(`src/audio/${beatmap[useBeatmapSet][useBeatmap].AudioFilename}`);
@@ -102,6 +103,7 @@ define(function(require) {
 			 */
 			audio.addEventListener("error", function() {
 				failedToLoadAudio = true;
+				backupStartTime = window.performance.now();
 				console.warn("failed to load audio, switching to window.performance for timing");
 			});
 			/* Beatmap difficulty data */
@@ -115,9 +117,6 @@ define(function(require) {
 			if (failedToLoadAudio === false) {
 				audio.play();
 			}
-			if (failedToLoadAudio) {
-				backupStartTime = window.performance.now();
-			}
 			(function animate() {
 				if (document.getElementById("webpage-state-gameplay").style.display !== "block" && document.getElementById("webpage-state-gameplay").style.display !== "") {
 					return;
@@ -125,6 +124,11 @@ define(function(require) {
 				let useTime = audio.currentTime;
 				if (failedToLoadAudio) {
 					useTime = (window.performance.now() - backupStartTime) / 1000;
+					if (playDetails.mods.doubleTime) {
+						useTime *= 1.5;
+					} else if (playDetails.mods.halfTime) {
+						useTime *= 0.75;
+					}
 				}
 				ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 				let hitObjectOffsetX = playfieldXOffset + window.innerWidth / 2 - window.innerHeight * playfieldSize * (4 / 3) / 2;
