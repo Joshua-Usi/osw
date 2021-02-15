@@ -104,7 +104,7 @@
 	padding-top: calc(50vh - 1em);
 	background: #000;
 	z-index: 1500;
-	color: #fff;
+	color: #fff; 
 }
 
 @keyframes splash-screen-text {

@@ -295,6 +295,7 @@ define(function(require) {
 		let audioVisualiser = document.getElementById("audio-visualiser");
 		audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
+		window.dispatchEvent(new CustomEvent("orientationchange"));
 	});
 	window.addEventListener("load", function() {
 		document.getElementById("splash-screen").style.animation = "splash-screen-text forwards";
@@ -629,7 +630,7 @@ define(function(require) {
 		}
 	}
 	window.addEventListener("orientationchange", function(event) {
-		if (event.target.screen.orientation.angle === 0 && window.screen.width < window.screen.height) {
+		if (event.target.screen.orientation.angle === 0 && window.innerWidth < window.innerHeight) {
 			document.getElementById("orientation-vertical").style.display = "block"
 		} else {
 			document.getElementById("orientation-vertical").style.display = "none";
