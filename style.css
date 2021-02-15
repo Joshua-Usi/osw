@@ -1,3 +1,11 @@
+#webpage-state-always {
+	display: block;
+}
+
+#webpage-state-menu {
+	display: block;
+}
+
 #webpage-state-beatmap-selection {
 	display: none;
 }

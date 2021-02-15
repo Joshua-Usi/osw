@@ -11,6 +11,7 @@
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-menu.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-beatmap-selection.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-gameplay.css">
+		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-pause-screen.css">
 		<link rel="icon" href="./src/images/osu-small.png">
 	</head>
 	<body id="body">
@@ -272,7 +273,20 @@
 			<span id="combo-container"></span>
 			<canvas id="gameplay"></canvas>
 		</div>
-		<div class="webpage-state" id="webpage-state-pause-screen"></div>
+		<div class="webpage-state" id="webpage-state-pause-screen">
+			<!-- <p>paused</p> -->
+			<div style="width: 100vw; height: 30vh; position: relative; top: calc(50vh - 30vh / 2); background: #191919">
+				<div id="pause-menu-continue" class="pause-menu-button triangle-background">
+					<p class="pause-menu-anti-skew">Continue</p>
+				</div>
+				<div id="pause-menu-retry" class="pause-menu-button triangle-background">
+					<p class="pause-menu-anti-skew">Retry</p>
+				</div>
+				<div id="pause-menu-quit" class="pause-menu-button triangle-background">
+					<p class="pause-menu-anti-skew">Quit</p>
+				</div>
+			</div>
+		</div>
 		<div class="webpage-state" id="webpage-state-fail-screen"></div>
 		<div class="webpage-state" id="webpage-state-beatmap-end-screen"></div>
 		<!-- https://github.com/foobar404/Wave.js -->

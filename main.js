@@ -38,7 +38,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.6.0b";
+	const version = "osu!web v2021.0.6.1b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -178,7 +178,7 @@ define(function(require) {
 					}
 
 					/* triangle background moves */
-					offset -= 0.25;
+					offset -= 0.5;
 					for (let i = 0; i < triangleBackgroundMoves.length; i++) {
 						triangleBackgroundMoves[i].style.backgroundPositionY = triangleBackgroundMoves[i].getBoundingClientRect().bottom + offset + "px";
 					}
