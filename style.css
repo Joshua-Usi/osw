@@ -3,7 +3,7 @@
 }
 
 #webpage-state-menu {
-	display: block;
+	display: none;
 }
 
 #webpage-state-beatmap-selection {
@@ -15,7 +15,7 @@
 }
 
 #webpage-state-pause-screen {
-	display: none;
+	display: block;
 }
 
 #webpage-state-fail-screen {

@@ -274,8 +274,13 @@
 			<canvas id="gameplay"></canvas>
 		</div>
 		<div class="webpage-state" id="webpage-state-pause-screen">
-			<!-- <p>paused</p> -->
-			<div style="width: 100vw; height: 30vh; position: relative; top: calc(50vh - 30vh / 2); background: #191919">
+			<div id="pause-menu-pause-text-container">
+				<div>
+					<p id="pause-menu-pause-text">paused</p>
+					<p id="pause-menu-pause-text-2">taking a break?</p>
+				</div>
+			</div>
+			<div id="pause-menu-container">
 				<div id="pause-menu-continue" class="pause-menu-button triangle-background">
 					<p class="pause-menu-anti-skew">Continue</p>
 				</div>

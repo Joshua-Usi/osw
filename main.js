@@ -157,10 +157,15 @@ define(function(require) {
 			time = 0;
 			lastTime = 0;
 			(function animate() {
+				let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
+				/* triangle background moves */
+				offset -= 0.5;
+				for (let i = 0; i < triangleBackgroundMoves.length; i++) {
+					triangleBackgroundMoves[i].style.backgroundPositionY = triangleBackgroundMoves[i].getBoundingClientRect().bottom + offset + "px";
+				}
 				if (document.getElementById("webpage-state-menu").style.display === "block" || document.getElementById("webpage-state-menu").style.display === "") {
 					let backgroundImageParallax = document.getElementById("background-blur");
 					let menuParallax = document.getElementById("menu-parallax");
-					let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
 					let logo = document.getElementById("logo");
 					let logoSizeIncrease = 1.1;
 					/* style image parallax based on mouse position */
@@ -177,11 +182,6 @@ define(function(require) {
 						menuParallax.style.left = 0;
 					}
 
-					/* triangle background moves */
-					offset -= 0.5;
-					for (let i = 0; i < triangleBackgroundMoves.length; i++) {
-						triangleBackgroundMoves[i].style.backgroundPositionY = triangleBackgroundMoves[i].getBoundingClientRect().bottom + offset + "px";
-					}
 					/* beat detection and accumulation */
 					lastTime = time;
 					time = menuAudio.currentTime;
