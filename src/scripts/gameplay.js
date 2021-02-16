@@ -33,11 +33,7 @@ define(function(require) {
 	let keyboardRightReleased = false;
 	ctx.font = "16px Arial";
 	canvas.setFillStyle("#fff");
-	let currentHitObject = 0;
-	let hitEvents = [];
-	let hitObjects = [];
-	let hitErrors = [];
-	let scoreObjects = [];
+	let alreadyRunning = false;
 	/* Details about the play, including replays */
 	let playDetails = {
 		score: 0,
@@ -57,11 +53,26 @@ define(function(require) {
 		mods: Mods(),
 		replay: "TODO",
 	};
-	playDetails.mods.doubleTime = false;
+	let audio;
 	return {
-		playMap: function(groupIndex, mapIndex) {
+		continue: function() {
+			audio.play();
+		},
+		pause: function() {
+			audio.pause();
+		},
+		retry: function() {
+			this.playMap(useBeatmapSet, useBeatmap);
+		},
+		playMap: function(groupIndex, mapIndex, mods) {
 			useBeatmapSet = groupIndex;
 			useBeatmap = mapIndex;
+			playDetails.mods = mods || Mods();
+			let currentHitObject = 0;
+			let hitEvents = [];
+			let hitObjects = [];
+			let hitErrors = [];
+			let scoreObjects = [];
 			/* Playfield calculations and data */
 			let playfieldSize = 0.8;
 			let playfieldXOffset = 0;
@@ -89,7 +100,7 @@ define(function(require) {
 			let angle = 0;
 			/* Audio variables */
 			let backupStartTime = 0;
-			let audio = AssetLoader.audio(`src/audio/${beatmap[useBeatmapSet][useBeatmap].AudioFilename}`);
+			audio = AssetLoader.audio(`src/audio/${beatmap[useBeatmapSet][useBeatmap].AudioFilename}`);
 			audio.currentTime = 0;
 			audio.playbackRate = 1;
 			if (playDetails.mods.doubleTime) {
@@ -117,6 +128,10 @@ define(function(require) {
 			let difficultyMultiplier = Formulas.difficultyPoints(beatmap[useBeatmapSet][useBeatmap].CircleSize, beatmap[useBeatmapSet][useBeatmap].HPDrainRate, beatmap[useBeatmapSet][useBeatmap].OverallDifficulty);
 			let odTime = Formulas.ODHitWindow(beatmap[useBeatmapSet][useBeatmap].OverallDifficulty, playDetails.mods);
 			mouse.lockPointer();
+			if (alreadyRunning) {
+				return;
+			}
+			alreadyRunning = true;
 			(function animate() {
 				if (document.getElementById("webpage-state-gameplay").style.display !== "block" && document.getElementById("webpage-state-gameplay").style.display !== "") {
 					return;

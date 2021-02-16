@@ -1,6 +1,13 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to slightly modified [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v2021.0.6.2b] - 2021-02-16
+### Added
+- Pause Menu UI functionality
+- Continue, Retry and Quit functions for mapss
+### Fixed
+- Going in and out of maps causing multiple beatmap instances to run
+---
 ## [v2021.0.6.1b] - 2021-02-15
 ### Added
 - Pause Menu UI (currently inaccessible)

@@ -38,7 +38,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.6.1b";
+	const version = "osu!web v2021.0.6.2b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -302,6 +302,13 @@ define(function(require) {
 		document.getElementById("splash-screen").style.animationDuration = "1s";
 		document.getElementById("splash-screen").style.animationDelay = "1s";
 		document.getElementById("heart-loader").style.display = "none";
+	});
+	window.addEventListener("blur", function() {
+		console.log(document.getElementById("webpage-state-gameplay").style.display);
+		if (document.getElementById("webpage-state-gameplay").style.display === "block") {
+			document.getElementById("webpage-state-pause-screen").style.display = "block";
+			gameplay.pause();
+		} 
 	});
 	/* Top bar event listeners */
 	document.getElementById("top-bar").addEventListener("mouseenter", function() {
@@ -653,18 +660,22 @@ define(function(require) {
 		document.getElementById("webpage-state-menu").style.display = "block";
 		document.getElementById("menu-audio").play();
 	});
-	// document.getElementById("beatmap-selection-play").addEventListener("click", function() {
-	// 	let elements = document.getElementsByClassName("webpage-state");
-	// 	for (var i = 0; i < elements.length; i++) {
-	// 		if (elements[i].id === "webpage-state-always") {
-	// 			continue;
-	// 		}
-	// 		elements[i].style.display = "none";
-	// 	}
-	// 	document.getElementById("top-bar").style.display = "none";
-	// 	document.getElementById("webpage-state-gameplay").style.display = "block";
-	// 	gameplay.playMap(2, 0);
-	// });
+	document.getElementById("pause-menu-continue").addEventListener("click", function() {
+		gameplay.continue();
+		document.getElementById("webpage-state-pause-screen").style.display = "none";
+	});
+	document.getElementById("pause-menu-retry").addEventListener("click", function() {
+		gameplay.retry();
+		document.getElementById("webpage-state-pause-screen").style.display = "none";
+	});
+	document.getElementById("pause-menu-quit").addEventListener("click", function() {
+		document.getElementById("menu-audio").play();
+		document.getElementById("webpage-state-always").style.display = "block";
+		document.getElementById("top-bar").style.display = "block";
+		document.getElementById("webpage-state-beatmap-selection").style.display = "block";
+		document.getElementById("webpage-state-gameplay").style.display = "none";
+		document.getElementById("webpage-state-pause-screen").style.display = "none";
+	});
 	/* Library Stuff */
 	if (window.origin !== "null") {
 		let wave = new Wave();
