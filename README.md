@@ -4,3 +4,5 @@
  Currently in heavy development
 
  due to the complexity of spinners and HP - custom, balanced algorithms were created
+
+ Due to school priorities, the project isn't abandoned but in slower development
