@@ -101,7 +101,7 @@ define(function(require) {
 			/* Audio variables */
 			let backupStartTime = 0;
 			audio = AssetLoader.audio(`src/audio/${beatmap[useBeatmapSet][useBeatmap].AudioFilename}`);
-			audio.currentTime = 0;
+			audio.currentTime = beatmap[useBeatmapSet][useBeatmap].hitObjects[4].time;
 			audio.playbackRate = 1;
 			if (playDetails.mods.doubleTime) {
 				audio.playbackRate = 1.5;
@@ -777,20 +777,20 @@ define(function(require) {
 						ctx.lineTo(mapped.x, mapped.y);
 						ctx.stroke();
 						/* Draw Slider Head */
-						if (hitObjects[i].slides > 1 && hitObjects[i].cache.hitHead === true) {
+						if (hitObjects[i].cache.hasHitAtAll === false || (hitObjects[i].cache.currentSlide === hitObjects[i].slides - 1 && hitObjects[i].slides > 1)) {
+							canvas.drawImage(Assets.hitCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
+							canvas.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
+							if (playDetails.mods.hidden === false && hitObjects[i].cache.currentSlide === 0) {
+								canvas.drawImage(Assets.approachCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
+								canvas.drawImage(Assets.comboNumbers[1], hitObjectMapped.x, hitObjectMapped.y);
+							}
+						} else if (hitObjects[i].cache.currentSlide >= 1 && hitObjects[i].cache.currentSlide < hitObjects[i].slides - 1) {
 							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[0].x, hitObjects[i].cache.points[0].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 							ctx.translate(mapped.x, mapped.y);
 							ctx.rotate(-utils.direction(hitObjects[i].cache.points[1].x, hitObjects[i].cache.points[1].y, hitObjects[i].cache.points[0].x, hitObjects[i].cache.points[0].y) + Math.PI / 2);
 							canvas.drawImage(Assets.hitCircle, 0, 0, circleDiameter, circleDiameter);
 							canvas.drawImage(Assets.reverseArrow, 0, 0, circleDiameter, circleDiameter);
 							ctx.resetTransform();
-						} else if (hitObjects[i].cache.hitHead === false) {
-							canvas.drawImage(Assets.hitCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
-							canvas.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
-							if (playDetails.mods.hidden === false) {
-								canvas.drawImage(Assets.approachCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
-							}
-							canvas.drawImage(Assets.comboNumbers[1], hitObjectMapped.x, hitObjectMapped.y);
 						}
 						/* Draw Slider End ---------------------------------------------------------------- */
 						if (hitObjects[i].slides > 1 && hitObjects[i].cache.currentSlide < hitObjects[i].slides - 1) {
@@ -800,7 +800,7 @@ define(function(require) {
 							canvas.drawImage(Assets.hitCircle, 0, 0, circleDiameter, circleDiameter);
 							canvas.drawImage(Assets.reverseArrow, 0, 0, circleDiameter, circleDiameter);
 							ctx.resetTransform();
-						} else {
+						} else if (hitObjects[i].slides === 1 || hitObjects[i].cache.currentSlide < hitObjects[i].slides - 2) {
 							let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 							canvas.drawImage(Assets.hitCircle, mapped.x, mapped.y, circleDiameter, circleDiameter);
 							canvas.drawImage(Assets.hitCircleOverlay, mapped.x, mapped.y, circleDiameter, circleDiameter);
