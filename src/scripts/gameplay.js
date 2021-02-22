@@ -5,6 +5,15 @@ define(function(require) {
 	const Mouse = require("./Mouse.js");
 	const Keyboard = require("./Keyboard.js");
 	const beatmap = require("./DefaultBeatMaps.js");
+	let loadedMaps;
+	(function loadMaps() {
+		if (beatmap.allMapsLoaded() === true) {
+			loadedMaps = beatmap.get();
+			/* Beatmap loading and adding to dom */
+		} else {
+			requestAnimationFrame(loadMaps);
+		}
+	})();
 	const Beizer = require("./Beizer.js");
 	const utils = require("./utils.js");
 	const HitObject = require("./HitObject.js");
@@ -68,6 +77,7 @@ define(function(require) {
 			useBeatmapSet = groupIndex;
 			useBeatmap = mapIndex;
 			playDetails.mods = mods || Mods();
+			playDetails.mods.auto = true;
 			let currentHitObject = 0;
 			let hitEvents = [];
 			let hitObjects = [];
@@ -100,8 +110,9 @@ define(function(require) {
 			let angle = 0;
 			/* Audio variables */
 			let backupStartTime = 0;
-			audio = AssetLoader.audio(`src/audio/${beatmap[useBeatmapSet][useBeatmap].AudioFilename}`);
-			audio.currentTime = beatmap[useBeatmapSet][useBeatmap].hitObjects[4].time;
+			console.log(loadedMaps);
+			audio = AssetLoader.audio(`src/audio/${loadedMaps[useBeatmapSet][useBeatmap].AudioFilename}`);
+			audio.currentTime = 0;
 			audio.playbackRate = 1;
 			if (playDetails.mods.doubleTime) {
 				audio.playbackRate = 1.5;
@@ -121,12 +132,12 @@ define(function(require) {
 				audio.play();
 			});
 			/* Beatmap difficulty data */
-			let arTime = Formulas.AR(beatmap[useBeatmapSet][useBeatmap].ApproachRate, playDetails.mods);
-			let arFadeIn = Formulas.ARFadeIn(beatmap[useBeatmapSet][useBeatmap].ApproachRate, playDetails.mods);
+			let arTime = Formulas.AR(loadedMaps[useBeatmapSet][useBeatmap].ApproachRate, playDetails.mods);
+			let arFadeIn = Formulas.ARFadeIn(loadedMaps[useBeatmapSet][useBeatmap].ApproachRate, playDetails.mods);
 			/* Map from osu!pixels to screen pixels */
-			let circleDiameter = utils.map(Formulas.CS(beatmap[useBeatmapSet][useBeatmap].CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * playfieldSize * (4 / 3));
-			let difficultyMultiplier = Formulas.difficultyPoints(beatmap[useBeatmapSet][useBeatmap].CircleSize, beatmap[useBeatmapSet][useBeatmap].HPDrainRate, beatmap[useBeatmapSet][useBeatmap].OverallDifficulty);
-			let odTime = Formulas.ODHitWindow(beatmap[useBeatmapSet][useBeatmap].OverallDifficulty, playDetails.mods);
+			let circleDiameter = utils.map(Formulas.CS(loadedMaps[useBeatmapSet][useBeatmap].CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * playfieldSize * (4 / 3));
+			let difficultyMultiplier = Formulas.difficultyPoints(loadedMaps[useBeatmapSet][useBeatmap].CircleSize, loadedMaps[useBeatmapSet][useBeatmap].HPDrainRate, loadedMaps[useBeatmapSet][useBeatmap].OverallDifficulty);
+			let odTime = Formulas.ODHitWindow(loadedMaps[useBeatmapSet][useBeatmap].OverallDifficulty, playDetails.mods);
 			mouse.lockPointer();
 			if (alreadyRunning) {
 				return;
@@ -185,7 +196,7 @@ define(function(require) {
 				if (currentHP <= 0) {
 					currentHP = 0;
 				}
-				currentHP -= Formulas.HPDrain(beatmap[useBeatmapSet][useBeatmap].HPDrainRate, useTime - previousTime);
+				currentHP -= Formulas.HPDrain(loadedMaps[useBeatmapSet][useBeatmap].HPDrainRate, useTime - previousTime);
 				hpDisplay += (currentHP - hpDisplay) / 8;
 				canvas.setImageAlignment("top-left");
 				canvas.drawImage(Assets.scoreBarBg, 10, 10, window.innerWidth / 2, Assets.scoreBarBg.height);
@@ -239,24 +250,24 @@ define(function(require) {
 						combo = 0;
 						document.getElementById("combo-container").innerHTML = "";
 					}
-					currentHP += Formulas.HP(beatmap[useBeatmapSet][useBeatmap].HPDrainRate, hitEvents[0].score, hitEvents[0].type, playDetails.mods);
+					currentHP += Formulas.HP(loadedMaps[useBeatmapSet][useBeatmap].HPDrainRate, hitEvents[0].score, hitEvents[0].type, playDetails.mods);
 					hitEvents.splice(0, 1);
 				}
-				while (currentHitObject < beatmap[useBeatmapSet][useBeatmap].hitObjects.length && useTime >= beatmap[useBeatmapSet][useBeatmap].hitObjects[currentHitObject].time - arTime) {
-					hitObjects.push(beatmap[useBeatmapSet][useBeatmap].hitObjects[currentHitObject]);
+				while (currentHitObject < loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length && useTime >= loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject].time - arTime) {
+					hitObjects.push(loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject]);
 					currentHitObject++;
 				}
 				/* +1 because the given time is beginning time, not end time */
-				while (currentTimingPoint < beatmap[useBeatmapSet][useBeatmap].timingPoints.length - 1 && useTime >= beatmap[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint + 1].time) {
+				while (currentTimingPoint < loadedMaps[useBeatmapSet][useBeatmap].timingPoints.length - 1 && useTime >= loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint + 1].time) {
 					currentTimingPoint++;
-					if (beatmap[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].uninherited === 1) {
+					if (loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].uninherited === 1) {
 						timingPointUninheritedIndex = currentTimingPoint;
 					}
 				}
 				/* Cache Loop ---------------------------------------------------------------- */
 				for (let i = 0; i < hitObjects.length; i++) {
 					/* Cache Setup ---------------------------------------------------------------- */
-					let sliderSpeedMultiplier = beatmap[useBeatmapSet][useBeatmap].SliderMultiplier;
+					let sliderSpeedMultiplier = loadedMaps[useBeatmapSet][useBeatmap].SliderMultiplier;
 					if (hitObjects[i].cache.cacheSet === false) {
 						/* Immediate Cache Setup ---------------------------------------------------------------- */
 						if (hitObjects[i].type[0] === "1") {
@@ -318,8 +329,8 @@ define(function(require) {
 						}
 					}
 					/* inherited timing point */
-					if (beatmap[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].uninherited === 0) {
-						sliderSpeedMultiplier *= Formulas.sliderMultiplier(beatmap[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].beatLength);
+					if (loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].uninherited === 0) {
+						sliderSpeedMultiplier *= Formulas.sliderMultiplier(loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].beatLength);
 					}
 					/* Cache Setup ---------------------------------------------------------------- */
 					if (useTime >= hitObjects[i].time) {
@@ -332,11 +343,11 @@ define(function(require) {
 							/* Cache Setup for Slider ---------------------------------------------------------------- */
 							hitObjects[i].cache.sliderInheritedMultiplier = sliderSpeedMultiplier;
 							hitObjects[i].cache.timingPointUninheritedIndex = timingPointUninheritedIndex;
-							hitObjects[i].cache.sliderOnceTime = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * beatmap[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
+							hitObjects[i].cache.sliderOnceTime = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
 							hitObjects[i].cache.sliderTotalTime = hitObjects[i].cache.sliderOnceTime * hitObjects[i].slides;
-							let time = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * beatmap[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
+							let time = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
 							/* Actual ticks is -1 due to unexplicable phenomenon */
-							hitObjects[i].cache.totalTicks = time / beatmap[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength * beatmap[useBeatmapSet][useBeatmap].SliderTickRate;
+							hitObjects[i].cache.totalTicks = time / loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength * loadedMaps[useBeatmapSet][useBeatmap].SliderTickRate;
 							hitObjects[i].cache.specificSliderTicksHit = [];
 							for (let j = 0; j < hitObjects[i].slides; j++) {
 								let tempArray = [];
@@ -427,7 +438,7 @@ define(function(require) {
 					if (hitObjects[i].type[1] === "1" && useTime >= hitObjects[i].time) {
 						if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
 							let sliderRepeat = false;
-							let time = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * beatmap[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
+							let time = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
 							if (hitObjects[i].cache.currentSlide % 2 === 0) {
 								hitObjects[i].cache.sliderBodyPosition = Math.floor(utils.map(useTime, hitObjects[i].time + time * hitObjects[i].cache.currentSlide, hitObjects[i].time + time * (hitObjects[i].cache.currentSlide + 1), 0, hitObjects[i].cache.points.length - 1));
 								/* Prevent Index Errors */
@@ -642,7 +653,7 @@ define(function(require) {
 						hitObjects[i].cache.velocity += (angleChange - hitObjects[i].cache.velocity) / 32;
 						hitObjects[i].cache.currentAngle += hitObjects[i].cache.velocity * (useTime - previousTime);
 						hitObjects[i].cache.spinAngle += hitObjects[i].cache.velocity * (useTime - previousTime);
-						if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && Math.abs(hitObjects[i].cache.velocity / (Math.PI)) >= Formulas.ODSpinner(beatmap[useBeatmapSet][useBeatmap].OverallDifficulty, playDetails.mods)) {
+						if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && Math.abs(hitObjects[i].cache.velocity / (Math.PI)) >= Formulas.ODSpinner(loadedMaps[useBeatmapSet][useBeatmap].OverallDifficulty, playDetails.mods)) {
 							hitObjects[i].cache.timeSpentAboveSpinnerMinimum += useTime - previousTime;
 						}
 						if (hitObjects[i].cache.timeSpentAboveSpinnerMinimum >= (hitObjects[i].endTime - hitObjects[i].time) * 0.25) {
@@ -845,6 +856,9 @@ define(function(require) {
 				}
 				for (let i = 0; i < scoreObjects.length; i++) {
 					if (scoreObjects[i].lifetime - useTime >= 0) {
+						if (scoreObjects[i].score === 300) {
+							continue;
+						}
 						let useImage = -1;
 						switch (scoreObjects[i].score) {
 							case 300:
@@ -877,6 +891,9 @@ define(function(require) {
 				canvas.setFillStyle("#66ccff");
 				ctx.fillRect(window.innerWidth / 2 - odTime[2] * 1000 / 2, window.innerHeight * 0.975, odTime[2] * 1000, window.innerHeight * 0.005);
 				for (let i = 0; i < hitErrors.length; i++) {
+					if (i > 40) {
+						break;
+					}
 					let alpha = utils.map(i, 40, 0, 0, 1);
 					if (alpha <= 0) {
 						alpha = 0;

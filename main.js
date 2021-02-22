@@ -38,16 +38,66 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.6.2b";
+	const version = "osu!web v2021.0.7.0b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].innerText = version;
 	}
-	/* Beatmap loading and adding to dom */
-	for (let i = 0; i < Beatmaps.length; i++) {
-		document.getElementById("beatmap-selection-right").innerHTML += BeatMapSelectionPaneTemplate.group(Beatmaps[i], i);
-	}
+	(function loadMaps() {
+		if (Beatmaps.allMapsLoaded() === true) {
+			let loadedMaps = Beatmaps.get();
+			/* Beatmap loading and adding to dom */
+			for (let i = 0; i < loadedMaps.length; i++) {
+				document.getElementById("beatmap-selection-right").innerHTML += BeatMapSelectionPaneTemplate.group(loadedMaps[i], i);
+			}
+			let beatMapGroups = document.getElementsByClassName("beatmap-selection-group-pane");
+			for (let i = 0; i < beatMapGroups.length; i++) {
+				beatMapGroups[i].addEventListener("click", function() {
+					let maps = this.parentNode.getElementsByClassName("beatmap-selection-group-pane-maps");
+					if (maps[0].style.display === "block") {
+						maps[0].style.display = "none";
+						this.classList.remove("beatmap-selection-selected");
+						let mapsChildren = maps[0].getElementsByClassName("beatmap-selection-map-pane");
+						for (let i = 0; i < mapsChildren.length; i++) {
+							mapsChildren[i].classList.remove("beatmap-selection-selected");
+						}
+					} else {
+						maps[0].style.display = "block";
+						this.classList.add("beatmap-selection-selected");
+						let mapsChildren = maps[0].getElementsByClassName("beatmap-selection-map-pane");
+						for (let i = 0; i < mapsChildren.length; i++) {
+							mapsChildren[i].classList.add("beatmap-selection-selected");
+						}
+						let menuAudio = document.getElementById("menu-audio");
+						if (menuAudio.src.replaceAll("%20", " ") !== window.origin + "/src/audio/" + this.dataset.audiosource) {
+							menuAudio.src = "src/audio/" + this.dataset.audiosource;
+							menuAudio.currentTime = 0;
+							menuAudio.play();
+						}
+					}
+				});
+			}
+			let beatmapSelectionPanes = document.getElementsByClassName("beatmap-selection-map-pane");
+			for (var i = 0; i < beatmapSelectionPanes.length; i++) {
+				beatmapSelectionPanes[i].addEventListener("click", function() {
+					let elements = document.getElementsByClassName("webpage-state");
+					for (var i = 0; i < elements.length; i++) {
+						if (elements[i].id === "webpage-state-always") {
+							continue;
+						}
+						elements[i].style.display = "none";
+					}
+					document.getElementById("top-bar").style.display = "none";
+					document.getElementById("webpage-state-gameplay").style.display = "block";
+					document.getElementById("menu-audio").pause();
+					gameplay.playMap(this.dataset.groupIndex, this.dataset.mapIndex);
+				});
+			}
+		} else {
+			requestAnimationFrame(loadMaps);
+		}
+	})();
 	/* Initialise mouse module */
 	let mouse = new Mouse("body");
 	mouse.init();
@@ -304,7 +354,6 @@ define(function(require) {
 		document.getElementById("heart-loader").style.display = "none";
 	});
 	window.addEventListener("blur", function() {
-		console.log(document.getElementById("webpage-state-gameplay").style.display);
 		if (document.getElementById("webpage-state-gameplay").style.display === "block") {
 			document.getElementById("webpage-state-pause-screen").style.display = "block";
 			gameplay.pause();
@@ -529,49 +578,6 @@ define(function(require) {
 	});
 	AttachAudio(document.getElementById("back-button"), "click", "src/audio/effects/back-button-click.wav", "settings-master-volume", "settings-effects-volume");
 	AttachAudio(document.getElementById("back-button"), "mouseenter", "src/audio/effects/back-button-hover.wav", "settings-master-volume", "settings-effects-volume");
-	let beatMapGroups = document.getElementsByClassName("beatmap-selection-group-pane");
-	for (let i = 0; i < beatMapGroups.length; i++) {
-		beatMapGroups[i].addEventListener("click", function() {
-			let maps = this.parentNode.getElementsByClassName("beatmap-selection-group-pane-maps");
-			if (maps[0].style.display === "block") {
-				maps[0].style.display = "none";
-				this.classList.remove("beatmap-selection-selected");
-				let mapsChildren = maps[0].getElementsByClassName("beatmap-selection-map-pane");
-				for (let i = 0; i < mapsChildren.length; i++) {
-					mapsChildren[i].classList.remove("beatmap-selection-selected");
-				}
-			} else {
-				maps[0].style.display = "block";
-				this.classList.add("beatmap-selection-selected");
-				let mapsChildren = maps[0].getElementsByClassName("beatmap-selection-map-pane");
-				for (let i = 0; i < mapsChildren.length; i++) {
-					mapsChildren[i].classList.add("beatmap-selection-selected");
-				}
-				let menuAudio = document.getElementById("menu-audio");
-				if (menuAudio.src.replaceAll("%20", " ") !== window.origin + "/src/audio/" + this.dataset.audiosource) {
-					menuAudio.src = "src/audio/" + this.dataset.audiosource;
-					menuAudio.currentTime = 0;
-					menuAudio.play();
-				}
-			}
-		});
-	}
-	let beatmapSelectionPanes = document.getElementsByClassName("beatmap-selection-map-pane");
-	for (var i = 0; i < beatmapSelectionPanes.length; i++) {
-		beatmapSelectionPanes[i].addEventListener("click", function() {
-			let elements = document.getElementsByClassName("webpage-state");
-			for (var i = 0; i < elements.length; i++) {
-				if (elements[i].id === "webpage-state-always") {
-					continue;
-				}
-				elements[i].style.display = "none";
-			}
-			document.getElementById("top-bar").style.display = "none";
-			document.getElementById("webpage-state-gameplay").style.display = "block";
-			document.getElementById("menu-audio").pause();
-			gameplay.playMap(this.dataset.groupIndex, this.dataset.mapIndex);
-		});
-	}
 	document.getElementById("menu-bar-play").addEventListener("click", function() {
 		document.getElementById("webpage-state-menu").style.display = "none";
 		document.getElementById("webpage-state-beatmap-selection").style.display = "block";

@@ -1,29 +1,63 @@
-let deps = ["require", "./Parser.js",
-	"../beatmaps/Peter Lambert - osu tutorial (peppy) [Gameplay basics].js",
-	"../beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Easy].js",
-	"../beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Normal].js",
-	"../beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Hard].js",
-	"../beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Insane].js",
-	"../beatmaps/Kurokotei - Galaxy Collapse (Doomsday is Bad) [Galaxy].js",
-	"../beatmaps/Kurokotei - Galaxy Collapse (Doomsday is Bad) [Galactic].js",
-	"../beatmaps/Soleily - Renatus (Gamu) [Normal].js",
-	"../beatmaps/Soleily - Renatus (Gamu) [Hard].js",
-	"../beatmaps/Soleily - Renatus (Gamu) [Insane].js"
+let deps = [
+	"../src/beatmaps/Peter Lambert - osu! tutorial (peppy) [Gameplay basics].osu",
+	"../src/beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Easy].osu",
+	"../src/beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Normal].osu",
+	"../src/beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Hard].osu",
+	"../src/beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Insane].osu",
+	"../src/beatmaps/Kurokotei - Galaxy Collapse (Doomsday is Bad) [Galaxy].osu",
+	"../src/beatmaps/Kurokotei - Galaxy Collapse (Doomsday is Bad) [Galactic].osu",
+	"../src/beatmaps/LeaF - Evanescent (Charles445) [Aspire].osu",
+	"../src/beatmaps/Soleily - Renatus (Gamu) [Normal].osu",
+	"../src/beatmaps/Soleily - Renatus (Gamu) [Hard].osu",
+	"../src/beatmaps/Soleily - Renatus (Gamu) [Insane].osu",
+	"../src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [emillia].osu",
+	"../src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [emillistream].osu",
+	"../src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [ET (Piggey vs Astar)].osu",
+	"../src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Firedigger's peaceful walk].osu",
+	"../src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Friendofox's Galaxy].osu",
+	"../src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Nao's Eclipse].osu",
+	"../src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Piggey's Destruction].osu",
+	"../src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Silverboxer's Supernova].osu",
+	"../src/beatmaps/UNDEAD CORPORATION - The Empress (Plutia) [STARBOW BREAK!].osu",
 ]
-define(deps, function(require) {
+define(function(require) {
 	let Parser = require("./Parser.js");
-	let beatmaps = deps.slice(2);
+	let fetchedMaps = [];
+	let mapsLoaded = 0;
 	let beatmapsSorted = [];
 	let beatMapGroups = [];
 	let previous = "";
-	for (var i = 0; i < beatmaps.length; i++) {
-		if (beatMapGroups.length !== 0 && beatmaps[i].substr(0, beatmaps[i].match(/\[/).index) !== previous) {
-			beatmapsSorted.push(beatMapGroups);
-			beatMapGroups = [];
-			previous = beatmaps[i].substr(0, beatmaps[i].match(/\[/).index);
+
+	async function fetchMaps() {
+		for (var i = 0; i < deps.length; i++) {
+			const response = await fetch(deps[i]);
+			await response.text().then(function(data) {
+				fetchedMaps.push(data);
+				mapsLoaded++;
+			});
 		}
-		beatMapGroups.push(Parser.parseBeatMap(require(beatmaps[i])));
+		for (var i = 0; i < fetchedMaps.length; i++) {
+			let parsedMap = Parser.parseBeatMap(fetchedMaps[i]);
+			if (beatMapGroups.length !== 0 && parsedMap.BeatmapSetID !== previous) {
+				beatmapsSorted.push(beatMapGroups);
+				beatMapGroups = [];
+				previous = parsedMap.BeatmapSetID;
+			}
+			beatMapGroups.push(parsedMap);
+		}
+		beatmapsSorted.push(beatMapGroups);
 	}
-	beatmapsSorted.push(beatMapGroups);
-	return beatmapsSorted;
+	fetchMaps();
+	return {
+		get: function() {
+			return beatmapsSorted;
+		},
+		allMapsLoaded: function() {
+			if (mapsLoaded === deps.length) {
+				return true;
+			} else {
+				false;
+			}
+		},
+	};
 });
