@@ -856,9 +856,6 @@ define(function(require) {
 				}
 				for (let i = 0; i < scoreObjects.length; i++) {
 					if (scoreObjects[i].lifetime - useTime >= 0) {
-						if (scoreObjects[i].score === 300) {
-							continue;
-						}
 						let useImage = -1;
 						switch (scoreObjects[i].score) {
 							case 300:
