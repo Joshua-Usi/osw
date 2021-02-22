@@ -18,7 +18,6 @@ let deps = [
 	"../src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Nao's Eclipse].osu",
 	"../src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Piggey's Destruction].osu",
 	"../src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Silverboxer's Supernova].osu",
-	"../src/beatmaps/UNDEAD CORPORATION - The Empress (Plutia) [STARBOW BREAK!].osu",
 ]
 define(function(require) {
 	let Parser = require("./Parser.js");

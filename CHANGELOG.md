@@ -12,7 +12,6 @@ and this project adheres to slightly modified [Semantic Versioning](https://semv
 - beatmap template
 ### Fixed
 - Slider heads and ends having the correct symbols
-
 ---
 ## [v2021.0.6.2b] - 2021-02-16
 ### Added
