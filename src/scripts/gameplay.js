@@ -743,6 +743,29 @@ define(function(require) {
 				mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 				ctx.lineTo(mapped.x, mapped.y);
 				ctx.stroke();
+				/* Draw Slider Ticks ---------------------------------------------------------------- */
+				if (hitObjects[i].cache.totalTicks >= 1 && hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide]) {
+					for (let j = 0; j < hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide].length; j++) {
+						if (hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j]) {
+							continue;
+						}
+						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].x, hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+						canvas.drawImage(Assets.sliderScorePoint, mapped.x, mapped.y);
+					}
+				}
+				/* Draw Slider End ---------------------------------------------------------------- */
+				if (hitObjects[i].slides > 1 && hitObjects[i].cache.currentSlide < hitObjects[i].slides - 1) {
+					let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+					ctx.translate(mapped.x, mapped.y);
+					ctx.rotate(-utils.direction(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 4].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 3].y, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 2].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y) + Math.PI / 2);
+					canvas.drawImage(Assets.hitCircle, 0, 0, circleDiameter, circleDiameter);
+					canvas.drawImage(Assets.reverseArrow, 0, 0, circleDiameter, circleDiameter);
+					ctx.resetTransform();
+				} else if (hitObjects[i].slides === 1 || hitObjects[i].cache.currentSlide < hitObjects[i].slides - 2) {
+					let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+					canvas.drawImage(Assets.hitCircle, mapped.x, mapped.y, circleDiameter, circleDiameter);
+					canvas.drawImage(Assets.hitCircleOverlay, mapped.x, mapped.y, circleDiameter, circleDiameter);
+				}
 				/* Draw Slider Head */
 				if (hitObjects[i].cache.hasHitAtAll === false || (hitObjects[i].cache.currentSlide === hitObjects[i].slides - 1 && hitObjects[i].slides > 1)) {
 					canvas.drawImage(Assets.hitCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
@@ -758,29 +781,6 @@ define(function(require) {
 					canvas.drawImage(Assets.hitCircle, 0, 0, circleDiameter, circleDiameter);
 					canvas.drawImage(Assets.reverseArrow, 0, 0, circleDiameter, circleDiameter);
 					ctx.resetTransform();
-				}
-				/* Draw Slider End ---------------------------------------------------------------- */
-				if (hitObjects[i].slides > 1 && hitObjects[i].cache.currentSlide < hitObjects[i].slides - 1) {
-					let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-					ctx.translate(mapped.x, mapped.y);
-					ctx.rotate(-utils.direction(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 4].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 3].y, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 2].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y) + Math.PI / 2);
-					canvas.drawImage(Assets.hitCircle, 0, 0, circleDiameter, circleDiameter);
-					canvas.drawImage(Assets.reverseArrow, 0, 0, circleDiameter, circleDiameter);
-					ctx.resetTransform();
-				} else if (hitObjects[i].slides === 1 || hitObjects[i].cache.currentSlide < hitObjects[i].slides - 2) {
-					let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-					canvas.drawImage(Assets.hitCircle, mapped.x, mapped.y, circleDiameter, circleDiameter);
-					canvas.drawImage(Assets.hitCircleOverlay, mapped.x, mapped.y, circleDiameter, circleDiameter);
-				}
-				/* Draw Slider Ticks ---------------------------------------------------------------- */
-				if (hitObjects[i].cache.totalTicks >= 1 && hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide]) {
-					for (let j = 0; j < hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide].length; j++) {
-						if (hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j]) {
-							continue;
-						}
-						let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].x, hitObjects[i].cache.points[hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide][j]].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-						canvas.drawImage(Assets.sliderScorePoint, mapped.x, mapped.y);
-					}
 				}
 				if (hitObjects[i].cache.sliderBodyPosition !== undefined && useTime >= hitObjects[i].time) {
 					let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].x, hitObjects[i].cache.points[hitObjects[i].cache.sliderBodyPosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
