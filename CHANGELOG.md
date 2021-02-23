@@ -1,6 +1,10 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to slightly modified [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v2021.0.7.1b] - 2021-02-23
+### Changed
+- Approach circle minimium size to match osu!
+---
 ## [v2021.0.7.0b] - 2021-02-22
 ### Added
 - Added more default maps
