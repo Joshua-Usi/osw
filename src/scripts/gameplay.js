@@ -663,15 +663,15 @@ define(function(require) {
 		canvas.setImageAlignment("center");
 		for (let i = hitObjects.length - 1; i >= 0; i--) {
 			/* Approach Circle Calculations ---------------------------------------------------------------- */
-			let approachCircleSize = utils.map(useTime - (hitObjects[i].time - arTime), 0, arTime, 5, 1.6);
+			let approachCircleSize = utils.map(useTime - (hitObjects[i].time - arTime), 0, arTime, 5, 1.4);
 			let hitObjectMapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 			/* approach circle max size */
 			if (approachCircleSize >= 5) {
 				approachCircleSize = 5;
 			}
 			/* approach circle min size */
-			if (approachCircleSize <= 1.6) {
-				approachCircleSize = 1.6;
+			if (approachCircleSize <= 1.4) {
+				approachCircleSize = 1.4;
 			}
 			/* Alpha Calculations ---------------------------------------------------------------- */
 			if (hitObjects[i].type[0] === "1") {
