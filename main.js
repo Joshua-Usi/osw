@@ -38,7 +38,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.7.1b";
+	const version = "osu!web v2021.0.7.2b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -95,7 +95,8 @@ define(function(require) {
 				});
 			}
 		} else {
-			requestAnimationFrame(loadMaps);
+			/* every 100ms try and load maps from the server*/
+			setTimeout(loadMaps, 100);
 		}
 	})();
 	/* Initialise mouse module */

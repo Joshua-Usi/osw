@@ -104,7 +104,7 @@
 .beatmap-selection-group-pane {
 	position: relative;
 	color: #e4ecef;
-	width: 40vw;
+	width: 50vw;
 	border-radius: 1.25vw 0 0 1.25vw;
 	margin-bottom: 1vh;
 	padding: 1vh;
@@ -116,7 +116,7 @@
 
 .beatmap-selection-map-pane {
 	color: #e4ecef;
-	width: 35vw;
+	width: 45vw;
 	position: relative;
 	left: 5vw;
 	border-radius: 1.25vw 0 0 1.25vw;

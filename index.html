@@ -22,6 +22,7 @@
 					<div></div>
 				</div>
 				<p style="margin: 0;">osu!web is in heavy development</p>
+				<p style="margin: 0;">many things are expected to change at any moments notice</p>
 				<p style="margin: 0;" class="version-number"></p>
 				<p style="margin: 0;">click to continue...</p>
 			</div>
@@ -92,12 +93,28 @@
 					<!-- Gameplay Settings -->
 					<div class="sidenav-divider"></div>
 					<p class="sidenav-title-text">Gameplay</p>
+					<p>Notelock style</p>
+					<div class="select-box" id="settings-notelock-type">
+						<div class="select-box-selected-container">
+							<!-- Default option -->
+							<p class="select-box-selected">Full (original osu! implementation)</p>
+							<p class="select-box-arrow">&#709;</p>
+						</div>
+						<div class="select-box-selections">
+							<p class="selected">Full (original osu! implementation)</p>
+							<p>Miss previous objects</p>
+							<p>None</p>
+						</div>
+					</div>
 					<p id="settings-background-dim-text">Background dim: 80%</p>
 					<input type="range" id="settings-background-dim" class="slider" min="0" max="100" value="80">
 					<div>
 						<p class="inline-block">Draw 300 hits</p>
 						<input type="checkbox" id="settings-draw-300-hits" class="checkbox inline-block float-right" name="settings-draw-300-hits" checked>
 					</div>
+					<!-- Gameplay Rendering Settings -->
+					<div class="sidenav-divider"></div>
+					<p class="sidenav-title-text">Gameplay Rendering</p>
 					<div>
 						<p class="inline-block">Snaking sliders</p>
 						<input type="checkbox" id="settings-snaking-sliders" class="checkbox inline-block float-right" name="settings-snaking-sliders" checked>

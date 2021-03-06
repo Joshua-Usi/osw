@@ -1,6 +1,11 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to slightly modified [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v2021.0.7.2b] - 2021-03-06
+### Added
+- Splash screen text to denote heavy developement
+- Notelock styles
+---
 ## [v2021.0.7.1b] - 2021-02-23
 ### Changed
 - Approach circle minimium size to match osu!
