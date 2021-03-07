@@ -1,5 +1,20 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to slightly modified [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
+---s
+## [v2021.0.7.3b] - 2021-03-08
+### Added
+*Based off https://github.com/ppy/osu/issues/7048*
+- snaking in sliders
+### Changed
+-
+### Deprecated
+-
+### Removed
+-
+### Fixed
+-
+### Security
+-
 ---
 ## [v2021.0.7.2b] - 2021-03-06
 ### Added

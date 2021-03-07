@@ -2,7 +2,7 @@ define(function(require) {
 	"use strict";
 	const utils = require("./utils.js");
 	let defaultOptions = {
-		version: 2,
+		version: 3,
 		types: [
 			"slider",
 			"slider",
@@ -20,6 +20,7 @@ define(function(require) {
 			"slider",
 			"checkbox",
 
+			"checkbox",
 			"checkbox",
 			"selectbox",
 
@@ -53,7 +54,8 @@ define(function(require) {
 			draw300Hits: true,
 		},
 		GameplayRendering: {
-			snakingSliders: true,
+			snakingSlidersIn: true,
+			snakingSlidersOut: true,
 			cursorTrails: "Interpolated",
 		},
 		Performance: {
