@@ -42,7 +42,7 @@ define(function(require) {
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
-		classes[i].innerText = version;
+		classes[i].textContent = version;
 	}
 	(function loadMaps() {
 		if (Beatmaps.allMapsLoaded() === true) {
@@ -115,14 +115,14 @@ define(function(require) {
 	let chosenSong;
 	let menuAudio = new Audio();
 	menuAudio.addEventListener("play", function() {
-		document.getElementById("now-playing").innerText = "Now Playing: " + utils.removeInstances(this.src, [window.origin, "/src/audio/", ".wav", ".mp3", ".ogg"]).replaceAll("%20", " ");
+		document.getElementById("now-playing").textContent = "Now Playing: " + utils.removeInstances(this.src, [window.origin, "/src/audio/", ".wav", ".mp3", ".ogg"]).replaceAll("%20", " ");
 	});
 	menuAudio.addEventListener("ended", function() {
 		this.play();
 	});
 	menuAudio.addEventListener("DOMAttrModified", function(event) {
 		if (event.attrName == "src") {
-			document.getElementById("now-playing").innerText = "Now Playing: " + utils.removeInstances(this[src], [".wav", ".mp3", ".ogg"]);
+			document.getElementById("now-playing").textContent = "Now Playing: " + utils.removeInstances(this[src], [".wav", ".mp3", ".ogg"]);
 		}
 	});
 	menuAudio.id = "menu-audio";
@@ -176,10 +176,10 @@ define(function(require) {
 									element.checked = Options[group][setting];
 									break;
 								case "selectbox":
-									element.getElementsByClassName("select-box-selected")[0].innerText = Options[group][setting];
+									element.getElementsByClassName("select-box-selected")[0].textContent = Options[group][setting];
 									break;
 								case "text":
-									element.innerText = Options[group][setting];
+									element.textContent = Options[group][setting];
 									break;
 							}
 							index++;
@@ -188,7 +188,7 @@ define(function(require) {
 				}
 			}
 			settingsSet = true;
-			if (document.getElementById("settings-intro-sequence").getElementsByClassName("select-box-selected")[0].innerText === "Triangles") {
+			if (document.getElementById("settings-intro-sequence").getElementsByClassName("select-box-selected")[0].textContent === "Triangles") {
 				chosenSong = 0;
 				menuAudio.src = `src/audio/${songs[chosenSong].src}`;
 			} else {
@@ -311,15 +311,15 @@ define(function(require) {
 					}
 					times.push(now);
 					frameRate = times.length;
-					let innerText = frameRate;
+					let textContent = frameRate;
 					if (Options.Performance.maxFrameRate === "VSync") {
-						innerText += " / 60fps";
+						textContent += " / 60fps";
 					} else if (Options.Performance.maxFrameRate === "2x VSync") {
-						innerText += " / 120fps";
+						textContent += " / 120fps";
 					} else if (Options.Performance.maxFrameRate === "Browser Maximum (250fps)") {
-						innerText += " / 250fps";
+						textContent += " / 250fps";
 					}
-					document.getElementById("frame-rate").innerText = innerText;
+					document.getElementById("frame-rate").textContent = textContent;
 					if (frameRate > 60) {
 						document.getElementById("frame-rate").style.background = "#6d9eeb";
 					} else if (frameRate > 45) {
@@ -461,25 +461,25 @@ define(function(require) {
 	}
 	/* Specific range slider listeners */
 	document.getElementById("settings-master-volume").addEventListener("input", function() {
-		document.getElementById("settings-master-volume-text").innerText = "Master volume: " + this.value + "%";
+		document.getElementById("settings-master-volume-text").textContent = "Master volume: " + this.value + "%";
 		document.getElementById("menu-audio").volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 		setSettings();
 	});
 	document.getElementById("settings-music-volume").addEventListener("input", function() {
-		document.getElementById("settings-music-volume-text").innerText = "Music volume: " + this.value + "%";
+		document.getElementById("settings-music-volume-text").textContent = "Music volume: " + this.value + "%";
 		document.getElementById("menu-audio").volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 		setSettings();
 	});
 	document.getElementById("settings-effects-volume").addEventListener("input", function() {
-		document.getElementById("settings-effects-volume-text").innerText = "Effects volume: " + this.value + "%";
+		document.getElementById("settings-effects-volume-text").textContent = "Effects volume: " + this.value + "%";
 		setSettings();
 	});
 	document.getElementById("settings-mouse-sensitivity").addEventListener("input", function() {
-		document.getElementById("settings-mouse-sensitivity-text").innerText = "Mouse sensitivity: " + (window.parseInt(this.value) / 10).toFixed(1) + "x";
+		document.getElementById("settings-mouse-sensitivity-text").textContent = "Mouse sensitivity: " + (window.parseInt(this.value) / 10).toFixed(1) + "x";
 		setSettings();
 	});
 	document.getElementById("settings-background-dim").addEventListener("input", function() {
-		document.getElementById("settings-background-dim-text").innerText = "Background dim: " + this.value + "%";
+		document.getElementById("settings-background-dim-text").textContent = "Background dim: " + this.value + "%";
 		setSettings();
 	});
 	document.getElementById("settings-slider-resolution").addEventListener("input", function() {
@@ -495,7 +495,7 @@ define(function(require) {
 		} else if (this.value === "5") {
 			resolution = "Sixteenth";
 		}
-		document.getElementById("settings-slider-resolution-text").innerText = "Slider resolution: " + resolution;
+		document.getElementById("settings-slider-resolution-text").textContent = "Slider resolution: " + resolution;
 		setSettings();
 	});
 	/* All selectbox listeners */
@@ -510,7 +510,7 @@ define(function(require) {
 					p[k].setAttribute("class", "");
 				}
 				this.setAttribute("class", "selected");
-				this.parentNode.parentNode.getElementsByClassName("select-box-selected")[0].innerText = this.innerText;
+				this.parentNode.parentNode.getElementsByClassName("select-box-selected")[0].textContent = this.textContent;
 				setSettings();
 			});
 		}
@@ -612,26 +612,26 @@ define(function(require) {
 			Options.Audio.musicVolume = document.getElementById("settings-music-volume").value / 100;
 			Options.Audio.effectsVolume = document.getElementById("settings-effects-volume").value / 100;
 			/* Inputs */
-			Options.Inputs.keyboardLeftButton = document.getElementById("settings-keyboard-left-button").innerText;
-			Options.Inputs.keyboardRightButton = document.getElementById("settings-keyboard-right-button").innerText;
+			Options.Inputs.keyboardLeftButton = document.getElementById("settings-keyboard-left-button").textContent;
+			Options.Inputs.keyboardRightButton = document.getElementById("settings-keyboard-right-button").textContent;
 			Options.Inputs.enableMouseButtonsInGameplay = document.getElementById("settings-enable-mouse-buttons-in-gameplay").checked;
 			Options.Inputs.mouseSensitivity = document.getElementById("settings-mouse-sensitivity").value / 10;
 			/* User Interface */
-			Options.UserInterface.introSequence = document.getElementById("settings-intro-sequence").getElementsByClassName("select-box-selected")[0].innerText;
+			Options.UserInterface.introSequence = document.getElementById("settings-intro-sequence").getElementsByClassName("select-box-selected")[0].textContent;
 			Options.UserInterface.menuParallax = document.getElementById("settings-menu-parallax").checked;
 			/* Gameplay */
 			Options.Gameplay.backgroundDim = document.getElementById("settings-background-dim").value / 100;
 			Options.Gameplay.draw300Hits = document.getElementById("settings-draw300-hits").checked;
 			/* Gameplay Rendering */
 			Options.GameplayRendering.snakingSliders = document.getElementById("settings-snaking-sliders").checked;
-			Options.GameplayRendering.cursorTrails = document.getElementById("settings-cursor-trails").getElementsByClassName("select-box-selected")[0].innerText;
+			Options.GameplayRendering.cursorTrails = document.getElementById("settings-cursor-trails").getElementsByClassName("select-box-selected")[0].textContent;
 			/* Performance */
 			Options.Performance.lowPowerMode = document.getElementById("settings-low-power-mode").checked;
-			Options.Performance.maxFrameRate = document.getElementById("settings-max-frame-rate").getElementsByClassName("select-box-selected")[0].innerText;
+			Options.Performance.maxFrameRate = document.getElementById("settings-max-frame-rate").getElementsByClassName("select-box-selected")[0].textContent;
 			Options.Performance.showFps = document.getElementById("settings-show-fps").checked;
 			Options.Performance.sliderResolution = utils.map(parseInt(document.getElementById("settings-slider-resolution").value), 1, 5, 0, 1);
 			Options.Performance.drawHitValues = document.getElementById("settings-draw-hit-values").checked;
-			Options.Performance.scoreUpdateRate = document.getElementById("settings-score-update-rate").getElementsByClassName("select-box-selected")[0].innerText;
+			Options.Performance.scoreUpdateRate = document.getElementById("settings-score-update-rate").getElementsByClassName("select-box-selected")[0].textContent;
 			localStorage.setItem("options", JSON.stringify(Options));
 			console.log("settings saved!");
 		}
