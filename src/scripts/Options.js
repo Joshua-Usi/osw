@@ -1,7 +1,37 @@
 define(function(require) {
 	"use strict";
+	const utils = require("./utils.js");
 	let defaultOptions = {
-		version: 1,
+		version: 2,
+		types: [
+			"slider",
+			"slider",
+			"slider",
+
+			"text",
+			"text",
+			"checkbox",
+			"slider",
+
+			"selectbox",
+			"checkbox",
+
+			"selectbox",
+			"slider",
+			"checkbox",
+
+			"checkbox",
+			"selectbox",
+
+			"checkbox",
+			"selectbox",
+			"checkbox",
+			"slider",
+			"checkbox",
+			"selectbox",
+
+			"selectbox",
+		],
 		Audio: {
 			masterVolume: 1,
 			musicVolume: 1,
@@ -11,23 +41,26 @@ define(function(require) {
 			keyboardLeftButton: "z",
 			keyboardRightButton: "x",
 			enableMouseButtonsInGameplay: true,
-			mouseSensitivity: 1,
+			mouseSensitivity: utils.map(1, 0.1, 6, 0, 1),
 		},
 		UserInterface: {
 			introSequence: "Triangles",
 			menuParallax: true,
 		},
 		Gameplay: {
+			notelockStyle: "Full (original osu! implementation)",
 			backgroundDim: 0.8,
 			draw300Hits: true,
+		},
+		GameplayRendering: {
 			snakingSliders: true,
 			cursorTrails: "Interpolated",
 		},
 		Performance: {
 			lowPowerMode: false,
 			maxFrameRate: "VSync",
-			ShowFPS: false,
-			sliderResolution: 1,
+			showFps: false,
+			sliderResolution: 0,
 			drawHitValues: true,
 			scoreUpdateRate: "Equal to frame rate",
 		},

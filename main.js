@@ -161,39 +161,32 @@ define(function(require) {
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
 			/* Setting settings */
-			/* Audio */
-			document.getElementById("settings-master-volume").value = Options.Audio.masterVolume * 100;
-			document.getElementById("settings-master-volume").dispatchEvent(new CustomEvent("input"));
-
-			document.getElementById("settings-music-volume").value = Options.Audio.musicVolume * 100;
-			document.getElementById("settings-music-volume").dispatchEvent(new CustomEvent("input"));
-
-			document.getElementById("settings-effects-volume").value = Options.Audio.effectsVolume * 100;
-			document.getElementById("settings-effects-volume").dispatchEvent(new CustomEvent("input"));
-			/* Inputs */
-			document.getElementById("settings-keyboard-left-button").innerText = Options.Inputs.keyboardLeftButton;
-			document.getElementById("settings-keyboard-right-button").innerText = Options.Inputs.keyboardRightButton;
-			document.getElementById("settings-enable-mouse-buttons-in-gameplay").checked = Options.Inputs.enableMouseButtonsInGameplay;
-
-			document.getElementById("settings-mouse-sensitivity").value = Options.Inputs.mouseSensitivity * 10;
-			document.getElementById("settings-mouse-sensitivity").dispatchEvent(new CustomEvent("input"));
-			/* User Interface */
-			document.getElementById("settings-intro-sequence").getElementsByClassName("select-box-selected")[0].innerText = Options.UserInterface.introSequence;
-			document.getElementById("settings-menu-parallax").checked = Options.UserInterface.menuParallax;
-			/* Gameplay */
-			document.getElementById("settings-background-dim").value = Options.Gameplay.backgroundDim * 100;
-			document.getElementById("settings-background-dim").dispatchEvent(new CustomEvent("input"));
-			document.getElementById("settings-draw-300-hits").checked = Options.Gameplay.draw300Hits;
-			document.getElementById("settings-snaking-sliders").checked = Options.Gameplay.snakingSliders;
-			document.getElementById("settings-cursor-trails").getElementsByClassName("select-box-selected")[0].innerText = Options.Gameplay.cursorTrails;
-			/* Performance */
-			document.getElementById("settings-low-power-mode").checked = Options.Performance.lowPowerMode;
-			document.getElementById("settings-max-frame-rate").getElementsByClassName("select-box-selected")[0].innerText = Options.Performance.maxFrameRate;
-			document.getElementById("settings-show-fps").checked = Options.Performance.ShowFPS;
-			document.getElementById("settings-slider-resolution").value = Options.Performance.sliderResolution;
-			document.getElementById("settings-slider-resolution").dispatchEvent(new CustomEvent("input"));
-			document.getElementById("settings-draw-hit-values").checked = Options.Performance.drawHitValues;
-			document.getElementById("settings-score-update-rate").getElementsByClassName("select-box-selected")[0].innerText = Options.Performance.scoreUpdateRate;
+			let index = 0;
+			for (let group in Options) {
+				if (Options.hasOwnProperty(group) && typeof(Options[group]) === "object" && group !== "types") {
+					for (let setting in Options[group]) {
+						if (Options[group].hasOwnProperty(setting)) {
+							let element = document.getElementById("settings-" + utils.camelCaseToDash(setting));
+							switch (Options.types[index]) {
+								case "slider":
+									element.value = utils.map(Options[group][setting], 0, 1, element.min, element.max);
+									element.dispatchEvent(new CustomEvent("input"));
+									break;
+								case "checkbox":
+									element.checked = Options[group][setting];
+									break;
+								case "selectbox":
+									element.getElementsByClassName("select-box-selected")[0].innerText = Options[group][setting];
+									break;
+								case "text":
+									element.innerText = Options[group][setting];
+									break;
+							}
+							index++;
+						}
+					}
+				}
+			}
 			settingsSet = true;
 			if (document.getElementById("settings-intro-sequence").getElementsByClassName("select-box-selected")[0].innerText === "Triangles") {
 				chosenSong = 0;
@@ -358,7 +351,7 @@ define(function(require) {
 		if (document.getElementById("webpage-state-gameplay").style.display === "block") {
 			document.getElementById("webpage-state-pause-screen").style.display = "block";
 			gameplay.pause();
-		} 
+		}
 	});
 	/* Top bar event listeners */
 	document.getElementById("top-bar").addEventListener("mouseenter", function() {
@@ -527,7 +520,6 @@ define(function(require) {
 		selectBoxes[i].addEventListener("click", function() {
 			let selectBoxSelections = this.getElementsByClassName("select-box-selections")[0];
 			if (selectBoxSelections.style.height === "0px" || selectBoxSelections.style.height === "") {
-				console.log(selectBoxSelections.style.cacheHeight);
 				selectBoxSelections.style.height = "calc(" + selectBoxSelections.style.cacheHeight + "vh + 1px)";
 				selectBoxSelections.style.opacity = 1;
 			} else {
@@ -629,14 +621,15 @@ define(function(require) {
 			Options.UserInterface.menuParallax = document.getElementById("settings-menu-parallax").checked;
 			/* Gameplay */
 			Options.Gameplay.backgroundDim = document.getElementById("settings-background-dim").value / 100;
-			Options.Gameplay.draw300Hits = document.getElementById("settings-draw-300-hits").checked;
-			Options.Gameplay.snakingSliders = document.getElementById("settings-snaking-sliders").checked;
-			Options.Gameplay.cursorTrails = document.getElementById("settings-cursor-trails").getElementsByClassName("select-box-selected")[0].innerText;
+			Options.Gameplay.draw300Hits = document.getElementById("settings-draw300-hits").checked;
+			/* Gameplay Rendering */
+			Options.GameplayRendering.snakingSliders = document.getElementById("settings-snaking-sliders").checked;
+			Options.GameplayRendering.cursorTrails = document.getElementById("settings-cursor-trails").getElementsByClassName("select-box-selected")[0].innerText;
 			/* Performance */
 			Options.Performance.lowPowerMode = document.getElementById("settings-low-power-mode").checked;
 			Options.Performance.maxFrameRate = document.getElementById("settings-max-frame-rate").getElementsByClassName("select-box-selected")[0].innerText;
-			Options.Performance.ShowFPS = document.getElementById("settings-show-fps").checked;
-			Options.Performance.sliderResolution = document.getElementById("settings-slider-resolution").value;
+			Options.Performance.showFps = document.getElementById("settings-show-fps").checked;
+			Options.Performance.sliderResolution = utils.map(parseInt(document.getElementById("settings-slider-resolution").value), 1, 5, 0, 1);
 			Options.Performance.drawHitValues = document.getElementById("settings-draw-hit-values").checked;
 			Options.Performance.scoreUpdateRate = document.getElementById("settings-score-update-rate").getElementsByClassName("select-box-selected")[0].innerText;
 			localStorage.setItem("options", JSON.stringify(Options));

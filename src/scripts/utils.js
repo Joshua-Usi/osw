@@ -240,5 +240,8 @@ define(function(require) {
 			}
 			return sum / array.length;
 		},
+		camelCaseToDash(string) {
+			return string.replace(/[A-Z]/g, m => "-" + m.toLowerCase());
+		}
 	};
 });
