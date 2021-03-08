@@ -5,16 +5,9 @@ and this project adheres to slightly modified [Semantic Versioning](https://semv
 ### Added
 *Based off https://github.com/ppy/osu/issues/7048*
 - snaking in sliders
+- hit effects
 ### Changed
--
-### Deprecated
--
-### Removed
--
-### Fixed
--
-### Security
--
+- Follow circle size from 2.4x to 2.0x (still feels too large)
 ---
 ## [v2021.0.7.2b] - 2021-03-06
 ### Added

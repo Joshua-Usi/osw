@@ -83,12 +83,22 @@ define(function(require) {
 			}
 		},
 		ScoreObject: class ScoreObject {
-			constructor(score, x, y, lifetime) {
+			constructor(score, x, y, initialTime, lifetime) {
 				this.score = score;
 				this.x = x;
 				this.y = y;
+				this.initialTime = initialTime;
 				this.lifetime = lifetime;
 			}
 		},
+		EffectObject: class EffectObject {
+			constructor(src, x, y, initialTime, lifetime) {
+				this.src = src;
+				this.x = x;
+				this.y = y;
+				this.initialTime = initialTime;
+				this.lifetime = lifetime;
+			}
+		}
 	};
 });
