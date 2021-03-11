@@ -42,7 +42,7 @@ define(function(require) {
 			keyboardLeftButton: "z",
 			keyboardRightButton: "x",
 			enableMouseButtonsInGameplay: true,
-			mouseSensitivity: utils.map(1, 0.1, 6, 0, 1),
+			mouseSensitivity: utils.map(100, 0, 1000, 0, 1),
 		},
 		UserInterface: {
 			introSequence: "Triangles",
