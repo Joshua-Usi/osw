@@ -38,7 +38,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.7.3b";
+	const version = "osu!web v2021.0.7.4b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -607,31 +607,31 @@ define(function(require) {
 
 	function setSettings() {
 		if (settingsSet === true) {
-			/* Audio */
-			Options.Audio.masterVolume = document.getElementById("settings-master-volume").value / 100;
-			Options.Audio.musicVolume = document.getElementById("settings-music-volume").value / 100;
-			Options.Audio.effectsVolume = document.getElementById("settings-effects-volume").value / 100;
-			/* Inputs */
-			Options.Inputs.keyboardLeftButton = document.getElementById("settings-keyboard-left-button").textContent;
-			Options.Inputs.keyboardRightButton = document.getElementById("settings-keyboard-right-button").textContent;
-			Options.Inputs.enableMouseButtonsInGameplay = document.getElementById("settings-enable-mouse-buttons-in-gameplay").checked;
-			Options.Inputs.mouseSensitivity = document.getElementById("settings-mouse-sensitivity").value / 10;
-			/* User Interface */
-			Options.UserInterface.introSequence = document.getElementById("settings-intro-sequence").getElementsByClassName("select-box-selected")[0].textContent;
-			Options.UserInterface.menuParallax = document.getElementById("settings-menu-parallax").checked;
-			/* Gameplay */
-			Options.Gameplay.backgroundDim = document.getElementById("settings-background-dim").value / 100;
-			Options.Gameplay.draw300Hits = document.getElementById("settings-draw300-hits").checked;
-			/* Gameplay Rendering */
-			Options.GameplayRendering.snakingSliders = document.getElementById("settings-snaking-sliders").checked;
-			Options.GameplayRendering.cursorTrails = document.getElementById("settings-cursor-trails").getElementsByClassName("select-box-selected")[0].textContent;
-			/* Performance */
-			Options.Performance.lowPowerMode = document.getElementById("settings-low-power-mode").checked;
-			Options.Performance.maxFrameRate = document.getElementById("settings-max-frame-rate").getElementsByClassName("select-box-selected")[0].textContent;
-			Options.Performance.showFps = document.getElementById("settings-show-fps").checked;
-			Options.Performance.sliderResolution = utils.map(parseInt(document.getElementById("settings-slider-resolution").value), 1, 5, 0, 1);
-			Options.Performance.drawHitValues = document.getElementById("settings-draw-hit-values").checked;
-			Options.Performance.scoreUpdateRate = document.getElementById("settings-score-update-rate").getElementsByClassName("select-box-selected")[0].textContent;
+			let index = 0;
+			for (let group in Options) {
+				if (Options.hasOwnProperty(group) && typeof(Options[group]) === "object" && group !== "types") {
+					for (let setting in Options[group]) {
+						if (Options[group].hasOwnProperty(setting)) {
+							let element = document.getElementById("settings-" + utils.camelCaseToDash(setting));
+							switch (Options.types[index]) {
+								case "slider":
+									Options[group][setting] = utils.map(element.value, element.min, element.max, 0, 1);
+									break;
+								case "checkbox":
+									Options[group][setting] = element.checked;
+									break;
+								case "selectbox":
+									Options[group][setting] = element.getElementsByClassName("select-box-selected")[0].textContent;
+									break;
+								case "text":
+									Options[group][setting] = element.textContent;
+									break;
+							}
+							index++;
+						}
+					}
+				}
+			}
 			localStorage.setItem("options", JSON.stringify(Options));
 			console.log("settings saved!");
 		}
