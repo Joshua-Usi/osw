@@ -169,8 +169,12 @@ define(function(require) {
 							let element = document.getElementById("settings-" + utils.camelCaseToDash(setting));
 							switch (Options.types[index]) {
 								case "slider":
-									element.value = utils.map(Options[group][setting], 0, 1, element.min, element.max);
-									element.dispatchEvent(new CustomEvent("input"));
+									let mapped = utils.map(Options[group][setting], 0, 1, element.min, element.max);
+									if (setting === "sliderResolution") {
+										mapped = utils.map(mapped, 10, 14, 1, 5);
+									}
+									element.value = Math.round(mapped);
+									element.dispatchEvent(new CustomEvent("input", {detail: true}));
 									break;
 								case "checkbox":
 									element.checked = Options[group][setting];
@@ -475,7 +479,7 @@ define(function(require) {
 		setSettings();
 	});
 	document.getElementById("settings-mouse-sensitivity").addEventListener("input", function() {
-		document.getElementById("settings-mouse-sensitivity-text").textContent = "Mouse sensitivity: " + (window.parseInt(this.value) / 10).toFixed(1) + "x";
+		document.getElementById("settings-mouse-sensitivity-text").textContent = "Mouse sensitivity: " + (this.value / 100).toFixed(2) + "x";
 		setSettings();
 	});
 	document.getElementById("settings-background-dim").addEventListener("input", function() {

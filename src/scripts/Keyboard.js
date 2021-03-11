@@ -36,7 +36,7 @@ define(function(require) {
 				for (let i = 96; i < 106; i++) {
 					this.keyData[i] = "numpad" + (i - 96);
 				}
-				/* 		fn keys */
+				/* fn keys */
 				for (let i = 113; i < 125; i++) {
 					this.keyData[i] = "f" + (i - 112);
 				}
