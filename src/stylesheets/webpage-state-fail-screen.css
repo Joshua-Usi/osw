@@ -1,7 +1,7 @@
-.pause-menu-button {
+.fail-menu-button {
 	width: 80vw;
 	margin: 0 10vw 0 10vw; 
-	height: calc(100% / 3);
+	height: calc(100% / 2);
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -12,38 +12,34 @@
 	transform: skewX(-20deg);
 }
 
-.pause-menu-anti-skew {
+.fail-menu-anti-skew {
 	transform: skewX(20deg);
 	font-size: 4vh;
 	color: #e4ecef;
 	font-weight: bolder;
 }
 
-.pause-menu-button:hover {
+.fail-menu-button:hover {
 	width: 90vw;
 	margin: 0 5vw 0 5vw;
 	letter-spacing: 0.5vh;
 }
 
-#pause-menu-continue {
-	background: url('../../src/images/triangles.png'), #88b300;
-}
-
-#pause-menu-retry {
+#fail-menu-retry {
 	background: url('../../src/images/triangles.png'), #eeaa00;
 }
 
-#pause-menu-quit {
+#fail-menu-quit {
 	background: url('../../src/images/triangles.png'), #aa1b27;
 }
 
-#pause-menu-container {
+#fail-menu-container {
 	width: 100vw;
-	height: 30vh;
+	height: 20vh;
 	background: #222;
 }
 
-#pause-menu-pause-text-container {
+#fail-menu-fail-text-container {
 	width: 100vw;
 	height: calc(50vh - 30vh / 2);
 	display: flex;
@@ -51,7 +47,7 @@
 	align-items: center;
 }
 
-#pause-menu-pause-text {
+#fail-menu-fail-text {
 	position: relative;
 	top: 10vh;
 	font-size: 4vh;
@@ -61,7 +57,7 @@
 	font-weight: bolder;
 }
 
-#pause-menu-pause-text-2 {
+#fail-menu-fail-text-2 {
 	position: relative;
 	top: 7.5vh;
 	color: #e4ecef;

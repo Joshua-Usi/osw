@@ -155,11 +155,17 @@ define(function(require) {
 		if (Math.sign(averageSign) !== Math.sign(angleChange)) {
 			angleChange *= -1;
 		}
-		if (currentHP >= 1) {
+
+		if (currentHP > 1) {
 			currentHP = 1;
 		}
-		if (currentHP <= 0) {
+		if (currentHP < 0) {
 			currentHP = 0;
+			if ((playDetails.mods.auto || playDetails.mods.relax || playDetails.mods.autoPilot || playDetails.mods.noFail) === false) {
+				document.getElementById("webpage-state-fail-screen").style.display = "block";
+				audio.pause();
+				isRunning = false;
+			}
 		}
 		currentHP -= Formulas.HPDrain(loadedMaps[useBeatmapSet][useBeatmap].HPDrainRate, useTime - previousTime);
 		hpDisplay += (currentHP - hpDisplay) / 8;
@@ -853,7 +859,7 @@ define(function(require) {
 		}
 		for (let i = 0; i < effectObjects.length; i++) {
 			if (effectObjects[i].lifetime - useTime >= 0) {
-				let alpha = utils.map(useTime, effectObjects[i].initialTime, effectObjects[i].lifetime, 2, 0);
+				let alpha = utils.map(useTime, effectObjects[i].initialTime, effectObjects[i].lifetime, 1, 0);
 				if (alpha > 1) {
 					alpha = 1;
 				}

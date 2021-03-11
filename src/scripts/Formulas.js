@@ -15,7 +15,6 @@ define(function(require) {
 		}
 		return n;
 	}
-
 	function applyModMultiplierCS(n, mods) {
 		if (mods) {
 			if (mods.easy) {
@@ -201,16 +200,16 @@ define(function(require) {
 			let multiplier = 1;
 			/* increases */
 			if (mods.hardRock) {
-				multiplier += 1.06;
+				multiplier *= 1.06;
 			}
 			if (mods.hiddden) {
-				multiplier += 1.06;
+				multiplier *= 1.06;
 			}
 			if (mods.doubleTime) {
-				multiplier += 1.12;
+				multiplier *= 1.12;
 			}
 			if (mods.flashLight) {
-				multiplier += 1.12;
+				multiplier *= 1.12;
 			}
 			/* decreases */
 			if (mods.easy) {
