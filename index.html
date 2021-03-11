@@ -12,6 +12,7 @@
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-beatmap-selection.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-gameplay.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-pause-screen.css">
+		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-fail-screen.css">
 		<link rel="icon" href="./src/images/osu-small.png">
 	</head>
 	<body id="body">
@@ -311,7 +312,22 @@
 				</div>
 			</div>
 		</div>
-		<div class="webpage-state" id="webpage-state-fail-screen"></div>
+		<div class="webpage-state" id="webpage-state-fail-screen">
+			<div id="fail-menu-fail-text-container">
+				<div>
+					<p id="fail-menu-fail-text">oh no! you failed</p>
+					<p id="fail-menu-fail-text-2">but thats ok, you'll do better next time</p>
+				</div>
+			</div>
+			<div id="fail-menu-container">
+				<div id="fail-menu-retry" class="fail-menu-button triangle-background">
+					<p class="fail-menu-anti-skew">Retry</p>
+				</div>
+				<div id="fail-menu-quit" class="fail-menu-button triangle-background">
+					<p class="fail-menu-anti-skew">Quit</p>
+				</div>
+			</div>
+		</div>
 		<div class="webpage-state" id="webpage-state-beatmap-end-screen"></div>
 		<!-- https://github.com/foobar404/Wave.js -->
 		<script type="text/javascript" src="./src/scripts/libs/wave.js"></script>

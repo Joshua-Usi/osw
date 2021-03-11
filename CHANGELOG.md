@@ -6,7 +6,6 @@ and this project adheres to slightly modified [Semantic Versioning](https://semv
 - Mouse sensitivity slider to be more precise
 ### Fixed
 - Slider resolution and mouse sensitivity sliders from not saving properly
-
 ---
 ## [v2021.0.7.3b] - 2021-03-08
 ### Added
