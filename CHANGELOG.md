@@ -1,6 +1,13 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to slightly modified [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v2021.8.0b] - 2021-03-11
+### Added
+- Automatic beat detection via audio analyser (not perfect but good enough)
+### Removed
+- Song API (now succeeded by automatic beat detection)
+- Reliance on wave.js
+---
 ## [v2021.0.7.4b] - 2021-03-11
 ### Changed
 - Mouse sensitivity slider to be more precise

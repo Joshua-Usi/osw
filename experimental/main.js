@@ -12,25 +12,10 @@ analyser.fftSize = 256;
 let source = audioCtx.createMediaElementSource(audioElement);
 
 source.connect(analyser);
-//this connects our music back to the default output, such as your //speakers 
 source.connect(audioCtx.destination);
 
-var gainNode = audioCtx.createGain();
-var biquadFilter = audioCtx.createBiquadFilter();
-
-// Manipulate the Biquad filter
-console.log(biquadFilter);
-biquadFilter.type = "lowshelf";
-biquadFilter.frequency.value = 400;
-biquadFilter.Q.value = -755;
-biquadFilter.gain.value = -700;
-
-source.connect(biquadFilter);
-biquadFilter.connect(gainNode);
-gainNode.connect(audioCtx.destination);
-
 let data = new Uint8Array(analyser.frequencyBinCount);
-let dataPrevious
+let dataPrevious;
 
 function map(num, numMin, numMax, mapMin, mapMax) {
 	return mapMin + ((mapMax - mapMin) / (numMax - numMin)) * (num - numMin);
@@ -47,7 +32,7 @@ function animate() {
 
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
-	opacity -= 0.1;
+	opacity -= 0.25;
 	if (opacity < 0) {
 		opacity = 0;
 	}
@@ -68,15 +53,18 @@ function animate() {
 	let dataSum = 0;
 	let dataPreviousSum = 0;
 	for (var i = 0; i < data.length; i++) {
-		dataSum += data[i] * (i - data.length);
+		dataSum += data[i] * Math.sqrt(data.length - i);
 	}
 	for (var i = 0; i < dataPrevious.length; i++) {
-		dataPreviousSum += dataPrevious[i] * (i - dataPrevious.length);
+		dataPreviousSum += dataPrevious[i] * Math.sqrt(dataPrevious.length - i);
 	}
 	// console.log(dataSum - dataPreviousSum);
-	if (dataSum - dataPreviousSum < -125000) {
+	if (dataSum - dataPreviousSum > 5000) {
 		console.log("beat");
 		opacity += 1;
+		if (opacity > 1) {
+			opacity = 1;
+		}
 	}
     j += 0.05 * speed;
 	k += 0.023 * speed;
@@ -92,4 +80,8 @@ window.onclick = function() {
 
 audioElement.onplay = ()=>{
     audioCtx.resume();
+}
+
+audioElement.onend = function() {
+	audioElement.play()
 }

@@ -25,7 +25,6 @@ define(function(require) {
 	"use strict";
 	/* RequireJS Module Loading */
 	const Mouse = require("src/scripts/Mouse.js");
-	const Song = require("src/scripts/Song.js");
 	let Options = require("src/scripts/Options.js");
 	const AssetLoader = require("src/scripts/AssetLoader.js");
 	const utils = require("src/scripts/utils.js");
@@ -38,7 +37,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.7.4b";
+	const version = "osu!web v2021.0.8.0b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -104,13 +103,13 @@ define(function(require) {
 	mouse.init();
 	/* Initial menu song pool */
 	let songs = [
-		Song.create("cYsmix - Triangles.mp3", Song.bpm(160)),
-		Song.create("nekodex - circles.mp3", Song.bpm([185, 360, 600, 185], [0, 8, 10.5, 12])),
+	"cYsmix - Triangles.mp3",
+	"nekodex - circles.mp3",
 	];
 	/* Only add christmas songs to list if the month is December */
 	if (new Date().getMonth() === 11) {
-		songs.push(Song.create("nekodex - aureole.mp3", Song.bpm(140)));
-		songs.push(Song.create("nekodex - Little Drummer Girl.mp3", Song.bpm(140)));
+		songs.push("nekodex - aureole.mp3");
+		songs.push("nekodex - Little Drummer Girl.mp3");
 	}
 	let chosenSong;
 	let menuAudio = new Audio();
@@ -126,16 +125,27 @@ define(function(require) {
 		}
 	});
 	menuAudio.id = "menu-audio";
-	/* Need to append for wave.js */
+	menuAudio.addEventListener("play", function() {
+	    audioCtx.resume();
+	});
+	/* Beat detection */
 	document.getElementById("body").appendChild(menuAudio);
+	let audioCtx = new AudioContext();
+	let analyser = audioCtx.createAnalyser();
+	analyser.fftSize = 2048;
+	let source = audioCtx.createMediaElementSource(menuAudio);
+	source.connect(analyser);
+	source.connect(audioCtx.destination);
+	let data = new Uint8Array(analyser.frequencyBinCount);
+	let dataPrevious;
+	let beatThreshold = 0.03;
+	let volumeThreshold = 250000;
 	/* Create audioVisualiser for audio visualizer */
 	let audioVisualiser = document.getElementById("audio-visualiser");
+	let ctx = audioVisualiser.getContext("2d");
 	let settingsSet = false;
 	let isFirstClick = true;
 	let offset = 0;
-	let time = 0;
-	let lastTime = 0;
-	let accumulator = 0;
 	/* States:
 	 * just-logo
 	 * first
@@ -194,20 +204,47 @@ define(function(require) {
 			settingsSet = true;
 			if (document.getElementById("settings-intro-sequence").getElementsByClassName("select-box-selected")[0].textContent === "Triangles") {
 				chosenSong = 0;
-				menuAudio.src = `src/audio/${songs[chosenSong].src}`;
+				menuAudio.src = `src/audio/${songs[chosenSong]}`;
 			} else {
 				chosenSong = 1;
-				menuAudio.src = `src/audio/${songs[chosenSong].src}`;
+				menuAudio.src = `src/audio/${songs[chosenSong]}`;
+			}
+			if (new Date().getMonth() === 11) {
+				chosenSong = utils.randomInt(2, 3);
+				menuAudio.src = `src/audio/${songs[chosenSong]}`;
 			}
 			menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);;
 			menuAudio.play();
 			isFirstClick = false;
-			time = 0;
-			lastTime = 0;
 			(function animate() {
+				ctx.clearRect(0, 0, audioVisualiser.width, audioVisualiser.height);
+				/* beat detection */
+				dataPrevious = data;
+				data = new Uint8Array(analyser.frequencyBinCount);
+				analyser.getByteFrequencyData(data); //passing our Uint data array
+				data = [...data];
+				let dataSum = 0;
+				let dataPreviousSum = 0;
+				for (var i = 0; i < data.length / 3; i++) {
+					dataSum += data[i] * Math.sqrt(data.length / 3 - i);
+				}
+				for (var i = 0; i < dataPrevious.length / 3; i++) {
+					dataPreviousSum += dataPrevious[i] * Math.sqrt(dataPrevious.length / 3 - i);
+				}
 				let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
 				/* triangle background moves */
 				offset -= 0.5;
+				ctx.lineWidth = 7;
+				ctx.beginPath();
+				ctx.strokeStyle = "#fff5";
+				let length = data.length * (2 / 3);
+				for (var i = 0; i < length; i += 4) {
+					let angle = utils.map(i, 0, length, 0, 2 * Math.PI) + Math.PI;
+					let mag = data[i] ** 1.2 / 4.5 + 100;
+					ctx.moveTo(audioVisualiser.width / 2, audioVisualiser.height / 2);
+					ctx.lineTo(audioVisualiser.width / 2 + Math.sin(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2), audioVisualiser.height / 2 + Math.cos(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2));
+				}
+				ctx.stroke();
 				for (let i = 0; i < triangleBackgroundMoves.length; i++) {
 					triangleBackgroundMoves[i].style.backgroundPositionY = triangleBackgroundMoves[i].getBoundingClientRect().bottom + offset + "px";
 				}
@@ -229,52 +266,42 @@ define(function(require) {
 						menuParallax.style.top = 0;
 						menuParallax.style.left = 0;
 					}
-
-					/* beat detection and accumulation */
-					lastTime = time;
-					time = menuAudio.currentTime;
-					if (accumulator < 0) {
-						accumulator = 0;
-					}
-					accumulator += time - lastTime;
-					if (accumulator > 1 / (songs[chosenSong].bpm.get(time) / 60)) {
-						while (accumulator > 1 / (songs[chosenSong].bpm.get(time) / 60)) {
-							/* logo pulse*/
-							logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
-							logo.style.width = logoSize + "vh";
-							logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
-							logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
-							logo.style.backgroundSize = logoSize + "vh";
-							// logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
-							/* logo background pulse, maximum 5 to prevent lag */
-							if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
-								let logoCircle = document.createElement("img");
-								logoCircle.src = "src/images/circle.png";
-								logoCircle.style.position = "absolute";
-								logoCircle.style.width = logoPulseSize + "vh";
-								logoCircle.style.top = "calc(" + logoY + "vh - " + logoPulseSize / 2 + "vh)";
-								logoCircle.style.left = "calc(" + logoX + "vw - " + logoPulseSize / 2 + "vh)";
-								logoCircle.style.opacity = 0.5;
-								document.getElementById("logo-beat").appendChild(logoCircle);
-							}
-							/* snow only in december, maximum 50 to prevent lag */
-							/* last tested:
-							 *	
-							 *	27/12/2020, works
-							 *	9/01/2021, works
-							 */
-							if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
-								let snowflake = document.createElement("img");
-								snowflake.src = "src/images/snowflake.png";
-								snowflake.style.position = "fixed";
-								snowflake.style.width = Math.random() * 2 + 1 + "vh";
-								snowflake.style.top = -10 + "vh";
-								snowflake.style.left = Math.random() * 100 + "vw";
-								snowflake.style.opacity = 0.4;
-								snowflake.style.zIndex = -5;
-								document.getElementById("snow").appendChild(snowflake);
-							}
-							accumulator -= 1 / (songs[chosenSong].bpm.get(time) / 60);
+					/* beat detection */
+					if (dataSum - dataPreviousSum > dataSum * beatThreshold && dataSum > volumeThreshold) {
+						/* logo pulse*/
+						logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
+						logo.style.width = logoSize + "vh";
+						logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
+						logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
+						logo.style.backgroundSize = logoSize + "vh";
+						// logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
+						/* logo background pulse, maximum 5 to prevent lag */
+						if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
+							let logoCircle = document.createElement("img");
+							logoCircle.src = "src/images/circle.png";
+							logoCircle.style.position = "absolute";
+							logoCircle.style.width = logoPulseSize + "vh";
+							logoCircle.style.top = "calc(" + logoY + "vh - " + logoPulseSize / 2 + "vh)";
+							logoCircle.style.left = "calc(" + logoX + "vw - " + logoPulseSize / 2 + "vh)";
+							logoCircle.style.opacity = 0.5;
+							document.getElementById("logo-beat").appendChild(logoCircle);
+						}
+						/* snow only in december, maximum 50 to prevent lag */
+						/* last tested:
+						 *	
+						 *	27/12/2020, works
+						 *	9/01/2021, works
+						 */
+						if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
+							let snowflake = document.createElement("img");
+							snowflake.src = "src/images/snowflake.png";
+							snowflake.style.position = "fixed";
+							snowflake.style.width = Math.random() * 2 + 1 + "vh";
+							snowflake.style.top = -10 + "vh";
+							snowflake.style.left = Math.random() * 100 + "vw";
+							snowflake.style.opacity = 0.4;
+							snowflake.style.zIndex = -5;
+							document.getElementById("snow").appendChild(snowflake);
 						}
 					} else {
 						logo.style.transition = "width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s";
@@ -680,15 +707,4 @@ define(function(require) {
 		document.getElementById("webpage-state-gameplay").style.display = "none";
 		document.getElementById("webpage-state-pause-screen").style.display = "none";
 	});
-	/* Library Stuff */
-	if (window.origin !== "null") {
-		let wave = new Wave();
-		wave.fromElement("menu-audio", "audio-visualiser", {
-			stroke: 8,
-			type: "flower",
-			colors: ["#fff5"]
-		});
-	} else {
-		console.warn("offline context, audio visualiser will not work");
-	}
 });
