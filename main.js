@@ -138,8 +138,8 @@ define(function(require) {
 	source.connect(audioCtx.destination);
 	let data = new Uint8Array(analyser.frequencyBinCount);
 	let dataPrevious;
-	let beatThreshold = 0.03;
-	let volumeThreshold = 250000;
+	let beatThreshold = 0.02;
+	let volumeThreshold = 300000;
 	/* Create audioVisualiser for audio visualizer */
 	let audioVisualiser = document.getElementById("audio-visualiser");
 	let ctx = audioVisualiser.getContext("2d");
@@ -213,7 +213,7 @@ define(function(require) {
 				chosenSong = utils.randomInt(2, 3);
 				menuAudio.src = `src/audio/${songs[chosenSong]}`;
 			}
-			menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);;
+			menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 			menuAudio.play();
 			isFirstClick = false;
 			(function animate() {
@@ -225,11 +225,12 @@ define(function(require) {
 				data = [...data];
 				let dataSum = 0;
 				let dataPreviousSum = 0;
-				for (var i = 0; i < data.length / 3; i++) {
-					dataSum += data[i] * Math.sqrt(data.length / 3 - i);
+				let len = data.length / 4;
+				for (var i = 0; i < len; i++) {
+					dataSum += data[i] * Math.sqrt(len - i);
 				}
-				for (var i = 0; i < dataPrevious.length / 3; i++) {
-					dataPreviousSum += dataPrevious[i] * Math.sqrt(dataPrevious.length / 3 - i);
+				for (var i = 0; i < len; i++) {
+					dataPreviousSum += dataPrevious[i] * Math.sqrt(len - i);
 				}
 				let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
 				/* triangle background moves */
@@ -240,7 +241,7 @@ define(function(require) {
 				let length = data.length * (2 / 3);
 				for (var i = 0; i < length; i += 4) {
 					let angle = utils.map(i, 0, length, 0, 2 * Math.PI) + Math.PI;
-					let mag = data[i] ** 1.2 / 4.5 + 100;
+					let mag = data[i] ** 1.5 / (255 ** 0.55) + 100;
 					ctx.moveTo(audioVisualiser.width / 2, audioVisualiser.height / 2);
 					ctx.lineTo(audioVisualiser.width / 2 + Math.sin(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2), audioVisualiser.height / 2 + Math.cos(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2));
 				}
@@ -267,7 +268,7 @@ define(function(require) {
 						menuParallax.style.left = 0;
 					}
 					/* beat detection */
-					if (dataSum - dataPreviousSum > dataSum * beatThreshold && dataSum > volumeThreshold) {
+					if (dataSum - dataPreviousSum > dataSum * beatThreshold && dataSum > volumeThreshold * (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100)) {
 						/* logo pulse*/
 						logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
 						logo.style.width = logoSize + "vh";
