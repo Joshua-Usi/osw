@@ -284,7 +284,7 @@ define(function(require) {
 					} else if (hitObjects[i].curveType === "P" && hitObjects[i].curvePoints.length === 3) {
 						/* Slider Type Perfect Circle ---------------------------------------------------------------- */
 						let circle = utils.circumcircle(hitObjects[i].curvePoints[0], hitObjects[i].curvePoints[1], hitObjects[i].curvePoints[2]);
-						hitObjects[i].cache.points = utils.circleToPoints(circle.x, circle.y, circle.r, hitObjects[i].length, -utils.direction(circle.x, circle.y, hitObjects[i].curvePoints[0].x, hitObjects[i].curvePoints[0].y) - Math.PI / 2, utils.orientation(hitObjects[i].curvePoints[0], hitObjects[i].curvePoints[1], hitObjects[i].curvePoints[2]));
+						hitObjects[i].cache.points = utils.circleToPoints(circle.x, circle.y, circle.r, Math.abs(hitObjects[i].length), -utils.direction(circle.x, circle.y, hitObjects[i].curvePoints[0].x, hitObjects[i].curvePoints[0].y) - Math.PI / 2, utils.orientation(hitObjects[i].curvePoints[0], hitObjects[i].curvePoints[1], hitObjects[i].curvePoints[2]));
 					}
 				} else if (hitObjects[i].type[3] === "1") {
 					hitObjects[i].cache.cacheSet = true;
@@ -314,9 +314,9 @@ define(function(require) {
 					/* Cache Setup for Slider ---------------------------------------------------------------- */
 					hitObjects[i].cache.sliderInheritedMultiplier = sliderSpeedMultiplier;
 					hitObjects[i].cache.timingPointUninheritedIndex = timingPointUninheritedIndex;
-					hitObjects[i].cache.sliderOnceTime = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
+					hitObjects[i].cache.sliderOnceTime = Math.abs(hitObjects[i].length) / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
 					hitObjects[i].cache.sliderTotalTime = hitObjects[i].cache.sliderOnceTime * hitObjects[i].slides;
-					let time = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
+					let time = Math.abs(hitObjects[i].length) / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
 					/* Actual ticks is -1 due to unexplicable phenomenon */
 					hitObjects[i].cache.totalTicks = time / loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength * loadedMaps[useBeatmapSet][useBeatmap].SliderTickRate;
 					hitObjects[i].cache.specificSliderTicksHit = [];
@@ -411,7 +411,7 @@ define(function(require) {
 			if (hitObjects[i].type[1] === "1" && useTime >= hitObjects[i].time) {
 				if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
 					let sliderRepeat = false;
-					let time = hitObjects[i].length / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
+					let time = Math.abs(hitObjects[i].length) / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
 					if (hitObjects[i].cache.currentSlide % 2 === 0) {
 						hitObjects[i].cache.sliderBodyPosition = Math.floor(utils.map(useTime, hitObjects[i].time + time * hitObjects[i].cache.currentSlide, hitObjects[i].time + time * (hitObjects[i].cache.currentSlide + 1), 0, hitObjects[i].cache.points.length - 1));
 						/* Prevent Index Errors */
