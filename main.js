@@ -136,8 +136,10 @@ define(function(require) {
 	let source = audioCtx.createMediaElementSource(menuAudio);
 	source.connect(analyser);
 	source.connect(audioCtx.destination);
-	let data = new Uint8Array(analyser.frequencyBinCount);
-	let dataPrevious;
+	let audioAnalyserData = new Uint8Array(analyser.frequencyBinCount);
+	let audioAnalyserDataPrevious;
+	let audioAnalyserDataPreviousSum = 0;
+	let audioAnalyserDataSum = 0;
 	let beatThreshold = 0.02;
 	let volumeThreshold = 300000;
 	/* Create audioVisualiser for audio visualizer */
@@ -219,18 +221,15 @@ define(function(require) {
 			(function animate() {
 				ctx.clearRect(0, 0, audioVisualiser.width, audioVisualiser.height);
 				/* beat detection */
-				dataPrevious = data;
-				data = new Uint8Array(analyser.frequencyBinCount);
-				analyser.getByteFrequencyData(data); //passing our Uint data array
-				data = [...data];
-				let dataSum = 0;
-				let dataPreviousSum = 0;
-				let len = data.length / 4;
+				audioAnalyserDataPrevious = audioAnalyserData;
+				audioAnalyserData = new Uint8Array(analyser.frequencyBinCount);
+				analyser.getByteFrequencyData(audioAnalyserData); // passing our Uint audioAnalyserData array
+				audioAnalyserData = [...audioAnalyserData];
+				audioAnalyserDataPreviousSum = audioAnalyserDataSum;
+				audioAnalyserDataSum = 0;
+				let len = audioAnalyserData.length / 4;
 				for (var i = 0; i < len; i++) {
-					dataSum += data[i] * Math.sqrt(len - i);
-				}
-				for (var i = 0; i < len; i++) {
-					dataPreviousSum += dataPrevious[i] * Math.sqrt(len - i);
+					audioAnalyserDataSum += audioAnalyserData[i] * Math.sqrt(len - i);
 				}
 				let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
 				/* triangle background moves */
@@ -238,10 +237,10 @@ define(function(require) {
 				ctx.lineWidth = 7;
 				ctx.beginPath();
 				ctx.strokeStyle = "#fff5";
-				let length = data.length * (2 / 3);
+				let length = audioAnalyserData.length * (2 / 3);
 				for (var i = 0; i < length; i += 4) {
 					let angle = utils.map(i, 0, length, 0, 2 * Math.PI) + Math.PI;
-					let mag = data[i] ** 1.5 / (255 ** 0.55) + 100;
+					let mag = audioAnalyserData[i] ** 1.5 / (255 ** 0.55) + 100;
 					ctx.moveTo(audioVisualiser.width / 2, audioVisualiser.height / 2);
 					ctx.lineTo(audioVisualiser.width / 2 + Math.sin(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2), audioVisualiser.height / 2 + Math.cos(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2));
 				}
@@ -268,7 +267,7 @@ define(function(require) {
 						menuParallax.style.left = 0;
 					}
 					/* beat detection */
-					if (dataSum - dataPreviousSum > dataSum * beatThreshold && dataSum > volumeThreshold * (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100)) {
+					if (audioAnalyserDataSum - audioAnalyserDataPreviousSum > audioAnalyserDataSum * beatThreshold && audioAnalyserDataSum > volumeThreshold * (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100)) {
 						/* logo pulse*/
 						logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
 						logo.style.width = logoSize + "vh";
