@@ -1,7 +1,15 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to slightly modified [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
-## [v2021.8.0b] - 2021-03-11
+## [v2021.0.8.1b] - 2021-03-18
+### Added
+- When pressing play, a beatmap is randomly selected for you to play! presuming you have any
+- Brightening filter whenever a beat is detected
+- Added beat bars (near edges of screen that alternate every beat)
+### Fixed
+- Logo beats from flashing in the wrong spot sometimes
+---
+## [v2021.0.8.0b] - 2021-03-11
 ### Added
 - Automatic beat detection via audio analyser (not perfect but good enough)
 ### Removed

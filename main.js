@@ -37,7 +37,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.8.0b";
+	const version = "osu!web v2021.0.8.1b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -70,7 +70,7 @@ define(function(require) {
 						}
 						let menuAudio = document.getElementById("menu-audio");
 						if (menuAudio.src.replaceAll("%20", " ") !== window.origin + "/src/audio/" + this.dataset.audiosource) {
-							menuAudio.src = "src/audio/" + this.dataset.audiosource;
+							menuAudio.src = "src/audio/" + this.getAttribute("data-audiosource");
 							menuAudio.currentTime = 0;
 							menuAudio.play();
 						}
@@ -90,7 +90,7 @@ define(function(require) {
 					document.getElementById("top-bar").style.display = "none";
 					document.getElementById("webpage-state-gameplay").style.display = "block";
 					document.getElementById("menu-audio").pause();
-					gameplay.playMap(this.dataset.groupIndex, this.dataset.mapIndex);
+					gameplay.playMap(this.getAttribute("data-group-index"), this.getAttribute("data-map-index"));
 				});
 			}
 		} else {
@@ -102,10 +102,7 @@ define(function(require) {
 	let mouse = new Mouse("body");
 	mouse.init();
 	/* Initial menu song pool */
-	let songs = [
-	"cYsmix - Triangles.mp3",
-	"nekodex - circles.mp3",
-	];
+	let songs = ["cYsmix - Triangles.mp3", "nekodex - circles.mp3", ];
 	/* Only add christmas songs to list if the month is December */
 	if (new Date().getMonth() === 11) {
 		songs.push("nekodex - aureole.mp3");
@@ -126,7 +123,7 @@ define(function(require) {
 	});
 	menuAudio.id = "menu-audio";
 	menuAudio.addEventListener("play", function() {
-	    audioCtx.resume();
+		audioCtx.resume();
 	});
 	/* Beat detection */
 	document.getElementById("body").appendChild(menuAudio);
@@ -137,11 +134,14 @@ define(function(require) {
 	source.connect(analyser);
 	source.connect(audioCtx.destination);
 	let audioAnalyserData = new Uint8Array(analyser.frequencyBinCount);
-	let audioAnalyserDataPrevious;
 	let audioAnalyserDataPreviousSum = 0;
 	let audioAnalyserDataSum = 0;
 	let beatThreshold = 0.02;
-	let volumeThreshold = 300000;
+	let beatNumber = 0;
+	let volumeThreshold = 20000;
+	let beat = 0;
+	let lastBeat = 0;
+	let lastBeatThreshold = 0.05;
 	/* Create audioVisualiser for audio visualizer */
 	let audioVisualiser = document.getElementById("audio-visualiser");
 	let ctx = audioVisualiser.getContext("2d");
@@ -186,7 +186,9 @@ define(function(require) {
 										mapped = utils.map(mapped, 10, 14, 1, 5);
 									}
 									element.value = Math.round(mapped);
-									element.dispatchEvent(new CustomEvent("input", {detail: true}));
+									element.dispatchEvent(new CustomEvent("input", {
+										detail: true
+									}));
 									break;
 								case "checkbox":
 									element.checked = Options[group][setting];
@@ -221,15 +223,14 @@ define(function(require) {
 			(function animate() {
 				ctx.clearRect(0, 0, audioVisualiser.width, audioVisualiser.height);
 				/* beat detection */
-				audioAnalyserDataPrevious = audioAnalyserData;
 				audioAnalyserData = new Uint8Array(analyser.frequencyBinCount);
 				analyser.getByteFrequencyData(audioAnalyserData); // passing our Uint audioAnalyserData array
 				audioAnalyserData = [...audioAnalyserData];
 				audioAnalyserDataPreviousSum = audioAnalyserDataSum;
 				audioAnalyserDataSum = 0;
-				let len = audioAnalyserData.length / 4;
+				let len = audioAnalyserData.length / 8;
 				for (var i = 0; i < len; i++) {
-					audioAnalyserDataSum += audioAnalyserData[i] * Math.sqrt(len - i);
+					audioAnalyserDataSum += audioAnalyserData[i];
 				}
 				let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
 				/* triangle background moves */
@@ -238,7 +239,7 @@ define(function(require) {
 				ctx.beginPath();
 				ctx.strokeStyle = "#fff5";
 				let length = audioAnalyserData.length * (2 / 3);
-				for (var i = 0; i < length; i += 4) {
+				for (let i = 0; i < length; i += 4) {
 					let angle = utils.map(i, 0, length, 0, 2 * Math.PI) + Math.PI;
 					let mag = audioAnalyserData[i] ** 1.5 / (255 ** 0.55) + 100;
 					ctx.moveTo(audioVisualiser.width / 2, audioVisualiser.height / 2);
@@ -246,12 +247,14 @@ define(function(require) {
 				}
 				ctx.stroke();
 				for (let i = 0; i < triangleBackgroundMoves.length; i++) {
-					triangleBackgroundMoves[i].style.backgroundPositionY = triangleBackgroundMoves[i].getBoundingClientRect().bottom + offset + "px";
+					triangleBackgroundMoves[i].style.backgroundPositionY = offset + "px";
 				}
 				if (document.getElementById("webpage-state-menu").style.display === "block" || document.getElementById("webpage-state-menu").style.display === "") {
 					let backgroundImageParallax = document.getElementById("background-blur");
 					let menuParallax = document.getElementById("menu-parallax");
 					let logo = document.getElementById("logo");
+					let leftBeat = document.getElementById("left-beat");
+					let rightBeat = document.getElementById("right-beat");
 					let logoSizeIncrease = 1.1;
 					/* style image parallax based on mouse position */
 					backgroundImageParallax.style.opacity = 1;
@@ -267,14 +270,24 @@ define(function(require) {
 						menuParallax.style.left = 0;
 					}
 					/* beat detection */
-					if (audioAnalyserDataSum - audioAnalyserDataPreviousSum > audioAnalyserDataSum * beatThreshold && audioAnalyserDataSum > volumeThreshold * (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100)) {
+					if (audioAnalyserDataSum - audioAnalyserDataPreviousSum > audioAnalyserDataSum * beatThreshold && audioAnalyserDataSum > volumeThreshold * (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100) && menuAudio.currentTime - lastBeat > lastBeatThreshold) {
+						beat = 0;
+						lastBeat = menuAudio.currentTime;
 						/* logo pulse*/
-						logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.5s";
+						logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.05s";
 						logo.style.width = logoSize + "vh";
 						logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
 						logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
 						logo.style.backgroundSize = logoSize + "vh";
-						// logo.style.backgroundPositionY = offset % (1024 * 0.5) + "px";
+						logo.style.filter = "brightness(1.25)";
+						if (beatNumber % 2 === 0) {
+							leftBeat.style.transition = "opacity 0.05s";
+							leftBeat.style.opacity = "1";
+						} else {
+							rightBeat.style.transition = "opacity 0.05s";
+							rightBeat.style.opacity = "1";
+						}
+						beatNumber++;
 						/* logo background pulse, maximum 5 to prevent lag */
 						if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
 							let logoCircle = document.createElement("img");
@@ -282,8 +295,8 @@ define(function(require) {
 							logoCircle.style.position = "absolute";
 							logoCircle.style.width = logoPulseSize + "vh";
 							logoCircle.style.top = "calc(" + logoY + "vh - " + logoPulseSize / 2 + "vh)";
-							logoCircle.style.left = "calc(" + logoX + "vw - " + logoPulseSize / 2 + "vh)";
-							logoCircle.style.opacity = 0.5;
+							logoCircle.style.left = "calc(5vw + " + logoX + "vw - " + logoPulseSize / 2 + "vh)";
+							logoCircle.style.opacity = "0.5";
 							document.getElementById("logo-beat").appendChild(logoCircle);
 						}
 						/* snow only in december, maximum 50 to prevent lag */
@@ -303,15 +316,21 @@ define(function(require) {
 							snowflake.style.zIndex = -5;
 							document.getElementById("snow").appendChild(snowflake);
 						}
-					} else {
+					}
+					if (beat === 3) {
 						logo.style.transition = "width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s";
 						logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
 						logo.style.width = logoSize * logoSizeIncrease + "vh";
 						logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
 						logo.style.left = "calc(5vw + " + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
 						logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
-						// logo.style.backgroundPositionY = offset % (1024 * 0.5) * logoSizeIncrease + "px";
+						logo.style.filter = "brightness(1)";
+						leftBeat.style.transition = "opacity 1s";
+						leftBeat.style.opacity = "0";
+						rightBeat.style.transition = "opacity 1s";
+						rightBeat.style.opacity = "0";
 					}
+					beat++;
 					let logoCircles = document.getElementById("logo-beat").querySelectorAll("img");
 					for (let i = 0; i < logoCircles.length; i++) {
 						if (parseFloat(logoCircles[i].style.opacity) <= 0) {
@@ -605,7 +624,15 @@ define(function(require) {
 	document.getElementById("menu-bar-play").addEventListener("click", function() {
 		document.getElementById("webpage-state-menu").style.display = "none";
 		document.getElementById("webpage-state-beatmap-selection").style.display = "block";
-		document.getElementById("menu-audio").pause();
+		let els = document.getElementsByClassName("beatmap-selection-group-pane");
+		let selectedElement = els[utils.randomInt(0, els.length)];
+		selectedElement.scrollIntoView({
+			block: "center",
+			inline: "end"
+		});
+		selectedElement.parentNode.parentNode.scrollTo(0, selectedElement.parentNode.parentNode.scrollTop);
+		window.scrollTo(0, 0);
+		selectedElement.dispatchEvent(new CustomEvent("click"));
 	});
 	/* Helper */
 	let menuTimeout;
@@ -633,7 +660,7 @@ define(function(require) {
 		setTimeout(function() {
 			let menuBar = document.getElementById("menu-bar");
 			menuBar.style.visibility = "hidden";
-		})
+		});
 	}
 
 	function setSettings() {
@@ -669,7 +696,7 @@ define(function(require) {
 	}
 	window.addEventListener("orientationchange", function(event) {
 		if (event.target.screen.orientation.angle === 0 && window.innerWidth < window.innerHeight) {
-			document.getElementById("orientation-vertical").style.display = "block"
+			document.getElementById("orientation-vertical").style.display = "block";
 		} else {
 			document.getElementById("orientation-vertical").style.display = "none";
 		}

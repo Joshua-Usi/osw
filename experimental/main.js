@@ -7,7 +7,8 @@ let audioElement = document.getElementById("audio");
 let audioCtx = new AudioContext();
 
 let analyser = audioCtx.createAnalyser();
-analyser.fftSize = 256;
+analyser.fftSize = 512;
+analyser.smoothingTimeConstant = 0.8;
 
 let source = audioCtx.createMediaElementSource(audioElement);
 
@@ -45,7 +46,7 @@ function animate() {
 	let length = data.length * 2 / 3;
 	for (var i = 0; i < length; i++) {
 		let value = data[i];
-		let mapped = map(value, 0, 255, 0, canvas.height / 2);
+		let mapped = map(value, 0, 255, canvas.height / 2, 1);
 		ctx.fillStyle = `rgb(${map(i, 0, length, 0, 255)}, ${map(Math.sin(j * 1), -1, 1, 0, 255)}, ${map(Math.cos(k * 1), -1, 1, 0, 255)})`;
         ctx.fillRect(map(i, 0, length, 0, canvas.width), canvas.height - mapped, 10, mapped);
         ctx.fillRect(map(i, 0, length, 0, canvas.width), mapped, 10, -mapped);
@@ -61,7 +62,7 @@ function animate() {
 	// console.log(dataSum - dataPreviousSum);
 	if (dataSum - dataPreviousSum > 5000) {
 		console.log("beat");
-		opacity += 1;
+		// opacity += 1;
 		if (opacity > 1) {
 			opacity = 1;
 		}

@@ -20,7 +20,8 @@
 #logo {
 	z-index: 50;
 	width: 70vh;
-	background: url('../../src/images/triangles.png'), #FD67AE;
+	background: url('../../src/images/triangles.png');
+	background-color: #FD67AE;
 	background-size: 50vh;
 	border-radius: 50%;
 	transition: width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s;
@@ -160,4 +161,25 @@
 
 #menu-bar-settings:hover {
 	left: 12.5vw;
+}
+
+#left-beat {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100vh;
+	width: 20vw;
+	background: linear-gradient(to right, #fff8, #fff0);
+	opacity: 0;
+}
+
+#right-beat {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 100vh;
+	width: 20vw;
+	background-color: #fff;
+	background: linear-gradient(to left, #fff8, #fff0);
+	opacity: 0;
 }

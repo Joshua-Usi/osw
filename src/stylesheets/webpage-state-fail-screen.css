@@ -26,11 +26,13 @@
 }
 
 #fail-menu-retry {
-	background: url('../../src/images/triangles.png'), #eeaa00;
+	background: url('../../src/images/triangles.png');
+	background-color: #eeaa00;
 }
 
 #fail-menu-quit {
-	background: url('../../src/images/triangles.png'), #aa1b27;
+	background: url('../../src/images/triangles.png');
+	background-color: #aa1b27;
 }
 
 #fail-menu-container {

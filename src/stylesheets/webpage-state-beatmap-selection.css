@@ -73,7 +73,8 @@
 #beatmap-selection-play {
 	z-index: 103;
 	width: 25vh;
-	background: url('../../src/images/triangles.png'), #FD67AE;
+	background: url('../../src/images/triangles.png');
+	background-color: #FD67AE;
 	background-size: 50vh;
 	border-radius: 50%;
 	transition: width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s;

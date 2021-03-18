@@ -44,7 +44,8 @@
 	width: 100%;
 	outline: none;
 	border-radius: 1.5vh;
-	background: url("../../src/images/triangles.png"), #2ca4cc;
+	background: url("../../src/images/triangles.png");
+	background-color: #2ca4cc;
 	background-size: 25vw;
 	color: #e4ecef;
 	text-align: center;
@@ -57,13 +58,15 @@
 }
 
 .settings-button .red:hover {
-	background: url("../../src/images/triangles.png"), #ff9ccb;
+	background: url("../../src/images/triangles.png");
+	background-color: #ff9ccb;
 	background-size: 25vw;
 
 }
 
 .settings-button .blue:hover {
-	background: url("../../src/images/triangles.png"), #45b0de;
+	background: url("../../src/images/triangles.png");
+	background-color: #45b0de;
 	background-size: 25vw;
 
 }
@@ -261,4 +264,8 @@
 	background: #0f0;
 	transition: background 1s, opacity 1s;
 	z-index: 100;
+}
+
+.triangle-background {
+	background-attachment: fixed;
 }
