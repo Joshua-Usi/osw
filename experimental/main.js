@@ -106,7 +106,47 @@ function map(num, numMin, numMax, mapMin, mapMax) {
 	return mapMin + ((mapMax - mapMin) / (numMax - numMin)) * (num - numMin);
 }
 
+function setPositions(elements, width, newWidth, range, newRange) {
+	for (let i = 0; i < elements.length; i++) {
+		elements[i].style.transition = "";
+		setTimeout(function() {
+			elements[i].style.width = width + "vh";
+			elements[i].style.top = (50 - width / 2) + "vh";
+			elements[i].style.left = 50 - width / 4 + map(i, 0, elements.length - 1, -range, range) + "vw";
+			elements[i].style.transition = "0.1s";
+			setTimeout(function() {
+				elements[i].style.width = newWidth + "vh";
+				elements[i].style.top = (50 - newWidth / 2) + "vh";
+				elements[i].style.left = 50 - newWidth / 4 + map(i, 0, elements.length - 1, -newRange, newRange) + "vw";
+			}, 0);
+		}, 0)
+	}
+}
+
+function randomInt(min, max) {
+	return Math.round((Math.random() * (max - min)) + min);
+}
+
 let eventDone = [false, false, false, false, false, false, false, false, false];
+
+let triangle = [];
+let triangleNumber = 0;
+let lastTriangle = 1; 
+
+class Triangle {
+	constructor(type, x, y, size, duration) {
+		this.type = type;
+		this.x = x;
+		this.y = y;
+		this.size = size;
+		this.duration = duration;
+		document.getElementById("triangles-container").innerHTML += `<svg style="position: absolute; top: ${this.y}px; left: ${this.x};" height="${this.size}px" width="${this.size}">
+		<polygon points="${this.size * 3 / 6},${this.size / 6} ${this.size * 5 / 6},${this.size * 5 / 6} ${this.size / 6},${this.size * 5 / 6}" style="fill:${(this.type === 0) ? "white" : "transparent"};stroke:white;stroke-width:5" />
+		</svg>`
+	}
+}
+
+
 let letterSpacing = 0;
 function animate() {
 	let audio = document.getElementById("audio");
@@ -127,37 +167,31 @@ function animate() {
 		document.getElementById("intro-text").style.letterSpacing = "0.325vh";
 		eventDone[3] = true;
 	}
-	if (audio.currentTime >= 1.65 && eventDone[4] === false) {
+	while (audio.currentTime >= 1 && triangleNumber <= 22 && audio.currentTime - lastTriangle > 0.022) {
+		console.log("triangle");
+		new Triangle(randomInt(0, 1), randomInt(window.innerWidth * 0.3, window.innerWidth * 0.7), randomInt(window.innerHeight * 0.4, window.innerHeight * 0.6), randomInt(10, 60), 0.12)
+		triangleNumber++;
+		lastTriangle += 0.022;
+	}
+	if (audio.currentTime >= 1.6 && eventDone[4] === false) {
 		let introGamemodes = document.getElementsByClassName("intro-gamemodes");
 		document.getElementById("intro-text").style.display = "none";
-		for (let i = 0; i < introGamemodes.length; i++) {
-			introGamemodes[i].style.display = "block";
-			introGamemodes[i].style.top = (50 - 2) + "vh";
-			introGamemodes[i].style.left = 50 - 1 + map(i, 0, 3, -25, 25) + "vw";
-		}
+		setPositions(document.getElementsByClassName("intro-gamemodes"), 4, 3.5, 25, 24);
 		eventDone[4] = true;
 	}
-	if (audio.currentTime >= 1.9 && eventDone[5] === false) {
+	if (audio.currentTime >= 1.8 && eventDone[5] === false) {
 		let introGamemodes = document.getElementsByClassName("intro-gamemodes");
 		document.getElementById("intro-text").style.display = "none";
-		for (let i = 0; i < introGamemodes.length; i++) {
-			introGamemodes[i].style.width = "8vh"
-			introGamemodes[i].style.top = (50 - 4) + "vh";
-			introGamemodes[i].style.left = 50 - 2 + map(i, 0, 3, -12.5, 12.5) + "vw";
-		}
+		setPositions(document.getElementsByClassName("intro-gamemodes"), 8, 7, 12.5, 11);
 		eventDone[5] = true;
 	}
-	if (audio.currentTime >= 2.1 && eventDone[6] === false) {
+	if (audio.currentTime >= 2 && eventDone[6] === false) {
 		let introGamemodes = document.getElementsByClassName("intro-gamemodes");
 		document.getElementById("intro-text").style.display = "none";
-		for (let i = 0; i < introGamemodes.length; i++) {
-			introGamemodes[i].style.width = "16vh"
-			introGamemodes[i].style.top = (50 - 8) + "vh";
-			introGamemodes[i].style.left = 50 - 4 + map(i, 0, 3, -17.5, 17.5) + "vw";
-		}
+		setPositions(document.getElementsByClassName("intro-gamemodes"), 16, 18, 17.5, 20);
 		eventDone[6] = true;
 	}
-	if (audio.currentTime >= 2.3 && eventDone[7] === false) {
+	if (audio.currentTime >= 2.2 && eventDone[7] === false) {
 		let introGamemodes = document.getElementsByClassName("intro-gamemodes");
 		document.getElementById("intro-text").style.display = "none";
 		for (let i = 0; i < introGamemodes.length; i++) {
@@ -165,7 +199,7 @@ function animate() {
 		}
 		eventDone[7] = true;
 	}
-	if (audio.currentTime >= 3.2 && eventDone[8] === false) {
+	if (audio.currentTime >= 3.1 && eventDone[8] === false) {
 		let introGamemodes = document.getElementsByClassName("intro-gamemodes");
 		document.getElementById("intro").style.background = "#fff";
 		document.getElementById("intro").style.opacity = 0;

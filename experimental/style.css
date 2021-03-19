@@ -26,6 +26,9 @@ body {
 .intro-gamemodes {
 	position: absolute;
 	width: 4vh;
-	display: none;
+	transition-timing-function: linear;
+}
+
+svg {
 }
 
