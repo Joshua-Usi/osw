@@ -29,6 +29,24 @@ body {
 	transition-timing-function: linear;
 }
 
-svg {
+polygon {
+	fill-opacity: 0;
+	stroke-opacity: 0;
+	animation-fill-mode: forwards;
 }
+
+@keyframes fade-in-out {
+	0% {
+		fill-opacity: 0;
+		stroke-opacity: 0;
+	}
+	20% {
+		fill-opacity: 1;
+		stroke-opacity: 1;
+	}
+	100% {
+		fill-opacity: 0;
+		stroke-opacity: 0;
+	}
+} 
 
