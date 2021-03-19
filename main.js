@@ -342,17 +342,15 @@ define(function(require) {
 						logoCircles[i].style.top = "calc(" + logoY + "vh - " + logoCircles[i].style.width + " / 2)";
 						logoCircles[i].style.left = "calc(5vw + " + logoX + "vw - " + logoCircles[i].style.width + " / 2)";
 					}
-					if (new Date().getMonth() === 11) {
-						let snow = document.getElementById("snow").querySelectorAll("img");
-						for (let i = 0; i < snow.length; i++) {
-							if (parseFloat(snow[i].style.top) >= 100) {
-								snow[i].remove();
-								break;
-							}
-							snow[i].style.top = parseFloat(snow[i].style.top) + parseFloat(snow[i].style.width) / 10 + "vh";
-							snow[i].style.left = parseFloat(snow[i].style.left) + Math.sin(parseFloat(snow[i].style.width) * 9 + parseFloat(snow[i].style.top) / 10) / 25 + "vw";
-							snow[i].style.transform = "rotate(" + parseFloat(snow[i].style.top) * parseFloat(snow[i].style.width) + "deg)";
+					let snow = document.getElementById("snow").querySelectorAll("img");
+					for (let i = 0; i < snow.length; i++) {
+						if (parseFloat(snow[i].style.top) >= 100) {
+							snow[i].remove();
+							break;
 						}
+						snow[i].style.top = parseFloat(snow[i].style.top) + parseFloat(snow[i].style.width) / 10 + "vh";
+						snow[i].style.left = parseFloat(snow[i].style.left) + Math.sin(parseFloat(snow[i].style.width) * 9 + parseFloat(snow[i].style.top) / 10) / 25 + "vw";
+						snow[i].style.transform = "rotate(" + parseFloat(snow[i].style.top) * parseFloat(snow[i].style.width) + "deg)";
 					}
 					/* Profiling */
 					const now = Date.now();
@@ -475,6 +473,25 @@ define(function(require) {
 		document.getElementById("sidenav").style.width = "25vw";
 		document.getElementById("sidenav").style.opacity = "1";
 	});
+	document.getElementById("menu-bar-exit").addEventListener("click", function() {
+		setTimeout(function() {
+			window.close();
+		}, 4000);
+		let audio = document.createElement("audio");
+		audio.src = "/src/audio/effects/seeya.mp3";
+		audio.play();
+		let time = Date.now();
+		function reduceVolume() {
+			menuAudio.volume -= 0.05;
+			console.log(menuAudio.volume);
+			if (menuAudio.volume > 0) {
+				requestAnimationFrame(reduceVolume);
+			}
+		}
+		reduceVolume();
+		document.getElementById("goodbye").style.zIndex = "10000";
+		document.getElementById("goodbye").style.opacity = "1";
+	});
 	/* All checkboxes listeners */
 	let checkbox = document.getElementsByClassName("checkbox");
 	for (let i = 0; i < checkbox.length; i++) {
@@ -596,6 +613,7 @@ define(function(require) {
 	/* logo listener */
 	AttachAudio(document.getElementById("logo"), "click", "src/audio/effects/menuHit.wav", "settings-master-volume", "settings-effects-volume");
 	document.getElementById("logo").addEventListener("click", function() {
+		beat = 3;
 		logoX = 30;
 		logoY = 50;
 		logoSize = 25;
@@ -638,6 +656,7 @@ define(function(require) {
 	let menuTimeout;
 
 	function resetMenu() {
+		beat = 3;
 		logoX = 50;
 		logoY = 50;
 		logoSize = 70;

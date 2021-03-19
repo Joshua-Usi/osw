@@ -269,3 +269,15 @@
 .triangle-background {
 	background-attachment: fixed;
 }
+
+#goodbye {
+	width: 100vw;
+	height: 100vh;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: #000;
+	opacity: 0;
+	z-index: -10000;
+	transition: opacity 4s;
+}

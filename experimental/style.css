@@ -1,4 +1,31 @@
 body {
 	margin: 0;
 	overflow: hidden;
+	background-image: url("../src/images/osu_background.jpg");
 }
+
+#intro {
+	color: #e4ecef;
+	background: #000;
+	width: 100vw;
+	height: 100vh;
+	transition: opacity 0.75s;
+}
+
+#intro-text {
+	text-align: center;
+	position: relative;
+	top: calc(50vh - 1em);
+	font-size: 5vh;
+	font-family: Varela Round;
+	letter-spacing: 0px;
+	transition: letter-spacing 0.8s;
+	transition-timing-function: cubic-bezier(0, 0, .58, 1);
+}
+
+.intro-gamemodes {
+	position: absolute;
+	width: 4vh;
+	display: none;
+}
+
