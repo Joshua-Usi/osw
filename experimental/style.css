@@ -20,11 +20,12 @@ body {
 	font-family: Varela Round;
 	letter-spacing: 0px;
 	transition: letter-spacing 0.8s;
-	transition-timing-function: cubic-bezier(0, 0, .58, 1);
+	transition-timing-function: linear;
 }
 
 .intro-gamemodes {
 	position: absolute;
+	top: -10vh;
 	width: 4vh;
 	transition-timing-function: linear;
 }
