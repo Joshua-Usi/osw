@@ -281,3 +281,63 @@
 	z-index: -10000;
 	transition: opacity 4s;
 }
+
+#intro {
+	color: #e4ecef;
+	background: #000;
+	position: absolute;
+	z-index: 999;
+	width: 100vw;
+	height: 100vh;
+	transition: opacity 0.75s;
+}
+
+#intro-logo {
+	position: absolute;
+	top: calc(50vh - 175vh / 2);
+	left: calc(50vw - 175vh / 2);
+	width: 175vh;
+	height: 175vh;
+	transition: left 0.8s, top 0.8s, width 0.8s, height 0.8s;
+	transition-timing-function: cubic-bezier(1,.75,.85,.3);
+}
+
+#intro-text {
+	text-align: center;
+	position: relative;
+	top: calc(50vh - 1em);
+	font-size: 5vh;
+	font-family: Varela Round;
+	letter-spacing: 0px;
+	transition: letter-spacing 0.8s;
+	transition-timing-function: linear;
+}
+
+.intro-gamemodes {
+	position: absolute;
+	top: -10vh;
+	width: 4vh;
+	transition-timing-function: linear;
+}
+
+polygon {
+	fill-opacity: 0;
+	stroke-opacity: 0;
+	animation-fill-mode: forwards;
+}
+
+@keyframes fade-in-out {
+	0% {
+		fill-opacity: 0;
+		stroke-opacity: 0;
+	}
+	20% {
+		fill-opacity: 1;
+		stroke-opacity: 1;
+	}
+	100% {
+		fill-opacity: 0;
+		stroke-opacity: 0;
+	}
+} 
+

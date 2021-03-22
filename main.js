@@ -32,12 +32,13 @@ define(function(require) {
 	const Beatmaps = require("src/scripts/DefaultBeatMaps.js");
 	const BeatMapSelectionPaneTemplate = require("src/scripts/BeatMapSelectionPane.js");
 	let gameplay = require("src/scripts/gameplay.js");
+	require("src/scripts/introSequence.js");
 	/* Offline context checks, needed to ensure for some effects to work */
 	if (window.origin === null) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.8.1b";
+	const version = "osu!web v2021.0.8.2b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {

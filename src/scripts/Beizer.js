@@ -63,13 +63,16 @@ define(function(require) {
 		return r;
 	}
 	/** Computes the drawing/support points for the Bezier curve*/
-	function computeSupportPoints(points) {
+	function computeSupportPoints(points, res) {
 		/** Compute the incremental step*/
 		let tLength = 0;
 		for (let i = 0; i < points.length - 1; i++) {
 			tLength += distance(points[i], points[i + 1]);
 		}
-		let step = 1 / tLength;
+		if (res === undefined) {
+			res = 1;
+		}
+		let step = res / tLength;
 		// compute the support points
 		let temp = [];
 		for (let t = 0; t <= 1; t += step) {
@@ -79,12 +82,12 @@ define(function(require) {
 		return temp;
 	}
 	/* Draws a N grade bezier curve from current point on the context */
-	return function bezier(points) {
+	return function bezier(points, res) {
 		// transform initial arguments into an {x: n, y: n} of [x,y] coordinates
 		let initialPoints = [];
 		for (let i = 0; i < points.length; i++) {
 			initialPoints.push([points[i].x, points[i].y]);
 		}
-		return computeSupportPoints(initialPoints);
+		return computeSupportPoints(initialPoints, res);
 	};
 });
