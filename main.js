@@ -46,6 +46,7 @@ define(function(require) {
 	(function loadMaps() {
 		if (Beatmaps.allMapsLoaded() === true) {
 			let loadedMaps = Beatmaps.get();
+			console.log(loadedMaps)
 			/* Beatmap loading and adding to dom */
 			for (let i = 0; i < loadedMaps.length; i++) {
 				document.getElementById("beatmap-selection-right").innerHTML += BeatMapSelectionPaneTemplate.group(loadedMaps[i], i);
@@ -71,7 +72,8 @@ define(function(require) {
 						let menuAudio = document.getElementById("menu-audio");
 						if (menuAudio.src.replaceAll("%20", " ") !== window.origin + "/src/audio/" + this.dataset.audiosource) {
 							menuAudio.src = "src/audio/" + this.getAttribute("data-audiosource");
-							menuAudio.currentTime = 0;
+							let first = this.parentNode.getElementsByClassName("beatmap-selection-group-pane-maps")[0].getElementsByClassName("beatmap-selection-map-pane")[0];
+							menuAudio.currentTime = loadedMaps[first.getAttribute("data-group-index")][first.getAttribute("data-map-index")].PreviewTime / 1000;
 							menuAudio.play();
 						}
 					}
