@@ -482,13 +482,14 @@ define(function(require) {
 		setTimeout(function() {
 			window.close();
 		}, 4000);
-		let audio = document.createElement("audio");
-		audio.src = "/src/audio/effects/seeya.mp3";
-		audio.play();
-		let time = Date.now();
 
 		function reduceVolume() {
-			menuAudio.volume -= 0.05;
+			let volume = menuAudio.volume;
+			volume -= 0.05
+			if (volume < 0) {
+				volume = 0;
+			}
+			menuAudio.volume = volume;
 			if (menuAudio.volume > 0) {
 				requestAnimationFrame(reduceVolume);
 			}
