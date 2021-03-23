@@ -9,12 +9,11 @@ define(function(require) {
 	(function loadMaps() {
 		if (beatmap.allMapsLoaded() === true) {
 			loadedMaps = beatmap.get();
-			/* Beatmap loading and adding to dom */
 		} else {
 			requestAnimationFrame(loadMaps);
 		}
 	})();
-	const Beizer = require("./Beizer.js");
+	const Bezier = require("./Bezier.js");
 	const utils = require("./utils.js");
 	const HitObject = require("./HitObject.js");
 	const HitEvent = require("./HitEvent.js");
@@ -31,6 +30,7 @@ define(function(require) {
 	canvas.setHeight(window.innerHeight);
 	canvas.setWidth(window.innerWidth);
 	let ctx = canvas.context;
+	canvas.setFillStyle("#fff");
 	let isRunning = false;
 	/* inputs setup */
 	let mouse = new Mouse("body", 10);
@@ -42,8 +42,6 @@ define(function(require) {
 	keyboard.init();
 	let keyboardLeftReleased = false;
 	let keyboardRightReleased = false;
-	ctx.font = "16px Arial";
-	canvas.setFillStyle("#fff");
 	let alreadyRunning = false;
 	/* Details about the play, including replays */
 	let playDetails;
@@ -93,10 +91,9 @@ define(function(require) {
 	audio.addEventListener("canplaythrough", function() {
 		audio.play();
 	});
-	/* Beatmap difficulty data */
+	/* Beatmap difficulty data constants */
 	let arTime;
 	let arFadeIn;
-	/* Map from osu!pixels to screen pixels */
 	let circleDiameter;
 	let difficultyMultiplier;
 	let odTime;
@@ -108,7 +105,7 @@ define(function(require) {
 	let hiddenFadeOutPercent = 0.7;
 	let sliderStrokeSize = 0.9;
 
-	function animate() {
+	function gameplayTick() {
 		if (document.getElementById("webpage-state-gameplay").style.display !== "block" && document.getElementById("webpage-state-gameplay").style.display !== "") {
 			return;
 		}
@@ -121,11 +118,8 @@ define(function(require) {
 				useTime *= 0.75;
 			}
 		}
-		ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 		let hitObjectOffsetX = playfieldXOffset + window.innerWidth / 2 - window.innerHeight * playfieldSize * (4 / 3) / 2;
 		let hitObjectOffsetY = playfieldYOffset + window.innerHeight / 2 - window.innerHeight * playfieldSize / 2;
-		canvas.setStrokeStyle("#fff");
-		ctx.lineWidth = 5;
 		let b = utils.mapToOsuPixels(256, 192, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 		previousAngle = angle;
 		angle = Math.atan2(mouse.position.y - b.y, mouse.position.x - b.x);
@@ -169,9 +163,6 @@ define(function(require) {
 		}
 		currentHP -= Formulas.HPDrain(loadedMaps[useBeatmapSet][useBeatmap].HPDrainRate, useTime - previousTime);
 		hpDisplay += (currentHP - hpDisplay) / 8;
-		canvas.setImageAlignment("top-left");
-		canvas.drawImage(Assets.scoreBarBg, 10, 10, window.innerWidth / 2, Assets.scoreBarBg.height);
-		canvas.drawImage(Assets.scoreBarColour, 0, 0, utils.map(hpDisplay, 0, 1, 0, Assets.scoreBarColour.width), Assets.scoreBarColour.height, 15, 10 + Assets.scoreBarColour.height / 1.5, utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2 - 0.01 * window.innerWidth), Assets.scoreBarColour.height);
 		/* Hit Events */
 		while (hitEvents.length > 0) {
 			switch (hitEvents[0].score) {
@@ -235,18 +226,18 @@ define(function(require) {
 				timingPointUninheritedIndex = currentTimingPoint;
 			}
 		}
-		/* Cache Loop ---------------------------------------------------------------- */
+		/* Cache Loop */
 		for (let i = 0; i < hitObjects.length; i++) {
-			/* Cache Setup ---------------------------------------------------------------- */
+			/* Cache Setup */
 			let sliderSpeedMultiplier = loadedMaps[useBeatmapSet][useBeatmap].SliderMultiplier;
 			if (hitObjects[i].cache.cacheSet === false) {
-				/* Immediate Cache Setup ---------------------------------------------------------------- */
+				/* Immediate Cache Setup */
 				if (hitObjects[i].type[0] === "1") {
-					/* Cache Setup for HitCircle ---------------------------------------------------------------- */
+					/* Cache Setup for HitCircle */
 					hitObjects[i].cache.cacheSet = true;
 				} else if (hitObjects[i].type[1] === "1") {
 					hitObjects[i].cache.cacheSet = true;
-					/* Cache Setup for Slider ---------------------------------------------------------------- */
+					/* Cache Setup for Slider */
 					hitObjects[i].cache.hitHead = false;
 					hitObjects[i].cache.hitEnd = false;
 					hitObjects[i].cache.onFollowCircle = false;
@@ -259,36 +250,36 @@ define(function(require) {
 					hitObjects[i].cache.points = [];
 					hitObjects[i].cache.timingPointUninheritedIndex = timingPointUninheritedIndex;
 					/* Precalculate Slider Curve Points */
-					/* Calculate Slider Points ---------------------------------------------------------------- */
+					/* Calculate Slider Points */
 					if (hitObjects[i].curveType === "B" || hitObjects[i].curveType === "C" || hitObjects[i].curveType === "L") {
-						/* Slider Type Beizer, Catmull and Linear ---------------------------------------------------------------- */
+						/* Slider Type Bezier, Catmull and Linear */
 						/* determine slider red / white anchor */
-						let beizerTemp = [];
+						let BezierTemp = [];
 						for (let j = 0; j < hitObjects[i].curvePoints.length; j++) {
 							if (hitObjects[i].curvePoints[j + 1] && hitObjects[i].curvePoints[j].x === hitObjects[i].curvePoints[j + 1].x && hitObjects[i].curvePoints[j].y === hitObjects[i].curvePoints[j + 1].y) {
-								beizerTemp.push(hitObjects[i].curvePoints[j]);
-								let point = Beizer(beizerTemp);
+								BezierTemp.push(hitObjects[i].curvePoints[j]);
+								let point = Bezier(BezierTemp);
 								for (let k = 0; k < point.length - 1; k++) {
 									hitObjects[i].cache.points.push(point[k]);
 								}
-								beizerTemp = [];
+								BezierTemp = [];
 							} else {
-								beizerTemp.push(hitObjects[i].curvePoints[j]);
+								BezierTemp.push(hitObjects[i].curvePoints[j]);
 							}
 						}
-						let point = Beizer(beizerTemp);
+						let point = Bezier(BezierTemp);
 						for (let k = 0; k < point.length; k++) {
 							hitObjects[i].cache.points.push(point[k]);
 						}
-						beizerTemp = [];
+						BezierTemp = [];
 					} else if (hitObjects[i].curveType === "P" && hitObjects[i].curvePoints.length === 3) {
-						/* Slider Type Perfect Circle ---------------------------------------------------------------- */
+						/* Slider Type Perfect Circle */
 						let circle = utils.circumcircle(hitObjects[i].curvePoints[0], hitObjects[i].curvePoints[1], hitObjects[i].curvePoints[2]);
 						hitObjects[i].cache.points = utils.circleToPoints(circle.x, circle.y, circle.r, Math.abs(hitObjects[i].length), -utils.direction(circle.x, circle.y, hitObjects[i].curvePoints[0].x, hitObjects[i].curvePoints[0].y) - Math.PI / 2, utils.orientation(hitObjects[i].curvePoints[0], hitObjects[i].curvePoints[1], hitObjects[i].curvePoints[2]));
 					}
 				} else if (hitObjects[i].type[3] === "1") {
 					hitObjects[i].cache.cacheSet = true;
-					/* Cache Setup for Spinner ---------------------------------------------------------------- */
+					/* Cache Setup for Spinner */
 					hitObjects[i].cache.spins = 0;
 					/* in rad/s */
 					hitObjects[i].cache.velocity = 0;
@@ -303,15 +294,15 @@ define(function(require) {
 			if (loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].uninherited === 0) {
 				sliderSpeedMultiplier *= Formulas.sliderMultiplier(loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].beatLength);
 			}
-			/* Cache Setup ---------------------------------------------------------------- */
+			/* Cache Setup */
 			if (useTime >= hitObjects[i].time) {
-				/* Cache Setup After Object Hit Time ---------------------------------------------------------------- */
+				/* Cache Setup After Object Hit Time */
 				if (hitObjects[i].type[0] === "1" && hitObjects[i].cache.cacheSetAfterHit === false) {
-					/* Cache Setup for HitCircle ---------------------------------------------------------------- */
+					/* Cache Setup for HitCircle */
 					hitObjects[i].cache.cacheSetAfterHit = true;
 				} else if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.cacheSetAfterHit === false) {
 					hitObjects[i].cache.cacheSetAfterHit = true;
-					/* Cache Setup for Slider ---------------------------------------------------------------- */
+					/* Cache Setup for Slider */
 					hitObjects[i].cache.sliderInheritedMultiplier = sliderSpeedMultiplier;
 					hitObjects[i].cache.timingPointUninheritedIndex = timingPointUninheritedIndex;
 					hitObjects[i].cache.sliderOnceTime = Math.abs(hitObjects[i].length) / (hitObjects[i].cache.sliderInheritedMultiplier * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObjects[i].cache.timingPointUninheritedIndex].beatLength;
@@ -349,11 +340,11 @@ define(function(require) {
 					hitObjects[i].cache.totalTicks = hitObjects[i].cache.specificSliderTicksPosition[0].length;
 				} else if (hitObjects[i].type[3] === "1" && hitObjects[i].cache.cacheSetAfterHit === false) {
 					hitObjects[i].cache.cacheSetAfterHit = true;
-					/* Cache Setup for Spinner ---------------------------------------------------------------- */
+					/* Cache Setup for Spinner */
 				}
 			}
 		}
-		/* Processing Loop ---------------------------------------------------------------- */
+		/* Processing Loop */
 		for (let i = 0; i < hitObjects.length; i++) {
 			let hitObjectMapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 			if (playDetails.mods.auto) {
@@ -371,7 +362,7 @@ define(function(require) {
 					keyboard.emulateKeyDown("z");
 				}
 			}
-			/* Hit Circle Hit Handling ---------------------------------------------------------------- */
+			/* Hit Circle Hit Handling */
 			if (hitObjects[i].type[0] === "1" && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased))) {
 				if (keyboard.getKeyDown("z") && keyboardLeftReleased) {
 					keyboardLeftReleased = false;
@@ -400,14 +391,14 @@ define(function(require) {
 				hitObjects.splice(i, 1);
 				i--;
 			}
-			/* Out of Index Handling ---------------------------------------------------------------- */
+			/* Out of Index Handling */
 			if (i <= -1) {
 				i = 0;
 				if (hitObjects.length === 0) {
 					continue;
 				}
 			}
-			/* Slider Follow Circle Handling ---------------------------------------------------------------- */
+			/* Slider Follow Circle Handling */
 			if (hitObjects[i].type[1] === "1" && useTime >= hitObjects[i].time) {
 				if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
 					let sliderRepeat = false;
@@ -504,7 +495,7 @@ define(function(require) {
 					}
 				}
 			}
-			/* Slider Head Hit Handling ---------------------------------------------------------------- */
+			/* Slider Head Hit Handling */
 			if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hitHead === false && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased)) && utils.withinRange(useTime, hitObjects[i].time, odTime[0])) {
 				if (keyboard.getKeyDown("z") && keyboardLeftReleased) {
 					keyboardLeftReleased = false;
@@ -519,31 +510,9 @@ define(function(require) {
 				hitObjects[i].cache.hitHead = true;
 				hitObjects[i].cache.hasHitAtAll = true;
 			}
-			/* Slider Tick Miss Check ---------------------------------------------------------------- */
-			// if (hitObjects[i].type[1] === "1" && useTime >= hitObjects[i].time) {
-			// 	let copy = [];
-			// 	let matches = 0;
-			// 	let totalOccurences = 0;
-			// 	for (let j = 0; j < hitObjects[i].cache.specificSliderTicksHit.length; j++) {
-			// 		copy.push(hitObjects[i].cache.specificSliderTicksHit[j]);
-			// 	}
-			// 	copy.sort(function(x, y) {
-			// 		return (x === y) ? 0 : x ? -1 : 1;
-			// 	});
-			// 	for (let j = 0; j < copy.length; j++) {
-			// 		if (copy[j]) {
-			// 			totalOccurences++;
-			// 		}
-			// 		if (copy[j] === hitObjects[i].cache.specificSliderTicksHit[j] && copy[j]) {
-			// 			matches++;
-			// 		}
-			// 	}
-			// 	if (matches !== totalOccurences) {
-			// 		combo = 0;
-			// 		document.getElementById("combo-container").innerHTML = "";
-			// 	}
-			// }
-			/* Slider Score Calculations ---------------------------------------------------------------- */
+			/* Slider Tick Miss Check */
+			/* todo */
+			/* Slider Score Calculations */
 			if (hitObjects[i].type[1] === "1" && hitObjects[i].cache.hasEnded) {
 				let sliderElementsHit = 0;
 				/* 1 head */
@@ -593,14 +562,14 @@ define(function(require) {
 				hitObjects.splice(i, 1);
 				i--;
 			}
-			/* Out of Index Handling ---------------------------------------------------------------- */
+			/* Out of Index Handling */
 			if (i <= -1) {
 				i = 0;
 				if (hitObjects.length === 0) {
 					continue;
 				}
 			}
-			/* Miss (Outside OD window) calculation ---------------------------------------------------------------- */
+			/* Miss (Outside OD window) calculation */
 			let miss = false;
 			let mapped = hitObjectMapped;
 			if (hitObjects[i].type[0] === "1" && useTime >= hitObjects[i].time + odTime[0] / 2) {
@@ -620,14 +589,14 @@ define(function(require) {
 				i--;
 				document.getElementById("combo-container").innerHTML = "";
 			}
-			/* Out of Index Handling ---------------------------------------------------------------- */
+			/* Out of Index Handling */
 			if (i <= -1) {
 				i = 0;
 				if (hitObjects.length === 0) {
 					continue;
 				}
 			}
-			/* Spinner handling ---------------------------------------------------------------- */
+			/* Spinner handling */
 			if (hitObjects[i].type[3] === "1") {
 				hitObjects[i].cache.velocity += (angleChange - hitObjects[i].cache.velocity) / 32;
 				hitObjects[i].cache.currentAngle += hitObjects[i].cache.velocity * (useTime - previousTime);
@@ -657,7 +626,7 @@ define(function(require) {
 					}
 				}
 			}
-			/* Spinner end handling ---------------------------------------------------------------- */
+			/* Spinner end handling */
 			if (hitObjects[i].type[3] === "1" && useTime >= hitObjects[i].endTime) {
 				let mapped = utils.mapToOsuPixels(256, 192, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 				if (hitObjects[i].cache.cleared) {
@@ -682,10 +651,16 @@ define(function(require) {
 				keyboardRightReleased = true;
 			}
 		}
-		/* Render Loop ---------------------------------------------------------------- */
+		/* Render Loop */
+		ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+		canvas.setStrokeStyle("#fff");
+		ctx.lineWidth = 5;
+		canvas.setImageAlignment("top-left");
+		canvas.drawImage(Assets.scoreBarBg, 10, 10, window.innerWidth / 2, Assets.scoreBarBg.height);
+		canvas.drawImage(Assets.scoreBarColour, 0, 0, utils.map(hpDisplay, 0, 1, 0, Assets.scoreBarColour.width), Assets.scoreBarColour.height, 15, 10 + Assets.scoreBarColour.height / 1.5, utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2 - 0.01 * window.innerWidth), Assets.scoreBarColour.height);
 		canvas.setImageAlignment("center");
 		for (let i = hitObjects.length - 1; i >= 0; i--) {
-			/* Approach Circle Calculations ---------------------------------------------------------------- */
+			/* Approach Circle Calculations */
 			let approachCircleSize = utils.map(useTime - (hitObjects[i].time - arTime), 0, arTime, approachCircleMaxSize, approachCircleMinSize);
 			let hitObjectMapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 			/* approach circle max size */
@@ -696,7 +671,7 @@ define(function(require) {
 			if (approachCircleSize < approachCircleMinSize) {
 				approachCircleSize = approachCircleMinSize;
 			}
-			/* Alpha Calculations ---------------------------------------------------------------- */
+			/* Alpha Calculations */
 			if (hitObjects[i].type[0] === "1") {
 				if (playDetails.mods.hidden) {
 					/* hidden fade in and out for hit circle */
@@ -726,9 +701,9 @@ define(function(require) {
 					canvas.setGlobalAlpha(1);
 				}
 			}
-			/* Object Draw ---------------------------------------------------------------- */
+			/* Object Draw */
 			if (hitObjects[i].type[0] === "1") {
-				/* Draw Hit Circle ---------------------------------------------------------------- */
+				/* Draw Hit Circle */
 				canvas.drawImage(Assets.hitCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
 				canvas.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
 				if (playDetails.mods.hidden === false) {
@@ -737,7 +712,7 @@ define(function(require) {
 				canvas.drawImage(Assets.comboNumbers[1], hitObjectMapped.x, hitObjectMapped.y);
 			} else if (hitObjects[i].type[1] === "1") {
 
-				/* Draw Slider ---------------------------------------------------------------- */
+				/* Draw Slider */
 				let sliderDrawPercent = Math.floor(utils.map(audio.currentTime, hitObjects[i].time - arTime / 2, hitObjects[i].time, 0, hitObjects[i].cache.points.length));
 				if (sliderDrawPercent < 0) {
 					sliderDrawPercent = 0;
@@ -748,7 +723,7 @@ define(function(require) {
 				/* Slider Curve calculated the at the hitobject time - ar time */
 				ctx.lineCap = "round";
 				ctx.lineJoin = 'round';
-				/* Draw Outer Slider Body ---------------------------------------------------------------- */
+				/* Draw Outer Slider Body */
 				ctx.lineWidth = circleDiameter;
 				canvas.setStrokeStyle("rgba(255, 255, 255, " + canvas.getGlobalAlpha() + ")");
 				ctx.beginPath();
@@ -757,7 +732,7 @@ define(function(require) {
 					ctx.lineTo(mapped.x, mapped.y);
 				}
 				ctx.stroke();
-				/* Draw Inner Slider Body ---------------------------------------------------------------- */
+				/* Draw Inner Slider Body */
 				ctx.lineWidth = circleDiameter * sliderStrokeSize;
 				canvas.setStrokeStyle("#222");
 				ctx.beginPath();
@@ -766,7 +741,7 @@ define(function(require) {
 					ctx.lineTo(mapped.x, mapped.y);
 				}
 				ctx.stroke();
-				/* Draw Slider Ticks ---------------------------------------------------------------- */
+				/* Draw Slider Ticks */
 				if (hitObjects[i].cache.totalTicks >= 1 && hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide]) {
 					for (let j = 0; j < hitObjects[i].cache.specificSliderTicksPosition[hitObjects[i].cache.currentSlide].length; j++) {
 						if (hitObjects[i].cache.specificSliderTicksHit[hitObjects[i].cache.currentSlide][j]) {
@@ -776,7 +751,7 @@ define(function(require) {
 						canvas.drawImage(Assets.sliderScorePoint, mapped.x, mapped.y);
 					}
 				}
-				/* Draw Slider End ---------------------------------------------------------------- */
+				/* Draw Slider End */
 				let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[sliderDrawPercent].x, hitObjects[i].cache.points[sliderDrawPercent].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 				if (hitObjects[i].slides > 1 && hitObjects[i].cache.currentSlide < hitObjects[i].slides - 1) {
 					ctx.translate(mapped.x, mapped.y);
@@ -923,7 +898,7 @@ define(function(require) {
 		}
 		canvas.setGlobalAlpha(1);
 		canvas.drawImage(Assets.cursor, mouse.position.x, mouse.position.y, Assets.cursor.width, Assets.cursor.height);
-		/* Profiling ----------------------------------------------------------------------------------------------- */
+		/* Profiling */
 		const now = Date.now();
 		while (times.length > 0 && times[0] <= now - 1000) {
 			times.shift();
@@ -942,7 +917,7 @@ define(function(require) {
 		}
 		previousTime = useTime;
 		if (isRunning) {
-			setTimeout(animate, 0);
+			setTimeout(gameplayTick, 0);
 		}
 	}
 	return {
@@ -950,7 +925,7 @@ define(function(require) {
 			audio.play();
 			mouse.lockPointer();
 			isRunning = true;
-			animate();
+			gameplayTick();
 		},
 		pause: function() {
 			audio.pause();
@@ -1013,7 +988,7 @@ define(function(require) {
 
 			mouse.lockPointer();
 			isRunning = true;
-			animate();
+			gameplayTick();
 		},
 		playDetails: function() {
 			return playDetails;

@@ -73,23 +73,6 @@ define(function(require) {
 				return false;
 			}
 		},
-		lineLine: function(x1, y1, x2, y2, x3, y3, x4, y4) {
-			const den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-			if (den === 0) return;
-			const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
-			const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
-			if (t > 0 && t < 1 && u > 0 && u < 1) {
-				const pt = {
-					x: undefined,
-					y: undefined,
-				};
-				pt.x = x1 + t * (x2 - x1);
-				pt.y = y1 + t * (y2 - y1);
-				return pt;
-			} else {
-				return;
-			}
-		},
 		// To find orientation of ordered triplet (p1, p2, p3). 
 		// The function returns following values 
 		// 0 --> p, q and r are colinear 
@@ -103,12 +86,6 @@ define(function(require) {
 			}
 			// clock or counterclock wise 
 			return (val > 0) ? 1 : 2;
-		},
-		angle: function(a, b, c) {
-			let ab = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
-			let bc = Math.sqrt(Math.pow(b.x - c.x, 2) + Math.pow(b.y - c.y, 2));
-			let ac = Math.sqrt(Math.pow(c.x - a.x, 2) + Math.pow(c.y - a.y, 2));
-			return Math.acos((bc * bc + ab * ab - ac * ac) / (2 * bc * ab));
 		},
 		/* 90 sided circle */
 		circleToPoints: function(x, y, r, length, startingAngle, clockwise) {
@@ -226,9 +203,13 @@ define(function(require) {
 			const mean = arr.reduce((acc, val) => acc + val, 0) / arr.length;
 			return Math.sqrt(arr.reduce((acc, val) => acc.concat((val - mean) ** 2), []).reduce((acc, val) => acc + val, 0) / (arr.length - (usePopulation ? 0 : 1)));
 		},
-		sum: function(array) {
+		sum: function(array, maxIndex) {
+			let len = array.length;
+			if (maxIndex) {
+				len = maxIndex;
+			}
 			let sum = 0;
-			for (let i = 0; i < array.length; i++) {
+			for (let i = 0; i < len; i++) {
 				sum += array[i];
 			}
 			return sum;

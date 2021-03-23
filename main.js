@@ -230,10 +230,7 @@ define(function(require) {
 				audioAnalyserData = [...audioAnalyserData];
 				audioAnalyserDataPreviousSum = audioAnalyserDataSum;
 				audioAnalyserDataSum = 0;
-				let len = audioAnalyserData.length / 8;
-				for (var i = 0; i < len; i++) {
-					audioAnalyserDataSum += audioAnalyserData[i];
-				}
+				audioAnalyserDataSum = utils.sum(audioAnalyserData, audioAnalyserData.length / 8);
 				let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
 				/* triangle background moves */
 				offset -= 0.5;
@@ -489,6 +486,7 @@ define(function(require) {
 		audio.src = "/src/audio/effects/seeya.mp3";
 		audio.play();
 		let time = Date.now();
+
 		function reduceVolume() {
 			menuAudio.volume -= 0.05;
 			if (menuAudio.volume > 0) {

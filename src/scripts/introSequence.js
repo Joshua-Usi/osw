@@ -1,6 +1,6 @@
 define(function(require) {
 	"use strict";
-	const bezier = require("./Beizer.js");
+	const bezier = require("./Bezier.js");
 	const utils = require("./utils.js");
 	let canvas = document.getElementById("intro-logo");
 	canvas.width = 0.8 * window.innerWidth;
@@ -25,7 +25,7 @@ define(function(require) {
 			octagonPoints.push(point(x, y));
 		}
 		for (let i = 0; i < octagonPoints.length - 1; i++) {
-			let bezierPoints = bezier([octagonPoints[i], octagonPoints[i + 1]], 0.01);
+			let bezierPoints = bezier([octagonPoints[i], octagonPoints[i + 1]], 0.04);
 			for (let j = 0; j < bezierPoints.length; j++) {
 				octagonInterpolatedPoints.push(bezierPoints[j]);
 			}
@@ -40,7 +40,7 @@ define(function(require) {
 			octagonPoints.push(point(x, y));
 		}
 		for (let i = 0; i < octagonPoints.length - 1; i++) {
-			let bezierPoints = bezier([octagonPoints[i], octagonPoints[i + 1]], 0.01);
+			let bezierPoints = bezier([octagonPoints[i], octagonPoints[i + 1]], 0.04);
 			for (let j = 0; j < bezierPoints.length; j++) {
 				octagonInterpolatedPoints.push(bezierPoints[j]);
 			}
@@ -112,7 +112,6 @@ define(function(require) {
 				pointArrays.push(pathPoints);
 			}
 		}
-		console.log(pointArrays);
 	}
 	generatePoints();
 	let animationStage = 0.05;
