@@ -23,7 +23,8 @@
 	background: url('../../src/images/triangles.png');
 	background-color: #FD67AE;
 	background-size: 50vh;
-	border-radius: 50%;
+	/*border-radius: 50%;*/
+	clip-path: polygon(50% 0, 85% 15%, 100% 50%, 85% 85%, 50% 100%, 15% 85%, 0 50%, 15% 15%);
 	transition: width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s;
 	transition-timing-function: cubic-bezier(0, .65, .25, 1.5);
 	position: absolute;

@@ -92,8 +92,11 @@
 	padding-top: calc(50vh - 3em);
 	background: #000;
 	z-index: 1000;
-	color: #000;
 	transition: opacity 1s;
+}
+
+#splash-screen p {
+	color: #000;
 }
 
 #orientation-vertical {
@@ -117,6 +120,17 @@
 	}
 	100% {
 		color: #e4ecef;
+		letter-spacing: 0px;
+	}
+}
+
+@keyframes splash-screen-text-2 {
+	0% {
+		color: #000;
+		letter-spacing: 3px;
+	}
+	100% {
+		color: #FD67AE;
 		letter-spacing: 0px;
 	}
 }

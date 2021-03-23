@@ -37,8 +37,8 @@ define(function(require) {
 	if (window.origin === null) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
-	/* Osu!web version incremented manually */
-	const version = "osu!web v2021.0.8.2b";
+	/* osw! version incremented manually */
+	const version = "osw! v2021.0.9.0b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
@@ -47,7 +47,6 @@ define(function(require) {
 	(function loadMaps() {
 		if (Beatmaps.allMapsLoaded() === true) {
 			let loadedMaps = Beatmaps.get();
-			console.log(loadedMaps)
 			/* Beatmap loading and adding to dom */
 			for (let i = 0; i < loadedMaps.length; i++) {
 				document.getElementById("beatmap-selection-right").innerHTML += BeatMapSelectionPaneTemplate.group(loadedMaps[i], i);
@@ -393,7 +392,13 @@ define(function(require) {
 		window.dispatchEvent(new CustomEvent("orientationchange"));
 	});
 	window.addEventListener("load", function() {
-		document.getElementById("splash-screen").style.animation = "splash-screen-text forwards";
+		let paragraphElements = document.getElementById("splash-screen").querySelectorAll("p");
+		for (var i = 0; i < paragraphElements.length; i++) {
+			paragraphElements[i].style.animation = "splash-screen-text forwards 1s";
+			if (paragraphElements[i].id === "splash-screen-warning") {
+				paragraphElements[i].style.animation = "splash-screen-text-2 forwards 1s";
+			}
+		}
 		document.getElementById("splash-screen").style.animationDuration = "1s";
 		document.getElementById("splash-screen").style.animationDelay = "1s";
 		document.getElementById("heart-loader").style.display = "none";
@@ -486,7 +491,6 @@ define(function(require) {
 		let time = Date.now();
 		function reduceVolume() {
 			menuAudio.volume -= 0.05;
-			console.log(menuAudio.volume);
 			if (menuAudio.volume > 0) {
 				requestAnimationFrame(reduceVolume);
 			}

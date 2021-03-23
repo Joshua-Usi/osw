@@ -1,6 +1,13 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to slightly modified [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v2021.0.9.0b] - 2021-03-23
+### Changed
+- rebranded to osw! due to copyright and trademark issues
+- New octagonal logo
+- changed and removed most osu! copyrighted images
+- New intro supports new logo
+---
 ## [v2021.0.8.1b] - 2021-03-18
 ### Added
 - When pressing play, a beatmap is randomly selected for you to play! presuming you have any
