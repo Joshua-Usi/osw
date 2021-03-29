@@ -33,7 +33,7 @@ define(function(require) {
 	canvas.setFillStyle("#fff");
 	let isRunning = false;
 	/* inputs setup */
-	let mouse = new Mouse("body", 10);
+	let mouse = new Mouse("body", 30);
 	let keyboard = new Keyboard("body");
 	mouse.setPosition(window.innerWidth / 2, window.innerHeight / 2);
 	mouse.init();
@@ -161,7 +161,10 @@ define(function(require) {
 				isRunning = false;
 			}
 		}
-		currentHP -= Formulas.HPDrain(loadedMaps[useBeatmapSet][useBeatmap].HPDrainRate, useTime - previousTime);
+		/* only start draining health 2 seconds before the first hit object*/
+		if (useTime > loadedMaps[useBeatmapSet][useBeatmap].hitObjects[0].time - 2) {
+			currentHP -= Formulas.HPDrain(loadedMaps[useBeatmapSet][useBeatmap].HPDrainRate, useTime - previousTime);
+		}
 		hpDisplay += (currentHP - hpDisplay) / 8;
 		/* Hit Events */
 		while (hitEvents.length > 0) {
@@ -348,6 +351,11 @@ define(function(require) {
 		for (let i = 0; i < hitObjects.length; i++) {
 			let hitObjectMapped = utils.mapToOsuPixels(hitObjects[i].x, hitObjects[i].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 			if (playDetails.mods.auto) {
+				if (i === 0) {
+					if ((hitObjects[i].cache.hasHitAtAll === false || hitObjects[i].cache.hasHitAtAll === undefined) && hitObjects[i].type[3] !== "1") {
+						mouse.changePosition((hitObjectMapped.x - mouse.position.x) / 8, (hitObjectMapped.y - mouse.position.y) / 8);
+					}
+				}
 				if (hitObjects[i].type[0] === "1" && useTime >= hitObjects[i].time) {
 					mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y);
 					keyboard.emulateKeyDown("z");
@@ -359,6 +367,7 @@ define(function(require) {
 				}
 				if (hitObjects[i].type[3] === "1" && useTime >= hitObjects[i].time) {
 					angleChange = 50;
+					mouse.setPosition(hitObjectMapped.x + 100 * Math.cos(hitObjects[i].cache.currentAngle), hitObjectMapped.y + 100 * Math.sin(hitObjects[i].cache.currentAngle))
 					keyboard.emulateKeyDown("z");
 				}
 			}

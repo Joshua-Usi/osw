@@ -38,7 +38,7 @@ define(function(require) {
 		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
 	}
 	/* osw! version incremented manually */
-	const version = "osw! v2021.0.9.0b";
+	const version = "osw! v2021.0.9.1b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("version-number");
 	for (let i = 0; i < classes.length; i++) {
