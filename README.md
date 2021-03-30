@@ -4,3 +4,5 @@
  it is also planned to be almost 1:1 with osu! (barring other gamemodes)
  
  Currently in heavy development
+
+ This version is currently a throwaway prototype. 
