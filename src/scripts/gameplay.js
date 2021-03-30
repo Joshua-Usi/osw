@@ -722,9 +722,9 @@ define(function(require) {
 			} else if (hitObjects[i].type[1] === "1") {
 
 				/* Draw Slider */
-				let sliderDrawPercent = Math.floor(utils.map(audio.currentTime, hitObjects[i].time - arTime / 2, hitObjects[i].time, 0, hitObjects[i].cache.points.length));
-				if (sliderDrawPercent < 0) {
-					sliderDrawPercent = 0;
+				let sliderDrawPercent = Math.floor(utils.map(audio.currentTime, hitObjects[i].time - 3 * arTime / 4, hitObjects[i].time - arTime / 4, hitObjects[i].cache.points.length / 4, hitObjects[i].cache.points.length));
+				if (sliderDrawPercent < Math.floor(hitObjects[i].cache.points.length / 4)) {
+					sliderDrawPercent = Math.floor(hitObjects[i].cache.points.length / 4);
 				}
 				if (sliderDrawPercent > hitObjects[i].cache.points.length - 1) {
 					sliderDrawPercent = hitObjects[i].cache.points.length - 1;
