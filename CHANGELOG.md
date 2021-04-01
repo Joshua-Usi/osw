@@ -6,12 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Combo Numbers
 - Combo Colours
 - Combo support for beatmap parser
+- Custom osw background
 ### Changed
 *From https://github.com/jylescoad-ward
 - Warning text when running without web server
 ### Removed
 - Unnecessary Audio Files
-- more official osu! files
+- More official osu! files
 ---
 ## [0.3.1b] - 2021-03-29
 ### Added
