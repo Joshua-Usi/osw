@@ -24,23 +24,24 @@
 define(function(require) {
 	"use strict";
 	/* RequireJS Module Loading */
-	const Mouse = require("src/scripts/Mouse.js");
-	let Options = require("src/scripts/Options.js");
-	const AssetLoader = require("src/scripts/AssetLoader.js");
-	const utils = require("src/scripts/utils.js");
-	const AttachAudio = require("src/scripts/AttachAudio.js");
-	const Beatmaps = require("src/scripts/DefaultBeatMaps.js");
-	const BeatMapSelectionPaneTemplate = require("src/scripts/BeatMapSelectionPane.js");
-	let gameplay = require("src/scripts/gameplay.js");
-	require("src/scripts/introSequence.js");
+	const Mouse = require("./src/scripts/Mouse.js");
+	let Options = require("./src/scripts/Options.js");
+	const AssetLoader = require("./src/scripts/AssetLoader.js");
+	const utils = require("./src/scripts/utils.js");
+	const AttachAudio = require("./src/scripts/AttachAudio.js");
+	const Beatmaps = require("./src/scripts/DefaultBeatMaps.js");
+	const BeatMapSelectionPaneTemplate = require("./src/scripts/BeatMapSelectionPane.js");
+	let gameplay = require("./src/scripts/gameplay.js");
+	const version = "osw! 0.4.0b";
+	require("./src/scripts/introSequence.js");
 	/* Offline context checks, needed to ensure for some effects to work */
+	/* Text suggested by jylescoad-ward*/
 	if (window.origin === null) {
-		console.warn("You appear to be running this locally without a web server, some effects may not work due to CORS");
+		console.warn("Looks like you're running this without a web server, this isn't suggested at all due to some features may break because CORS is a thing :/");
 	}
 	/* osw! version incremented manually */
-	const version = "osw! v2021.0.9.1b";
 	/* Set element version numbers */
-	let classes = document.getElementsByClassName("version-number");
+	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].textContent = version;
 	}
@@ -71,7 +72,7 @@ define(function(require) {
 						}
 						let menuAudio = document.getElementById("menu-audio");
 						if (menuAudio.src.replaceAll("%20", " ") !== window.origin + "/src/audio/" + this.dataset.audiosource) {
-							menuAudio.src = "src/audio/" + this.getAttribute("data-audiosource");
+							menuAudio.src = "./src/audio/" + this.getAttribute("data-audiosource");
 							let first = this.parentNode.getElementsByClassName("beatmap-selection-group-pane-maps")[0].getElementsByClassName("beatmap-selection-map-pane")[0];
 							menuAudio.currentTime = loadedMaps[first.getAttribute("data-group-index")][first.getAttribute("data-map-index")].PreviewTime / 1000;
 							menuAudio.play();
@@ -104,7 +105,7 @@ define(function(require) {
 	let mouse = new Mouse("body");
 	mouse.init();
 	/* Initial menu song pool */
-	let songs = ["cYsmix - Triangles.mp3", "nekodex - circles.mp3", ];
+	let songs = ["cYsmix - Triangles.mp3", "nekodex - circles.mp3"];
 	/* Only add christmas songs to list if the month is December */
 	if (new Date().getMonth() === 11) {
 		songs.push("nekodex - aureole.mp3");
@@ -156,7 +157,6 @@ define(function(require) {
 	 * play
 	 * settings
 	 */
-	let menuState = "just-logo";
 	let logoX = 50;
 	let logoY = 50;
 	let logoSize = 70;
@@ -169,8 +169,7 @@ define(function(require) {
 	audioVisualiser.style.top = "calc(" + logoY + "vh - " + (logoSize * audioVisualiserSize / 2) + "vh)";
 	audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + (logoSize * audioVisualiserSize / 2) + "vh)";
 	/* Profiling variables */
-	let times = [];
-	let frameRate = 0;
+	let recordedFramesPerSecond = [];
 	/* Event Listeners */
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
@@ -239,9 +238,14 @@ define(function(require) {
 				ctx.strokeStyle = "#fff5";
 				let length = audioAnalyserData.length * (2 / 3);
 				for (let i = 0; i < length; i += 4) {
-					let angle = utils.map(i, 0, length, 0, 2 * Math.PI) + Math.PI;
+					/* do not render visualiser lines that are too short*/
+					if (audioAnalyserData[i] < 80) {
+						continue;
+					}
 					let mag = audioAnalyserData[i] ** 1.5 / (255 ** 0.55) + 100;
-					ctx.moveTo(audioVisualiser.width / 2, audioVisualiser.height / 2);
+					let angle = utils.map(i, 0, length, Math.PI, 3 * Math.PI);
+					/* optimised rendering by not rendering parts of lines that are unseen */
+					ctx.moveTo(audioVisualiser.width / 2 + Math.sin(angle) * audioVisualiser.width / 4, audioVisualiser.height / 2 + Math.cos(angle) * audioVisualiser.height / 4);
 					ctx.lineTo(audioVisualiser.width / 2 + Math.sin(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2), audioVisualiser.height / 2 + Math.cos(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2));
 				}
 				ctx.stroke();
@@ -252,8 +256,6 @@ define(function(require) {
 					let backgroundImageParallax = document.getElementById("background-blur");
 					let menuParallax = document.getElementById("menu-parallax");
 					let logo = document.getElementById("logo");
-					let leftBeat = document.getElementById("left-beat");
-					let rightBeat = document.getElementById("right-beat");
 					let logoSizeIncrease = 1.1;
 					/* style image parallax based on mouse position */
 					backgroundImageParallax.style.opacity = 1;
@@ -280,24 +282,15 @@ define(function(require) {
 						logo.style.backgroundSize = logoSize + "vh";
 						logo.style.filter = "brightness(1.25)";
 						if (beatNumber % 2 === 0) {
+							let leftBeat = document.getElementById("left-beat");
 							leftBeat.style.transition = "opacity 0.05s";
 							leftBeat.style.opacity = "1";
 						} else {
+							let rightBeat = document.getElementById("right-beat");
 							rightBeat.style.transition = "opacity 0.05s";
 							rightBeat.style.opacity = "1";
 						}
 						beatNumber++;
-						/* logo background pulse, maximum 5 to prevent lag */
-						if (document.getElementById("logo-beat").querySelectorAll("img").length <= 5) {
-							let logoCircle = document.createElement("img");
-							logoCircle.src = "src/images/circle.png";
-							logoCircle.style.position = "absolute";
-							logoCircle.style.width = logoPulseSize + "vh";
-							logoCircle.style.top = "calc(" + logoY + "vh - " + logoPulseSize / 2 + "vh)";
-							logoCircle.style.left = "calc(5vw + " + logoX + "vw - " + logoPulseSize / 2 + "vh)";
-							logoCircle.style.opacity = "0.5";
-							document.getElementById("logo-beat").appendChild(logoCircle);
-						}
 						/* snow only in december, maximum 50 to prevent lag */
 						/* last tested:
 						 *	
@@ -306,7 +299,7 @@ define(function(require) {
 						 */
 						if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
 							let snowflake = document.createElement("img");
-							snowflake.src = "src/images/snowflake.png";
+							snowflake.src = "./src/images/snowflake.png";
 							snowflake.style.position = "fixed";
 							snowflake.style.width = Math.random() * 2 + 1 + "vh";
 							snowflake.style.top = -10 + "vh";
@@ -324,57 +317,53 @@ define(function(require) {
 						logo.style.left = "calc(5vw + " + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
 						logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
 						logo.style.filter = "brightness(1)";
+						let leftBeat = document.getElementById("left-beat");
+						let rightBeat = document.getElementById("right-beat");
 						leftBeat.style.transition = "opacity 1s";
 						leftBeat.style.opacity = "0";
 						rightBeat.style.transition = "opacity 1s";
 						rightBeat.style.opacity = "0";
 					}
 					beat++;
-					let logoCircles = document.getElementById("logo-beat").querySelectorAll("img");
-					for (let i = 0; i < logoCircles.length; i++) {
-						if (parseFloat(logoCircles[i].style.opacity) <= 0) {
-							logoCircles[i].remove();
-							break;
+					if (new Date().getMonth() === 11) {
+						let snow = document.getElementById("snow").querySelectorAll("img");
+						for (let i = 0; i < snow.length; i++) {
+							if (parseFloat(snow[i].style.top) >= 100) {
+								snow[i].remove();
+								continue;
+							}
+							snow[i].style.top = parseFloat(snow[i].style.top) + parseFloat(snow[i].style.width) / 10 + "vh";
+							snow[i].style.left = parseFloat(snow[i].style.left) + Math.sin(parseFloat(snow[i].style.width) * 9 + parseFloat(snow[i].style.top) / 10) / 25 + "vw";
+							snow[i].style.transform = "rotate(" + parseFloat(snow[i].style.top) * parseFloat(snow[i].style.width) + "deg)";
 						}
-						logoCircles[i].style.opacity = parseFloat(logoCircles[i].style.opacity) - 0.05;
-						logoCircles[i].style.width = parseFloat(logoCircles[i].style.width) + 0.5 + "vh";
-						logoCircles[i].style.top = "calc(" + logoY + "vh - " + logoCircles[i].style.width + " / 2)";
-						logoCircles[i].style.left = "calc(5vw + " + logoX + "vw - " + logoCircles[i].style.width + " / 2)";
-					}
-					let snow = document.getElementById("snow").querySelectorAll("img");
-					for (let i = 0; i < snow.length; i++) {
-						if (parseFloat(snow[i].style.top) >= 100) {
-							snow[i].remove();
-							break;
-						}
-						snow[i].style.top = parseFloat(snow[i].style.top) + parseFloat(snow[i].style.width) / 10 + "vh";
-						snow[i].style.left = parseFloat(snow[i].style.left) + Math.sin(parseFloat(snow[i].style.width) * 9 + parseFloat(snow[i].style.top) / 10) / 25 + "vw";
-						snow[i].style.transform = "rotate(" + parseFloat(snow[i].style.top) * parseFloat(snow[i].style.width) + "deg)";
 					}
 					/* Profiling */
 					const now = Date.now();
-					while (times.length > 0 && times[0] <= now - 1000) {
-						times.shift();
+					while (recordedFramesPerSecond.length > 0 && recordedFramesPerSecond[0] <= now - 1000) {
+						recordedFramesPerSecond.shift();
 					}
-					times.push(now);
-					frameRate = times.length;
-					let textContent = frameRate;
-					if (Options.Performance.maxFrameRate === "VSync") {
-						textContent += " / 60fps";
-					} else if (Options.Performance.maxFrameRate === "2x VSync") {
-						textContent += " / 120fps";
-					} else if (Options.Performance.maxFrameRate === "Browser Maximum (250fps)") {
-						textContent += " / 250fps";
+					recordedFramesPerSecond.push(now);
+					/* Update frame counter */
+					let frameCounter = document.getElementById("frame-rate");
+					switch (Options.Performance.maxFrameRate) {
+						case "VSync":
+						frameCounter.textContent = recordedFramesPerSecond.length + " / 60fps";
+						break;
+						case "2x VSync":
+						frameCounter.textContent = recordedFramesPerSecond.length + " / 120fps";
+						break;
+						case "Browser Maximum (250fps)":
+						frameCounter.textContent = recordedFramesPerSecond.length + " / 250fps";
+						break;
 					}
-					document.getElementById("frame-rate").textContent = textContent;
-					if (frameRate > 60) {
-						document.getElementById("frame-rate").style.background = "#6d9eeb";
-					} else if (frameRate > 45) {
-						document.getElementById("frame-rate").style.background = "#39e639";
-					} else if (frameRate > 20) {
-						document.getElementById("frame-rate").style.background = "#ffa500";
+					if (recordedFramesPerSecond.length > 60) {
+						frameCounter.style.background = "#6d9eeb";
+					} else if (recordedFramesPerSecond.length > 45) {
+						frameCounter.style.background = "#39e639";
+					} else if (recordedFramesPerSecond.length > 20) {
+						frameCounter.style.background = "#ffa500";
 					} else {
-						document.getElementById("frame-rate").style.background = "#B00020";
+						frameCounter.style.background = "#B00020";
 					}
 				}
 				requestAnimationFrame(animate);
@@ -418,16 +407,17 @@ define(function(require) {
 		utils.blurDiv("menu-parallax", 0);
 	});
 	document.getElementById("pause").addEventListener("click", function() {
-		if (document.getElementById("menu-audio").paused) {
-			document.getElementById("menu-audio").play();
+		let menuAudio = document.getElementById("menu-audio");
+		if (menuAudio.paused) {
+			menuAudio.play();
 			this.innerHTML = "&#x275A;&#x275A;";
 		} else {
-			document.getElementById("menu-audio").pause();
+			menuAudio.pause();
 			this.innerHTML = "&#x25BA;";
 		}
 	});
 	/* Sidenav event listener */
-	AttachAudio(document.getElementById("close-btn"), "click", "src/audio/effects/back-button-click.wav", "settings-master-volume", "settings-effects-volume");
+	AttachAudio(document.getElementById("close-btn"), "click", "./src/audio/effects/back-button-click.wav", "settings-master-volume", "settings-effects-volume");
 	document.getElementById("close-btn").addEventListener("click", function() {
 		document.getElementById("sidenav").style.width = "0";
 		document.getElementById("sidenav").style.opacity = "0.2";
@@ -442,28 +432,23 @@ define(function(require) {
 		let hoverSrc = "";
 		switch (buttons[i].id) {
 			case "menu-bar-settings":
-				clickSrc = "src/audio/effects/menu-options-click.wav";
-				hoverSrc = "src/audio/effects/menu-options-hover.wav";
+				clickSrc = "./src/audio/effects/menu-options-click.wav";
 				break;
 			case "menu-bar-play":
-				clickSrc = "src/audio/effects/menu-freeplay-click.wav";
-				hoverSrc = "src/audio/effects/menu-freeplay-hover.wav";
+				clickSrc = "./src/audio/effects/menu-freeplay-click.wav";
 				break;
 			case "menu-bar-edit":
-				clickSrc = "src/audio/effects/menu-edit-click.wav";
-				hoverSrc = "src/audio/effects/menu-edit-hover.wav";
+				clickSrc = "./src/audio/effects/menu-edit-click.wav";
 				break;
 			case "menu-bar-direct":
-				clickSrc = "src/audio/effects/menu-direct-click.wav";
-				hoverSrc = "src/audio/effects/menu-direct-hover.wav";
+				clickSrc = "./src/audio/effects/menu-direct-click.wav";
 				break;
 			case "menu-bar-exit":
-				clickSrc = "src/audio/effects/menu-exit-click.wav";
-				hoverSrc = "src/audio/effects/menu-exit-hover.wav";
+				clickSrc = "./src/audio/effects/menu-exit-click.wav";
 				break;
 		}
 		AttachAudio(buttons[i], "click", clickSrc, "settings-master-volume", "settings-effects-volume");
-		AttachAudio(buttons[i], "mouseenter", hoverSrc, "settings-master-volume", "settings-effects-volume");
+		AttachAudio(buttons[i], "mouseenter", "./src/audio/effects/menu-hover.wav", "settings-master-volume", "settings-effects-volume");
 		buttons[i].addEventListener("mouseenter", function() {
 			this.getElementsByClassName("menu-bar-buttons-icon")[0].classList.add("menu-bar-buttons-icon-animation");
 			this.getElementsByClassName("menu-bar-image-move")[0].classList.add("menu-bar-image-move-animation");
@@ -485,7 +470,7 @@ define(function(require) {
 
 		function reduceVolume() {
 			let volume = menuAudio.volume;
-			volume -= 0.05
+			volume -= 0.05;
 			if (volume < 0) {
 				volume = 0;
 			}
@@ -503,17 +488,17 @@ define(function(require) {
 	for (let i = 0; i < checkbox.length; i++) {
 		checkbox[i].addEventListener("change", function() {
 			if (this.checked === true) {
-				let checkOn = AssetLoader.audio("src/audio/effects/check-on.wav");
+				let checkOn = AssetLoader.audio("./src/audio/effects/check-on.wav");
 				checkOn.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 				checkOn.play();
 			} else {
-				let checkOff = AssetLoader.audio("src/audio/effects/check-off.wav");
+				let checkOff = AssetLoader.audio("./src/audio/effects/check-off.wav");
 				checkOff.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
 				checkOff.play();
 			}
 			setSettings();
 		});
-		AttachAudio(checkbox[i], "mouseenter", "src/audio/effects/menuclick.wav", "settings-master-volume", "settings-effects-volume");
+		AttachAudio(checkbox[i], "mouseenter", "./src/audio/effects/settings-hover.wav", "settings-master-volume", "settings-effects-volume");
 	}
 	/* Specific checkbox listeners */
 	document.getElementById("settings-show-fps").addEventListener("input", function() {
@@ -529,8 +514,8 @@ define(function(require) {
 		sliders[i].addEventListener("input", function() {
 			this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
 		});
-		AttachAudio(sliders[i], "input", "src/audio/effects/sliderbar.wav", "settings-master-volume", "settings-effects-volume");
-		AttachAudio(sliders[i], "mouseenter", "src/audio/effects/menuclick.wav", "settings-master-volume", "settings-effects-volume");
+		AttachAudio(sliders[i], "input", "./src/audio/effects/sliderbar.wav", "settings-master-volume", "settings-effects-volume");
+		AttachAudio(sliders[i], "mouseenter", "./src/audio/effects/settings-hover.wav", "settings-master-volume", "settings-effects-volume");
 	}
 	/* Specific range slider listeners */
 	document.getElementById("settings-master-volume").addEventListener("input", function() {
@@ -557,16 +542,22 @@ define(function(require) {
 	});
 	document.getElementById("settings-slider-resolution").addEventListener("input", function() {
 		let resolution = "";
-		if (this.value === "1") {
+		switch (this.value) {
+			case "1":
 			resolution = "Full";
-		} else if (this.value === "2") {
+			break;
+			case "2":
 			resolution = "Half";
-		} else if (this.value === "3") {
+			break;
+			case "3":
 			resolution = "Quarter";
-		} else if (this.value === "4") {
+			break;
+			case "4":
 			resolution = "Eighth";
-		} else if (this.value === "5") {
+			break;
+			case "5":
 			resolution = "Sixteenth";
+			break;
 		}
 		document.getElementById("settings-slider-resolution-text").textContent = "Slider resolution: " + resolution;
 		setSettings();
@@ -600,7 +591,7 @@ define(function(require) {
 				selectBoxSelections.style.opacity = 0;
 			}
 		});
-		AttachAudio(selectBoxes[i], "mouseenter", "src/audio/effects/menuclick.wav", "settings-master-volume", "settings-effects-volume");
+		AttachAudio(selectBoxes[i], "mouseenter", "./src/audio/effects/settings-hover.wav", "settings-master-volume", "settings-effects-volume");
 	}
 	/* Settings button listeners*/
 	document.getElementById("settings-button-clear-local-storage").addEventListener("click", function() {
@@ -617,7 +608,7 @@ define(function(require) {
 		}, 1000);
 	});
 	/* logo listener */
-	AttachAudio(document.getElementById("logo"), "click", "src/audio/effects/menuHit.wav", "settings-master-volume", "settings-effects-volume");
+	AttachAudio(document.getElementById("logo"), "click", "./src/audio/effects/menuHit.wav", "settings-master-volume", "settings-effects-volume");
 	document.getElementById("logo").addEventListener("click", function() {
 		beat = 3;
 		logoX = 30;
@@ -643,8 +634,8 @@ define(function(require) {
 		clearTimeout(menuTimeout);
 		menuTimeout = setTimeout(resetMenu, 15000);
 	});
-	AttachAudio(document.getElementById("back-button"), "click", "src/audio/effects/back-button-click.wav", "settings-master-volume", "settings-effects-volume");
-	AttachAudio(document.getElementById("back-button"), "mouseenter", "src/audio/effects/back-button-hover.wav", "settings-master-volume", "settings-effects-volume");
+	AttachAudio(document.getElementById("back-button"), "click", "./src/audio/effects/back-button-click.wav", "settings-master-volume", "settings-effects-volume");
+	AttachAudio(document.getElementById("back-button"), "mouseenter", "./src/audio/effects/back-button-hover.wav", "settings-master-volume", "settings-effects-volume");
 	document.getElementById("menu-bar-play").addEventListener("click", function() {
 		document.getElementById("webpage-state-menu").style.display = "none";
 		document.getElementById("webpage-state-beatmap-selection").style.display = "block";

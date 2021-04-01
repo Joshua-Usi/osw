@@ -88,5 +88,61 @@ define(function(require) {
 				}
 			}
 		}
+		/* courtesy of https://web.archive.org/web/20171014203801/http://www.playmycode.com/blog/2011/06/realtime-image-tinting-on-html5-canvas/*/
+		generateRGBKs(img) {
+			let w = img.width;
+			let h = img.height;
+			let rgbks = [];
+			let canvas = document.createElement("canvas");
+			canvas.width = w;
+			canvas.height = h;
+			let ctx = canvas.getContext("2d");
+			ctx.drawImage(img, 0, 0);
+			let pixels = ctx.getImageData(0, 0, w, h).data;
+			// 4 is used to ask for 3 images: red, green, blue and
+			// black in that order.
+			for (let rgbI = 0; rgbI < 4; rgbI++) {
+				let canvas = document.createElement("canvas");
+				canvas.width = w;
+				canvas.height = h;
+				let ctx = canvas.getContext("2d");
+				ctx.drawImage(img, 0, 0);
+				let to = ctx.getImageData(0, 0, w, h);
+				let toData = to.data;
+				for (let i = 0, len = pixels.length; i < len; i += 4) {
+					toData[i] = (rgbI === 0) ? pixels[i] : 0;
+					toData[i + 1] = (rgbI === 1) ? pixels[i + 1] : 0;
+					toData[i + 2] = (rgbI === 2) ? pixels[i + 2] : 0;
+					toData[i + 3] = pixels[i + 3];
+				}
+				ctx.putImageData(to, 0, 0);
+				rgbks.push(canvas);
+			}
+			return rgbks;
+		}
+		generateTintImage(img, red, green, blue) {
+			let rgbks = this.generateRGBKs(img);
+			let buff = document.createElement("canvas");
+			buff.width = img.width;
+			buff.height = img.height;
+			let ctx = buff.getContext("2d");
+			ctx.globalAlpha = 1;
+			ctx.globalCompositeOperation = "copy";
+			ctx.drawImage(rgbks[3], 0, 0);
+			ctx.globalCompositeOperation = "screen";
+			if (red > 0) {
+				ctx.globalAlpha = red / 255;
+				ctx.drawImage(rgbks[0], 0, 0);
+			}
+			if (green > 0) {
+				ctx.globalAlpha = green / 255;
+				ctx.drawImage(rgbks[1], 0, 0);
+			}
+			if (blue > 0) {
+				ctx.globalAlpha = blue / 255;
+				ctx.drawImage(rgbks[2], 0, 0);
+			}
+			return buff;
+		}
 	}
 });

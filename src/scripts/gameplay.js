@@ -62,24 +62,28 @@ define(function(require) {
 	/* Timing point indexes */
 	let timingPointUninheritedIndex = 0;
 	let currentTimingPoint = 0;
-	/* Score variables */
+	/* Score letiables */
 	let scoreMultiplier = 1;
 	let score = 0;
 	let displayedScore = 0;
-	/* Combo variables */
+	/* Combo letiables */
 	let combo = 0;
+	let currentComboNumber = 1;
+	let currentComboColour = 0;
 	let comboPulseSize = 1;
-	/* Profiling variables */
-	let times = [];
-	let frameRate = 0;
+	/* Profiling letiables */
+	let recordedFramesPerSecond = [];
 	/* spinner tests */
 	let previousSigns = [];
 	let previousAngle = 0;
 	let angle = 0;
-	/* Audio variables */
+	/* Audio letiables */
 	let backupStartTime = 0;
 	let audio = new Audio();
 	let failedToLoadAudio = false;
+	/* combo colour tints*/
+	let hitCircleComboBuffers = [];
+	let approachCircleComboBuffers = [];
 	/* 	attempting to run in offline on a chromebook causes audio loading errors
 	 *	switch to performance.now instead
 	 */
@@ -143,7 +147,7 @@ define(function(require) {
 		}
 		previousSigns.push(Math.sign(angleChange));
 		let averageSign = 0;
-		for (var i = 0; i < previousSigns.length; i++) {
+		for (let i = 0; i < previousSigns.length; i++) {
 			averageSign += previousSigns[i];
 		}
 		if (Math.sign(averageSign) !== Math.sign(angleChange)) {
@@ -220,6 +224,14 @@ define(function(require) {
 		}
 		while (currentHitObject < loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length && useTime >= loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject].time - arTime) {
 			hitObjects.push(loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject]);
+			/* second bit flag determines new combo */
+			if (loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject].type[2] === "1") {
+				currentComboNumber = 1;
+				currentComboColour++;
+				if (currentComboColour > loadedMaps[useBeatmapSet][useBeatmap].comboColours.length - 1) {
+					currentComboColour = 0;
+				}
+			}
 			currentHitObject++;
 		}
 		/* +1 because the given time is beginning time, not end time */
@@ -235,6 +247,9 @@ define(function(require) {
 			let sliderSpeedMultiplier = loadedMaps[useBeatmapSet][useBeatmap].SliderMultiplier;
 			if (hitObjects[i].cache.cacheSet === false) {
 				/* Immediate Cache Setup */
+				hitObjects[i].cache.comboNumber = currentComboNumber;
+				hitObjects[i].cache.comboColour = currentComboColour;
+				currentComboNumber++;
 				if (hitObjects[i].type[0] === "1") {
 					/* Cache Setup for HitCircle */
 					hitObjects[i].cache.cacheSet = true;
@@ -392,7 +407,7 @@ define(function(require) {
 					hitObjects[i].cache.hasHit = true;
 					hitObjects[i].cache.hitTime = useTime;
 					hitEvents.push(new HitEvent("hit-circle", hitWindowScore, "increasing", hitObjectMapped.x, hitObjectMapped.y));
-					effectObjects.push(new HitObject.EffectObject(Assets.hitCircle, hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
+					effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObjects[i].cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
 					effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
 				} else {
 					hitEvents.push(new HitEvent("hit-circle", 0, "reset", hitObjectMapped.x, hitObjectMapped.y));
@@ -482,7 +497,7 @@ define(function(require) {
 							if (utils.dist(mouse.position.x, mouse.position.y, sliderBodyPos.x, sliderBodyPos.y) <= circleDiameter * followCircleSize / 2 && hitObjects[i].cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 								hitObjects[i].cache.repeatsHit++;
 								hitEvents.push(new HitEvent("slider-element", 30, "increasing", sliderBodyPos.x));
-								effectObjects.push(new HitObject.EffectObject(Assets.hitCircle, sliderBodyPos.x, sliderBodyPos.y, useTime, useTime + 0.2));
+								effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObjects[i].cache.comboColour], sliderBodyPos.x, sliderBodyPos.y, useTime, useTime + 0.2));
 								effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, sliderBodyPos.x, sliderBodyPos.y, useTime, useTime + 0.2));
 							} else if (hitObjects[i].cache.currentSlide < hitObjects[i].slides) {
 								hitEvents.push(new HitEvent("slider-element-miss", 0, "reset", sliderBodyPos.x, sliderBodyPos.y));
@@ -514,7 +529,7 @@ define(function(require) {
 				}
 				hitErrors.push(useTime - hitObjects[i].time);
 				hitEvents.push(new HitEvent("slider-element", 30, "increasing", hitObjectMapped.x, hitObjectMapped.y));
-				effectObjects.push(new HitObject.EffectObject(Assets.hitCircle, hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
+				effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObjects[i].cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
 				effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
 				hitObjects[i].cache.hitHead = true;
 				hitObjects[i].cache.hasHitAtAll = true;
@@ -540,8 +555,8 @@ define(function(require) {
 					sliderElementsHit++;
 				}
 				sliderElementsHit += hitObjects[i].cache.repeatsHit;
-				for (var j = 0; j < hitObjects[i].cache.specificSliderTicksHit.length; j++) {
-					for (var k = 0; k < hitObjects[i].cache.specificSliderTicksHit[j].length; k++) {
+				for (let j = 0; j < hitObjects[i].cache.specificSliderTicksHit.length; j++) {
+					for (let k = 0; k < hitObjects[i].cache.specificSliderTicksHit[j].length; k++) {
 						if (hitObjects[i].cache.specificSliderTicksHit[j][k]) {
 							sliderElementsHit++;
 						}
@@ -563,7 +578,7 @@ define(function(require) {
 				}
 				if (hitScore !== 0) {
 					hitEvents.push(new HitEvent("hit-circle", hitScore, "increasing", mapped.x, mapped.y));
-					effectObjects.push(new HitObject.EffectObject(Assets.hitCircle, mapped.x, mapped.y, useTime, useTime + 0.2));
+					effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObjects[i].cache.comboColour], mapped.x, mapped.y, useTime, useTime + 0.2));
 					effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, mapped.x, mapped.y, useTime, useTime + 0.2));
 				} else {
 					hitEvents.push(new HitEvent("hit-circle", 0, "reset", mapped.x, mapped.y));
@@ -713,12 +728,15 @@ define(function(require) {
 			/* Object Draw */
 			if (hitObjects[i].type[0] === "1") {
 				/* Draw Hit Circle */
-				canvas.drawImage(Assets.hitCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
+				canvas.drawImage(hitCircleComboBuffers[hitObjects[i].cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
 				canvas.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
 				if (playDetails.mods.hidden === false) {
-					canvas.drawImage(Assets.approachCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
+					canvas.drawImage(approachCircleComboBuffers[hitObjects[i].cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
 				}
-				canvas.drawImage(Assets.comboNumbers[1], hitObjectMapped.x, hitObjectMapped.y);
+				let individualDigits = hitObjects[i].cache.comboNumber.toString();
+				for (let j = 0; j < individualDigits.length; j++) {
+					canvas.drawImage(Assets.comboNumbers[individualDigits[j]], hitObjectMapped.x - (individualDigits.length - 1) * circleDiameter / 6 + j * circleDiameter / 3, hitObjectMapped.y, circleDiameter / 3, circleDiameter / 3 * (Assets.comboNumbers[individualDigits[j]].height / Assets.comboNumbers[individualDigits[j]].width));	
+				}
 			} else if (hitObjects[i].type[1] === "1") {
 
 				/* Draw Slider */
@@ -765,26 +783,29 @@ define(function(require) {
 				if (hitObjects[i].slides > 1 && hitObjects[i].cache.currentSlide < hitObjects[i].slides - 1) {
 					ctx.translate(mapped.x, mapped.y);
 					ctx.rotate(-utils.direction(hitObjects[i].cache.points[hitObjects[i].cache.points.length - 2].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 2].y, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].x, hitObjects[i].cache.points[hitObjects[i].cache.points.length - 1].y) + Math.PI / 2);
-					canvas.drawImage(Assets.hitCircle, 0, 0, circleDiameter, circleDiameter);
+					canvas.drawImage(hitCircleComboBuffers[hitObjects[i].cache.comboColour], 0, 0, circleDiameter, circleDiameter);
 					canvas.drawImage(Assets.reverseArrow, 0, 0, circleDiameter, circleDiameter);
 					ctx.resetTransform();
 				} else if (hitObjects[i].slides === 1 || hitObjects[i].cache.currentSlide < hitObjects[i].slides - 2) {
-					canvas.drawImage(Assets.hitCircle, mapped.x, mapped.y, circleDiameter, circleDiameter);
+					canvas.drawImage(hitCircleComboBuffers[hitObjects[i].cache.comboColour], mapped.x, mapped.y, circleDiameter, circleDiameter);
 					canvas.drawImage(Assets.hitCircleOverlay, mapped.x, mapped.y, circleDiameter, circleDiameter);
 				}
 				/* Draw Slider Head */
 				if (hitObjects[i].cache.hasHitAtAll === false || (hitObjects[i].cache.currentSlide === hitObjects[i].slides - 1 && hitObjects[i].slides > 1)) {
-					canvas.drawImage(Assets.hitCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
+					canvas.drawImage(hitCircleComboBuffers[hitObjects[i].cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
 					canvas.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
 					if (playDetails.mods.hidden === false && hitObjects[i].cache.currentSlide === 0) {
-						canvas.drawImage(Assets.approachCircle, hitObjectMapped.x, hitObjectMapped.y, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
-						canvas.drawImage(Assets.comboNumbers[1], hitObjectMapped.x, hitObjectMapped.y);
+						canvas.drawImage(approachCircleComboBuffers[hitObjects[i].cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
+						let individualDigits = hitObjects[i].cache.comboNumber.toString();
+						for (let j = 0; j < individualDigits.length; j++) {
+							canvas.drawImage(Assets.comboNumbers[individualDigits[j]], hitObjectMapped.x - (individualDigits.length - 1) * circleDiameter / 6 + j * circleDiameter / 3, hitObjectMapped.y, circleDiameter / 3, circleDiameter / 3 * (Assets.comboNumbers[individualDigits[j]].height / Assets.comboNumbers[individualDigits[j]].width));	
+						}
 					}
 				} else if (hitObjects[i].cache.currentSlide >= 1 && hitObjects[i].cache.currentSlide < hitObjects[i].slides - 1) {
 					let mapped = utils.mapToOsuPixels(hitObjects[i].cache.points[0].x, hitObjects[i].cache.points[0].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					ctx.translate(mapped.x, mapped.y);
 					ctx.rotate(-utils.direction(hitObjects[i].cache.points[1].x, hitObjects[i].cache.points[1].y, hitObjects[i].cache.points[0].x, hitObjects[i].cache.points[0].y) + Math.PI / 2);
-					canvas.drawImage(Assets.hitCircle, 0, 0, circleDiameter, circleDiameter);
+					canvas.drawImage(hitCircleComboBuffers[hitObjects[i].cache.comboColour], 0, 0, circleDiameter, circleDiameter);
 					canvas.drawImage(Assets.reverseArrow, 0, 0, circleDiameter, circleDiameter);
 					ctx.resetTransform();
 				}
@@ -899,37 +920,45 @@ define(function(require) {
 			els[i].style.width = 2 * (comboPulseSize + 1) + "vw";
 		}
 		/* mouse trails */
+		let numberOfMouseTrailsRendered = 0;
 		for (let i = 0; i < mouse.previousPositions.x.length - 1; i++) {
+			/* prevent the rendering of too many trails otherwise it will lag */
+			if (numberOfMouseTrailsRendered > 256) {
+				break;
+			}
 			canvas.setGlobalAlpha(utils.map(i, 0, mouse.previousPositions.x.length - 1, 0, 1));
 			for (let j = 0; j < utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]) / (Assets.cursorTrail.width / 2); j++) {
 				canvas.drawImage(Assets.cursorTrail, utils.map(j, 0, utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]) / (Assets.cursorTrail.width / 2), mouse.previousPositions.x[i], mouse.previousPositions.x[i + 1]) - Assets.cursorTrail.width / 2, utils.map(j, 0, utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]) / (Assets.cursorTrail.width / 2), mouse.previousPositions.y[i], mouse.previousPositions.y[i + 1]));
+				numberOfMouseTrailsRendered++;
 			}
+		}
+		/* Profiling */
+		const now = Date.now();
+		while (recordedFramesPerSecond.length > 0 && recordedFramesPerSecond[0] <= now - 1000) {
+			recordedFramesPerSecond.shift();
+		}
+		recordedFramesPerSecond.push(now);
+		/* Update frame counter */
+		let frameCounter = document.getElementById("frame-rate");
+		frameCounter.textContent = recordedFramesPerSecond.length + "fps";
+		if (recordedFramesPerSecond.length > 60) {
+			frameCounter.style.background = "#6d9eeb";
+		} else if (recordedFramesPerSecond.length > 45) {
+			frameCounter.style.background = "#39e639";
+		} else if (recordedFramesPerSecond.length > 20) {
+			frameCounter.style.background = "#ffa500";
+		} else {
+			frameCounter.style.background = "#B00020";
 		}
 		canvas.setGlobalAlpha(1);
 		canvas.drawImage(Assets.cursor, mouse.position.x, mouse.position.y, Assets.cursor.width, Assets.cursor.height);
-		/* Profiling */
-		const now = Date.now();
-		while (times.length > 0 && times[0] <= now - 1000) {
-			times.shift();
-		}
-		times.push(now);
-		frameRate = times.length;
-		document.getElementById("frame-rate").innerText = frameRate + " / 60 fps";
-		if (frameRate > 60) {
-			document.getElementById("frame-rate").style.background = "#6d9eeb";
-		} else if (frameRate > 45) {
-			document.getElementById("frame-rate").style.background = "#39e639";
-		} else if (frameRate > 20) {
-			document.getElementById("frame-rate").style.background = "#ffa500";
-		} else {
-			document.getElementById("frame-rate").style.background = "#B00020";
-		}
 		previousTime = useTime;
 		if (isRunning) {
 			setTimeout(gameplayTick, 0);
 		}
 	}
 	return {
+		gameplayTick: gameplayTick,
 		continue: function() {
 			audio.play();
 			mouse.lockPointer();
@@ -964,21 +993,20 @@ define(function(require) {
 			/* Timing point indexes */
 			timingPointUninheritedIndex = 0;
 			currentTimingPoint = 0;
-			/* Score variables */
+			/* Score letiables */
 			scoreMultiplier = Formulas.modScoreMultiplier(playDetails.mods);
 			score = 0;
 			displayedScore = 0;
-			/* Combo variables */
+			/* Combo letiables */
 			combo = 0;
 			comboPulseSize = 1;
-			/* Profiling variables */
-			times = [];
-			frameRate = 0;
+			/* Profiling letiables */
+			recordedFramesPerSecond = [];
 			/* spinner tests */
 			previousSigns = [];
 			previousAngle = 0;
 			angle = 0;
-			/* Audio variables */
+			/* Audio letiables */
 			backupStartTime = 0;
 			let failedToLoadAudio = false;
 			audio.src = `src/audio/${loadedMaps[useBeatmapSet][useBeatmap].AudioFilename}`;
@@ -997,6 +1025,13 @@ define(function(require) {
 
 			mouse.lockPointer();
 			isRunning = true;
+			hitCircleComboBuffers = [];
+			approachCircleComboBuffers = [];
+			for (let i = 0; i < loadedMaps[useBeatmapSet][useBeatmap].comboColours.length; i++) {
+				let comboColours = loadedMaps[useBeatmapSet][useBeatmap].comboColours[i];
+				hitCircleComboBuffers.push(canvas.generateTintImage(Assets.hitCircle, comboColours.r, comboColours.g, comboColours.b));
+				approachCircleComboBuffers.push(canvas.generateTintImage(Assets.approachCircle, comboColours.r, comboColours.g, comboColours.b));
+			}
 			gameplayTick();
 		},
 		playDetails: function() {

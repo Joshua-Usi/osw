@@ -27,7 +27,6 @@
 }
 
 body {
-	cursor: url("src/images/cursor.png"), default;
 	/* Helvetica for fallback*/
 	font-family: Varela Round, Helvetica;
 	font-display: fallback;

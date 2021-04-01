@@ -1,21 +1,33 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to slightly modified [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
-## [v2021.0.9.1b] - 2021-03-29
+## [v0.4.0b] - 2021-04-01 - Refactor update
+### Added
+- Combo Numbers
+- Combo Colours
+- Combo support for beatmap parser
+### Changed
+*From https://github.com/jylescoad-ward
+- Warning text when running without web server
+### Removed
+- Unnecessary Audio Files
+- more official osu! files
+---
+## [0.3.1b] - 2021-03-29
 ### Added
 - HP now only starts draining 2 seconds before the first note
 ### Changed
 - Smoother Auto (less jumpy)
 - Auto now spins on spinners
 ---
-## [v2021.0.9.0b] - 2021-03-23
+## [0.3.0b] - 2021-03-23
 ### Changed
 - rebranded to osw! due to copyright and trademark issues
 - New octagonal logo
 - changed and removed most osu! copyrighted images
 - New intro supports new logo
 ---
-## [v2021.0.8.1b] - 2021-03-18
+## [0.2.1b] - 2021-03-18
 ### Added
 - When pressing play, a beatmap is randomly selected for you to play! presuming you have any
 - Brightening filter whenever a beat is detected
@@ -23,20 +35,20 @@ and this project adheres to slightly modified [Semantic Versioning](https://semv
 ### Fixed
 - Logo beats from flashing in the wrong spot sometimes
 ---
-## [v2021.0.8.0b] - 2021-03-11
+## [0.2.0b] - 2021-03-11
 ### Added
 - Automatic beat detection via audio analyser (not perfect but good enough)
 ### Removed
 - Song API (now succeeded by automatic beat detection)
 - Reliance on wave.js
 ---
-## [v2021.0.7.4b] - 2021-03-11
+## [0.2.4b] - 2021-03-11
 ### Changed
 - Mouse sensitivity slider to be more precise
 ### Fixed
 - Slider resolution and mouse sensitivity sliders from not saving properly
 ---
-## [v2021.0.7.3b] - 2021-03-08
+## [0.2.3b] - 2021-03-08
 ### Added
 *Based off https://github.com/ppy/osu/issues/7048*
 - snaking in sliders
@@ -44,16 +56,16 @@ and this project adheres to slightly modified [Semantic Versioning](https://semv
 ### Changed
 - Follow circle size from 2.4x to 2.0x (still feels too large)
 ---
-## [v2021.0.7.2b] - 2021-03-06
+## [0.2.2b] - 2021-03-06
 ### Added
 - Splash screen text to denote heavy developement
 - Notelock styles
 ---
-## [v2021.0.7.1b] - 2021-02-23
+## [0.2.1b] - 2021-02-23
 ### Changed
 - Approach circle minimium size to match osu!
 ---
-## [v2021.0.7.0b] - 2021-02-22
+## [0.2.0b] - 2021-02-22
 ### Added
 - Added more default maps
 ### Changed
@@ -65,20 +77,20 @@ and this project adheres to slightly modified [Semantic Versioning](https://semv
 ### Fixed
 - Slider heads and ends having the correct symbols
 ---
-## [v2021.0.6.2b] - 2021-02-16
+## [0.1.2b] - 2021-02-16
 ### Added
 - Pause Menu UI functionality
 - Continue, Retry and Quit functions for mapss
 ### Fixed
 - Going in and out of maps causing multiple beatmap instances to run
 ---
-## [v2021.0.6.1b] - 2021-02-15
+## [0.1.1b] - 2021-02-15
 ### Added
 - Pause Menu UI (currently inaccessible)
 ### Changed
 - Doubled triangle-background speed
 ---
-## [v2021.0.6.0b] - 2021-02-14
+## [0.1.0b] - 2021-02-14
 ### Moved into Beta
 ### Added
 - Gameplay
@@ -96,7 +108,7 @@ and this project adheres to slightly modified [Semantic Versioning](https://semv
 - Centerised audio visualiser
 - Fixed backup time (when audio fails to load) from referencing when page first loads
 ---
-## [v2021.0.5.2a] - 2021-02-13
+## [0.1.2a] - 2021-02-13
 ### Added
 - Horizontal device support, ensures that devices are horizontal to be compatible
 - Disabled mobile device scrolling
@@ -114,10 +126,10 @@ and this project adheres to slightly modified [Semantic Versioning](https://semv
 ### Fixed
 - Audio visualiser responsiveness
 ---
-## [v2021.0.5.1a] - 2021-02-12
+## [0.1.1a] - 2021-02-12
 ### Changed
 - Scalability of beatmap loading was improved (generated on the fly)
 ---
-## [v2021.0.5.0a] - 2021-02-10
+## [0.1.0a] - 2021-02-10
 ### Changed
 - Standardised changelog

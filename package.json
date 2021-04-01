@@ -1,0 +1,9 @@
+{
+	"name": "osw!",
+	"version": "0.4.0b",
+	"description": "an osu! clone designed to run on browsers, allows you to play osu on any device (chromebooks included)",
+	"license": "MIT",
+	"dependencies": {
+		"requirejs": "2.3.6",
+	}
+}
