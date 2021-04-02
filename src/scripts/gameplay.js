@@ -163,6 +163,7 @@ define(function(require) {
 				document.getElementById("webpage-state-fail-screen").style.display = "block";
 				audio.pause();
 				isRunning = false;
+				mouse.unlockPointer();
 			}
 		}
 		/* only start draining health 2 seconds before the first hit object*/
@@ -972,7 +973,7 @@ define(function(require) {
 			isRunning = false;
 		},
 		retry: function() {
-			this.playMap(useBeatmapSet, useBeatmap);
+			this.playMap(useBeatmapSet, useBeatmap, playDetails.mods);
 		},
 		playMap: function(groupIndex, mapIndex, mods) {
 			useBeatmapSet = groupIndex;
@@ -1000,9 +1001,6 @@ define(function(require) {
 			displayedScore = 0;
 			/* Combo letiables */
 			combo = 0;
-			comboPulseSize = 1;
-			/* Profiling letiables */
-			recordedFramesPerSecond = [];
 			/* spinner tests */
 			previousSigns = [];
 			previousAngle = 0;
