@@ -126,14 +126,13 @@ define(function(require) {
 			}
 			return rgbks;
 		}
-		generateTintImage(img, red, green, blue, width, height) {
+		generateTintImage(img, rgbks, red, green, blue, width, height) {
 			if (width === undefined) {
 				width = img.width;
 			}
 			if (height === undefined) {
 				height = img.height;
 			}
-			let rgbks = this.generateRGBKs(img);
 			let buff = document.createElement("canvas");
 			buff.width = width;
 			buff.height = height;

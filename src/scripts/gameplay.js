@@ -1026,10 +1026,12 @@ define(function(require) {
 			isRunning = true;
 			hitCircleComboBuffers = [];
 			approachCircleComboBuffers = [];
+			let hitCircleRgbks = canvas.generateRGBKs(Assets.hitCircle);
+			let approachCircleRgbks = canvas.generateRGBKs(Assets.approachCircle);
 			for (let i = 0; i < loadedMaps[useBeatmapSet][useBeatmap].comboColours.length; i++) {
 				let comboColours = loadedMaps[useBeatmapSet][useBeatmap].comboColours[i];
-				hitCircleComboBuffers.push(canvas.generateTintImage(Assets.hitCircle, comboColours.r, comboColours.g, comboColours.b, circleDiameter, circleDiameter));
-				approachCircleComboBuffers.push(canvas.generateTintImage(Assets.approachCircle, comboColours.r, comboColours.g, comboColours.b));
+				hitCircleComboBuffers.push(canvas.generateTintImage(Assets.hitCircle, hitCircleRgbks, comboColours.r, comboColours.g, comboColours.b, circleDiameter, circleDiameter));
+				approachCircleComboBuffers.push(canvas.generateTintImage(Assets.approachCircle, approachCircleRgbks, comboColours.r, comboColours.g, comboColours.b));
 			}
 			gameplayTick();
 		},
