@@ -34,7 +34,6 @@ define(function(require) {
 	let gameplay = require("./src/scripts/gameplay.js");
 	const introSequence = require("./src/scripts/introSequence.js");
 	require("./src/scripts/formElementsEventListeners.js");
-	console.log(introSequence);
 	/* Offline context checks, needed to ensure for some effects to work */
 	/* Text suggested by jylescoad-ward */
 	if (window.origin === null) {
