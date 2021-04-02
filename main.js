@@ -33,7 +33,8 @@ define(function(require) {
 	const BeatMapSelectionPaneTemplate = require("./src/scripts/BeatMapSelectionPane.js");
 	let gameplay = require("./src/scripts/gameplay.js");
 	const version = "osw! 0.4.0b";
-	require("./src/scripts/introSequence.js");
+	const introSequence = require("./src/scripts/introSequence.js");
+	console.log(introSequence);
 	/* Offline context checks, needed to ensure for some effects to work */
 	/* Text suggested by jylescoad-ward*/
 	if (window.origin === null) {
@@ -173,6 +174,7 @@ define(function(require) {
 	/* Event Listeners */
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
+			introSequence.animate();
 			/* Setting settings */
 			let index = 0;
 			for (let group in Options) {
@@ -347,14 +349,14 @@ define(function(require) {
 					let frameCounter = document.getElementById("frame-rate");
 					switch (Options.Performance.maxFrameRate) {
 						case "VSync":
-						frameCounter.textContent = recordedFramesPerSecond.length + " / 60fps";
-						break;
+							frameCounter.textContent = recordedFramesPerSecond.length + " / 60fps";
+							break;
 						case "2x VSync":
-						frameCounter.textContent = recordedFramesPerSecond.length + " / 120fps";
-						break;
+							frameCounter.textContent = recordedFramesPerSecond.length + " / 120fps";
+							break;
 						case "Browser Maximum (250fps)":
-						frameCounter.textContent = recordedFramesPerSecond.length + " / 250fps";
-						break;
+							frameCounter.textContent = recordedFramesPerSecond.length + " / 250fps";
+							break;
 					}
 					if (recordedFramesPerSecond.length > 60) {
 						frameCounter.style.background = "#6d9eeb";
@@ -544,20 +546,20 @@ define(function(require) {
 		let resolution = "";
 		switch (this.value) {
 			case "1":
-			resolution = "Full";
-			break;
+				resolution = "Full";
+				break;
 			case "2":
-			resolution = "Half";
-			break;
+				resolution = "Half";
+				break;
 			case "3":
-			resolution = "Quarter";
-			break;
+				resolution = "Quarter";
+				break;
 			case "4":
-			resolution = "Eighth";
-			break;
+				resolution = "Eighth";
+				break;
 			case "5":
-			resolution = "Sixteenth";
-			break;
+				resolution = "Sixteenth";
+				break;
 		}
 		document.getElementById("settings-slider-resolution-text").textContent = "Slider resolution: " + resolution;
 		setSettings();

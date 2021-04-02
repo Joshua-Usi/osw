@@ -735,12 +735,12 @@ define(function(require) {
 				}
 				let individualDigits = hitObjects[i].cache.comboNumber.toString();
 				for (let j = 0; j < individualDigits.length; j++) {
-					canvas.drawImage(Assets.comboNumbers[individualDigits[j]], hitObjectMapped.x - (individualDigits.length - 1) * circleDiameter / 6 + j * circleDiameter / 3, hitObjectMapped.y, circleDiameter / 3, circleDiameter / 3 * (Assets.comboNumbers[individualDigits[j]].height / Assets.comboNumbers[individualDigits[j]].width));	
+					canvas.drawImage(Assets.comboNumbers[individualDigits[j]], hitObjectMapped.x - (individualDigits.length - 1) * circleDiameter / 6 + j * circleDiameter / 3, hitObjectMapped.y, circleDiameter / 3, circleDiameter / 3 * (Assets.comboNumbers[individualDigits[j]].height / Assets.comboNumbers[individualDigits[j]].width));
 				}
 			} else if (hitObjects[i].type[1] === "1") {
 
 				/* Draw Slider */
-				let sliderDrawPercent = Math.floor(utils.map(audio.currentTime, hitObjects[i].time - 3 * arTime / 4, hitObjects[i].time - arTime / 4, hitObjects[i].cache.points.length / 4, hitObjects[i].cache.points.length));
+				let sliderDrawPercent = Math.floor(utils.map(audio.currentTime, hitObjects[i].time - arTime, hitObjects[i].time - arTime / 4, hitObjects[i].cache.points.length / 4, hitObjects[i].cache.points.length));
 				if (sliderDrawPercent < Math.floor(hitObjects[i].cache.points.length / 4)) {
 					sliderDrawPercent = Math.floor(hitObjects[i].cache.points.length / 4);
 				}
@@ -798,7 +798,7 @@ define(function(require) {
 						canvas.drawImage(approachCircleComboBuffers[hitObjects[i].cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
 						let individualDigits = hitObjects[i].cache.comboNumber.toString();
 						for (let j = 0; j < individualDigits.length; j++) {
-							canvas.drawImage(Assets.comboNumbers[individualDigits[j]], hitObjectMapped.x - (individualDigits.length - 1) * circleDiameter / 6 + j * circleDiameter / 3, hitObjectMapped.y, circleDiameter / 3, circleDiameter / 3 * (Assets.comboNumbers[individualDigits[j]].height / Assets.comboNumbers[individualDigits[j]].width));	
+							canvas.drawImage(Assets.comboNumbers[individualDigits[j]], hitObjectMapped.x - (individualDigits.length - 1) * circleDiameter / 6 + j * circleDiameter / 3, hitObjectMapped.y, circleDiameter / 3, circleDiameter / 3 * (Assets.comboNumbers[individualDigits[j]].height / Assets.comboNumbers[individualDigits[j]].width));
 						}
 					}
 				} else if (hitObjects[i].cache.currentSlide >= 1 && hitObjects[i].cache.currentSlide < hitObjects[i].slides - 1) {
@@ -922,14 +922,15 @@ define(function(require) {
 		/* mouse trails */
 		let numberOfMouseTrailsRendered = 0;
 		for (let i = 0; i < mouse.previousPositions.x.length - 1; i++) {
+			canvas.setGlobalAlpha(utils.map(i, 0, mouse.previousPositions.x.length - 1, 0, 1));
+			let distance = utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]) / (Assets.cursorTrail.width / 2);
+			for (let j = 0; j <= distance; j++) {
+				canvas.drawImage(Assets.cursorTrail, utils.map(j, 0, distance, mouse.previousPositions.x[i], mouse.previousPositions.x[i + 1]) - Assets.cursorTrail.width / 2, utils.map(j, 0, distance, mouse.previousPositions.y[i], mouse.previousPositions.y[i + 1]));
+				numberOfMouseTrailsRendered++;
+			}
 			/* prevent the rendering of too many trails otherwise it will lag */
 			if (numberOfMouseTrailsRendered > 256) {
 				break;
-			}
-			canvas.setGlobalAlpha(utils.map(i, 0, mouse.previousPositions.x.length - 1, 0, 1));
-			for (let j = 0; j < utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]) / (Assets.cursorTrail.width / 2); j++) {
-				canvas.drawImage(Assets.cursorTrail, utils.map(j, 0, utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]) / (Assets.cursorTrail.width / 2), mouse.previousPositions.x[i], mouse.previousPositions.x[i + 1]) - Assets.cursorTrail.width / 2, utils.map(j, 0, utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]) / (Assets.cursorTrail.width / 2), mouse.previousPositions.y[i], mouse.previousPositions.y[i + 1]));
-				numberOfMouseTrailsRendered++;
 			}
 		}
 		/* Profiling */
@@ -1029,7 +1030,7 @@ define(function(require) {
 			approachCircleComboBuffers = [];
 			for (let i = 0; i < loadedMaps[useBeatmapSet][useBeatmap].comboColours.length; i++) {
 				let comboColours = loadedMaps[useBeatmapSet][useBeatmap].comboColours[i];
-				hitCircleComboBuffers.push(canvas.generateTintImage(Assets.hitCircle, comboColours.r, comboColours.g, comboColours.b));
+				hitCircleComboBuffers.push(canvas.generateTintImage(Assets.hitCircle, comboColours.r, comboColours.g, comboColours.b, circleDiameter, circleDiameter));
 				approachCircleComboBuffers.push(canvas.generateTintImage(Assets.approachCircle, comboColours.r, comboColours.g, comboColours.b));
 			}
 			gameplayTick();

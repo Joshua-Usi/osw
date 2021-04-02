@@ -221,8 +221,14 @@ define(function(require) {
 			}
 			return sum / array.length;
 		},
-		camelCaseToDash(string) {
+		camelCaseToDash: function(string) {
 			return string.replace(/[A-Z]/g, m => "-" + m.toLowerCase());
-		}
+		},
+		point: function(x, y) {
+			return {
+				x: x,
+				y: y,
+			}
+		},
 	};
 });

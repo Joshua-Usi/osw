@@ -101,6 +101,8 @@ define(function(require) {
 			let pixels = ctx.getImageData(0, 0, w, h).data;
 			// 4 is used to ask for 3 images: red, green, blue and
 			// black in that order.
+			let length = pixels.length;
+			let l = 0;
 			for (let rgbI = 0; rgbI < 4; rgbI++) {
 				let canvas = document.createElement("canvas");
 				canvas.width = w;
@@ -109,7 +111,11 @@ define(function(require) {
 				ctx.drawImage(img, 0, 0);
 				let to = ctx.getImageData(0, 0, w, h);
 				let toData = to.data;
-				for (let i = 0, len = pixels.length; i < len; i += 4) {
+				for (let i = 0; i < length; i += 4) {
+					// ignore alpha 0 values
+					if (pixels[i + 3] === 0) {
+						continue;
+					}
 					toData[i] = (rgbI === 0) ? pixels[i] : 0;
 					toData[i + 1] = (rgbI === 1) ? pixels[i + 1] : 0;
 					toData[i + 2] = (rgbI === 2) ? pixels[i + 2] : 0;
@@ -120,29 +126,37 @@ define(function(require) {
 			}
 			return rgbks;
 		}
-		generateTintImage(img, red, green, blue) {
+		generateTintImage(img, red, green, blue, width, height) {
+			if (width === undefined) {
+				width = img.width;
+			}
+			if (height === undefined) {
+				height = img.height;
+			}
 			let rgbks = this.generateRGBKs(img);
 			let buff = document.createElement("canvas");
-			buff.width = img.width;
-			buff.height = img.height;
+			buff.width = width;
+			buff.height = height;
 			let ctx = buff.getContext("2d");
 			ctx.globalAlpha = 1;
 			ctx.globalCompositeOperation = "copy";
-			ctx.drawImage(rgbks[3], 0, 0);
-			ctx.globalCompositeOperation = "screen";
+			ctx.drawImage(rgbks[3], 0, 0, width, height);
+			ctx.globalCompositeOperation = "lighten";
 			if (red > 0) {
 				ctx.globalAlpha = red / 255;
-				ctx.drawImage(rgbks[0], 0, 0);
+				ctx.drawImage(rgbks[0], 0, 0, width, height);
 			}
 			if (green > 0) {
 				ctx.globalAlpha = green / 255;
-				ctx.drawImage(rgbks[1], 0, 0);
+				ctx.drawImage(rgbks[1], 0, 0, width, height);
 			}
 			if (blue > 0) {
 				ctx.globalAlpha = blue / 255;
-				ctx.drawImage(rgbks[2], 0, 0);
+				ctx.drawImage(rgbks[2], 0, 0, width, height);
 			}
-			return buff;
+			let bufferAsImage = document.createElement("img");
+			bufferAsImage.src = buff.toDataURL("image/png");
+			return bufferAsImage;
 		}
 	}
 });
