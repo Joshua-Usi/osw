@@ -13,6 +13,7 @@
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-gameplay.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-pause-screen.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-fail-screen.css">
+		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-results-screen.css">
 		<link rel="icon" href="./src/images/osw-small.png">
 	</head>
 	<body id="body">
@@ -278,24 +279,24 @@
 					</div>
 				</div>
 			</div>
-			<div id="bottom-bar">
+			<div id="bottom-bar-client-version">
 				<p id="version" class="client-version"></p>
+			</div>
+		</div>
+		<div id="bottom-bar">
+			<div id="back-button">
+				<div id="back-button-anti-skew">
+					<div id="back-button-image-container">
+						<img alt="go back" src="./src/images/back.png" id="back-button-image">
+					</div>
+					<p id="back-button-text">Back</p>
+				</div>
 			</div>
 		</div>
 		<div class="webpage-state" id="webpage-state-beatmap-selection">
 			<div id="beatmap-selection-left"></div>
 			<div id="beatmap-selection-right">
 				
-			</div>
-			<div id="beatmap-selection-bottom-bar">
-				<div id="back-button">
-					<div id="back-button-anti-skew">
-						<div id="back-button-image-container">
-							<img alt="go back" src="./src/images/back.png" id="back-button-image">
-						</div>
-						<p id="back-button-text">Back</p>
-					</div>
-				</div>
 			</div>
 		</div>
 		<div class="webpage-state" id="webpage-state-gameplay">
@@ -340,7 +341,69 @@
 				</div>
 			</div>
 		</div>
-		<div class="webpage-state" id="webpage-state-beatmap-end-screen"></div>
+		<div class="webpage-state" id="webpage-state-results-screen">
+			<div id="end-results">
+				<p id="end-results-map-name">Map Name</p>
+				<p id="end-results-artist-name">Artist</p>
+				<img id="end-results-grade" src="../src/images/d-rank-icon.png">
+				<p id="end-results-score">0</p>
+				<div id="end-results-accuracy">
+					<div id="end-results-accuracy-bar">0.00%</div>
+				</div>
+				<p id="end-results-difficulty-name">Difficulty Name</p>
+				<p id="end-results-mapper-name">Mapper Name</p>
+				<div class="end-results-section">
+					<div class="end-results-3-part">
+						<p class="end-results-header">ACCURACY</p>
+						<p id="end-results-accuracy-header">0.00%</p>
+					</div>
+					<div class="end-results-3-part">
+						<p class="end-results-header">COMBO</p>
+						<div>
+							<p id="end-results-max-combo" style="display: inline;">0</p>
+							<p id="end-results-combo-type" style="display: inline; font-size: 1.5vh;">PERFECT</p>
+						</div>
+					</div>
+					<div class="end-results-3-part">
+						<p class="end-results-header">PP</p>
+						<p id="end-results-pp">0</p>
+					</div>
+				</div>
+				<div class="end-results-section">
+					<div class="end-results-4-part">
+						<p class="end-results-header" style="color: #93c4e3;">GREAT</p>
+						<p id="end-results-great">0</p>
+					</div>
+					<div class="end-results-4-part">
+						<p class="end-results-header" style="color: #6a7a28;">OK</p>
+						<p id="end-results-ok">0</p>
+					</div>
+					<div class="end-results-4-part">
+						<p class="end-results-header" style="color: #baa855;">MEH</p>
+						<p id="end-results-meh">0</p>
+					</div>
+					<div class="end-results-4-part">
+						<p class="end-results-header" style="color: #710008;">MISS</p>
+						<p id="end-results-miss">0</p>
+					</div>
+				</div>
+				<div class="end-results-section">
+					<div class="end-results-3-part">
+						<p class="end-results-header">SLIDER END</p>
+						<p id="end-results-slider-ends">0/0</p>
+					</div>
+					<div class="end-results-3-part">
+						<p class="end-results-header">UNSTABLE RATE</p>
+						<p id="end-results-unstable-rate">0</p>
+					</div>
+					<div class="end-results-3-part">
+						<p class="end-results-header">COMBO BREAKS</p>
+						<p id="end-results-combo-breaks">0</p>
+					</div>
+				</div>
+				<p id="end-results-date-played">played on </p>
+			</div>
+		</div>
 		<script data-main="main" type="text/javascript" src=require.js></script>
 	</body>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Varela Round">

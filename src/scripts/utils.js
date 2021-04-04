@@ -163,6 +163,9 @@ define(function(require) {
 			};
 		},
 		htmlCounter: function(digits, container, element, rootSrc, positionTag, positioning) {
+			if (digits.length < document.getElementById(container).childNodes.length) {
+				document.getElementById(container).innerHTML = "";
+			}
 			for (let i = 0; i < digits.length; i++) {
 				if (document.getElementById(element + i) === null) {
 					let image = new Image();
@@ -230,5 +233,28 @@ define(function(require) {
 				y: y,
 			}
 		},
+		formatDate: function(day, month, year, hour, minute) {
+			let monthWords = [
+				"January",
+				"February",
+				"March",
+				"April",
+				"May",
+				"June",
+				"July",
+				"August",
+				"September",
+				"October",
+				"November",
+				"December",
+			];
+			if (hour.toString().length === 1) {
+				hour = "0" + hour;
+			}
+			if (minute.toString().length === 1) {
+				minute = "0" + minute;
+			}
+			return `${day} ${monthWords[month]} ${year} ${hour}:${minute}`; 
+		}
 	};
 });

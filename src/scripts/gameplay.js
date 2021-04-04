@@ -17,12 +17,11 @@ define(function(require) {
 	const utils = require("./utils.js");
 	const HitObject = require("./HitObject.js");
 	const HitEvent = require("./HitEvent.js");
-	const AssetLoader = require("./AssetLoader.js");
 	const Assets = require("./GameplayAssets.js");
 	const Canvas = require("./Canvas.js");
 	const skin = require("./DefaultSkin.js");
-	const Mods = require("./Mods.js");
 	const PlayDetails = require("./PlayDetails.js");
+	const endScreen = require("./endScreen.js");
 	let useBeatmapSet;
 	let useBeatmap;
 	/* canvas setup */
@@ -42,7 +41,6 @@ define(function(require) {
 	keyboard.init();
 	let keyboardLeftReleased = false;
 	let keyboardRightReleased = false;
-	let alreadyRunning = false;
 	/* Details about the play, including replays */
 	let playDetails;
 	let currentHitObject = 0;
@@ -68,11 +66,10 @@ define(function(require) {
 	let displayedScore = 0;
 	/* Combo letiables */
 	let combo = 0;
+	let highestCombo = 0;
 	let currentComboNumber = 1;
 	let currentComboColour = 0;
 	let comboPulseSize = 1;
-	/* Profiling letiables */
-	let recordedFramesPerSecond = [];
 	/* spinner tests */
 	let previousSigns = [];
 	let previousAngle = 0;
@@ -80,7 +77,7 @@ define(function(require) {
 	/* Audio letiables */
 	let backupStartTime = 0;
 	let audio = new Audio();
-	let failedToLoadAudio = false;
+	let audioFailedToLoad = false;
 	/* combo colour tints*/
 	let hitCircleComboBuffers = [];
 	let approachCircleComboBuffers = [];
@@ -88,12 +85,31 @@ define(function(require) {
 	 *	switch to performance.now instead
 	 */
 	audio.addEventListener("error", function() {
-		failedToLoadAudio = true;
+		audioFailedToLoad = true;
 		backupStartTime = window.performance.now();
 		console.warn("failed to load audio, switching to window.performance for timing");
 	});
 	audio.addEventListener("canplaythrough", function() {
 		audio.play();
+	});
+	audio.addEventListener("ended", function() {
+		mouse.unlockPointer();
+		document.getElementById("webpage-state-always").style.display = "block";
+		document.getElementById("top-bar").style.display = "block";
+		document.getElementById("webpage-state-beatmap-selection").style.display = "none";
+		document.getElementById("webpage-state-gameplay").style.display = "none";
+		document.getElementById("webpage-state-pause-screen").style.display = "none";
+		document.getElementById("webpage-state-fail-screen").style.display = "none";
+		document.getElementById("webpage-state-results-screen").style.display = "block";
+		document.getElementById("bottom-bar").style.display = "block";
+		let date = new Date();
+		playDetails.datePlayed = utils.formatDate(date.getDate(), date.getMonth(), date.getFullYear(), date.getHours(), date.getMinutes());
+		playDetails.unstableRate = utils.standardDeviation(hitErrors) * 1000 * 100;
+		playDetails.mapName = loadedMaps[useBeatmapSet][useBeatmap].Title;
+		playDetails.mapperName = loadedMaps[useBeatmapSet][useBeatmap].Creator;
+		playDetails.artist = loadedMaps[useBeatmapSet][useBeatmap].Artist;
+		playDetails.difficultyName = loadedMaps[useBeatmapSet][useBeatmap].Version;
+		endScreen.displayResults(playDetails);
 	});
 	/* Beatmap difficulty data constants */
 	let arTime;
@@ -114,7 +130,7 @@ define(function(require) {
 			return;
 		}
 		let useTime = audio.currentTime;
-		if (failedToLoadAudio) {
+		if (audioFailedToLoad) {
 			useTime = (window.performance.now() - backupStartTime) / 1000;
 			if (playDetails.mods.doubleTime) {
 				useTime *= 1.5;
@@ -153,7 +169,6 @@ define(function(require) {
 		if (Math.sign(averageSign) !== Math.sign(angleChange)) {
 			angleChange *= -1;
 		}
-
 		if (currentHP > 1) {
 			currentHP = 1;
 		}
@@ -180,23 +195,23 @@ define(function(require) {
 					break;
 					/* great*/
 				case 300:
-					playDetails.hitDetails.total300s++;
+					playDetails.hitDetails.total300++;
 					break;
 					/* good or spinner spin */
 				case 100:
 					if (hitEvents[0].type === "hit-circle") {
-						playDetails.hitDetails.total100s++;
+						playDetails.hitDetails.total100++;
 					} else {
 						playDetails.hitDetails.totalSpinnerSpins++;
 					}
 					break;
 					/* meh */
 				case 50:
-					playDetails.hitDetails.total50s++;
+					playDetails.hitDetails.total50++;
 					break;
 					/* complete miss */
 				case 0:
-					playDetails.hitDetails.totalMisses++;
+					playDetails.hitDetails.totalMiss++;
 					break;
 					/* Slider head, repeat and end */
 				case 30:
@@ -215,6 +230,9 @@ define(function(require) {
 			}
 			if (hitEvents[0].combo === "increasing") {
 				combo++;
+				if (combo > highestCombo) {
+					highestCombo = combo;
+				}
 				comboPulseSize = 1;
 			} else if (hitEvents[0].combo === "reset") {
 				combo = 0;
@@ -224,7 +242,8 @@ define(function(require) {
 			hitEvents.splice(0, 1);
 		}
 		while (currentHitObject < loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length && useTime >= loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject].time - arTime) {
-			hitObjects.push(loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject]);
+			/* create copy not reference, otherwise retrying wouldn't work*/
+			hitObjects.push(JSON.parse(JSON.stringify(loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject])));
 			/* second bit flag determines new combo */
 			if (loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject].type[2] === "1") {
 				currentComboNumber = 1;
@@ -383,7 +402,7 @@ define(function(require) {
 				}
 				if (hitObjects[i].type[3] === "1" && useTime >= hitObjects[i].time) {
 					angleChange = 50;
-					mouse.setPosition(hitObjectMapped.x + 100 * Math.cos(hitObjects[i].cache.currentAngle), hitObjectMapped.y + 100 * Math.sin(hitObjects[i].cache.currentAngle))
+					mouse.setPosition(hitObjectMapped.x + 100 * Math.cos(hitObjects[i].cache.currentAngle), hitObjectMapped.y + 100 * Math.sin(hitObjects[i].cache.currentAngle));
 					keyboard.emulateKeyDown("z");
 				}
 			}
@@ -702,8 +721,8 @@ define(function(require) {
 					/* hidden fade in and out for hit circle */
 					if (utils.map(useTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= hiddenFadeInPercent) {
 						canvas.setGlobalAlpha(utils.map(useTime - (hitObjects[i].time - arTime), 0, arTime * hiddenFadeInPercent, 0, 1));
-					} else if (utils.map(useTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= 0.7) {
-						canvas.setGlobalAlpha(utils.map(useTime - (hitObjects[i].time - arTime), arTime * hiddenFadeInPercent, arTime * 0.7, 1, 0));
+					} else if (utils.map(useTime - (hitObjects[i].time - arTime), 0, arTime, 0, 1) <= hiddenFadeOutPercent) {
+						canvas.setGlobalAlpha(utils.map(useTime - (hitObjects[i].time - arTime), arTime * hiddenFadeInPercent, arTime * hiddenFadeOutPercent, 1, 0));
 					} else {
 						canvas.setGlobalAlpha(0);
 					}
@@ -741,7 +760,7 @@ define(function(require) {
 			} else if (hitObjects[i].type[1] === "1") {
 
 				/* Draw Slider */
-				let sliderDrawPercent = Math.floor(utils.map(audio.currentTime, hitObjects[i].time - arTime, hitObjects[i].time - arTime / 4, hitObjects[i].cache.points.length / 4, hitObjects[i].cache.points.length));
+				let sliderDrawPercent = Math.floor(utils.map(useTime, hitObjects[i].time - arTime, hitObjects[i].time - arTime / 4, hitObjects[i].cache.points.length / 4, hitObjects[i].cache.points.length));
 				if (sliderDrawPercent < Math.floor(hitObjects[i].cache.points.length / 4)) {
 					sliderDrawPercent = Math.floor(hitObjects[i].cache.points.length / 4);
 				}
@@ -912,9 +931,9 @@ define(function(require) {
 		/* update combo html element */
 		utils.htmlCounter(utils.reverse(combo + "x"), "combo-container", "combo-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "top", "calc(100vh - 52 / 32 * " + 2 * (comboPulseSize + 1) + "vw)");
 		/* update accuracy html element */
-		utils.htmlCounter("%" + utils.reverse("" + (Formulas.accuracy(playDetails.hitDetails.total300s, playDetails.hitDetails.total100s, playDetails.hitDetails.total50s, playDetails.hitDetails.totalMisses) * 100).toPrecision(4)), "accuracy-container", "accuracy-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
+		utils.htmlCounter("%" + utils.reverse("" + (Formulas.accuracy(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss) * 100).toFixed(2)), "accuracy-container", "accuracy-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
 		/* rank grade */
-		document.getElementById("grade").src = `src/images/skins/${skin}/ranking-` + Formulas.grade(playDetails.hitDetails.total300s, playDetails.hitDetails.total100s, playDetails.hitDetails.total50s, playDetails.hitDetails.totalMisses, false) + "-small.png";
+		document.getElementById("grade").src = `src/images/skins/${skin}/ranking-` + Formulas.grade(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss, false) + "-small.png";
 		/* combo pulse size */
 		let els = document.getElementById("combo-container").querySelectorAll("img");
 		for (let i = 0; i < els.length; i++) {
@@ -934,38 +953,21 @@ define(function(require) {
 				break;
 			}
 		}
-		/* Profiling */
-		const now = Date.now();
-		while (recordedFramesPerSecond.length > 0 && recordedFramesPerSecond[0] <= now - 1000) {
-			recordedFramesPerSecond.shift();
-		}
-		recordedFramesPerSecond.push(now);
-		/* Update frame counter */
-		let frameCounter = document.getElementById("frame-rate");
-		frameCounter.textContent = recordedFramesPerSecond.length + "fps";
-		if (recordedFramesPerSecond.length > 60) {
-			frameCounter.style.background = "#6d9eeb";
-		} else if (recordedFramesPerSecond.length > 45) {
-			frameCounter.style.background = "#39e639";
-		} else if (recordedFramesPerSecond.length > 20) {
-			frameCounter.style.background = "#ffa500";
-		} else {
-			frameCounter.style.background = "#B00020";
-		}
 		canvas.setGlobalAlpha(1);
 		canvas.drawImage(Assets.cursor, mouse.position.x, mouse.position.y, Assets.cursor.width, Assets.cursor.height);
 		previousTime = useTime;
-		if (isRunning) {
-			setTimeout(gameplayTick, 0);
-		}
+
+		playDetails.score = score;
+		playDetails.accuracy = Formulas.accuracy(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss) * 100;
+		playDetails.grade = Formulas.grade(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss, false);
+		playDetails.maxCombo = highestCombo;
 	}
 	return {
-		gameplayTick: gameplayTick,
+		tick: gameplayTick,
 		continue: function() {
 			audio.play();
 			mouse.lockPointer();
 			isRunning = true;
-			gameplayTick();
 		},
 		pause: function() {
 			audio.pause();
@@ -977,13 +979,14 @@ define(function(require) {
 		},
 		playMap: function(groupIndex, mapIndex, mods) {
 			useBeatmapSet = groupIndex;
-			useBeatmap = mapIndex
+			useBeatmap = mapIndex;
 			playDetails = PlayDetails(mods);
 			currentHitObject = 0;
 			hitEvents = [];
 			hitObjects = [];
 			hitErrors = [];
 			scoreObjects = [];
+			effectObjects = [];
 			/* Playfield calculations and data */
 			playfieldSize = 0.8;
 			playfieldXOffset = 0;
@@ -1001,14 +1004,20 @@ define(function(require) {
 			displayedScore = 0;
 			/* Combo letiables */
 			combo = 0;
+			highestCombo = 0;
+			currentComboNumber = 1;
+			currentComboColour = 0;
+			comboPulseSize = 1;
 			/* spinner tests */
 			previousSigns = [];
 			previousAngle = 0;
 			angle = 0;
 			/* Audio letiables */
-			backupStartTime = 0;
-			let failedToLoadAudio = false;
+			backupStartTime = window.performance.now();
+			audioFailedToLoad = false;
 			audio.src = `src/audio/${loadedMaps[useBeatmapSet][useBeatmap].AudioFilename}`;
+			audio.currentTime = 0;
+			audio.playbackRate = 16;
 			if (playDetails.mods.doubleTime) {
 				audio.playbackRate = 1.5;
 			} else if (playDetails.mods.halfTime) {
@@ -1033,10 +1042,12 @@ define(function(require) {
 				hitCircleComboBuffers.push(canvas.generateTintImage(Assets.hitCircle, hitCircleRgbks, comboColours.r, comboColours.g, comboColours.b, circleDiameter, circleDiameter));
 				approachCircleComboBuffers.push(canvas.generateTintImage(Assets.approachCircle, approachCircleRgbks, comboColours.r, comboColours.g, comboColours.b));
 			}
-			gameplayTick();
 		},
 		playDetails: function() {
 			return playDetails;
+		},
+		isRunning: function() {
+			return isRunning;
 		}
 	};
 });

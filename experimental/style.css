@@ -1,0 +1,85 @@
+#end-results {
+	font-family: Varela Round;
+	width: 25vw;
+	height: 80vh;
+	/* fallback for browsers that don't support gradients*/
+	border-radius: 2vh;
+	background-color: #545454;
+	background-image: linear-gradient(#545454, #343434);
+	padding: 1vh;
+	font-size: 2.5vh;
+	position: absolute;
+	top: calc(50vh - 80vh / 2);
+	left: calc(50vw - 25vw / 2);
+}
+
+#end-results * {
+	color: #e4ecef;
+	text-align: center;
+	margin: 0;
+}
+
+#end-results-map-name {
+	font-size: 3vh;
+}
+
+#end-results-artist-name {
+	font-size: 2vh;
+}
+
+#end-results-score {
+	font-size: 5vh;
+}
+
+#end-results-date-played {
+	font-size: 2vh;
+	position: relative;
+	top: 27.5vh;
+}
+
+.end-results-3-part {
+	width: calc(100% / 3);
+	display: inline-block;
+	float: left;
+}
+
+.end-results-4-part {
+	width: calc(100% / 4.0);
+	display: inline-block;
+	float: left;
+}
+
+.end-results-header {
+	background-color: #222222;
+	border-radius: 5vh;
+	font-size: 1.75vh;
+}
+
+.end-results-section {
+	width: 100%;
+	height: 6vh;
+}
+
+#end-results-accuracy {
+	width: 90%;
+	height: 1em;
+	margin: auto;
+	border-radius: 1em;
+	background-color: #000;
+}
+
+#end-results-accuracy-bar {
+	width: 0;
+	height: 1em;
+	border-radius: 1em;
+	background-color: #2fa0b7;
+	transition: width 0.5s;
+}
+
+#end-results-grade {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 3vh;
+	width: 25%;
+}

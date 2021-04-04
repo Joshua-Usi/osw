@@ -5,7 +5,7 @@
 	transition-timing-function: ease;
 }
 
-#bottom-bar {
+#bottom-bar-client-version {
 	position: fixed;
 	top: calc(100vh - 3vh);
 	left: 0;

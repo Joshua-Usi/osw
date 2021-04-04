@@ -41,7 +41,7 @@ define(function(require) {
 	}
 	/* osw! version incremented manually */
 	/* Set element version numbers */
-	const version = "osw! 0.4.0b";
+	const version = "osw! 0.5.0b";
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].textContent = version;
@@ -93,6 +93,7 @@ define(function(require) {
 					}
 					document.getElementById("top-bar").style.display = "none";
 					document.getElementById("webpage-state-gameplay").style.display = "block";
+					document.getElementById("bottom-bar").style.display = "none";
 					document.getElementById("menu-audio").pause();
 					gameplay.playMap(this.getAttribute("data-group-index"), this.getAttribute("data-map-index"));
 				});
@@ -315,36 +316,43 @@ define(function(require) {
 							snow[i].style.transform = "rotate(" + parseFloat(snow[i].style.top) * parseFloat(snow[i].style.width) + "deg)";
 						}
 					}
-					/* Profiling */
-					const now = Date.now();
-					while (recordedFramesPerSecond.length > 0 && recordedFramesPerSecond[0] <= now - 1000) {
-						recordedFramesPerSecond.shift();
-					}
-					recordedFramesPerSecond.push(now);
-					/* Update frame counter */
-					let frameCounter = document.getElementById("frame-rate");
-					switch (Options.Performance.maxFrameRate) {
-						case "VSync":
-							frameCounter.textContent = recordedFramesPerSecond.length + " / 60fps";
-							break;
-						case "2x VSync":
-							frameCounter.textContent = recordedFramesPerSecond.length + " / 120fps";
-							break;
-						case "Browser Maximum (250fps)":
-							frameCounter.textContent = recordedFramesPerSecond.length + " / 250fps";
-							break;
-					}
-					if (recordedFramesPerSecond.length > 60) {
-						frameCounter.style.background = "#6d9eeb";
-					} else if (recordedFramesPerSecond.length > 45) {
-						frameCounter.style.background = "#39e639";
-					} else if (recordedFramesPerSecond.length > 20) {
-						frameCounter.style.background = "#ffa500";
-					} else {
-						frameCounter.style.background = "#B00020";
-					}
 				}
-				requestAnimationFrame(animate);
+				/* Profiling */
+				const now = Date.now();
+				while (recordedFramesPerSecond.length > 0 && recordedFramesPerSecond[0] <= now - 1000) {
+					recordedFramesPerSecond.shift();
+				}
+				recordedFramesPerSecond.push(now);
+				/* Update frame counter */
+				let frameCounter = document.getElementById("frame-rate");
+				switch (Options.Performance.maxFrameRate) {
+					case "VSync":
+						frameCounter.textContent = recordedFramesPerSecond.length + " / 60fps";
+						break;
+					case "2x VSync":
+						frameCounter.textContent = recordedFramesPerSecond.length + " / 120fps";
+						break;
+					case "Browser Maximum (250fps)":
+						frameCounter.textContent = recordedFramesPerSecond.length + " / 250fps";
+						break;
+				}
+				if (recordedFramesPerSecond.length > 60) {
+					frameCounter.style.background = "#6d9eeb";
+				} else if (recordedFramesPerSecond.length > 45) {
+					frameCounter.style.background = "#39e639";
+				} else if (recordedFramesPerSecond.length > 20) {
+					frameCounter.style.background = "#ffa500";
+				} else {
+					frameCounter.style.background = "#B00020";
+				}
+				if (gameplay.isRunning()) {
+					gameplay.tick();
+				}
+				if (gameplay.isRunning()) {
+					setTimeout(animate, 0);
+				} else {
+					requestAnimationFrame(animate);
+				}
 			})();
 		}
 	});
@@ -576,6 +584,7 @@ define(function(require) {
 	document.getElementById("menu-bar-play").addEventListener("click", function() {
 		document.getElementById("webpage-state-menu").style.display = "none";
 		document.getElementById("webpage-state-beatmap-selection").style.display = "block";
+		document.getElementById("bottom-bar").style.display = "block";
 		let els = document.getElementsByClassName("beatmap-selection-group-pane");
 		let selectedElement = els[utils.randomInt(0, els.length)];
 		selectedElement.scrollIntoView({
@@ -668,6 +677,7 @@ define(function(require) {
 			elements[i].style.display = "none";
 		}
 		document.getElementById("webpage-state-menu").style.display = "block";
+		document.getElementById("bottom-bar").style.display = "none";
 		document.getElementById("menu-audio").play();
 	});
 	document.getElementById("pause-menu-continue").addEventListener("click", function() {
