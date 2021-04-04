@@ -1017,7 +1017,6 @@ define(function(require) {
 			audioFailedToLoad = false;
 			audio.src = `src/audio/${loadedMaps[useBeatmapSet][useBeatmap].AudioFilename}`;
 			audio.currentTime = 0;
-			audio.playbackRate = 16;
 			if (playDetails.mods.doubleTime) {
 				audio.playbackRate = 1.5;
 			} else if (playDetails.mods.halfTime) {
