@@ -580,7 +580,7 @@ define(function(require) {
 		menuTimeout = setTimeout(resetMenu, 15000);
 	});
 	AttachAudio(document.getElementById("back-button"), "click", "./src/audio/effects/back-button-click.wav", "settings-master-volume", "settings-effects-volume");
-	AttachAudio(document.getElementById("back-button"), "mouseenter", "./src/audio/effects/back-button-hover.wav", "settings-master-volume", "settings-effects-volume");
+	AttachAudio(document.getElementById("back-button"), "mouseenter", "./src/audio/effects/menu-hover.wav", "settings-master-volume", "settings-effects-volume");
 	document.getElementById("menu-bar-play").addEventListener("click", function() {
 		document.getElementById("webpage-state-menu").style.display = "none";
 		document.getElementById("webpage-state-beatmap-selection").style.display = "block";
