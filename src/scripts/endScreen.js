@@ -4,7 +4,7 @@ define(function(require) {
 			document.getElementById("end-results-map-name").textContent = playDetails.mapName;
 			document.getElementById("end-results-artist-name").textContent = playDetails.artist;
 			document.getElementById("end-results-grade").src = `./src/images/${playDetails.grade}-rank-icon.png`;
-			document.getElementById("end-results-score").textContent = Number(playDetails.score).toLocaleString();
+			document.getElementById("end-results-score").textContent = Number(Math.round(playDetails.score)).toLocaleString();
 			document.getElementById("end-results-accuracy-bar").style.width = playDetails.accuracy + "%";
 			document.getElementById("end-results-accuracy-bar").textContent = playDetails.accuracy.toFixed(2) + "%";
 			document.getElementById("end-results-difficulty-name").textContent = playDetails.difficultyName;

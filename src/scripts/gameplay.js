@@ -93,25 +93,9 @@ define(function(require) {
 	audio.addEventListener("canplaythrough", function() {
 		audio.play();
 	});
-	audio.addEventListener("ended", function() {
-		mouse.unlockPointer();
-		document.getElementById("webpage-state-always").style.display = "block";
-		document.getElementById("top-bar").style.display = "block";
-		document.getElementById("webpage-state-beatmap-selection").style.display = "none";
-		document.getElementById("webpage-state-gameplay").style.display = "none";
-		document.getElementById("webpage-state-pause-screen").style.display = "none";
-		document.getElementById("webpage-state-fail-screen").style.display = "none";
-		document.getElementById("webpage-state-results-screen").style.display = "block";
-		document.getElementById("bottom-bar").style.display = "block";
-		let date = new Date();
-		playDetails.datePlayed = utils.formatDate(date.getDate(), date.getMonth(), date.getFullYear(), date.getHours(), date.getMinutes());
-		playDetails.unstableRate = utils.standardDeviation(hitErrors) * 1000 * 10;
-		playDetails.mapName = loadedMaps[useBeatmapSet][useBeatmap].Title;
-		playDetails.mapperName = loadedMaps[useBeatmapSet][useBeatmap].Creator;
-		playDetails.artist = loadedMaps[useBeatmapSet][useBeatmap].Artist;
-		playDetails.difficultyName = loadedMaps[useBeatmapSet][useBeatmap].Version;
-		endScreen.displayResults(playDetails);
-	});
+	// audio.addEventListener("ended", function() {
+		
+	// });
 	/* Beatmap difficulty data constants */
 	let arTime;
 	let arFadeIn;
@@ -954,6 +938,41 @@ define(function(require) {
 				useTime *= 1.5;
 			} else if (playDetails.mods.halfTime) {
 				useTime *= 0.75;
+			}
+		}
+		if (currentHitObject >= loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length) {
+			let endingTime;
+			let lastHitObject = loadedMaps[useBeatmapSet][useBeatmap].hitObjects[loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length - 1];
+			if (lastHitObject.type[0] === "1") {
+				endingTime = lastHitObject.time + 2;
+			}
+			if (lastHitObject.type[1] === "1") {
+				let sliderOnceTime = Math.abs(lastHitObject.length) / (Formulas.sliderMultiplier(loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].beatLength) * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[timingPointUninheritedIndex].beatLength;
+				let sliderTotalTime = sliderOnceTime * lastHitObject.slides;
+				endingTime = lastHitObject.time + sliderTotalTime + 2;
+			}
+			if (lastHitObject.type[3] === "1") {
+				endingTime = lastHitObject.endTime + 2;
+			}
+			if (useTime > endingTime) {
+				mouse.unlockPointer();
+				document.getElementById("webpage-state-always").style.display = "block";
+				document.getElementById("top-bar").style.display = "block";
+				document.getElementById("webpage-state-beatmap-selection").style.display = "none";
+				document.getElementById("webpage-state-gameplay").style.display = "none";
+				document.getElementById("webpage-state-pause-screen").style.display = "none";
+				document.getElementById("webpage-state-fail-screen").style.display = "none";
+				document.getElementById("webpage-state-results-screen").style.display = "block";
+				document.getElementById("bottom-bar").style.display = "block";
+				let date = new Date();
+				playDetails.datePlayed = utils.formatDate(date.getDate(), date.getMonth(), date.getFullYear(), date.getHours(), date.getMinutes());
+				playDetails.unstableRate = utils.standardDeviation(hitErrors) * 1000 * 10;
+				playDetails.mapName = loadedMaps[useBeatmapSet][useBeatmap].Title;
+				playDetails.mapperName = loadedMaps[useBeatmapSet][useBeatmap].Creator;
+				playDetails.artist = loadedMaps[useBeatmapSet][useBeatmap].Artist;
+				playDetails.difficultyName = loadedMaps[useBeatmapSet][useBeatmap].Version;
+				endScreen.displayResults(playDetails);
+				isRunning = false;
 			}
 		}
 		detectSpinSpeed(hitObjectOffsetX, hitObjectOffsetY);
