@@ -1,7 +1,6 @@
 define(function(require) {
 	const AssetLoader = require("./AssetLoader.js");
 	const skin = require("./DefaultSkin.js");
-	console.log(window.location.href);
 	return {
 		/* cursor assets */
 		cursor: AssetLoader.image(`${window.location.href}src/images/skins/${skin}/cursor.png`),

@@ -285,6 +285,7 @@ define(function(require) {
 			}
 			hitObjects.splice(index, 1);
 			hasSpliced = true;
+			return hasSpliced;
 		}
 		/* Slider Follow Circle Handling */
 		if (hitObject.type[1] === "1" && useTime >= hitObject.time) {
@@ -453,6 +454,7 @@ define(function(require) {
 			}
 			hitObjects.splice(index, 1);
 			hasSpliced = true;
+			return hasSpliced;
 		}
 		/* Miss (Outside OD window) calculation */
 		let miss = false;
@@ -472,6 +474,7 @@ define(function(require) {
 			hitEvents.push(new HitEvent("hit-circle", 0, "reset", mapped.x, mapped.y));
 			hitObjects.splice(index, 1);
 			hasSpliced = true;
+			return hasSpliced;
 		}
 		/* Spinner handling */
 		if (hitObject.type[3] === "1") {
@@ -517,6 +520,7 @@ define(function(require) {
 			}
 			hitObjects.splice(index, 1);
 			hasSpliced = true;
+			return hasSpliced;
 		}
 		if (playDetails.mods.auto) {
 			keyboard.emulateKeyUp("z");
@@ -706,7 +710,7 @@ define(function(require) {
 		/* update accuracy html element */
 		utils.htmlCounter("%" + utils.reverse("" + (Formulas.accuracy(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss) * 100).toFixed(2)), "accuracy-container", "accuracy-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
 		/* rank grade */
-		document.getElementById("grade").src = `src/images/skins/${skin}/ranking-` + Formulas.grade(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss, false) + "-small.png";
+		document.getElementById("grade").src = `./src/images/skins/${skin}/ranking-` + Formulas.grade(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss, false) + "-small.png";
 		/* combo pulse size */
 		let els = document.getElementById("combo-container").querySelectorAll("img");
 		for (let i = 0; i < els.length; i++) {
