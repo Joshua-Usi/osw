@@ -1,3 +1,3 @@
 define(function() {
-	return "ajax transparent";
+	return "ajax-transparent";
 });
