@@ -6,14 +6,14 @@ define(function(require) {
 		cursor: AssetLoader.image(`../../src/images/skins/${skin}/cursor.png`),
 		cursorTrail: AssetLoader.image(`../../src/images/skins/${skin}/cursortrail.png`),
 		/* hit circle assets */
-		hitCircle: AssetLoader.image(`../../src/images/skins/${skin}/hitCircle.png`),
-		hitCircleOverlay: AssetLoader.image(`../../src/images/skins/${skin}/hitCircleoverlay.png`),
+		hitCircle: AssetLoader.image(`../../src/images/skins/${skin}/hitcircle.png`),
+		hitCircleOverlay: AssetLoader.image(`../../src/images/skins/${skin}/hitcircleoverlay.png`),
 		approachCircle: AssetLoader.image(`../../src/images/skins/${skin}/approachcircle.png`),
 		/* slider assets */
 		sliderBody: AssetLoader.image(`../../src/images/skins/${skin}/sliderb0.png`),
 		sliderFollowCircle: AssetLoader.image(`../../src/images/skins/${skin}/sliderfollowcircle.png`),
 		sliderScorePoint: AssetLoader.image(`../../src/images/skins/${skin}/sliderscorepoint.png`),
-		reverseArrow: AssetLoader.image(`../../src/images/skins/${skin}/reverseArrow.png`),
+		reverseArrow: AssetLoader.image(`../../src/images/skins/${skin}/reversearrow.png`),
 		/* spinner assets */
 		spinnerApproachCircle: AssetLoader.image(`../../src/images/skins/${skin}/spinner-approachcircle.png`),
 		spinnerRPM: AssetLoader.image(`../../src/images/skins/${skin}/spinner-rpm.png`),
