@@ -674,6 +674,9 @@ define(function(require) {
 			if (elements[i].id === "webpage-state-always") {
 				continue;
 			}
+			if (elements[i].id === "webpage-state-state-beatmap-selection" && document.getElementById("webpage-state-end-results").style.display === "block") {
+				continue;
+			}
 			elements[i].style.display = "none";
 		}
 		document.getElementById("webpage-state-menu").style.display = "block";

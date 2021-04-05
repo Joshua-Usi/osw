@@ -20,6 +20,8 @@ let deps = [
 	"../src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Silverboxer's Supernova].osu",
 	"../src/beatmaps/TheFatRat - Mayday (feat. Laura Brehm) (Voltaeyx) [[2B] Calling Out Mayday].osu",
 	"../src/beatmaps/Camellia - Exit This Earth's Atomosphere (Camellia's ''PLANETARY200STEP'' Remix) (ProfessionalBox) [Primordial Nucleosynthesis].osu",
+	"../src/beatmaps/xi - FREEDOM DiVE (Nakagawa-Kanon) [FOUR DIMENSIONS].osu",
+	"../src/beatmaps/UNDEAD CORPORATION - The Empress (Plutia) [STARBOW BREAK!].osu",
 
 ]
 define(function(require) {
