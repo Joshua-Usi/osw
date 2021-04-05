@@ -5,4 +5,4 @@
  
  Currently in heavy development
 
- This version is currently a throwaway prototype. 
+ Accessible via https://joshua-usi.github.io/osw
