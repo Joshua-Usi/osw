@@ -1037,6 +1037,13 @@ define(function(require) {
 		playDetails.grade = Formulas.grade(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss, false);
 		playDetails.maxCombo = highestCombo;
 		previousTime = useTime;
+
+		if (keyboard.getKeyDown("esc")) {
+			document.getElementById("webpage-state-pause-screen").style.display = "block";
+			audio.pause();
+			mouse.unlockPointer();
+			isRunning = false;
+		}
 	}
 	return {
 		tick: gameplayTick,
