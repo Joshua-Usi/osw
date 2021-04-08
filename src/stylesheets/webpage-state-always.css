@@ -129,7 +129,8 @@
 	background: #0d0d0d;
 	overflow-x: hidden;
 	overflow-y: scroll;
-	transition: 0.3s;
+	transition: 0.7s;
+	transition-timing-function: cubic-bezier(0.15, 0.6, 0.3, 1);
 	opacity: 0;
 }
 
