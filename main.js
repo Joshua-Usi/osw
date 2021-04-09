@@ -216,13 +216,15 @@ define(function(require) {
 			menuAudio.play();
 			isFirstClick = false;
 			(function animate() {
-				/* triangle background moves */
-				let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
-				offset -= 0.5;
-				for (let i = 0; i < triangleBackgroundMoves.length; i++) {
-					triangleBackgroundMoves[i].style.backgroundPositionY = offset + "px";
-				}
 				if (document.getElementById("webpage-state-menu").style.display === "block" || document.getElementById("webpage-state-menu").style.display === "") {
+					/* triangle background moves */
+					let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
+					offset -= 0.5;
+					for (let i = 0; i < triangleBackgroundMoves.length; i++) {
+						if (triangleBackgroundMoves[i].style.display !== "none") {
+							triangleBackgroundMoves[i].style.backgroundPositionY = offset + "px";
+						}
+					}
 					/* beat detection */
 					audioAnalyserData = new Uint8Array(analyser.frequencyBinCount);
 					analyser.getByteFrequencyData(audioAnalyserData); // passing our Uint audioAnalyserData array
@@ -398,9 +400,9 @@ define(function(require) {
 	});
 	/* Top bar event listeners */
 	document.getElementById("top-bar").addEventListener("mouseenter", function() {
-		utils.blurDiv("background-blur", 4);
+		utils.blurDiv("background-blur", 2);
 		utils.brighten("background-dim", 0.75);
-		utils.blurDiv("menu-parallax", 8);
+		utils.blurDiv("menu-parallax", 4);
 	});
 	document.getElementById("top-bar").addEventListener("mouseleave", function() {
 		utils.blurDiv("background-blur", 0);
