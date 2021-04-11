@@ -75,7 +75,7 @@ define(function(require) {
 	} else {
 		let optionsTemp = JSON.parse(window.localStorage.getItem("options"));
 		if (optionsTemp.version < defaultOptions.version) {
-			localStorage.setItem("options", defaultOptions);
+			localStorage.setItem("options", JSON.stringify(defaultOptions));
 			console.log("Your Options was reset due to new version");
 		}
 		defaultOptions = optionsTemp;
