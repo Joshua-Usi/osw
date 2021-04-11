@@ -761,6 +761,7 @@ define(function(require) {
 		document.getElementById("webpage-state-gameplay").style.display = "none";
 		document.getElementById("webpage-state-pause-screen").style.display = "none";
 		document.getElementById("webpage-state-fail-screen").style.display = "none";
+		document.getElementById("bottom-bar").style.display = "block";
 	}
 	document.getElementById("pause-menu-quit").addEventListener("click", quit);
 	document.getElementById("fail-menu-quit").addEventListener("click", quit);
