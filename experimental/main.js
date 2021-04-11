@@ -1,32 +1,34 @@
-document.getElementById("beatmap").addEventListener("change", (event) => {
-	const fileList = event.target.files;
-	readFile(fileList[0]);
+document.getElementById("beatmap").addEventListener("change", function() {
+	let fileReader = new FileReader();
+	fileReader.onload = function() {
+		var new_zip = new JSZip();
+		new_zip.loadAsync(this.result).then(function(zip) {
+			let numberOfValidFiles = 0;
+			for (let key in zip.files) {
+				if (key.includes(".mp3") || key.includes(".ogg")) {
+					zip.files[key].async("binarystring").then(function(content) {
+						let audio = document.getElementById("audio");
+						let audioType;
+						if (key.includes(".mp3")) {
+							audioType = "mp3";
+						} else if (key.includes(".ogg")) {
+							audioType = "ogg";
+						}
+						audio.src = `data:audio/${audioType};base64,${btoa(content)}`;
+						audio.play();
+						numberOfValidFiles++;
+					});
+				} else if (key.includes(".osu")) {
+					zip.files[key].async("string").then(function(content) {
+						console.log("Length as string " + content.length);
+					});
+					numberOfValidFiles++;
+				}
+			}
+			if (numberOfValidFiles === 0) {
+				console.warn("Invalid osu beatmap");
+			}
+		});
+	};
+	fileReader.readAsBinaryString(this.files[0]);
 });
-
-function getMetadataForFileList(fileList) {
-	for (const file of fileList) {
-		// Not supported in Safari for iOS.
-		const name = file.name ? file.name : "NOT SUPPORTED";
-		// Not supported in Firefox for Android or Opera for Android.
-		const type = file.type ? file.type : "NOT SUPPORTED";
-		// Unknown cross-browser support.
-		const size = file.size ? file.size : "NOT SUPPORTED";
-		console.log({file, name, type, size});
-	}
-}
-
-function readFile(file) {
-	const reader = new FileReader();
-	reader.addEventListener("load", (event) => {
-		const result = event.target.result;
-		// Do something with result
-	});
-
-	reader.addEventListener("progress", (event) => {
-		if (event.loaded && event.total) {
-			const percent = (event.loaded / event.total) * 100;
-			console.log(`Progress: ${Math.round(percent)}`);
-		}
-	});
-	console.log(reader.readAsDataURL(file));
-}
