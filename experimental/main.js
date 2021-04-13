@@ -32,3 +32,27 @@ document.getElementById("beatmap").addEventListener("change", function() {
 	};
 	fileReader.readAsBinaryString(this.files[0]);
 });
+
+let beatmapDatabase = indexedDB.open("beatmap-database", 1);
+
+beatmapDatabase.addEventListener("upgradeneeded", function(event) {
+	console.log("A new version of the database exists and will need to be updated");
+	 let db = openRequest.result
+	 // existing db version
+	 switch (event.oldVersion) {
+		case 0:
+			// version 0 means that the client had no database
+			// perform initialization
+	}
+});
+
+beatmapDatabase.addEventListener("error", function() {
+	console.error("Error " + beatmapDatabase.error);
+});
+
+beatmapDatabase.addEventListener("success", function() {
+	console.log("Success");
+	let db = beatmapDatabase.result;
+	console.log(db);
+	// continue working with database using db object
+});
