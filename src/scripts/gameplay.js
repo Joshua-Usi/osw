@@ -748,7 +748,7 @@ define(function(require) {
 		if (Math.sign(angle) === -1) {
 			angle = Math.PI * 2 + angle;
 		}
-		let angleChange = ((angle - previousAngle) / (useTime - previousTime));
+		angleChange = ((angle - previousAngle) / (useTime - previousTime));
 		if (isNaN(angleChange)) {
 			angleChange = 0;
 		}
@@ -989,7 +989,7 @@ define(function(require) {
 				isRunning = false;
 			}
 		}
-		detectSpinSpeed(hitObjectOffsetX, hitObjectOffsetY);
+		detectSpinSpeed(useTime, previousTime, hitObjectOffsetX, hitObjectOffsetY);
 		updateHp(useTime, previousTime);
 		/* Hit Events */
 		while (hitEvents.length > 0) {
