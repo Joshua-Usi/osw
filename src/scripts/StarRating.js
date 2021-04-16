@@ -33,7 +33,7 @@ define(function(require) {
 			angleBetweenHitobjects = 0;
 		}
 		let angleDifficulty = -((angleBetweenHitobjects - Math.PI) ** 2) / (Math.PI ** (Math.E / 1.35)) + 2;
-		return ((distanceBetweenObjects + Math.sqrt(timeBetweenObjects)) / 100) * (1 / (timeBetweenObjects ** (9 / 16))) * angleDifficulty;
+		return ((distanceBetweenObjects + Math.sqrt(timeBetweenObjects)) / 90) * (1 / (timeBetweenObjects ** (9 / 16))) * angleDifficulty;
 	}
 
 	return {
