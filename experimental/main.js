@@ -4,7 +4,6 @@ function getObjectStore(database, store, mode) {
 	let transaction = database.transaction(store, mode);
 	return transaction.objectStore(store);
 }
-
 let parser = {
 	parseBeatMap: function(data) {
 		let splited = data.split("\n");
@@ -50,10 +49,8 @@ let parser = {
 		}
 		return beatmap;
 	},
-}
-
-beatmapQueue = [];
-
+};
+let beatmapQueue = [];
 document.getElementById("beatmap").addEventListener("change", function() {
 	let fileReader = new FileReader();
 	fileReader.onload = function() {
@@ -70,7 +67,11 @@ document.getElementById("beatmap").addEventListener("change", function() {
 						if (beatmapSetId === undefined) {
 							beatmapSetId = parser.parseBeatMap(content).BeatmapSetID;
 						}
-						beatmapQueue.push({type: "beatmap", name: key, data: content});
+						beatmapQueue.push({
+							type: "beatmap",
+							name: key,
+							data: content
+						});
 					});
 					numberOfValidFiles++;
 				}
@@ -86,7 +87,11 @@ document.getElementById("beatmap").addEventListener("change", function() {
 					}
 					audio.src = `data:audio/${audioType};base64,${btoa(content)}`;
 					audio.play();
-					beatmapQueue.push({type: "audio", name: beatmapSetId + audioKey, data: btoa(content)});
+					beatmapQueue.push({
+						type: "audio",
+						name: beatmapSetId + audioKey,
+						data: btoa(content)
+					});
 					numberOfValidFiles++;
 				});
 			}
@@ -97,68 +102,90 @@ document.getElementById("beatmap").addEventListener("change", function() {
 	};
 	fileReader.readAsBinaryString(this.files[0]);
 });
-
-
 if (!window.indexedDB) {
 	console.warn("IndexedDB is not supported on your browser, this means you will be unable to save beatmaps");
 }
-
-let database = indexedDB.open("", 1);
+let database = indexedDB.open("osw-database", 1);
 database.addEventListener("upgradeneeded", function() {
 	console.log("A new version of the database exists and will need to be updated");
-	 let db = event.target.result;
-	 // existing db version
-	 switch (event.oldVersion) {
+	let db = event.target.result;
+	// existing db version
+	switch (event.oldVersion) {
 		case 0:
-			db.createObjectStore("beatmaps", {keyPath: "name"});
-			db.createObjectStore("audio", {keyPath: "name"});
+			db.createObjectStore("beatmaps", {
+				keyPath: "name"
+			});
+			db.createObjectStore("audio", {
+				keyPath: "name"
+			});
+			break;
 	}
 });
-
 database.addEventListener("error", function(event) {
-	console.error("Error " + event.target.error);
+	console.error(`Attempt to open database failed: ${event.target.error}`);
 });
-
 database.addEventListener("success", function(event) {
-	console.log("Success");
 	let database = event.target.result;
+	let returns = {
+		values: [],
+		complete: false,
+	};
 
 	function checkForNewMaps() {
 		if (beatmapQueue.length > 0) {
 			while (beatmapQueue.length > 0) {
 				if (beatmapQueue[0].type === "beatmap") {
-					add(database, "beatmaps", beatmapQueue[0].name, beatmapQueue[0].data);
+					addToDatabase(database, "beatmaps", beatmapQueue[0].name, beatmapQueue[0].data);
 				} else if (beatmapQueue[0].type === "audio") {
-					add(database, "audio", beatmapQueue[0].name, beatmapQueue[0].data);
+					addToDatabase(database, "audio", beatmapQueue[0].name, beatmapQueue[0].data);
 				}
 				beatmapQueue.splice(0, 1);
 			}
+		}
+		let d = document.getElementById("d");
+		if (returns.complete) {
+			let d = document.getElementById("d");
+			let content = "";
+			for (let i = 0; i < returns.values.length; i++) {
+				content += returns.values[i].name + "<br>";
+			}
+			d.innerHTML = content;
 		} else {
-			console.log(all(database, "v"));
+			d.innerHTML = "Loading maps";
 		}
 	}
+	getAllInDatabase(database, "beatmaps", returns);
 	setInterval(checkForNewMaps, 1000);
 	// continue working with database using db object
 });
 
-function add(database, store, key, data) {
+function addToDatabase(database, store, key, data) {
 	let object = {
 		name: key,
 		data: data,
 	};
 	let objectStore = getObjectStore(database, store, "readwrite");
 	let request;
-	try {
-		request = objectStore.add(object);
-	} catch (e) {
-		throw e;
-	}
-	request.addEventListener("error", function () {
-		console.log("Insertion in DB Failed ", this.error);
+	request = objectStore.add(object);
+	request.addEventListener("error", function(event) {
+		console.error(`Attempt to insert into object store ${store} failed: ${event.target.error}`);
 	});
 }
 
-function all(database, store) {
+function getAllInDatabase(database, store, asyncReturns) {
 	let objectStore = getObjectStore(database, store, "readonly");
-	return objectStore.getAll().result;
+	let request = objectStore.openCursor();
+	request.addEventListener("error", function(event) {
+		console.error(`Attempt to fetch data from object store ${store} failed: ${event.target.error}`);
+	});
+	request.addEventListener("success", function(event) {
+		let cursor = event.target.result;
+		if (cursor) {
+			let value = cursor.value;
+			asyncReturns.values.push(value);
+			cursor.continue();
+		} else {
+			asyncReturns.complete = true;
+		}
+	});
 }

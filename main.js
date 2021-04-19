@@ -33,6 +33,7 @@ define(function(require) {
 	const BeatMapSelectionPaneTemplate = require("./src/scripts/BeatMapSelectionPane.js");
 	let gameplay = require("./src/scripts/gameplay.js");
 	const introSequence = require("./src/scripts/introSequence.js");
+	const Accumulator = require("./src/scripts/accumulator.js");
 	/* Offline context checks, needed to ensure for some effects to work */
 	/* Text suggested by jylescoad-ward */
 	if (window.origin === null) {
@@ -163,6 +164,10 @@ define(function(require) {
 	let audioVisualiserSize = 1.6;
 	/* Profiling variables */
 	let recordedFramesPerSecond = [];
+	/* Accumulators */
+	let time = 0;
+	let previousTime = 0;
+	let gameplayRenderAccumulator = new Accumulator(gameplay.render, 1000 / 60);
 	/* Event Listeners */
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
@@ -348,7 +353,10 @@ define(function(require) {
 				}
 				if (gameplay.isRunning()) {
 					gameplay.tick();
+					gameplayRenderAccumulator.tick(time - previousTime);
 				}
+				previousTime = time;
+				time = Date.now();
 				if (gameplay.isRunning()) {
 					setTimeout(animate, 0);
 				} else {

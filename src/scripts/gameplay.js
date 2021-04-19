@@ -110,6 +110,8 @@ define(function(require) {
 	let hiddenFadeInPercent = 0.4;
 	let hiddenFadeOutPercent = 0.7;
 	let sliderStrokeSize = 0.9;
+	let hitObjectOffsetX = playfieldXOffset + window.innerWidth / 2 - window.innerHeight * playfieldSize * (4 / 3) / 2;
+	let hitObjectOffsetY = playfieldYOffset + window.innerHeight / 2 - window.innerHeight * playfieldSize / 2;
 
 	function setHitObjectCache(hitObject, useTime, hitObjectOffsetX, hitObjectOffsetY) {
 		/* Cache Setup */
@@ -938,115 +940,119 @@ define(function(require) {
 			ctx.fillRect(window.innerWidth / 2 + hitErrors[i] * 1000, window.innerHeight * 0.975 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.025);
 		}
 	}
-
-	function gameplayTick() {
-		if (document.getElementById("webpage-state-gameplay").style.display !== "block" && document.getElementById("webpage-state-gameplay").style.display !== "") {
-			return;
-		}
-		let hitObjectOffsetX = playfieldXOffset + window.innerWidth / 2 - window.innerHeight * playfieldSize * (4 / 3) / 2;
-		let hitObjectOffsetY = playfieldYOffset + window.innerHeight / 2 - window.innerHeight * playfieldSize / 2;
-		let useTime = audio.currentTime;
-		if (audioFailedToLoad) {
-			useTime = (window.performance.now() - backupStartTime) / 1000;
-			if (playDetails.mods.doubleTime) {
-				useTime *= 1.5;
-			} else if (playDetails.mods.halfTime) {
-				useTime *= 0.75;
-			}
-		}
-		if (currentHitObject >= loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length) {
-			let endingTime;
-			let lastHitObject = loadedMaps[useBeatmapSet][useBeatmap].hitObjects[loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length - 1];
-			if (lastHitObject.type[0] === "1") {
-				endingTime = lastHitObject.time + 2;
-			}
-			if (lastHitObject.type[1] === "1") {
-				let sliderOnceTime = Math.abs(lastHitObject.length) / (Formulas.sliderMultiplier(loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].beatLength) * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[timingPointUninheritedIndex].beatLength;
-				let sliderTotalTime = sliderOnceTime * lastHitObject.slides;
-				endingTime = lastHitObject.time + sliderTotalTime + 2;
-			}
-			if (lastHitObject.type[3] === "1") {
-				endingTime = lastHitObject.endTime + 2;
-			}
-			if (useTime > endingTime) {
-				mouse.unlockPointer();
-				document.getElementById("webpage-state-always").style.display = "block";
-				document.getElementById("top-bar").style.display = "block";
-				document.getElementById("webpage-state-beatmap-selection").style.display = "none";
-				document.getElementById("webpage-state-gameplay").style.display = "none";
-				document.getElementById("webpage-state-pause-screen").style.display = "none";
-				document.getElementById("webpage-state-fail-screen").style.display = "none";
-				document.getElementById("webpage-state-results-screen").style.display = "block";
-				document.getElementById("bottom-bar").style.display = "block";
-				let date = new Date();
-				playDetails.datePlayed = utils.formatDate(date.getDate(), date.getMonth(), date.getFullYear(), date.getHours(), date.getMinutes());
-				playDetails.unstableRate = utils.standardDeviation(hitErrors) * 1000 * 10;
-				playDetails.mapName = loadedMaps[useBeatmapSet][useBeatmap].Title;
-				playDetails.mapperName = loadedMaps[useBeatmapSet][useBeatmap].Creator;
-				playDetails.artist = loadedMaps[useBeatmapSet][useBeatmap].Artist;
-				playDetails.difficultyName = loadedMaps[useBeatmapSet][useBeatmap].Version;
-				endScreen.displayResults(playDetails);
-				isRunning = false;
-			}
-		}
-		detectSpinSpeed(useTime, previousTime, hitObjectOffsetX, hitObjectOffsetY);
-		updateHp(useTime, previousTime);
-		/* Hit Events */
-		while (hitEvents.length > 0) {
-			processHitEvent(useTime);
-		}
-		while (currentHitObject < loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length && useTime >= loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject].time - arTime) {
-			nextHitObject();
-		}
-		/* +1 because the given time is beginning time, not end time */
-		while (currentTimingPoint < loadedMaps[useBeatmapSet][useBeatmap].timingPoints.length - 1 && useTime >= loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint + 1].time) {
-			nextTimingPoint();
-		}
-		/* Cache Loop */
-		for (let i = 0; i < hitObjects.length; i++) {
-			setHitObjectCache(hitObjects[i], useTime, hitObjectOffsetX, hitObjectOffsetY);
-		}
-		/* Processing Loop */
-		for (let i = 0; i < hitObjects.length; i++) {
-			let spliced = processHitObject(hitObjects[i], useTime, previousTime, i, hitObjectOffsetX, hitObjectOffsetY);
-			if (spliced) {
-				i--;
-				if (i < 0) {
-					i = 0;
+	return {
+		tick: function() {
+			let useTime = audio.currentTime;
+			if (audioFailedToLoad) {
+				useTime = (window.performance.now() - backupStartTime) / 1000;
+				if (playDetails.mods.doubleTime) {
+					useTime *= 1.5;
+				} else if (playDetails.mods.halfTime) {
+					useTime *= 0.75;
 				}
 			}
-		}
-		ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-		canvas.setStrokeStyle("#fff");
-		ctx.lineWidth = 5;
-		canvas.setImageAlignment("top-left");
-		canvas.drawImage(Assets.scoreBarBg, 10, 10, window.innerWidth / 2, Assets.scoreBarBg.height);
-		canvas.drawImage(Assets.scoreBarColour, 0, 0, utils.map(hpDisplay, 0, 1, 0, Assets.scoreBarColour.width), Assets.scoreBarColour.height, 15, 10 + Assets.scoreBarColour.height / 1.5, utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2 - 0.01 * window.innerWidth), Assets.scoreBarColour.height);
-		canvas.setImageAlignment("center");
-		/* Render Loop */
-		for (let i = hitObjects.length - 1; i >= 0; i--) {
-			renderHitObject(hitObjects[i], useTime, hitObjectOffsetX, hitObjectOffsetY);
-		}
-		renderEffects(useTime);
-		/* hit errors */
-		renderHitErrors();
-		updateScore();
-		renderMouse();
-		playDetails.score = score;
-		playDetails.accuracy = Formulas.accuracy(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss) * 100;
-		playDetails.grade = Formulas.grade(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss, false);
-		playDetails.maxCombo = highestCombo;
-		previousTime = useTime;
+			if (currentHitObject >= loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length) {
+				let endingTime;
+				let lastHitObject = loadedMaps[useBeatmapSet][useBeatmap].hitObjects[loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length - 1];
+				if (lastHitObject.type[0] === "1") {
+					endingTime = lastHitObject.time + 2;
+				}
+				if (lastHitObject.type[1] === "1") {
+					let sliderOnceTime = Math.abs(lastHitObject.length) / (Formulas.sliderMultiplier(loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].beatLength) * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[timingPointUninheritedIndex].beatLength;
+					let sliderTotalTime = sliderOnceTime * lastHitObject.slides;
+					endingTime = lastHitObject.time + sliderTotalTime + 2;
+				}
+				if (lastHitObject.type[3] === "1") {
+					endingTime = lastHitObject.endTime + 2;
+				}
+				if (useTime > endingTime) {
+					mouse.unlockPointer();
+					document.getElementById("webpage-state-always").style.display = "block";
+					document.getElementById("top-bar").style.display = "block";
+					document.getElementById("webpage-state-beatmap-selection").style.display = "none";
+					document.getElementById("webpage-state-gameplay").style.display = "none";
+					document.getElementById("webpage-state-pause-screen").style.display = "none";
+					document.getElementById("webpage-state-fail-screen").style.display = "none";
+					document.getElementById("webpage-state-results-screen").style.display = "block";
+					document.getElementById("bottom-bar").style.display = "block";
+					let date = new Date();
+					playDetails.datePlayed = utils.formatDate(date.getDate(), date.getMonth(), date.getFullYear(), date.getHours(), date.getMinutes());
+					playDetails.unstableRate = utils.standardDeviation(hitErrors) * 1000 * 10;
+					playDetails.mapName = loadedMaps[useBeatmapSet][useBeatmap].Title;
+					playDetails.mapperName = loadedMaps[useBeatmapSet][useBeatmap].Creator;
+					playDetails.artist = loadedMaps[useBeatmapSet][useBeatmap].Artist;
+					playDetails.difficultyName = loadedMaps[useBeatmapSet][useBeatmap].Version;
+					endScreen.displayResults(playDetails);
+					isRunning = false;
+				}
+			}
+			detectSpinSpeed(useTime, previousTime, hitObjectOffsetX, hitObjectOffsetY);
+			updateHp(useTime, previousTime);
+			/* Hit Events */
+			while (hitEvents.length > 0) {
+				processHitEvent(useTime);
+			}
+			while (currentHitObject < loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length && useTime >= loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject].time - arTime) {
+				nextHitObject();
+			}
+			/* +1 because the given time is beginning time, not end time */
+			while (currentTimingPoint < loadedMaps[useBeatmapSet][useBeatmap].timingPoints.length - 1 && useTime >= loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint + 1].time) {
+				nextTimingPoint();
+			}
+			/* Cache Loop */
+			for (let i = 0; i < hitObjects.length; i++) {
+				setHitObjectCache(hitObjects[i], useTime, hitObjectOffsetX, hitObjectOffsetY);
+			}
+			/* Processing Loop */
+			for (let i = 0; i < hitObjects.length; i++) {
+				let spliced = processHitObject(hitObjects[i], useTime, previousTime, i, hitObjectOffsetX, hitObjectOffsetY);
+				if (spliced) {
+					i--;
+					if (i < 0) {
+						i = 0;
+					}
+				}
+			}
+			playDetails.score = score;
+			playDetails.accuracy = Formulas.accuracy(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss) * 100;
+			playDetails.grade = Formulas.grade(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss, false);
+			playDetails.maxCombo = highestCombo;
+			previousTime = useTime;
 
-		if (keyboard.getKeyDown("esc")) {
-			document.getElementById("webpage-state-pause-screen").style.display = "block";
-			audio.pause();
-			mouse.unlockPointer();
-			isRunning = false;
-		}
-	}
-	return {
-		tick: gameplayTick,
+			if (keyboard.getKeyDown("esc")) {
+				document.getElementById("webpage-state-pause-screen").style.display = "block";
+				audio.pause();
+				mouse.unlockPointer();
+				isRunning = false;
+			}
+		},
+		render: function() {
+			let useTime = audio.currentTime;
+			if (audioFailedToLoad) {
+				useTime = (window.performance.now() - backupStartTime) / 1000;
+				if (playDetails.mods.doubleTime) {
+					useTime *= 1.5;
+				} else if (playDetails.mods.halfTime) {
+					useTime *= 0.75;
+				}
+			}
+			ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+			canvas.setStrokeStyle("#fff");
+			ctx.lineWidth = 5;
+			canvas.setImageAlignment("top-left");
+			canvas.drawImage(Assets.scoreBarBg, 10, 10, window.innerWidth / 2, Assets.scoreBarBg.height);
+			canvas.drawImage(Assets.scoreBarColour, 0, 0, utils.map(hpDisplay, 0, 1, 0, Assets.scoreBarColour.width), Assets.scoreBarColour.height, 15, 10 + Assets.scoreBarColour.height / 1.5, utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2 - 0.01 * window.innerWidth), Assets.scoreBarColour.height);
+			canvas.setImageAlignment("center");
+			/* Render Loop */
+			for (let i = hitObjects.length - 1; i >= 0; i--) {
+				renderHitObject(hitObjects[i], useTime, hitObjectOffsetX, hitObjectOffsetY);
+			}
+			renderEffects(useTime);
+			/* hit errors */
+			renderHitErrors();
+			updateScore();
+			renderMouse();
+		},
 		continue: function() {
 			audio.play();
 			mouse.lockPointer();
