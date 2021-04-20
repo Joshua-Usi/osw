@@ -284,12 +284,20 @@
 			</div>
 		</div>
 		<div id="bottom-bar">
-			<div id="back-button">
-				<div id="back-button-anti-skew">
-					<div id="back-button-image-container">
-						<img alt="go back" src="./src/images/back.png" id="back-button-image">
+			<div style="display:inline-block; width: 15vw;">
+				<div id="back-button">
+					<div id="back-button-anti-skew">
+						<div id="back-button-image-container">
+							<img alt="go back" src="./src/images/back.png" id="back-button-image">
+						</div>
+						<p id="back-button-text">Back</p>
 					</div>
-					<p id="back-button-text">Back</p>
+				</div>
+			</div>
+			<div style="display:inline-block; width: 15vw;">
+				<input type="file" name="upload-beatmap" id="upload-beatmap" style="display: none;"/>
+				<div id="upload-beatmap-ui">
+					<p id="upload-beatmap-ui-text" onclick="document.getElementById('upload-beatmap').click()">upload a beatmap</p>
 				</div>
 			</div>
 		</div>
@@ -345,7 +353,7 @@
 			<div id="end-results">
 				<p id="end-results-map-name">Map Name</p>
 				<p id="end-results-artist-name">Artist</p>
-				<img id="end-results-grade" src="./src/images/d-rank-icon.png">
+				<img id="end-results-grade" src="//:0">
 				<p id="end-results-score">0</p>
 				<div id="end-results-accuracy">
 					<div id="end-results-accuracy-bar">0.00%</div>

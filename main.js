@@ -29,7 +29,7 @@ define(function(require) {
 	const AssetLoader = require("./src/scripts/assetLoader.js");
 	const utils = require("./src/scripts/utils.js");
 	const AttachAudio = require("./src/scripts/attachAudio.js");
-	const Beatmaps = require("./src/scripts/defaultBeatMaps.js");
+	const Beatmaps = require("./src/scripts/beatmapFetcher.js");
 	const BeatMapSelectionPaneTemplate = require("./src/scripts/beatMapSelectionPane.js");
 	let gameplay = require("./src/scripts/gameplay.js");
 	const introSequence = require("./src/scripts/introSequence.js");

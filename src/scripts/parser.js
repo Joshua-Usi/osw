@@ -1,6 +1,6 @@
 define(function(require) {
 	"use strict";
-	const HitObject = require("./hitObject.js");
+	const HitObject = require("./hitObjects.js");
 	const utils = require("./utils.js");
 	return {
 		parseBeatMap: function(data) {

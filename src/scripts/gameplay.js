@@ -4,7 +4,7 @@ define(function(require) {
 	const Formulas = require("./formulas.js");
 	const Mouse = require("./mouse.js");
 	const Keyboard = require("./keyboard.js");
-	const beatmap = require("./defaultBeatMaps.js");
+	const beatmap = require("./beatmapFetcher.js");
 	const Bezier = require("./bezier.js");
 	const utils = require("./utils.js");
 	const HitObject = require("./hitObjects.js");
