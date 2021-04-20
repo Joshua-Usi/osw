@@ -1115,7 +1115,6 @@ define(function(require) {
 					console.error(`Attempt to find query failed: ${event.target.error}`);
 				})
 				request.addEventListener("success", function(event) {
-					console.log(event);
 					let audioType;
 					if (event.target.result.name.includes(".mp3")) {
 						audioType = "mp3";
