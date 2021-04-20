@@ -38,16 +38,29 @@ define(function(require) {
 
 	return {
 		version: 1,
-		calculate: function(beatMap, mods) {
+		calculate: function(beatmap, mods) {
+
 			let highest = 0;
 			let highestIndex = 0;
 			let starRatingSum = 0;
 			let total = 0;
-			for (let i = 1; i < beatMap.hitObjects.length - 1; i++) {
-				if (beatMap.hitObjects[i].type[3] === "1" || beatMap.hitObjects[i + 1].type[3] === "1") {
-					continue;
+			if (beatmap.hitObjects.length <= 4) {
+				return 0;
+			}
+			for (let i = 1; i < beatmap.hitObjects.length - 1; i++) {
+				try {
+					if (beatmap.hitObjects[i].type[3] === "1" || 
+						beatmap.hitObjects[i + 1].type[3] === "1") {
+						continue;
+					}
+				} catch (e) {
+					console.log(`${i}:${beatmap.hitObjects.length}`);
+					console.log(beatmap.hitObjects[i]);
+					console.log(beatmap.hitObjects[i + 1]);
+					console.log(beatmap);
+					throw e;
 				}
-				let diff = difficulty(beatMap.hitObjects[i], beatMap.hitObjects[i + 1], beatMap.hitObjects[i - 1], mods);
+				let diff = difficulty(beatmap.hitObjects[i], beatmap.hitObjects[i + 1], beatmap.hitObjects[i - 1], mods);
 				if (diff > highest) {
 					highest = diff;
 					highestIndex = i;

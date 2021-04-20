@@ -14,6 +14,7 @@ define(function(require) {
 	const skin = require("./defaultSkin.js");
 	const PlayDetails = require("./playDetails.js");
 	const endScreen = require("./endScreen.js");
+	const databaseManager = require("./databaseManager.js");
 	let loadedMaps;
 	(function loadMaps() {
 		if (beatmap.allMapsLoaded() === true) {
@@ -1105,7 +1106,25 @@ define(function(require) {
 			/* Audio letiables */
 			backupStartTime = window.performance.now();
 			audioFailedToLoad = false;
-			audio.src = `src/audio/${loadedMaps[useBeatmapSet][useBeatmap].AudioFilename}`;
+			let database = indexedDB.open("osw-database", 1);
+			database.addEventListener("success", function(event) {
+				let database = event.target.result;
+				let objectStore = databaseManager.getObjectStore(database, "audio", "readonly");
+				let request = objectStore.get(loadedMaps[useBeatmapSet][useBeatmap].BeatmapSetID + loadedMaps[useBeatmapSet][useBeatmap].AudioFilename);
+				request.addEventListener("error", function(event) {
+					console.error(`Attempt to find query failed: ${event.target.error}`);
+				})
+				request.addEventListener("success", function(event) {
+					console.log(event);
+					let audioType;
+					if (event.target.result.name.includes(".mp3")) {
+						audioType = "mp3";
+					} else if (event.target.result.name.includes(".ogg")) {
+						audioType = "ogg";
+					}
+					audio.src = `data:audio/${audioType};base64,${event.target.result.data}`;
+				});
+			});
 			audio.currentTime = 0;
 			if (playDetails.mods.doubleTime) {
 				audio.playbackRate = 1.5;

@@ -34,10 +34,14 @@ define(function(require) {
 	let gameplay = require("./src/scripts/gameplay.js");
 	const introSequence = require("./src/scripts/introSequence.js");
 	const Accumulator = require("./src/scripts/accumulator.js");
+	const databaseManager = require("./src/scripts/databaseManager.js");
 	/* Offline context checks, needed to ensure for some effects to work */
 	/* Text suggested by jylescoad-ward */
 	if (window.origin === null) {
-		console.warn("Looks like you're running this without a web server, this isn't suggested at all due to features breaking because of CORS :/");
+		console.warn("Looks like you're running this without a web server, some audio based effects will not work due to CORS :/");
+	}
+	if (!window.indexedDB) {
+		console.warn("IndexedDB is not supported on your browser, this means you will be unable to save beatmaps");
 	}
 	/* osw! version incremented manually */
 	/* Set element version numbers */
@@ -72,12 +76,28 @@ define(function(require) {
 							mapsChildren[i].classList.add("beatmap-selection-selected");
 						}
 						let menuAudio = document.getElementById("menu-audio");
-						if (menuAudio.src.replaceAll("%20", " ") !== window.origin + "/src/audio/" + this.dataset.audiosource) {
-							menuAudio.src = "./src/audio/" + this.getAttribute("data-audiosource");
-							let first = this.parentNode.getElementsByClassName("beatmap-selection-group-pane-maps")[0].getElementsByClassName("beatmap-selection-map-pane")[0];
-							menuAudio.currentTime = loadedMaps[first.getAttribute("data-group-index")][first.getAttribute("data-map-index")].PreviewTime / 1000;
-							menuAudio.play();
-						}
+						let database = indexedDB.open("osw-database", 1);
+						let that = this;
+						database.addEventListener("success", function(event) {
+							let database = event.target.result;
+							let objectStore = databaseManager.getObjectStore(database, "audio", "readonly");
+							let request = objectStore.get(that.getAttribute("data-audiosource"));
+							request.addEventListener("error", function(event) {
+								console.error(`Attempt to find query failed: ${event.target.error}`);
+							})
+							request.addEventListener("success", function(event) {
+								let audioType;
+								if (event.target.result.name.includes(".mp3")) {
+									audioType = "mp3";
+								} else if (event.target.result.name.includes(".ogg")) {
+									audioType = "ogg";
+								}
+								menuAudio.src = `data:audio/${audioType};base64,${event.target.result.data}`;
+								let first = that.parentNode.getElementsByClassName("beatmap-selection-group-pane-maps")[0].getElementsByClassName("beatmap-selection-map-pane")[0];
+								menuAudio.currentTime = loadedMaps[first.getAttribute("data-group-index")][first.getAttribute("data-map-index")].PreviewTime / 1000;
+								menuAudio.play();
+							});
+						});
 					}
 				});
 			}
@@ -114,18 +134,11 @@ define(function(require) {
 	let menuAudio = new Audio();
 	menuAudio.id = "menu-audio";
 	menuAudio.addEventListener("play", function() {
-		document.getElementById("now-playing").textContent = "Now Playing: " + utils.removeInstances(this.src, [window.origin, "/src/audio/", ".wav", ".mp3", ".ogg"]).replaceAll("%20", " ");
+		// document.getElementById("now-playing").textContent = "Now Playing: " + utils.removeInstances(this.src, [window.origin, "/src/audio/", ".wav", ".mp3", ".ogg"]).replaceAll("%20", " ");
+		audioCtx.resume();
 	});
 	menuAudio.addEventListener("ended", function() {
 		this.play();
-	});
-	menuAudio.addEventListener("DOMAttrModified", function(event) {
-		if (event.attrName == "src") {
-			document.getElementById("now-playing").textContent = "Now Playing: " + utils.removeInstances(this[src], [".wav", ".mp3", ".ogg"]);
-		}
-	});
-	menuAudio.addEventListener("play", function() {
-		audioCtx.resume();
 	});
 	/* Beat detection */
 	document.getElementById("body").appendChild(menuAudio);
