@@ -24,13 +24,13 @@
 define(function(require) {
 	"use strict";
 	/* RequireJS Module Loading */
-	const Mouse = require("./src/scripts/Mouse.js");
-	let Options = require("./src/scripts/Options.js");
-	const AssetLoader = require("./src/scripts/AssetLoader.js");
+	const Mouse = require("./src/scripts/mouse.js");
+	let Options = require("./src/scripts/options.js");
+	const AssetLoader = require("./src/scripts/assetLoader.js");
 	const utils = require("./src/scripts/utils.js");
-	const AttachAudio = require("./src/scripts/AttachAudio.js");
-	const Beatmaps = require("./src/scripts/DefaultBeatMaps.js");
-	const BeatMapSelectionPaneTemplate = require("./src/scripts/BeatMapSelectionPane.js");
+	const AttachAudio = require("./src/scripts/attachAudio.js");
+	const Beatmaps = require("./src/scripts/defaultBeatMaps.js");
+	const BeatMapSelectionPaneTemplate = require("./src/scripts/beatMapSelectionPane.js");
 	let gameplay = require("./src/scripts/gameplay.js");
 	const introSequence = require("./src/scripts/introSequence.js");
 	const Accumulator = require("./src/scripts/accumulator.js");
