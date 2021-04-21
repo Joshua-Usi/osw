@@ -1,6 +1,20 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v0.6.0b] - 2021-03-21 - UNSTABLE
+### Added
+- Ability to upload and save osz files for later
+- Ability to play and save maps locally on the user file system
+### Changed
+- Star rating to now consider jumps and streams more impressive
+### Deprecated
+- Old maps
+### Removed
+- Old maps that were fetched via javascript fetch calls
+### Fixed
+- A small issue where spinners would not spin
+- An issue when ending a beatmaps, the back button (and the bar it sits on) will disappear
+---
 ## [v0.5.0b] - 2021-04-04
 ### Added
 - Results screen

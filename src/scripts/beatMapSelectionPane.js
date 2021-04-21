@@ -11,7 +11,7 @@ define(function(require) {
 				mapsHTML += this.map(maps[j], i, j);
 			}
 			return `<div class="beatmap-selection-group">
-					<div data-audiosource="${maps[0].BeatmapSetID + maps[0].AudioFilename}" class="beatmap-selection-group-pane triangle-background">
+					<div data-audiosource="${maps[0].Creator + maps[0].Title + maps[0].AudioFilename}" class="beatmap-selection-group-pane triangle-background">
 						<div class="beatmap-selection-group-pane-name">${maps[0].Title}</div>
 						<div class="beatmap-selection-group-pane-artist-name">${maps[0].Artist}</div>
 						<div>

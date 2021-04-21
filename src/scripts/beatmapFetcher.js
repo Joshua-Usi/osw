@@ -1,29 +1,7 @@
-// let deps = [
-// 	"./src/beatmaps/Peter Lambert - osu! tutorial (peppy) [Gameplay basics].osu",
-// 	"./src/beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Easy].osu",
-// 	"./src/beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Normal].osu",
-// 	"./src/beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Hard].osu",
-// 	"./src/beatmaps/Rostik - Liquid (Paul Rosenthal Remix) (Charles445) [Insane].osu",
-// 	"./src/beatmaps/Kurokotei - Galaxy Collapse (Doomsday is Bad) [Galaxy].osu",
-// 	"./src/beatmaps/Kurokotei - Galaxy Collapse (Doomsday is Bad) [Galactic].osu",
-// 	"./src/beatmaps/LeaF - Evanescent (Charles445) [Aspire].osu",
-// 	"./src/beatmaps/Soleily - Renatus (Gamu) [Normal].osu",
-// 	"./src/beatmaps/Soleily - Renatus (Gamu) [Hard].osu",
-// 	"./src/beatmaps/Soleily - Renatus (Gamu) [Insane].osu",
-// 	"./src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [emillia].osu",
-// 	"./src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [emillistream].osu",
-// 	"./src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [ET (Piggey vs Astar)].osu",
-// 	"./src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Firedigger's peaceful walk].osu",
-// 	"./src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Friendofox's Galaxy].osu",
-// 	"./src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Nao's Eclipse].osu",
-// 	"./src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Piggey's Destruction].osu",
-// 	"./src/beatmaps/The Koxx - A FOOL MOON NIGHT (Astar) [Silverboxer's Supernova].osu",
-// 	"./src/beatmaps/TheFatRat - Mayday (feat. Laura Brehm) (Voltaeyx) [[2B] Calling Out Mayday].osu",
-// 	"./src/beatmaps/Camellia - Exit This Earth's Atomosphere (Camellia's ''PLANETARY200STEP'' Remix) (ProfessionalBox) [Primordial Nucleosynthesis].osu",
-// ];
 define(function(require) {
 	const Parser = require("./parser.js");
 	const databaseManager = require("./databaseManager.js");
+	const starRating = require("src/scripts/starRating.js");
 	let fetchedMaps = [];
 	let mapsLoaded = 0;
 	let beatmapsSorted = [];
@@ -56,25 +34,35 @@ define(function(require) {
 		console.error(`Attempt to open database failed: ${event.target.error}`);
 	});
 	database.addEventListener("success", function(event) {
-	let database = event.target.result;
-	async function fetchMaps() {
+		let database = event.target.result;
+		fetchMaps(database);
+	});
+	async function fetchMaps(database) {
 		databaseManager.getAllInDatabase(database, "beatmaps", returns);
 		function checkComplete() {
 			if (returns.complete && fullyCompletedLoading === false) {
 				for (let i = 0; i < returns.values.length; i++) {
 					let parsedMap = Parser.parseBeatMap(returns.values[i].data);
+					if (i === 0) {
+						previous = parsedMap.Creator + parsedMap.Title;
+					}
 					/* ignore other gamemodes... for now */
 					if (parsedMap.Mode !== 0) {
 						continue;
 					}
-					if (beatMapGroups.length !== 0 && parsedMap.BeatmapSetID !== previous) {
+					if (beatMapGroups.length !== 0 && parsedMap.Creator + parsedMap.Title !== previous) {
+						beatMapGroups.sort(function(a, b) {
+							return starRating.calculate(a) - starRating.calculate(b);
+						});
 						beatmapsSorted.push(beatMapGroups);
 						beatMapGroups = [];
-						previous = parsedMap.BeatmapSetID;
+						previous = parsedMap.Creator + parsedMap.Title;
 					}
 					beatMapGroups.push(parsedMap);
 				}
-				beatmapsSorted.push(beatMapGroups);
+				if (beatMapGroups.length >= 1) {
+					beatmapsSorted.push(beatMapGroups);
+				}
 				fullyCompletedLoading = true;
 			} else {
 				setTimeout(checkComplete, 250);
@@ -82,8 +70,6 @@ define(function(require) {
 		}
 		checkComplete();
 	}
-	fetchMaps();
-});
 	return {
 		get: function() {
 			return beatmapsSorted;
@@ -91,5 +77,47 @@ define(function(require) {
 		allMapsLoaded: function() {
 			return fullyCompletedLoading;
 		},
+		refresh: function() {
+			mapsLoaded = 0;
+			beatmapsSorted = [];
+			beatMapGroups = [];
+			previous = "";
+
+			returns = {
+				values: [],
+				complete: false,
+			};
+			fullyCompletedLoading = false;
+			let database = indexedDB.open("osw-database", 1);
+			database.addEventListener("error", function(event) {
+				console.error(`Attempt to open database failed: ${event.target.error}`);
+			});
+			database.addEventListener("success", function(event) {
+				let database = event.target.result;
+				fetchMaps(database);
+			});
+		},
+		checkForNewMaps: function(beatmapQueue) {
+			let database = indexedDB.open("osw-database", 1);
+			database.addEventListener("error", function(event) {
+				console.error(`Attempt to open database failed: ${event.target.error}`);
+			});
+			database.addEventListener("success", function(event) {
+				let database = event.target.result;
+				if (beatmapQueue.length > 0) {
+					while (beatmapQueue.length > 0) {
+						if (beatmapQueue[0].type === "beatmap") {
+							console.log("Adding beatmaps");
+							databaseManager.addToDatabase(database, "beatmaps", beatmapQueue[0].name, beatmapQueue[0].data);
+							fetchedMaps.push(beatmapQueue[0].data);
+						} else if (beatmapQueue[0].type === "audio") {
+							console.log("Adding audio");
+							databaseManager.addToDatabase(database, "audio", beatmapQueue[0].name, beatmapQueue[0].data);
+						}
+						beatmapQueue.splice(0, 1);
+					}
+				}
+			});
+		}
 	};
 });

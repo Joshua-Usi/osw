@@ -35,6 +35,7 @@ define(function(require) {
 	const introSequence = require("./src/scripts/introSequence.js");
 	const Accumulator = require("./src/scripts/accumulator.js");
 	const databaseManager = require("./src/scripts/databaseManager.js");
+	const Parser = require("./src/scripts/parser.js");
 	/* Offline context checks, needed to ensure for some effects to work */
 	/* Text suggested by jylescoad-ward */
 	if (window.origin === null) {
@@ -45,12 +46,14 @@ define(function(require) {
 	}
 	/* osw! version incremented manually */
 	/* Set element version numbers */
-	const version = "osw! 0.5.0b";
+	const version = "osw! 0.6.0b";
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].textContent = version;
 	}
-	(function loadMaps() {
+	let loadedNewMaps = false;
+	function loadMaps() {
+		document.getElementById("beatmap-selection-right").innerHTML = "";
 		if (Beatmaps.allMapsLoaded() === true) {
 			let loadedMaps = Beatmaps.get();
 			/* Beatmap loading and adding to dom */
@@ -122,7 +125,8 @@ define(function(require) {
 			/* every 250ms try and load maps from the server*/
 			setTimeout(loadMaps, 250);
 		}
-	})();
+	};
+	loadMaps();
 	/* Initial menu song pool */
 	let songs = ["cYsmix - Triangles.mp3", "nekodex - circles.mp3"];
 	/* Only add christmas songs to list if the month is December */
@@ -181,6 +185,7 @@ define(function(require) {
 	let time = 0;
 	let previousTime = 0;
 	let gameplayRenderAccumulator = new Accumulator(gameplay.render, 1000 / 60);
+	let beatmapQueue = [];
 	/* Event Listeners */
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
@@ -367,6 +372,15 @@ define(function(require) {
 				if (gameplay.isRunning()) {
 					gameplay.tick();
 					gameplayRenderAccumulator.tick(time - previousTime);
+				}
+				if (beatmapQueue.length > 0) {
+					Beatmaps.checkForNewMaps(beatmapQueue);
+					loadedNewMaps = false;
+				} else if (loadedNewMaps === false) {
+					Beatmaps.refresh();
+					loadMaps();
+					gameplay.updateMaps();
+					loadedNewMaps = true;
 				}
 				previousTime = time;
 				time = Date.now();
@@ -665,14 +679,16 @@ define(function(require) {
 		document.getElementById("webpage-state-beatmap-selection").style.display = "block";
 		document.getElementById("bottom-bar").style.display = "block";
 		let els = document.getElementsByClassName("beatmap-selection-group-pane");
-		let selectedElement = els[utils.randomInt(0, els.length)];
-		selectedElement.scrollIntoView({
-			block: "center",
-			inline: "end"
-		});
-		selectedElement.parentNode.parentNode.scrollTo(0, selectedElement.parentNode.parentNode.scrollTop);
-		window.scrollTo(0, 0);
-		selectedElement.dispatchEvent(new CustomEvent("click"));
+		if (els.length >= 1) {
+			let selectedElement = els[utils.randomInt(0, els.length - 1)];
+			selectedElement.scrollIntoView({
+				block: "center",
+				inline: "end"
+			});
+			selectedElement.parentNode.parentNode.scrollTo(0, selectedElement.parentNode.parentNode.scrollTop);
+			window.scrollTo(0, 0);
+			selectedElement.dispatchEvent(new CustomEvent("click"));
+		}
 	});
 	/* Helper */
 	let menuTimeout;
@@ -786,4 +802,43 @@ define(function(require) {
 	}
 	document.getElementById("pause-menu-quit").addEventListener("click", quit);
 	document.getElementById("fail-menu-quit").addEventListener("click", quit);
+	document.getElementById("upload-beatmap").addEventListener("change", function() {
+		let fileReader = new FileReader();
+		fileReader.addEventListener("load", function() {
+			let new_zip = new JSZip();
+			new_zip.loadAsync(event.target.result).then(function(zip) {
+				let numberOfValidFiles = 0;
+				let uniqueIdentifier;
+				for (let key in zip.files) {
+					if (key.includes(".mp3") || key.includes(".ogg")) {
+						zip.files[key].async("binarystring").then(function(content) {
+							beatmapQueue.push({
+								type: "audio",
+								name: uniqueIdentifier + key,
+								data: btoa(content)
+							});
+							numberOfValidFiles++;
+						});
+					} else if (key.includes(".osu")) {
+						zip.files[key].async("string").then(function(content) {
+							if (uniqueIdentifier === undefined) {
+								let parsedMap = Parser.parseBeatMap(content);
+								uniqueIdentifier = parsedMap.Creator + parsedMap.Title;
+							}
+							beatmapQueue.push({
+								type: "beatmap",
+								name: key,
+								data: content
+							});
+						});
+						numberOfValidFiles++;
+					}
+				}
+				if (numberOfValidFiles === 0) {
+					console.warn("Invalid osu beatmap");
+				}
+			});
+		});
+		fileReader.readAsBinaryString(this.files[0]);
+	});
 });

@@ -16,15 +16,17 @@ define(function(require) {
 	const endScreen = require("./endScreen.js");
 	const databaseManager = require("./databaseManager.js");
 	let loadedMaps;
-	(function loadMaps() {
+	function loadMaps() {
 		if (beatmap.allMapsLoaded() === true) {
 			loadedMaps = beatmap.get();
 		} else {
-			requestAnimationFrame(loadMaps);
+			setTimeout(loadMaps, 250);
 		}
-	})();
+	};
+	loadMaps();
 	let useBeatmapSet;
 	let useBeatmap;
+	let loadedMap;
 	/* canvas setup */
 	let canvas = new Canvas("gameplay");
 	canvas.setHeight(window.innerHeight);
@@ -116,7 +118,7 @@ define(function(require) {
 
 	function setHitObjectCache(hitObject, useTime, hitObjectOffsetX, hitObjectOffsetY) {
 		/* Cache Setup */
-		let sliderSpeedMultiplier = loadedMaps[useBeatmapSet][useBeatmap].SliderMultiplier;
+		let sliderSpeedMultiplier = loadedMap.SliderMultiplier;
 		if (hitObject.cache.cacheSet === false) {
 			/* Immediate Cache Setup */
 			hitObject.cache.comboNumber = currentComboNumber;
@@ -182,8 +184,8 @@ define(function(require) {
 			}
 		}
 		/* inherited timing point */
-		if (loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].uninherited === 0) {
-			sliderSpeedMultiplier *= Formulas.sliderMultiplier(loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].beatLength);
+		if (loadedMap.timingPoints[currentTimingPoint].uninherited === 0) {
+			sliderSpeedMultiplier *= Formulas.sliderMultiplier(loadedMap.timingPoints[currentTimingPoint].beatLength);
 		}
 		/* Cache Setup */
 		if (useTime >= hitObject.time) {
@@ -196,11 +198,11 @@ define(function(require) {
 				/* Cache Setup for Slider */
 				hitObject.cache.sliderInheritedMultiplier = sliderSpeedMultiplier;
 				hitObject.cache.timingPointUninheritedIndex = timingPointUninheritedIndex;
-				hitObject.cache.sliderOnceTime = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
+				hitObject.cache.sliderOnceTime = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * loadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
 				hitObject.cache.sliderTotalTime = hitObject.cache.sliderOnceTime * hitObject.slides;
-				let time = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
+				let time = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * loadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
 				/* Actual ticks is -1 due to unexplicable phenomenon */
-				hitObject.cache.totalTicks = time / loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength * loadedMaps[useBeatmapSet][useBeatmap].SliderTickRate;
+				hitObject.cache.totalTicks = time / loadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength * loadedMap.SliderTickRate;
 				hitObject.cache.specificSliderTicksHit = [];
 				for (let j = 0; j < hitObject.slides; j++) {
 					let tempArray = [];
@@ -242,7 +244,7 @@ define(function(require) {
 		if (playDetails.mods.auto) {
 			if (index === 0) {
 				if ((hitObject.cache.hasHitAtAll === false || hitObject.cache.hasHitAtAll === undefined) && hitObject.type[3] !== "1") {
-					mouse.changePosition((hitObjectMapped.x - mouse.position.x) / 8, (hitObjectMapped.y - mouse.position.y) / 8);
+					mouse.changePosition((hitObjectMapped.x - mouse.position.x) / 4, (hitObjectMapped.y - mouse.position.y) / 4);
 				}
 			}
 			if (hitObject.type[0] === "1" && useTime >= hitObject.time) {
@@ -295,7 +297,7 @@ define(function(require) {
 			hitObject.cache.sliderFollowCircleSize += (1 - hitObject.cache.sliderFollowCircleSize) / 8;
 			if (hitObject.cache.currentSlide < hitObject.slides) {
 				let sliderRepeat = false;
-				let time = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
+				let time = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * loadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
 				if (hitObject.cache.currentSlide % 2 === 0) {
 					hitObject.cache.sliderFollowCirclePosition = Math.floor(utils.map(useTime, hitObject.time + time * hitObject.cache.currentSlide, hitObject.time + time * (hitObject.cache.currentSlide + 1), 0, hitObject.cache.points.length - 1));
 					/* Prevent Index Errors */
@@ -484,7 +486,7 @@ define(function(require) {
 			hitObject.cache.velocity += (angleChange - hitObject.cache.velocity) / 32;
 			hitObject.cache.currentAngle += hitObject.cache.velocity * (useTime - previousTime);
 			hitObject.cache.spinAngle += hitObject.cache.velocity * (useTime - previousTime);
-			if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && Math.abs(hitObject.cache.velocity / (Math.PI)) >= Formulas.ODSpinner(loadedMaps[useBeatmapSet][useBeatmap].OverallDifficulty, playDetails.mods)) {
+			if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && Math.abs(hitObject.cache.velocity / (Math.PI)) >= Formulas.ODSpinner(loadedMap.OverallDifficulty, playDetails.mods)) {
 				hitObject.cache.timeSpentAboveSpinnerMinimum += useTime - previousTime;
 			}
 			if (hitObject.cache.timeSpentAboveSpinnerMinimum >= (hitObject.endTime - hitObject.time) * 0.25) {
@@ -790,8 +792,8 @@ define(function(require) {
 			}
 		}
 		/* only start draining health 2 seconds before the first hit object*/
-		if (useTime > loadedMaps[useBeatmapSet][useBeatmap].hitObjects[0].time - 2) {
-			currentHP -= Formulas.HPDrain(loadedMaps[useBeatmapSet][useBeatmap].HPDrainRate, useTime - previousTime);
+		if (useTime > loadedMap.hitObjects[0].time - 2) {
+			currentHP -= Formulas.HPDrain(loadedMap.HPDrainRate, useTime - previousTime);
 		}
 		hpDisplay += (currentHP - hpDisplay) / 8;
 	}
@@ -847,18 +849,18 @@ define(function(require) {
 			combo = 0;
 			document.getElementById("combo-container").innerHTML = "";
 		}
-		currentHP += Formulas.HP(loadedMaps[useBeatmapSet][useBeatmap].HPDrainRate, hitEvents[0].score, hitEvents[0].type, playDetails.mods);
+		currentHP += Formulas.HP(loadedMap.HPDrainRate, hitEvents[0].score, hitEvents[0].type, playDetails.mods);
 		hitEvents.splice(0, 1);
 	}
 
 	function nextHitObject() {
 		/* create copy not reference, otherwise retrying wouldn't work*/
-		hitObjects.push(JSON.parse(JSON.stringify(loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject])));
+		hitObjects.push(JSON.parse(JSON.stringify(loadedMap.hitObjects[currentHitObject])));
 		/* second bit flag determines new combo */
-		if (loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject].type[2] === "1") {
+		if (loadedMap.hitObjects[currentHitObject].type[2] === "1") {
 			currentComboNumber = 1;
 			currentComboColour++;
-			if (currentComboColour > loadedMaps[useBeatmapSet][useBeatmap].comboColours.length - 1) {
+			if (currentComboColour > loadedMap.comboColours.length - 1) {
 				currentComboColour = 0;
 			}
 		}
@@ -867,7 +869,7 @@ define(function(require) {
 
 	function nextTimingPoint() {
 		currentTimingPoint++;
-		if (loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].uninherited === 1) {
+		if (loadedMap.timingPoints[currentTimingPoint].uninherited === 1) {
 			timingPointUninheritedIndex = currentTimingPoint;
 		}
 	}
@@ -952,14 +954,14 @@ define(function(require) {
 					useTime *= 0.75;
 				}
 			}
-			if (currentHitObject >= loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length) {
+			if (currentHitObject >= loadedMap.hitObjects.length) {
 				let endingTime;
-				let lastHitObject = loadedMaps[useBeatmapSet][useBeatmap].hitObjects[loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length - 1];
+				let lastHitObject = loadedMap.hitObjects[loadedMap.hitObjects.length - 1];
 				if (lastHitObject.type[0] === "1") {
 					endingTime = lastHitObject.time + 2;
 				}
 				if (lastHitObject.type[1] === "1") {
-					let sliderOnceTime = Math.abs(lastHitObject.length) / (Formulas.sliderMultiplier(loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint].beatLength) * 100) * loadedMaps[useBeatmapSet][useBeatmap].timingPoints[timingPointUninheritedIndex].beatLength;
+					let sliderOnceTime = Math.abs(lastHitObject.length) / (Formulas.sliderMultiplier(loadedMap.timingPoints[currentTimingPoint].beatLength) * 100) * loadedMap.timingPoints[timingPointUninheritedIndex].beatLength;
 					let sliderTotalTime = sliderOnceTime * lastHitObject.slides;
 					endingTime = lastHitObject.time + sliderTotalTime + 2;
 				}
@@ -979,10 +981,10 @@ define(function(require) {
 					let date = new Date();
 					playDetails.datePlayed = utils.formatDate(date.getDate(), date.getMonth(), date.getFullYear(), date.getHours(), date.getMinutes());
 					playDetails.unstableRate = utils.standardDeviation(hitErrors) * 1000 * 10;
-					playDetails.mapName = loadedMaps[useBeatmapSet][useBeatmap].Title;
-					playDetails.mapperName = loadedMaps[useBeatmapSet][useBeatmap].Creator;
-					playDetails.artist = loadedMaps[useBeatmapSet][useBeatmap].Artist;
-					playDetails.difficultyName = loadedMaps[useBeatmapSet][useBeatmap].Version;
+					playDetails.mapName = loadedMap.Title;
+					playDetails.mapperName = loadedMap.Creator;
+					playDetails.artist = loadedMap.Artist;
+					playDetails.difficultyName = loadedMap.Version;
 					endScreen.displayResults(playDetails);
 					isRunning = false;
 				}
@@ -993,11 +995,11 @@ define(function(require) {
 			while (hitEvents.length > 0) {
 				processHitEvent(useTime);
 			}
-			while (currentHitObject < loadedMaps[useBeatmapSet][useBeatmap].hitObjects.length && useTime >= loadedMaps[useBeatmapSet][useBeatmap].hitObjects[currentHitObject].time - arTime) {
+			while (currentHitObject < loadedMap.hitObjects.length && useTime >= loadedMap.hitObjects[currentHitObject].time - arTime) {
 				nextHitObject();
 			}
 			/* +1 because the given time is beginning time, not end time */
-			while (currentTimingPoint < loadedMaps[useBeatmapSet][useBeatmap].timingPoints.length - 1 && useTime >= loadedMaps[useBeatmapSet][useBeatmap].timingPoints[currentTimingPoint + 1].time) {
+			while (currentTimingPoint < loadedMap.timingPoints.length - 1 && useTime >= loadedMap.timingPoints[currentTimingPoint + 1].time) {
 				nextTimingPoint();
 			}
 			/* Cache Loop */
@@ -1070,6 +1072,7 @@ define(function(require) {
 		playMap: function(groupIndex, mapIndex, mods) {
 			useBeatmapSet = groupIndex;
 			useBeatmap = mapIndex;
+			loadedMap = loadedMaps[useBeatmapSet][useBeatmap];
 			playDetails = PlayDetails(mods);
 			currentHitObject = 0;
 			hitEvents = [];
@@ -1110,7 +1113,7 @@ define(function(require) {
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
 				let objectStore = databaseManager.getObjectStore(database, "audio", "readonly");
-				let request = objectStore.get(loadedMaps[useBeatmapSet][useBeatmap].BeatmapSetID + loadedMaps[useBeatmapSet][useBeatmap].AudioFilename);
+				let request = objectStore.get(loadedMap.Creator + loadedMap.Title + loadedMap.AudioFilename);
 				request.addEventListener("error", function(event) {
 					console.error(`Attempt to find query failed: ${event.target.error}`);
 				})
@@ -1131,20 +1134,20 @@ define(function(require) {
 				audio.playbackRate = 0.75;
 			}
 			/* Beatmap difficulty data */
-			arTime = Formulas.AR(loadedMaps[useBeatmapSet][useBeatmap].ApproachRate, playDetails.mods);
-			arFadeIn = Formulas.ARFadeIn(loadedMaps[useBeatmapSet][useBeatmap].ApproachRate, playDetails.mods);
+			arTime = Formulas.AR(loadedMap.ApproachRate, playDetails.mods);
+			arFadeIn = Formulas.ARFadeIn(loadedMap.ApproachRate, playDetails.mods);
 			/* Map from osu!pixels to screen pixels */
-			circleDiameter = utils.map(Formulas.CS(loadedMaps[useBeatmapSet][useBeatmap].CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * playfieldSize * (4 / 3));
-			difficultyMultiplier = Formulas.difficultyPoints(loadedMaps[useBeatmapSet][useBeatmap].CircleSize, loadedMaps[useBeatmapSet][useBeatmap].HPDrainRate, loadedMaps[useBeatmapSet][useBeatmap].OverallDifficulty);
-			odTime = Formulas.ODHitWindow(loadedMaps[useBeatmapSet][useBeatmap].OverallDifficulty, playDetails.mods);
+			circleDiameter = utils.map(Formulas.CS(loadedMap.CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * playfieldSize * (4 / 3));
+			difficultyMultiplier = Formulas.difficultyPoints(loadedMap.CircleSize, loadedMap.HPDrainRate, loadedMap.OverallDifficulty);
+			odTime = Formulas.ODHitWindow(loadedMap.OverallDifficulty, playDetails.mods);
 			mouse.lockPointer();
 			isRunning = true;
 			hitCircleComboBuffers = [];
 			approachCircleComboBuffers = [];
 			let hitCircleRgbks = canvas.generateRGBKs(Assets.hitCircle);
 			let approachCircleRgbks = canvas.generateRGBKs(Assets.approachCircle);
-			for (let i = 0; i < loadedMaps[useBeatmapSet][useBeatmap].comboColours.length; i++) {
-				let comboColours = loadedMaps[useBeatmapSet][useBeatmap].comboColours[i];
+			for (let i = 0; i < loadedMap.comboColours.length; i++) {
+				let comboColours = loadedMap.comboColours[i];
 				hitCircleComboBuffers.push(canvas.generateTintImage(Assets.hitCircle, hitCircleRgbks, comboColours.r, comboColours.g, comboColours.b, circleDiameter, circleDiameter));
 				approachCircleComboBuffers.push(canvas.generateTintImage(Assets.approachCircle, approachCircleRgbks, comboColours.r, comboColours.g, comboColours.b));
 			}
@@ -1154,6 +1157,9 @@ define(function(require) {
 		},
 		isRunning: function() {
 			return isRunning;
+		},
+		updateMaps: function() {
+			loadMaps();
 		}
 	};
 });
