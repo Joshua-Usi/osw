@@ -239,7 +239,7 @@ define(function(require) {
 			menuAudio.play();
 			isFirstClick = false;
 			(function animate() {
-				if (document.getElementById("webpage-state-menu").style.display === "block" || document.getElementById("webpage-state-menu").style.display === "") {
+				if ((document.getElementById("webpage-state-gameplay").style.display === "none" || document.getElementById("webpage-state-gameplay").style.display === "")) {
 					/* triangle background moves */
 					let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
 					offset -= 0.5;
@@ -393,7 +393,7 @@ define(function(require) {
 		}
 	});
 	window.addEventListener("mousemove", function(mouse) {
-		if (Options.UserInterface.menuParallax === true && (document.getElementById("webpage-state-menu").style.display === "block" || document.getElementById("webpage-state-menu").style.display === "")) {
+		if (Options.UserInterface.menuParallax === true && (document.getElementById("webpage-state-gameplay").style.display === "none" || document.getElementById("webpage-state-gameplay").style.display === "")) {
 			let backgroundImageParallax = document.getElementById("background-blur");
 			let menuParallax = document.getElementById("menu-parallax");
 			backgroundImageParallax.style.top = (mouse.y - window.innerHeight * 0.5) / 128 - window.innerHeight * 0.05 + "px";

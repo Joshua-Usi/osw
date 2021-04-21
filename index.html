@@ -284,7 +284,7 @@
 			</div>
 		</div>
 		<div id="bottom-bar">
-			<div style="display:inline-block; width: 15vw;">
+			<div style="display:inline-block; width: 15vw; float: left;">
 				<div id="back-button">
 					<div id="back-button-anti-skew">
 						<div id="back-button-image-container">
@@ -294,20 +294,28 @@
 					</div>
 				</div>
 			</div>
-			<div style="display:inline-block; width: 15vw;">
+			<div style="width: 15vw;" class="buttons-container">
 				<input type="file" name="upload-beatmap" id="upload-beatmap" style="display: none;"/>
-				<div id="upload-beatmap-ui" onclick="document.getElementById('upload-beatmap').click()">
-					<p id="upload-beatmap-ui-text">upload a beatmap</p>
+				<div onclick="document.getElementById('upload-beatmap').click()">
+					<div id="back-button-anti-skew">
+						<p class="buttons-container-text">Upload a beatmap</p>
+					</div>
 				</div>
 			</div>
-			<div style="display:inline-block; width: 15vw;">
-				<p>Mods</p>
+			<div style="width: 10vw;" class="buttons-container">
+				<div id="back-button-anti-skew">
+						<p class="buttons-container-text">Mods</p>
+					</div>
 			</div>
-			<div style="display:inline-block; width: 15vw;">
-				<p>Random</p>
+			<div style="width: 10vw;" class="buttons-container">
+				<div id="back-button-anti-skew">
+						<p class="buttons-container-text">Random</p>
+					</div>
 			</div>
-			<div style="display:inline-block; width: 15vw;">
-				<p>Options</p>
+			<div style="width: 10vw;" class="buttons-container">
+				<div id="back-button-anti-skew">
+						<p class="buttons-container-text">Options</p>
+					</div>
 			</div>
 		</div>
 		<div class="webpage-state" id="webpage-state-beatmap-selection">
