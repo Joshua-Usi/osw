@@ -37,10 +37,6 @@ define(function(require) {
 		direction: function(x1, y1, x2, y2) {
 			return Math.atan2(x1 - x2, y1 - y2);
 		},
-		blurDiv: function(element, value) {
-			let blur = document.getElementById(element);
-			blur.style.filter = "blur(" + value + "px)";
-		},
 		brighten: function(element, value) {
 			let dim = document.getElementById(element);
 			dim.style.filter = "brightness(" + value + ")";

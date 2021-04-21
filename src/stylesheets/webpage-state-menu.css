@@ -1,7 +1,7 @@
 #audio-visualiser {
 	z-index: 5;
 	position: absolute;
-	transition: left 0.5s, top 0.5s, width 0.5s, height 0.5s;
+	transition: left 0.25s, top 0.25s, width 0.25s, height 0.25s;
 	transition-timing-function: ease;
 }
 
@@ -131,11 +131,16 @@
 
 #menu-right-side {
 	position: absolute;
-	left: 39vw;
+	left: 38vw;
 }
 
 #menu-bar-play {
+	width: 12.5vw !important;
 	background-color: #6644cc;
+}
+
+#menu-bar-play:hover {
+	width: 20vw !important;
 }
 
 #menu-bar-edit {
@@ -151,7 +156,8 @@
 }
 
 #menu-bar-settings {
-	left: 20vw;
+	left: 17.5vw;
+	width: 15vw;
 	background-color: #555555;
 }
 
@@ -161,6 +167,7 @@
 
 #menu-bar-settings:hover {
 	left: 12.5vw;
+	width: 20vw;
 }
 
 #left-beat {

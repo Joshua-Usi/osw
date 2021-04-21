@@ -15,10 +15,11 @@ define(function(require) {
 	let fullyCompletedLoading = false;
 
 	let database = indexedDB.open("osw-database", 1);
-	database.addEventListener("upgradeneeded", function() {
+	database.addEventListener("upgradeneeded", function(event) {
 		console.log("A new version of the database exists and will need to be updated");
 		let db = event.target.result;
 		// existing db version
+		console.log(event.oldVersion);
 		switch (event.oldVersion) {
 			case 0:
 				db.createObjectStore("beatmaps", {

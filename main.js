@@ -52,6 +52,7 @@ define(function(require) {
 		classes[i].textContent = version;
 	}
 	let loadedNewMaps = false;
+	let database = indexedDB.open("osw-database", 1);
 	function loadMaps() {
 		document.getElementById("beatmap-selection-right").innerHTML = "";
 		if (Beatmaps.allMapsLoaded() === true) {
@@ -156,7 +157,7 @@ define(function(require) {
 	let audioAnalyserDataPreviousSum = 0;
 	let audioAnalyserDataSum = 0;
 	let beatThreshold = 0.02;
-	let beatNumber = 0;
+	let framesSinceLastBeat = 0;
 	let volumeThreshold = 20000;
 	let beat = 0;
 	let lastBeat = 0;
@@ -284,7 +285,7 @@ define(function(require) {
 						logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
 						logo.style.backgroundSize = logoSize + "vh";
 						logo.style.filter = "brightness(1.25)";
-						if (beatNumber % 2 === 0) {
+						if (framesSinceLastBeat % 2 === 0) {
 							let leftBeat = document.getElementById("left-beat");
 							leftBeat.style.transition = "opacity 0.05s";
 							leftBeat.style.opacity = "1";
@@ -293,7 +294,7 @@ define(function(require) {
 							rightBeat.style.transition = "opacity 0.05s";
 							rightBeat.style.opacity = "1";
 						}
-						beatNumber++;
+						framesSinceLastBeat++;
 						/* snow only in december, maximum 50 to prevent lag */
 						/* last tested:
 						 *	
@@ -305,7 +306,7 @@ define(function(require) {
 							snowflake.src = "./src/images/snowflake.png";
 							snowflake.style.position = "fixed";
 							snowflake.style.width = Math.random() * 2 + 1 + "vh";
-							snowflake.style.top = -10 + "vh";
+							snowflake.style.top = "-10vh";
 							snowflake.style.left = Math.random() * 100 + "vw";
 							snowflake.style.opacity = 0.4;
 							snowflake.style.zIndex = -5;
@@ -313,7 +314,7 @@ define(function(require) {
 						}
 					}
 					if (beat === 3) {
-						logo.style.transition = "width 0.5s, top 0.5s, left 0.5s, background-size 0.5s, filter 0.5s";
+						logo.style.transition = "width 0.25s, top 0.25s, left 0.25s, background-size 0.25s, filter 0.25s";
 						logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
 						logo.style.width = logoSize * logoSizeIncrease + "vh";
 						logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
@@ -435,14 +436,10 @@ define(function(require) {
 	});
 	/* Top bar event listeners */
 	document.getElementById("top-bar").addEventListener("mouseenter", function() {
-		utils.blurDiv("background-blur", 2);
-		utils.brighten("background-dim", 0.75);
-		utils.blurDiv("menu-parallax", 4);
+		utils.brighten("background-dim", 0.5);
 	});
 	document.getElementById("top-bar").addEventListener("mouseleave", function() {
-		utils.blurDiv("background-blur", 0);
 		utils.brighten("background-dim", 1);
-		utils.blurDiv("menu-parallax", 0);
 	});
 	document.getElementById("pause").addEventListener("click", function() {
 		let menuAudio = document.getElementById("menu-audio");
@@ -458,7 +455,7 @@ define(function(require) {
 	AttachAudio(document.getElementById("close-btn"), "click", "./src/audio/effects/back-button-click.wav", "settings-master-volume", "settings-effects-volume");
 	document.getElementById("close-btn").addEventListener("click", function() {
 		document.getElementById("sidenav").style.width = "0";
-		document.getElementById("sidenav").style.opacity = "0.2";
+		document.getElementById("sidenav").style.opacity = 0.2;
 	});
 	document.getElementById("settings-icon").addEventListener("click", function() {
 		document.getElementById("menu-bar-settings").dispatchEvent(new CustomEvent("click"));
@@ -540,7 +537,7 @@ define(function(require) {
 			}
 			selectBoxSelections.style.height = "auto";
 			selectBoxSelections.style.cacheHeight = parseFloat(document.defaultView.getComputedStyle(selectBoxSelections).height) / window.innerHeight * 100;
-			selectBoxSelections.style.height = "0px";
+			selectBoxSelections.style.height = 0;
 			selectBoxes[i].addEventListener("click", function() {
 				let selectBoxSelections = this.getElementsByClassName("select-box-selections")[0];
 				if (selectBoxSelections.style.height === "0px" || selectBoxSelections.style.height === "") {
@@ -556,7 +553,7 @@ define(function(require) {
 	/* Specific menu bar button listeners */
 	document.getElementById("menu-bar-settings").addEventListener("click", function() {
 		document.getElementById("sidenav").style.width = "25vw";
-		document.getElementById("sidenav").style.opacity = "1";
+		document.getElementById("sidenav").style.opacity = 1;
 	});
 	document.getElementById("menu-bar-exit").addEventListener("click", function() {
 		setTimeout(function() {
@@ -575,8 +572,8 @@ define(function(require) {
 			}
 		}
 		reduceVolume();
-		document.getElementById("goodbye").style.zIndex = "10000";
-		document.getElementById("goodbye").style.opacity = "1";
+		document.getElementById("goodbye").style.zIndex = 10000;
+		document.getElementById("goodbye").style.opacity = 1;
 	});
 	/* Specific checkbox listeners */
 	document.getElementById("settings-show-fps").addEventListener("input", function() {
@@ -665,8 +662,8 @@ define(function(require) {
 		menuBar.style.opacity = 1;
 		let menuBarButtons = document.getElementsByClassName("menu-bar-buttons-parent");
 		for (let i = 0; i < menuBarButtons.length; i++) {
-			menuBarButtons[i].style.paddingTop = 5 + "vh";
-			menuBarButtons[i].style.paddingBottom = 5 + "vh";
+			menuBarButtons[i].style.paddingTop = "5vh";
+			menuBarButtons[i].style.paddingBottom = "5vh";
 		}
 		menuBar.style.top = "calc(50vh - 5vh * 1.5)";
 		clearTimeout(menuTimeout);
@@ -692,7 +689,6 @@ define(function(require) {
 	});
 	/* Helper */
 	let menuTimeout;
-
 	function resetMenu() {
 		beat = 3;
 		logoX = 50;
