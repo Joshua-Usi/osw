@@ -46,7 +46,7 @@ define(function(require) {
 	}
 	/* osw! version incremented manually */
 	/* Set element version numbers */
-	const version = "osw! 0.6.0b";
+	const version = "osw! 0.6.2b";
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].textContent = version;
