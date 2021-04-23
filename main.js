@@ -257,7 +257,11 @@ define(function(require) {
 					audioAnalyserDataSum = 0;
 					audioAnalyserDataSum = utils.sum(audioAnalyserData, audioAnalyserData.length / 8);
 					ctx.clearRect(0, 0, audioVisualiser.width, audioVisualiser.height);
-					ctx.lineWidth = 7;
+					if (logoSize === 70) {
+						ctx.lineWidth = 7;
+					} else {
+						ctx.lineWidth = 3;
+					}
 					ctx.beginPath();
 					ctx.strokeStyle = "#fff5";
 					let length = audioAnalyserData.length * (2 / 3);

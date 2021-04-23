@@ -31,13 +31,25 @@ define(function(require) {
 	return {
 		AR: function(n, mods) {
 			n = applyModMultiplier(n, mods);
-			let ar;
 			if (n < 5) {
-				ar = 1.2 + 0.6 * (5 - n) / 5;
+				return 1.2 + 0.6 * (5 - n) / 5;
 			} else if (n === 5) {
-				ar = 1.2;
+				return 1.2;
 			} else if (n > 5) {
-				ar = 1.2 - 0.75 * (n - 5) / 5;
+				return 1.2 - 0.75 * (n - 5) / 5;
+			}
+		},
+		msToAR: function(n) {
+			let ar;
+			if (n > 1.2) {
+				ar = -(5 * (n - 1.2)) / 0.6 + 5;
+			} else if (n === 1.2) {
+				ar = 5;
+			} else if (n < 1.2) {
+				ar = -(5 * (n - 1.2)) / 0.75 + 5;
+			}
+			if (ar > -Number.EPSILON * 10 && ar < Number.EPSILON * 10) {
+				ar = 0;
 			}
 			return ar;
 		},

@@ -164,15 +164,14 @@ img {
 	width: 20vw;
 	height: 6vh;
 	color: #e4ecef;
-	background: #2225;
 	transform: skew(-10deg);
+	transition: border-top 0.2s ease;
 }
-
 .buttons-container-text {
 	text-align: center;
 	position: relative;
 	height: 6vh;
-	bottom: calc(1em / 4);
+	bottom: calc(1em / 1.5);
 }
 
 #bottom-bar {
@@ -183,4 +182,44 @@ img {
 	width: 100vw;
 	z-index: 1000;
 	display: none;
+}
+
+#bottom-bar-upload {
+	box-sizing: border-box;
+	border-top: 0.5vh solid #ff842677;
+}
+
+#bottom-bar-upload:hover {
+	border-top: 1.5vh solid #ff8426;
+}
+
+#bottom-bar-mods {
+	box-sizing: border-box;
+	border-top: 0.5vh solid #ffcb2077;
+}
+
+#bottom-bar-mods:hover {
+	border-top: 1.5vh solid #ffcb20;
+}
+
+#bottom-bar-random {
+	box-sizing: border-box;
+	border-top: 0.5vh solid #89b20277;	
+}
+
+#bottom-bar-random:hover {
+	border-top: 1.5vh solid #89b202;
+}
+
+#bottom-bar-options {
+	box-sizing: border-box;
+	border-top: 0.5vh solid #66ccff77;
+}
+
+#bottom-bar-options:hover {
+	border-top: 1.5vh solid #66ccff;
+}
+
+#bottom-bar-options:hover #bottom-bar-effect {
+	background: #66ccff;
 }

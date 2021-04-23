@@ -43,7 +43,7 @@ define(function(require) {
 		function checkComplete() {
 			if (returns.complete && fullyCompletedLoading === false) {
 				for (let i = 0; i < returns.values.length; i++) {
-					let parsedMap = Parser.parseBeatMap(returns.values[i].data);
+					let parsedMap = Parser.parseBeatMap(returns.values[i].data, true);
 					if (i === 0) {
 						previous = parsedMap.Creator + parsedMap.Title;
 					}

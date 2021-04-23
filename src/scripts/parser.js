@@ -3,11 +3,11 @@ define(function(require) {
 	const HitObject = require("./hitObjects.js");
 	const utils = require("./utils.js");
 	return {
-		parseBeatMap: function(data) {
+		parseBeatMap: function(data, fastParse) {
+			if (fastParse === undefined) {
+				fastParse = false;
+			}
 			let splited = data.split("\n");
-			// if (splited[0] !== "osu file format v14") {
-			// console.warn("Currently parsed beatmap uses \"" + splited[0] + "\" which may be incompatible with the current parser");
-			// }
 			let beatmap = {
 				version: splited[0],
 				hitObjects: [],
@@ -26,15 +26,21 @@ define(function(require) {
 					continue;
 				}
 				if (section === "[TimingPoints]" && /[,]/g.test(splited[i])) {
-					beatmap.timingPoints.push(this.parseTimingPoint(splited[i]));
+					if (fastParse === false) {
+						beatmap.timingPoints.push(this.parseTimingPoint(splited[i]));
+					}
 					continue;
 				}
 				if (section === "[HitObjects]" && /[,]/g.test(splited[i])) {
-					beatmap.hitObjects.push(this.parseHitObject(splited[i]));
+					if (fastParse === false) {
+						beatmap.hitObjects.push(this.parseHitObject(splited[i]));
+					}
 					continue;
 				}
 				if (section === "[Colours]" && /(Combo)/g.test(splited[i])) {
-					beatmap.comboColours.push(this.parseComboColour(splited[i]));
+					if (fastParse === false) {
+						beatmap.comboColours.push(this.parseComboColour(splited[i]));
+					}
 					continue;
 				}
 				let l = splited[i].split(/:(.+)/);
@@ -57,7 +63,7 @@ define(function(require) {
 					beatmap[l[0]] = parseFloat(l[1]);
 				}
 			}
-			if (beatmap.comboColours.length === 0) {
+			if (beatmap.comboColours.length === 0 && fastParse === false) {
 				beatmap.comboColours = this.defaultComboColours();
 			}
 			return beatmap;
