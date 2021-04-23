@@ -19,7 +19,6 @@ define(function(require) {
 		console.log("A new version of the database exists and will need to be updated");
 		let db = event.target.result;
 		// existing db version
-		console.log(event.oldVersion);
 		switch (event.oldVersion) {
 			case 0:
 				db.createObjectStore("beatmaps", {
@@ -43,7 +42,7 @@ define(function(require) {
 		function checkComplete() {
 			if (returns.complete && fullyCompletedLoading === false) {
 				for (let i = 0; i < returns.values.length; i++) {
-					let parsedMap = Parser.parseBeatMap(returns.values[i].data, true);
+					let parsedMap = Parser.parseBeatMap(returns.values[i].data);
 					if (i === 0) {
 						previous = parsedMap.Creator + parsedMap.Title;
 					}

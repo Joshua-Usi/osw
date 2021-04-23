@@ -1,16 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Beatmap end screen</title>
+	<title>star rating tests</title>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Varela Round">
 	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-	<input type="file" name="zip" id="beatmap">
-	<audio id="audio"></audio>
-	<p id="d"></p>
+	<table>
+		<tr>
+			<th>Map Name</th>
+			<th>osu! aim rating</th>
+			<th>osu! speed rating</th>
+			<th>osu! star rating</th>
+			<th>osw! aim rating</th>
+			<th>osw! speed rating</th>
+			<th>osw! star rating</th>
+			<th>difference</th>
+		</tr>
+	</table>
 
-	<script type="text/javascript" src="jszip.js"></script>
-	<script type="text/javascript" src="main.js"></script>
+	<script data-main="main" type="text/javascript" src="../require.js"></script>
 </body>
 </html>

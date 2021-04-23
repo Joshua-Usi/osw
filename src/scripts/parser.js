@@ -32,9 +32,7 @@ define(function(require) {
 					continue;
 				}
 				if (section === "[HitObjects]" && /[,]/g.test(splited[i])) {
-					if (fastParse === false) {
-						beatmap.hitObjects.push(this.parseHitObject(splited[i]));
-					}
+					beatmap.hitObjects.push(this.parseHitObject(splited[i]));
 					continue;
 				}
 				if (section === "[Colours]" && /(Combo)/g.test(splited[i])) {
