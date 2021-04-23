@@ -1,5 +1,6 @@
 define(function(require) {
 	let utils = require("./utils.js");
+	let Mods = require("./mods.js");
 
 	function difficulty(hitObject1, hitObject2, previous, mods) {
 		let distanceBetweenObjects = 0;
@@ -39,7 +40,9 @@ define(function(require) {
 	return {
 		version: 1,
 		calculate: function(beatmap, mods) {
-
+			if (mods === undefined) {
+				mods = Mods();
+			}
 			let highest = 0;
 			let highestIndex = 0;
 			let starRatingSum = 0;
@@ -48,17 +51,9 @@ define(function(require) {
 				return 0;
 			}
 			for (let i = 1; i < beatmap.hitObjects.length - 1; i++) {
-				try {
-					if (beatmap.hitObjects[i].type[3] === "1" || 
-						beatmap.hitObjects[i + 1].type[3] === "1") {
-						continue;
-					}
-				} catch (e) {
-					console.log(`${i}:${beatmap.hitObjects.length}`);
-					console.log(beatmap.hitObjects[i]);
-					console.log(beatmap.hitObjects[i + 1]);
-					console.log(beatmap);
-					throw e;
+				if (beatmap.hitObjects[i].type[3] === "1" || 
+					beatmap.hitObjects[i + 1].type[3] === "1") {
+					continue;
 				}
 				let diff = difficulty(beatmap.hitObjects[i], beatmap.hitObjects[i + 1], beatmap.hitObjects[i - 1], mods);
 				if (diff > highest) {
