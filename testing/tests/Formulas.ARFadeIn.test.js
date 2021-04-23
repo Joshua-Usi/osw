@@ -1,9 +1,5 @@
-define(function(require) {
-	let Test = require("../test.js");
-	let Formulas = require("../../src/scripts/Formulas.js");
-	/* dependencies */
-	let Mods = require("../../src/scripts/Mods.js");
-	Test.table(Formulas.AR, [
+define(["../testLib.js", "../../src/scripts/Formulas.js", "../../src/scripts/Mods.js"], function(Test, Formulas, Mods) {
+	Test.table(Formulas.ARFadeIn, [
 		-1,
 		0,
 		1,
@@ -23,23 +19,23 @@ define(function(require) {
 		[5, Mods(false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false)],
 		[10, Mods(false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false)],
 	], [
-		1.92,
-		1.8,
-		1.68,
-		1.56,
-		1.44,
-		1.32,
+		1.28,
 		1.2,
-		1.05,
-		0.9,
-		0.75,
+		1.12,
+		1.04,
+		0.96,
+		0.88,
+		0.8,
+		0.7,
 		0.6,
-		0.45,
+		0.5,
+		0.4,
 		0.3,
-		Formulas.AR(0),
-		Formulas.AR(5),
-		Formulas.AR(0),
-		Formulas.AR(7),
-		Formulas.AR(10),
+		0.2,
+		Formulas.ARFadeIn(0),
+		Formulas.ARFadeIn(5),
+		Formulas.ARFadeIn(0),
+		Formulas.ARFadeIn(7),
+		Formulas.ARFadeIn(10),
 	]);
 });

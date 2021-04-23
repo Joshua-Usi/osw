@@ -1,8 +1,4 @@
-define(function(require) {
-	let Test = require("../test.js");
-	let Formulas = require("../../src/scripts/Formulas.js");
-	/* dependencies */
-	let Mods = require("../../src/scripts/Mods.js");
+define(["../testLib.js", "../../src/scripts/Formulas.js", "../../src/scripts/Mods.js"], function(Test, Formulas, Mods) {
 	Test.table(Formulas.modScoreMultiplier, [
 		[Mods(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)],
 		[Mods(true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false)],

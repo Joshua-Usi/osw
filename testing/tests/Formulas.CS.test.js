@@ -1,9 +1,5 @@
-define(function(require) {
-	let Test = require("../test.js");
-	let Formulas = require("../../src/scripts/Formulas.js");
-	/* dependencies */
-	let Mods = require("../../src/scripts/Mods.js");
-	Test.table(Formulas.ARFadeIn, [
+define(["../testLib.js", "../../src/scripts/Formulas.js", "../../src/scripts/Mods.js"], function(Test, Formulas, Mods) {
+	Test.table(Formulas.CS, [
 		-1,
 		0,
 		1,
@@ -23,23 +19,23 @@ define(function(require) {
 		[5, Mods(false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false)],
 		[10, Mods(false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false)],
 	], [
-		1.28,
-		1.2,
-		1.12,
-		1.04,
-		0.96,
-		0.88,
-		0.8,
-		0.7,
-		0.6,
-		0.5,
-		0.4,
-		0.3,
-		0.2,
-		Formulas.ARFadeIn(0),
-		Formulas.ARFadeIn(5),
-		Formulas.ARFadeIn(0),
-		Formulas.ARFadeIn(7),
-		Formulas.ARFadeIn(10),
+		54.4 - 4.48 * -1,
+		54.4 - 4.48 * 0,
+		54.4 - 4.48 * 1,
+		54.4 - 4.48 * 2,
+		54.4 - 4.48 * 3,
+		54.4 - 4.48 * 4,
+		54.4 - 4.48 * 5,
+		54.4 - 4.48 * 6,
+		54.4 - 4.48 * 7,
+		54.4 - 4.48 * 8,
+		54.4 - 4.48 * 9,
+		54.4 - 4.48 * 10,
+		54.4 - 4.48 * 11,
+		Formulas.CS(0),
+		Formulas.CS(5),
+		Formulas.CS(0),
+		Formulas.CS(6.5),
+		Formulas.CS(10),
 	]);
 });

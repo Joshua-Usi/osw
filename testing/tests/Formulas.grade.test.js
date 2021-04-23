@@ -1,6 +1,4 @@
-define(function(require) {
-	let Test = require("../test.js");
-	let Formulas = require("../../src/scripts/Formulas.js");
+define(["../testLib.js", "../../src/scripts/Formulas.js"], function(Test, Formulas) {
 	/* dependencies */
 	Test.table(Formulas.grade, [
 		[0, 0, 0, 0, false],

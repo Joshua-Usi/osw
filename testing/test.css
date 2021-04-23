@@ -7,3 +7,7 @@ table, tr, th, td {
 	overflow-x: auto;
 	white-space: nowrap;
 }
+
+h1, p {
+	font-family: Varela Round, Helvetica;
+}

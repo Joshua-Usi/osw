@@ -1,7 +1,7 @@
 define(function(require) {
-	const Parser = require("../src/scripts/parser.js");
-	const starRating = require("../src/scripts/starRating.js");
-	const databaseManager = require("../src/scripts/databaseManager.js");
+	const Parser = require("../../src/scripts/parser.js");
+	const starRating = require("../../src/scripts/starRating.js");
+	const databaseManager = require("../../src/scripts/databaseManager.js");
 
 	let returns = {
 		values: [],

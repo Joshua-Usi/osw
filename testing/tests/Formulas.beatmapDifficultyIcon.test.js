@@ -1,7 +1,4 @@
-define(function(require) {
-	let Test = require("../test.js");
-	let Formulas = require("../../src/scripts/Formulas.js");
-	/* dependencies */
+define(["../testLib.js", "../../src/scripts/Formulas.js"], function(Test, Formulas) {
 	Test.table(Formulas.beatmapDifficultyIcon, [
 		-1,
 		0,

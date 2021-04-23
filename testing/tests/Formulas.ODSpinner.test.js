@@ -1,9 +1,5 @@
-define(function(require) {
-	let Test = require("../test.js");
-	let Formulas = require("../../src/scripts/Formulas.js");
-	/* dependencies */
-	let Mods = require("../../src/scripts/Mods.js");
-	Test.table(Formulas.CS, [
+define(["../testLib.js", "../../src/scripts/Formulas.js", "../../src/scripts/Mods.js"], function(Test, Formulas, Mods) {
+	Test.table(Formulas.ODSpinner, [
 		-1,
 		0,
 		1,
@@ -22,24 +18,24 @@ define(function(require) {
 		[0, Mods(false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false)],
 		[5, Mods(false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false)],
 		[10, Mods(false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false)],
-	], [
-		54.4 - 4.48 * -1,
-		54.4 - 4.48 * 0,
-		54.4 - 4.48 * 1,
-		54.4 - 4.48 * 2,
-		54.4 - 4.48 * 3,
-		54.4 - 4.48 * 4,
-		54.4 - 4.48 * 5,
-		54.4 - 4.48 * 6,
-		54.4 - 4.48 * 7,
-		54.4 - 4.48 * 8,
-		54.4 - 4.48 * 9,
-		54.4 - 4.48 * 10,
-		54.4 - 4.48 * 11,
-		Formulas.CS(0),
-		Formulas.CS(5),
-		Formulas.CS(0),
-		Formulas.CS(6.5),
-		Formulas.CS(10),
+		], [
+		2.6,
+		3,
+		3.4,
+		3.8,
+		4.2,
+		4.6,
+		5,
+		5.5,
+		6,
+		6.5,
+		7,
+		7.5,
+		8,
+		Formulas.ODSpinner(0),
+		Formulas.ODSpinner(5),
+		Formulas.ODSpinner(0),
+		Formulas.ODSpinner(7),
+		Formulas.ODSpinner(10),
 	]);
 });
