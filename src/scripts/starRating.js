@@ -2,14 +2,16 @@ define(function(require) {
 	let utils = require("./utils.js");
 	let Mods = require("./mods.js");
 
-	/* star rating constants */
-	let aimWeightMultiplier = 1.1;
-	let speedWeightMultiplier = 1;
+	/* Star rating constants */
+	let aimWeightMultiplier = 1.25 * 0.35;
+	let speedWeightMultiplier = 1.1;
 
+	/* Longer sliders are considered harder by the algorithm */
 	function sliderDifficulty(slider) {
-		return slider.length / 750 + 1;
+		return slider.length / 500 + 0.75;
 	}
 
+	/* Consider CS for difficulties */
 	function CSDifficulty(CS, mods) {
 		let newCS = CS;
 		if (mods.easy) {
@@ -20,22 +22,24 @@ define(function(require) {
 				newCS = 10;
 			}
 		}
-		return Math.E ** (0.1 * newCS);
+		return 1.5 * Math.E ** (0.05 * newCS) - 5 / 6;
 	}
 
+	function gaussianDistribution(x, a, b, c) {
+		return c / (a * Math.sqrt(2 * Math.PI)) * Math.E ** (-1 * (x - b) ** 2 / (2 * a ** 2));
+	}
+
+	/* 
+	 *	Jumps that are larger are considered more impreesive
+	 *	i.e one large jump is more impresssive than two half sized jumps
+	 *
+	 *	Sliders are also weighted slightly differently
+	*/
 	function aimDifficultyMultiplier(distance, hitObject) {
 		if (hitObject.type[1] === "1") {
-			// if (distance <= 480) {
-				return Math.E ** (Math.E * 0.00525 * distance)
-			// } else {
-				// return Math.log(distance - 470) * 280 + 664;
-			// }
+			return 1.75 * Math.E ** (Math.E * 0.0035 * distance) * (gaussianDistribution(distance, 200, -110, 8400) + 1) - 10;
 		} else {
-			// if (distance <= 480) {
-				return Math.E ** (Math.E * 0.005 * distance)
-			// } else {
-				// return Math.log(distance - 470) * 280 + 400;
-			// }
+			return 1.5 * Math.E ** (Math.E * 0.004 * distance) * (gaussianDistribution(distance, 200, -110, 8400) + 1) - 10;
 		}
 	}
 
@@ -46,9 +50,7 @@ define(function(require) {
 		}
 		let distanceBetweenObjects = 0;
 		let sliderLengthBonus = 1;
-		let aimDiff = 0.00525;
 		if (hitObject.type[1] === "1") {
-			aimDiff = 0.005;
 			sliderLengthBonus = sliderDifficulty(hitObject);
 			if (hitObject.type[1].slides % 2 === 1) {
 				distanceBetweenObjects = utils.dist(previousHitObject.curvePoints[previousHitObject.curvePoints.length - 1].x, previousHitObject.curvePoints[previousHitObject.curvePoints.length - 1].y, hitObject.x, hitObject.y);
@@ -67,14 +69,14 @@ define(function(require) {
 			angleBetweenHitobjects = 0;
 		}
 		let angleDifficulty = -((angleBetweenHitobjects - Math.PI) ** 2) / (Math.PI ** (Math.E / 1.05)) + 1;
-		return aimDifficultyMultiplier(distanceBetweenObjects, hitObject) * 0.1 * angleDifficulty * sliderLengthBonus * CSDifficulty(circleSize, mods);
+		return aimDifficultyMultiplier(distanceBetweenObjects, hitObject) * 0.15 * angleDifficulty * sliderLengthBonus * CSDifficulty(circleSize, mods);
 	}
 
 	function speedDifficulty(hitObject, previousHitObject, mods) {
 		let time = Math.abs(hitObject.time - previousHitObject.time);
-		let multiplier = 0.55;
+		let multiplier = 0.5;
 		if (hitObject.type[1] === "1") {
-			multiplier = 0.5;
+			multiplier = 0.45;
 		}
 		if (time < 1 / 60) {
 			time = 1 / 60;
@@ -84,7 +86,7 @@ define(function(require) {
 		} else if (mods.halfTime) {
 			time /= 0.75
 		}
-		return multiplier / time;
+		return multiplier / (time + 0.05);
 	}
 
 	return {
@@ -112,7 +114,7 @@ define(function(require) {
 					highest = difficulty;
 				}
 			}
-			return (sum / (beatmap.hitObjects.length - 1) + highest / 100) * aimWeightMultiplier;
+			return (sum / (beatmap.hitObjects.length - 1) + highest / 150) * aimWeightMultiplier;
 		},
 		calculateSpeedDifficulty: function(beatmap, mods) {
 			if (mods === undefined) {
@@ -137,7 +139,7 @@ define(function(require) {
 				}
 				numberOfConsideredHitObjects++;
 			}
-			return (sum / numberOfConsideredHitObjects + highest / 100) * speedWeightMultiplier;
+			return (sum / numberOfConsideredHitObjects + highest / 150) * speedWeightMultiplier;
 		},
 	}
 });
