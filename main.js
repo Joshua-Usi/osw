@@ -46,7 +46,7 @@ define(function(require) {
 	}
 	/* osw! version incremented manually */
 	/* Set element version numbers */
-	const version = "osw! 0.6.2b";
+	const version = "osw! 0.6.3b";
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].textContent = version;
@@ -154,6 +154,8 @@ define(function(require) {
 	source.connect(analyser);
 	source.connect(audioCtx.destination);
 	let audioAnalyserData = new Uint8Array(analyser.frequencyBinCount);
+	let visualiserData = [];
+	let n = 0;
 	let audioAnalyserDataPreviousSum = 0;
 	let audioAnalyserDataSum = 0;
 	let beatThreshold = 0.02;
@@ -162,8 +164,8 @@ define(function(require) {
 	let beat = 0;
 	let lastBeat = 0;
 	let lastBeatThreshold = 0.05;
-	let logoSizeIncrease = 1.1;
-	/* Create audioVisualiser for audio visualizer */
+	let logoSizeIncrease = 1.05;
+	/* Create audioVisualiser for audio visualiser */
 	let audioVisualiser = document.getElementById("audio-visualiser");
 	let ctx = audioVisualiser.getContext("2d");
 	let settingsSet = false;
@@ -263,14 +265,29 @@ define(function(require) {
 						ctx.lineWidth = 3;
 					}
 					ctx.beginPath();
-					ctx.strokeStyle = "#fff5";
-					let length = audioAnalyserData.length * (2 / 3);
+					ctx.strokeStyle = "#fff2";
+					let length = 512;
+					if (visualiserData.length === 0) {
+						visualiserData = [];
+						for (let i = 0; i < length; i++) {
+							visualiserData.push(0);
+						}
+					}
+					for (let i = 0; i < length; i += 4) {
+						let l = (i * 5 + n) % length;
+						if (visualiserData[i] < audioAnalyserData[l]) {
+							visualiserData[i] += audioAnalyserData[l] / 8 * (255 / (l + 64) - 0.25);
+						} else {
+							visualiserData[i] *= 0.98;
+						}
+					}
+					n += 16;
 					for (let i = 0; i < length; i += 4) {
 						/* do not render visualiser lines that are too short*/
-						if (audioAnalyserData[i] < 80) {
+						if (visualiserData[i] < 80) {
 							continue;
 						}
-						let mag = audioAnalyserData[i] ** 1.5 / (255 ** 0.55) + 100;
+						let mag = (visualiserData[i] ** 1.5 / (255 ** 0.6) + 100);
 						let angle = utils.map(i, 0, length, Math.PI, 3 * Math.PI);
 						/* optimised rendering by not rendering parts of lines that are unseen */
 						ctx.moveTo(audioVisualiser.width / 2 + Math.sin(angle) * audioVisualiser.width / 4, audioVisualiser.height / 2 + Math.cos(angle) * audioVisualiser.height / 4);
@@ -576,6 +593,9 @@ define(function(require) {
 			}
 		}
 		reduceVolume();
+		resetMenu();
+		document.getElementById("logo").style.background = "none";
+		document.getElementById("logo").style.backgroundColor = "#000";
 		document.getElementById("goodbye").style.zIndex = 10000;
 		document.getElementById("goodbye").style.opacity = 1;
 	});
