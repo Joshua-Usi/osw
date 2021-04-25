@@ -135,7 +135,8 @@ define(function(require) {
 		logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
 		logo.style.backgroundSize = logoSize + "vh";
 		logo.style.filter = "brightness(1.25)";
-		if (loudness > 90000 * (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100)) {
+		console.log(loudness);
+		if (loudness > 5000 * (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100)) {
 			if (beatNumber % 2 === 0 || beatNumber % 4 === 0) {
 				let leftBeat = document.getElementById("left-beat");
 				leftBeat.style.transition = "opacity 0.05s";
