@@ -109,43 +109,34 @@ define(function(require) {
 			return points;
 		},
 		circumcircle: function(a, b, c) {
-			a = a;
-			b = b;
-			c = c;
-			let EPSILON = 1.0 / 1048576.0;
-			let ax = a.x,
-				ay = a.y,
-				bx = b.x,
-				by = b.y,
-				cx = c.x,
-				cy = c.y,
-				fabsy1y2 = Math.abs(ay - by),
-				fabsy2y3 = Math.abs(by - cy),
-				xc, yc, m1, m2, mx1, mx2, my1, my2, dx, dy;
+			let EPSILON = 1 / 1048576;
+			let fabsy1y2 = Math.abs(a.y - b.y);
+			let fabsy2y3 = Math.abs(b.y - c.y);
+			let xc, yc, m1, m2, mx1, mx2, my1, my2, dx, dy;
 			if (fabsy1y2 < EPSILON) {
-				m2 = -((cx - bx) / (cy - by));
-				mx2 = (bx + cx) / 2.0;
-				my2 = (by + cy) / 2.0;
-				xc = (bx + ax) / 2.0;
+				m2 = -((c.x - b.x) / (c.y - b.y));
+				mx2 = (b.x + c.x) / 2;
+				my2 = (b.y + c.y) / 2;
+				xc = (b.x + a.x) / 2;
 				yc = m2 * (xc - mx2) + my2;
 			} else if (fabsy2y3 < EPSILON) {
-				m1 = -((bx - ax) / (by - ay));
-				mx1 = (ax + bx) / 2.0;
-				my1 = (ay + by) / 2.0;
-				xc = (cx + bx) / 2.0;
+				m1 = -((b.x - a.x) / (b.y - a.y));
+				mx1 = (a.x + b.x) / 2;
+				my1 = (a.y + b.y) / 2;
+				xc = (c.x + b.x) / 2;
 				yc = m1 * (xc - mx1) + my1;
 			} else {
-				m1 = -((bx - ax) / (by - ay));
-				m2 = -((cx - bx) / (cy - by));
-				mx1 = (ax + bx) / 2.0;
-				mx2 = (bx + cx) / 2.0;
-				my1 = (ay + by) / 2.0;
-				my2 = (by + cy) / 2.0;
+				m1 = -((b.x - a.x) / (b.y - a.y));
+				m2 = -((c.x - b.x) / (c.y - b.y));
+				mx1 = (a.x + b.x) / 2;
+				mx2 = (b.x + c.x) / 2;
+				my1 = (a.y + b.y) / 2;
+				my2 = (b.y + c.y) / 2;
 				xc = (m1 * mx1 - m2 * mx2 + my2 - my1) / (m1 - m2);
 				yc = (fabsy1y2 > fabsy2y3) ? m1 * (xc - mx1) + my1 : m2 * (xc - mx2) + my2;
 			}
-			dx = bx - xc;
-			dy = by - yc;
+			dx = b.x - xc;
+			dy = b.y - yc;
 			return {
 				x: xc,
 				y: yc,

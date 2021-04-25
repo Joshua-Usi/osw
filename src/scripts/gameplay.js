@@ -8,7 +8,6 @@ define(function(require) {
 	const Bezier = require("./bezier.js");
 	const utils = require("./utils.js");
 	const HitObject = require("./hitObjects.js");
-	const HitEvent = require("./hitEvent.js");
 	const Assets = require("./gameplayAssets.js");
 	const Canvas = require("./canvas.js");
 	const skin = require("./defaultSkin.js");
@@ -22,7 +21,7 @@ define(function(require) {
 		} else {
 			setTimeout(loadMaps, 250);
 		}
-	};
+	}
 	loadMaps();
 	let useBeatmapSet;
 	let useBeatmap;
@@ -282,11 +281,11 @@ define(function(require) {
 				hitErrors.push(useTime - hitObject.time);
 				hitObject.cache.hasHit = true;
 				hitObject.cache.hitTime = useTime;
-				hitEvents.push(new HitEvent("hit-circle", hitWindowScore, "increasing", hitObjectMapped.x, hitObjectMapped.y));
+				hitEvents.push(new HitObject.Event("hit-circle", hitWindowScore, "increasing", hitObjectMapped.x, hitObjectMapped.y));
 				effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObject.cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
 				effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
 			} else {
-				hitEvents.push(new HitEvent("hit-circle", 0, "reset", hitObjectMapped.x, hitObjectMapped.y));
+				hitEvents.push(new HitObject.Event("hit-circle", 0, "reset", hitObjectMapped.x, hitObjectMapped.y));
 			}
 			hitObjects.splice(index, 1);
 			hasSpliced = true;
@@ -309,27 +308,6 @@ define(function(require) {
 						hitObject.cache.sliderFollowCirclePosition = hitObject.cache.points.length - 1;
 						sliderRepeat = true;
 					}
-					/* Check if slider follow circle went over slider ticks */
-					for (let j = 0; j < hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide].length; j++) {
-						if (hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] === false && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
-							let mapped = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].x, hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							if (utils.dist(mapped.x, mapped.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * followCircleSize / 2 && hitObject.cache.onFollowCircle) {
-								hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] = true;
-								hitObject.cache.sliderTicksHit++;
-								hitObject.cache.sliderFollowCircleSize += 0.125;
-								hitEvents.push(new HitEvent("slider-tick", 10, "increasing", mapped.x, mapped.y));
-							}
-						}
-					}
-					let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-					if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * followCircleSize / 2 && hitObject.cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
-						hitObject.cache.onFollowCircle = true;
-					} else if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter / 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
-						hitObject.cache.onFollowCircle = true;
-					} else {
-						hitObject.cache.onFollowCircle = false;
-					}
 				} else if (hitObject.cache.currentSlide % 2 === 1) {
 					hitObject.cache.sliderFollowCirclePosition = Math.floor(utils.map(useTime, hitObject.time + time * hitObject.cache.currentSlide, hitObject.time + time * (hitObject.cache.currentSlide + 1), hitObject.cache.points.length - 1, 0));
 					/* Prevent Index Errors */
@@ -341,28 +319,27 @@ define(function(require) {
 						hitObject.cache.sliderFollowCirclePosition = 0;
 						sliderRepeat = true;
 					}
-					/* Check if slider follow circle went over slider ticks */
-					for (let j = 0; j < hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide].length; j++) {
-						if (hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] === false && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
-							let mapped = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].x, hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-							if (utils.dist(mapped.x, mapped.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * followCircleSize / 2 && hitObject.cache.onFollowCircle) {
-								hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] = true;
-								hitObject.cache.sliderTicksHit++;
-								hitObject.cache.sliderFollowCircleSize += 0.125;
-								hitEvents.push(new HitEvent("slider-tick", 10, "increasing", mapped.x, mapped.y));
-							}
+				}
+				/* Check if slider follow circle went over slider ticks */
+				for (let j = 0; j < hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide].length; j++) {
+					if (hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] === false && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+						let mapped = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].x, hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+						let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+						if (utils.dist(mapped.x, mapped.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * followCircleSize / 2 && hitObject.cache.onFollowCircle) {
+							hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] = true;
+							hitObject.cache.sliderTicksHit++;
+							hitObject.cache.sliderFollowCircleSize += 0.125;
+							hitEvents.push(new HitObject.Event("slider-tick", 10, "increasing", mapped.x, mapped.y));
 						}
 					}
-					let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-					if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * followCircleSize / 2 && hitObject.cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
-						hitObject.cache.onFollowCircle = true;
-					} else if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter / 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
-						hitObject.cache.onFollowCircle = true;
-
-					} else {
-						hitObject.cache.onFollowCircle = false;
-					}
+				}
+				let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+				if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * followCircleSize / 2 && hitObject.cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+					hitObject.cache.onFollowCircle = true;
+				} else if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter / 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+					hitObject.cache.onFollowCircle = true;
+				} else {
+					hitObject.cache.onFollowCircle = false;
 				}
 				if (sliderRepeat) {
 					hitObject.cache.currentSlide++;
@@ -370,11 +347,11 @@ define(function(require) {
 						let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 						if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * followCircleSize / 2 && hitObject.cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 							hitObject.cache.repeatsHit++;
-							hitEvents.push(new HitEvent("slider-element", 30, "increasing", sliderFollowCirclePos.x));
+							hitEvents.push(new HitObject.Event("slider-element", 30, "increasing", sliderFollowCirclePos.x));
 							effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObject.cache.comboColour], sliderFollowCirclePos.x, sliderFollowCirclePos.y, useTime, useTime + 0.2));
 							effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, sliderFollowCirclePos.x, sliderFollowCirclePos.y, useTime, useTime + 0.2));
 						} else if (hitObject.cache.currentSlide < hitObject.slides) {
-							hitEvents.push(new HitEvent("slider-element-miss", 0, "reset", sliderFollowCirclePos.x, sliderFollowCirclePos.y));
+							hitEvents.push(new HitObject.Event("slider-element-miss", 0, "reset", sliderFollowCirclePos.x, sliderFollowCirclePos.y));
 						}
 					}
 				}
@@ -402,7 +379,7 @@ define(function(require) {
 				keyboardRightReleased = false;
 			}
 			hitErrors.push(useTime - hitObject.time);
-			hitEvents.push(new HitEvent("slider-element", 30, "increasing", hitObjectMapped.x, hitObjectMapped.y));
+			hitEvents.push(new HitObject.Event("slider-element", 30, "increasing", hitObjectMapped.x, hitObjectMapped.y));
 			effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObject.cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
 			effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
 			hitObject.cache.hitHead = true;
@@ -451,11 +428,11 @@ define(function(require) {
 				hitScore = 50;
 			}
 			if (hitScore !== 0) {
-				hitEvents.push(new HitEvent("hit-circle", hitScore, "increasing", mapped.x, mapped.y));
+				hitEvents.push(new HitObject.Event("hit-circle", hitScore, "increasing", mapped.x, mapped.y));
 				effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObject.cache.comboColour], mapped.x, mapped.y, useTime, useTime + 0.2));
 				effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, mapped.x, mapped.y, useTime, useTime + 0.2));
 			} else {
-				hitEvents.push(new HitEvent("hit-circle", 0, "reset", mapped.x, mapped.y));
+				hitEvents.push(new HitObject.Event("hit-circle", 0, "reset", mapped.x, mapped.y));
 			}
 			hitObjects.splice(index, 1);
 			hasSpliced = true;
@@ -476,7 +453,7 @@ define(function(require) {
 			}
 		}
 		if (miss) {
-			hitEvents.push(new HitEvent("hit-circle", 0, "reset", mapped.x, mapped.y));
+			hitEvents.push(new HitObject.Event("hit-circle", 0, "reset", mapped.x, mapped.y));
 			hitObjects.splice(index, 1);
 			hasSpliced = true;
 			return hasSpliced;
@@ -496,18 +473,18 @@ define(function(require) {
 				hitObject.cache.spins++;
 				hitObject.cache.spinAngle -= Math.PI * 2;
 				if (hitObject.cache.cleared === false) {
-					hitEvents.push(new HitEvent("spinner-spin", 100, "no-increase", mapped.x, mapped.y));
+					hitEvents.push(new HitObject.Event("spinner-spin", 100, "no-increase", mapped.x, mapped.y));
 				} else {
-					hitEvents.push(new HitEvent("spinner-bonus-spin", 1000, "no-increase", mapped.x, mapped.y));
+					hitEvents.push(new HitObject.Event("spinner-bonus-spin", 1000, "no-increase", mapped.x, mapped.y));
 				}
 			}
 			while (hitObject.cache.spinAngle <= -Math.PI * 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 				hitObject.cache.spins++;
 				hitObject.cache.spinAngle += Math.PI * 2;
 				if (hitObject.cache.cleared === false) {
-					hitEvents.push(new HitEvent("spinner-spin", 100, "no-increase", mapped.x, mapped.y));
+					hitEvents.push(new HitObject.Event("spinner-spin", 100, "no-increase", mapped.x, mapped.y));
 				} else {
-					hitEvents.push(new HitEvent("spinner-bonus-spin", 1000, "no-increase", mapped.x, mapped.y));
+					hitEvents.push(new HitObject.Event("spinner-bonus-spin", 1000, "no-increase", mapped.x, mapped.y));
 				}
 			}
 		}
@@ -515,13 +492,13 @@ define(function(require) {
 		if (hitObject.type[3] === "1" && useTime >= hitObject.endTime) {
 			let mapped = utils.mapToOsuPixels(256, 192, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 			if (hitObject.cache.cleared) {
-				hitEvents.push(new HitEvent("hit-circle", 300, "increasing", mapped.x, mapped.y));
+				hitEvents.push(new HitObject.Event("hit-circle", 300, "increasing", mapped.x, mapped.y));
 			} else if (hitObject.cache.timeSpentAboveSpinnerMinimum >= (hitObject.endTime - hitObject.time) * 0.25 * 0.75) {
-				hitEvents.push(new HitEvent("hit-circle", 100, "increasing", mapped.x, mapped.y));
+				hitEvents.push(new HitObject.Event("hit-circle", 100, "increasing", mapped.x, mapped.y));
 			} else if (hitObject.cache.timeSpentAboveSpinnerMinimum >= (hitObject.endTime - hitObject.time) * 0.25 * 0.25) {
-				hitEvents.push(new HitEvent("hit-circle", 50, "increasing", mapped.x, mapped.y));
+				hitEvents.push(new HitObject.Event("hit-circle", 50, "increasing", mapped.x, mapped.y));
 			} else if (hitObject.cache.timeSpentAboveSpinnerMinimum < (hitObject.endTime - hitObject.time) * 0.25 * 0.25) {
-				hitEvents.push(new HitEvent("hit-circle", 0, "reset", mapped.x, mapped.y));
+				hitEvents.push(new HitObject.Event("hit-circle", 0, "reset", mapped.x, mapped.y));
 			}
 			hitObjects.splice(index, 1);
 			hasSpliced = true;
@@ -1116,7 +1093,7 @@ define(function(require) {
 				let request = objectStore.get(loadedMap.Creator + loadedMap.Title + loadedMap.AudioFilename);
 				request.addEventListener("error", function(event) {
 					console.error(`Attempt to find query failed: ${event.target.error}`);
-				})
+				});
 				request.addEventListener("success", function(event) {
 					let audioType;
 					if (event.target.result.name.includes(".mp3")) {

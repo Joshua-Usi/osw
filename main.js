@@ -24,7 +24,6 @@
 define(function(require) {
 	"use strict";
 	/* RequireJS Module Loading */
-	const Mouse = require("./src/scripts/mouse.js");
 	let Options = require("./src/scripts/options.js");
 	const AssetLoader = require("./src/scripts/assetLoader.js");
 	const utils = require("./src/scripts/utils.js");
@@ -45,14 +44,13 @@ define(function(require) {
 		console.warn("IndexedDB is not supported on your browser, this means you will be unable to save beatmaps");
 	}
 	/* osw! version incremented manually */
+	const version = "osw! 0.6.4b";
 	/* Set element version numbers */
-	const version = "osw! 0.6.3b";
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].textContent = version;
 	}
 	let loadedNewMaps = false;
-	let database = indexedDB.open("osw-database", 1);
 	function loadMaps() {
 		document.getElementById("beatmap-selection-right").innerHTML = "";
 		if (Beatmaps.allMapsLoaded() === true) {
@@ -88,7 +86,7 @@ define(function(require) {
 							let request = objectStore.get(that.getAttribute("data-audiosource"));
 							request.addEventListener("error", function(event) {
 								console.error(`Attempt to find query failed: ${event.target.error}`);
-							})
+							});
 							request.addEventListener("success", function(event) {
 								let audioType;
 								if (event.target.result.name.includes(".mp3")) {
@@ -126,7 +124,7 @@ define(function(require) {
 			/* every 250ms try and load maps from the server*/
 			setTimeout(loadMaps, 250);
 		}
-	};
+	}
 	loadMaps();
 
 	function logoBeat() {
@@ -187,17 +185,13 @@ define(function(require) {
 	}
 
 	/* Initial menu song pool */
-	let songs = ["cYsmix - Triangles.mp3", "nekodex - circles.mp3"];
+	let songs = ["cYsmix - Triangles.mp3", "nekodex - circles.mp3", "nekodex - aureole.mp3"];
 	let defaultSongsMs = [
 		375,
 		333,
 		429,
 
 	];
-	/* Only add christmas songs to list if the month is December */
-	if (new Date().getMonth() === 11) {
-		songs.push("nekodex - aureole.mp3");
-	}
 	let chosenSong;
 	let menuAudio = new Audio();
 	menuAudio.id = "menu-audio";
@@ -212,12 +206,16 @@ define(function(require) {
 	document.getElementById("body").appendChild(menuAudio);
 	let audioCtx = new AudioContext();
 	let analyser = audioCtx.createAnalyser();
-	analyser.fftSize = 2048;
+	analyser.fftSize = 128;
 	let source = audioCtx.createMediaElementSource(menuAudio);
 	source.connect(analyser);
 	source.connect(audioCtx.destination);
 	let audioAnalyserData = new Uint8Array(analyser.frequencyBinCount);
 	let visualiserData = [];
+	let analyserLength = 128;
+	for (let i = 0; i < analyserLength; i++) {
+		visualiserData.push(0);
+	}
 	let visualiserOffset = 0;
 	let beatNumber = 0;
 	let loudness = 0;
@@ -229,22 +227,15 @@ define(function(require) {
 	let settingsSet = false;
 	let isFirstClick = true;
 	let offset = 0;
-	/* States:
-	 * just-logo
-	 * first
-	 * play
-	 * settings
-	 */
 	let logoX = 50;
 	let logoY = 50;
 	let logoSize = 70;
-	let logoPulseSize = 75;
 	let audioVisualiserSize = 1.6;
 	/* Profiling variables */
 	let recordedFramesPerSecond = [];
 	/* Accumulators */
-	let time = Date.now();
-	let previousTime = time;
+	let time = 0;
+	let previousTime = 0;
 	let gameplayRenderAccumulator = new Accumulator(gameplay.render, 1000 / 60);
 	let logoBeatAccumulator;
 	let beatmapQueue = [];
@@ -301,6 +292,8 @@ define(function(require) {
 			menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 			menuAudio.play();
 			isFirstClick = false;
+			time = Date.now();
+			previousTime = time;
 			(function animate() {
 				if ((document.getElementById("webpage-state-gameplay").style.display === "none" || document.getElementById("webpage-state-gameplay").style.display === "")) {
 					/* triangle background moves */
@@ -316,37 +309,28 @@ define(function(require) {
 					analyser.getByteFrequencyData(audioAnalyserData); // passing our Uint audioAnalyserData array
 					audioAnalyserData = [...audioAnalyserData];
 					loudness = utils.sum(audioAnalyserData);
+					visualiserOffset += 16;
 					ctx.clearRect(0, 0, audioVisualiser.width, audioVisualiser.height);
 					if (logoSize === 70) {
-						ctx.lineWidth = 7;
+						ctx.lineWidth = window.innerWidth * 0.005;
 					} else {
-						ctx.lineWidth = 3;
+						ctx.lineWidth = window.innerWidth * 0.003;
 					}
 					ctx.beginPath();
 					ctx.strokeStyle = "#fff2";
-					let length = 512;
-					if (visualiserData.length === 0) {
-						visualiserData = [];
-						for (let i = 0; i < length; i++) {
-							visualiserData.push(0);
-						}
-					}
-					for (let i = 0; i < length; i += 4) {
-						let l = (i * 5 + visualiserOffset) % length;
+					for (let i = 0; i < analyserLength; i++) {
+						let l = (i * 4 * 5 + visualiserOffset) % (analyserLength * 4);
 						if (visualiserData[i] < audioAnalyserData[l]) {
 							visualiserData[i] += audioAnalyserData[l] / 8 * (255 / (l + 64) - 0.25);
 						} else {
 							visualiserData[i] *= 0.98;
 						}
-					}
-					visualiserOffset += 16;
-					for (let i = 0; i < length; i += 4) {
 						/* do not render visualiser lines that are too short*/
 						if (visualiserData[i] < 80) {
 							continue;
 						}
 						let mag = (visualiserData[i] ** 1.6 / (255 ** 0.7) + 100);
-						let angle = utils.map(i, 0, length, Math.PI, 3 * Math.PI);
+						let angle = utils.map(i, 0, analyserLength, Math.PI, 3 * Math.PI);
 						/* optimised rendering by not rendering parts of lines that are unseen */
 						ctx.moveTo(audioVisualiser.width / 2 + Math.sin(angle) * audioVisualiser.width / 4, audioVisualiser.height / 2 + Math.cos(angle) * audioVisualiser.height / 4);
 						ctx.lineTo(audioVisualiser.width / 2 + Math.sin(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2), audioVisualiser.height / 2 + Math.cos(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2));
@@ -431,10 +415,9 @@ define(function(require) {
 			menuParallax.style.top = "calc(5vh + " + ((mouse.y - window.innerHeight * 0.5) / 256 - window.innerHeight * 0.05) + "px)";
 			menuParallax.style.left = "calc(" + ((mouse.x - window.innerWidth * 0.5) / 256 - window.innerWidth * 0.05) + "px)";
 		}
-	})
+	});
 	/* Omnipotent web listeners */
 	window.addEventListener("resize", function() {
-		let audioVisualiser = document.getElementById("audio-visualiser");
 		audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		window.dispatchEvent(new CustomEvent("orientationchange"));
@@ -493,7 +476,6 @@ define(function(require) {
 	let buttons = document.getElementsByClassName("menu-bar-buttons-parent");
 	for (let i = 0; i < buttons.length; i++) {
 		let clickSrc = "";
-		let hoverSrc = "";
 		switch (buttons[i].id) {
 			case "menu-bar-settings":
 				clickSrc = "./src/audio/effects/menu-options-click.wav";
@@ -557,9 +539,12 @@ define(function(require) {
 				selections[j].addEventListener("click", function() {
 					let p = this.parentNode.querySelectorAll("p");
 					for (let k = 0; k < p.length; k++) {
-						p[k].setAttribute("class", "");
+						if (p[k] === this) {
+							p[k].setAttribute("class", "selected");
+						} else {
+							p[k].setAttribute("class", "");
+						}
 					}
-					this.setAttribute("class", "selected");
 					this.parentNode.parentNode.getElementsByClassName("select-box-selected")[0].textContent = this.textContent;
 					setSettings();
 				});
@@ -588,7 +573,6 @@ define(function(require) {
 		setTimeout(function() {
 			window.close();
 		}, 4000);
-
 		function reduceVolume() {
 			let volume = menuAudio.volume;
 			volume -= 0.05;
@@ -602,8 +586,8 @@ define(function(require) {
 		}
 		reduceVolume();
 		resetMenu();
-		document.getElementById("logo").style.background = "none";
-		document.getElementById("logo").style.backgroundColor = "#000";
+		logo.style.background = "none";
+		logo.style.backgroundColor = "#000";
 		document.getElementById("goodbye").style.zIndex = 10000;
 		document.getElementById("goodbye").style.opacity = 1;
 	});
@@ -664,7 +648,7 @@ define(function(require) {
 	document.getElementById("settings-button-clear-local-storage").addEventListener("click", function() {
 		if (window.confirm("Are you sure you want to delete local storage? you will lose all your set options")) {
 			window.localStorage.clear();
-			alert("local storage cleared, refresh for changes to take effect");
+			window.alert("local storage cleared, refresh for changes to take effect");
 		}
 	});
 	/* Splashscreen listener */
@@ -680,8 +664,6 @@ define(function(require) {
 		logoX = 30;
 		logoY = 50;
 		logoSize = 25;
-		logoPulseSize = 26;
-		let audioVisualiser = document.getElementById("audio-visualiser");
 		audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";
@@ -724,8 +706,6 @@ define(function(require) {
 		logoX = 50;
 		logoY = 50;
 		logoSize = 70;
-		logoPulseSize = 75;
-		let audioVisualiser = document.getElementById("audio-visualiser");
 		audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";
@@ -734,16 +714,13 @@ define(function(require) {
 		audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + (logoSize * audioVisualiserSize / 2) + "vh)";
 		let menuBar = document.getElementById("menu-bar");
 		menuBar.style.opacity = 0;
+		menuBar.style.top = "50vh";
+		menuBar.style.visibility = "hidden";
 		let menuBarButtons = document.getElementsByClassName("menu-bar-buttons-parent");
 		for (let i = 0; i < menuBarButtons.length; i++) {
 			menuBarButtons[i].style.paddingTop = 0;
 			menuBarButtons[i].style.paddingBottom = 0;
 		}
-		menuBar.style.top = "calc(50vh)";
-		setTimeout(function() {
-			let menuBar = document.getElementById("menu-bar");
-			menuBar.style.visibility = "hidden";
-		});
 	}
 
 	function setSettings() {
@@ -833,7 +810,6 @@ define(function(require) {
 		fileReader.addEventListener("load", function() {
 			let new_zip = new JSZip();
 			new_zip.loadAsync(event.target.result).then(function(zip) {
-				let numberOfValidFiles = 0;
 				let uniqueIdentifier;
 				for (let key in zip.files) {
 					if (key.includes(".mp3") || key.includes(".ogg")) {
@@ -843,7 +819,6 @@ define(function(require) {
 								name: uniqueIdentifier + key,
 								data: btoa(content)
 							});
-							numberOfValidFiles++;
 						});
 					} else if (key.includes(".osu")) {
 						zip.files[key].async("string").then(function(content) {
@@ -857,11 +832,7 @@ define(function(require) {
 								data: content
 							});
 						});
-						numberOfValidFiles++;
 					}
-				}
-				if (numberOfValidFiles === 0) {
-					console.warn("Invalid osu beatmap");
 				}
 			});
 		});

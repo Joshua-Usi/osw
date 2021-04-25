@@ -28,15 +28,22 @@ define(function(require) {
 	"use strict";
 
 	function distance(a, b) {
-		return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
+		return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
 	}
 	/** Computes factorial*/
-	function fact(k) {
+	let precomputedFactorials = [];
+	function precomputeFactorial(k) {
 		let total = 1;
 		for (let i = 2; i <= k; i++) {
 			total *= i;
 		}
 		return total;
+	}
+	for (var i = 0; i < 170; i++) {
+		precomputedFactorials.push(precomputeFactorial(i));
+	}
+	function factorial(k) {
+		return precomputedFactorials[k];
 	}
 	/**	Computes Bernstain
 	 *	@param {Integer} i - the i-th index
@@ -44,7 +51,7 @@ define(function(require) {
 	 *	@param {Number} t - the value of parameter t , between 0 and 1
 	 **/
 	function B(i, n, t) {
-		return fact(n) / (fact(i) * fact(n - i)) * Math.pow(t, i) * Math.pow(1 - t, n - i);
+		return factorial(n) / (factorial(i) * factorial(n - i)) * Math.pow(t, i) * Math.pow(1 - t, n - i);
 	}
 	/** Computes a point's coordinates for a value of t
 	 *	@param {Number} t - a value between o and 1
@@ -57,13 +64,14 @@ define(function(require) {
 		};
 		let n = points.length - 1;
 		for (let i = 0; i <= n; i++) {
-			r.x += points[i][0] * B(i, n, t);
-			r.y += points[i][1] * B(i, n, t);
+			r.x += points[i].x * B(i, n, t);
+			r.y += points[i].y * B(i, n, t);
 		}
 		return r;
 	}
-	/** Computes the drawing/support points for the Bezier curve*/
-	function computeSupportPoints(points, res) {
+	
+	/* Draws a N grade bezier curve from current point on the context */
+	return function bezier(points, res) {
 		/** Compute the incremental step*/
 		let tLength = 0;
 		for (let i = 0; i < points.length - 1; i++) {
@@ -76,18 +84,8 @@ define(function(require) {
 		// compute the support points
 		let temp = [];
 		for (let t = 0; t <= 1; t += step) {
-			let p = P(t, points);
-			temp.push(p);
+			temp.push(P(t, points));
 		}
 		return temp;
 	}
-	/* Draws a N grade bezier curve from current point on the context */
-	return function bezier(points, res) {
-		// transform initial arguments into an {x: n, y: n} of [x,y] coordinates
-		let initialPoints = [];
-		for (let i = 0; i < points.length; i++) {
-			initialPoints.push([points[i].x, points[i].y]);
-		}
-		return computeSupportPoints(initialPoints, res);
-	};
 });

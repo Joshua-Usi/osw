@@ -3,10 +3,7 @@ define(function(require) {
 	const HitObject = require("./hitObjects.js");
 	const utils = require("./utils.js");
 	return {
-		parseBeatMap: function(data, fastParse) {
-			if (fastParse === undefined) {
-				fastParse = false;
-			}
+		parseBeatMap: function(data) {
 			let splited = data.split("\n");
 			let beatmap = {
 				version: splited[0],
@@ -26,9 +23,7 @@ define(function(require) {
 					continue;
 				}
 				if (section === "[TimingPoints]" && /[,]/g.test(splited[i])) {
-					if (fastParse === false) {
-						beatmap.timingPoints.push(this.parseTimingPoint(splited[i]));
-					}
+					beatmap.timingPoints.push(this.parseTimingPoint(splited[i]));
 					continue;
 				}
 				if (section === "[HitObjects]" && /[,]/g.test(splited[i])) {
@@ -36,32 +31,30 @@ define(function(require) {
 					continue;
 				}
 				if (section === "[Colours]" && /(Combo)/g.test(splited[i])) {
-					if (fastParse === false) {
-						beatmap.comboColours.push(this.parseComboColour(splited[i]));
-					}
+					beatmap.comboColours.push(this.parseComboColour(splited[i]));
 					continue;
 				}
-				let l = splited[i].split(/:(.+)/);
-				if (l.length === 1) {
+				let keyValuePair = splited[i].split(/:(.+)/);
+				if (keyValuePair.length === 1) {
 					continue;
 				}
-				if (l[0] === "AudioFilename") {
-					if (l[1].substr(0, 1) === " ") {
-						l[1] = l[1].substr(1);
+				if (keyValuePair[0] === "AudioFilename") {
+					if (keyValuePair[1].substr(0, 1) === " ") {
+						keyValuePair[1] = keyValuePair[1].substr(1);
 					}
-					beatmap[l[0]] = l[1];
+					beatmap[keyValuePair[0]] = keyValuePair[1];
 					continue;
 				}
-				if (isNaN(parseFloat(l[1]))) {
-					if (l[1].substr(0, 1) === " ") {
-						l[1] = l[1].substr(1);
+				if (isNaN(parseFloat(keyValuePair[1]))) {
+					if (keyValuePair[1].substr(0, 1) === " ") {
+						keyValuePair[1] = keyValuePair[1].substr(1);
 					}
-					beatmap[l[0]] = l[1];
+					beatmap[keyValuePair[0]] = keyValuePair[1];
 				} else {
-					beatmap[l[0]] = parseFloat(l[1]);
+					beatmap[keyValuePair[0]] = parseFloat(keyValuePair[1]);
 				}
 			}
-			if (beatmap.comboColours.length === 0 && fastParse === false) {
+			if (beatmap.comboColours.length === 0) {
 				beatmap.comboColours = this.defaultComboColours();
 			}
 			return beatmap;

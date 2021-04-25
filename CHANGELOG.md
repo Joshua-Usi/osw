@@ -5,6 +5,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - new hexagon background
 - spiced audio visualiser effects
+- slight performance optimisations (main menu and slider generation)
+### Removed
+- hitEvents.js, now merged with hitObjects.js
 ---
 ## [v0.6.2] - 2021-04-24
 ### Changed
