@@ -128,18 +128,81 @@ define(function(require) {
 		}
 	};
 	loadMaps();
+
+	function logoBeat() {
+		/* logo pulse*/
+		logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.05s";
+		logo.style.width = logoSize + "vh";
+		logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
+		logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
+		logo.style.backgroundSize = logoSize + "vh";
+		logo.style.filter = "brightness(1.25)";
+		if (loudness > 90000 * (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100)) {
+			if (beatNumber % 2 === 0 || beatNumber % 4 === 0) {
+				let leftBeat = document.getElementById("left-beat");
+				leftBeat.style.transition = "opacity 0.05s";
+				leftBeat.style.opacity = "1";
+			}
+			if (beatNumber % 2 === 1 || beatNumber % 4 === 0) {
+				let rightBeat = document.getElementById("right-beat");
+				rightBeat.style.transition = "opacity 0.05s";
+				rightBeat.style.opacity = "1";
+			}
+		}
+		beatNumber++;
+		/* snow only in december, maximum 50 to prevent lag */
+		/* last tested:
+		 *	
+		 *	27/12/2020, works
+		 *	9/01/2021, works
+		 */
+		if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
+			let snowflake = document.createElement("img");
+			snowflake.src = "./src/images/snowflake.png";
+			snowflake.style.position = "fixed";
+			snowflake.style.width = Math.random() * 2 + 1 + "vh";
+			snowflake.style.top = "-10vh";
+			snowflake.style.left = Math.random() * 100 + "vw";
+			snowflake.style.opacity = 0.4;
+			snowflake.style.zIndex = -5;
+			document.getElementById("snow").appendChild(snowflake);
+		}
+		setTimeout(logoResetBeat, 4000 / 60);
+	}
+
+	function logoResetBeat() {
+		logo.style.transition = "width 0.25s, top 0.25s, left 0.25s, background-size 0.25s, filter 0.25s";
+		logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
+		logo.style.width = logoSize * logoSizeIncrease + "vh";
+		logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
+		logo.style.left = "calc(5vw + " + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
+		logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
+		logo.style.filter = "brightness(1)";
+		let leftBeat = document.getElementById("left-beat");
+		let rightBeat = document.getElementById("right-beat");
+		leftBeat.style.transition = "opacity 0.5s";
+		leftBeat.style.opacity = "0";
+		rightBeat.style.transition = "opacity 0.5s";
+		rightBeat.style.opacity = "0";
+	}
+
 	/* Initial menu song pool */
 	let songs = ["cYsmix - Triangles.mp3", "nekodex - circles.mp3"];
+	let defaultSongsMs = [
+		375,
+		333,
+		429,
+
+	];
 	/* Only add christmas songs to list if the month is December */
 	if (new Date().getMonth() === 11) {
 		songs.push("nekodex - aureole.mp3");
-		songs.push("nekodex - Little Drummer Girl.mp3");
 	}
 	let chosenSong;
 	let menuAudio = new Audio();
 	menuAudio.id = "menu-audio";
 	menuAudio.addEventListener("play", function() {
-		// document.getElementById("now-playing").textContent = "Now Playing: " + utils.removeInstances(this.src, [window.origin, "/src/audio/", ".wav", ".mp3", ".ogg"]).replaceAll("%20", " ");
+		beatNumber = 0;
 		audioCtx.resume();
 	});
 	menuAudio.addEventListener("ended", function() {
@@ -155,18 +218,13 @@ define(function(require) {
 	source.connect(audioCtx.destination);
 	let audioAnalyserData = new Uint8Array(analyser.frequencyBinCount);
 	let visualiserData = [];
-	let n = 0;
-	let audioAnalyserDataPreviousSum = 0;
-	let audioAnalyserDataSum = 0;
-	let beatThreshold = 0.02;
-	let framesSinceLastBeat = 0;
-	let volumeThreshold = 20000;
-	let beat = 0;
-	let lastBeat = 0;
-	let lastBeatThreshold = 0.05;
+	let visualiserOffset = 0;
+	let beatNumber = 0;
+	let loudness = 0;
 	let logoSizeIncrease = 1.05;
 	/* Create audioVisualiser for audio visualiser */
 	let audioVisualiser = document.getElementById("audio-visualiser");
+	let logo = document.getElementById("logo");
 	let ctx = audioVisualiser.getContext("2d");
 	let settingsSet = false;
 	let isFirstClick = true;
@@ -185,9 +243,10 @@ define(function(require) {
 	/* Profiling variables */
 	let recordedFramesPerSecond = [];
 	/* Accumulators */
-	let time = 0;
-	let previousTime = 0;
+	let time = Date.now();
+	let previousTime = time;
 	let gameplayRenderAccumulator = new Accumulator(gameplay.render, 1000 / 60);
+	let logoBeatAccumulator;
 	let beatmapQueue = [];
 	/* Event Listeners */
 	window.addEventListener("click", function() {
@@ -235,9 +294,10 @@ define(function(require) {
 				menuAudio.src = `src/audio/${songs[chosenSong]}`;
 			}
 			if (new Date().getMonth() === 11) {
-				chosenSong = utils.randomInt(2, 3);
+				chosenSong = 3;
 				menuAudio.src = `src/audio/${songs[chosenSong]}`;
 			}
+			logoBeatAccumulator = new Accumulator(logoBeat, defaultSongsMs[chosenSong]);
 			menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 			menuAudio.play();
 			isFirstClick = false;
@@ -255,9 +315,7 @@ define(function(require) {
 					audioAnalyserData = new Uint8Array(analyser.frequencyBinCount);
 					analyser.getByteFrequencyData(audioAnalyserData); // passing our Uint audioAnalyserData array
 					audioAnalyserData = [...audioAnalyserData];
-					audioAnalyserDataPreviousSum = audioAnalyserDataSum;
-					audioAnalyserDataSum = 0;
-					audioAnalyserDataSum = utils.sum(audioAnalyserData, audioAnalyserData.length / 8);
+					loudness = utils.sum(audioAnalyserData);
 					ctx.clearRect(0, 0, audioVisualiser.width, audioVisualiser.height);
 					if (logoSize === 70) {
 						ctx.lineWidth = 7;
@@ -274,82 +332,27 @@ define(function(require) {
 						}
 					}
 					for (let i = 0; i < length; i += 4) {
-						let l = (i * 5 + n) % length;
+						let l = (i * 5 + visualiserOffset) % length;
 						if (visualiserData[i] < audioAnalyserData[l]) {
 							visualiserData[i] += audioAnalyserData[l] / 8 * (255 / (l + 64) - 0.25);
 						} else {
 							visualiserData[i] *= 0.98;
 						}
 					}
-					n += 16;
+					visualiserOffset += 16;
 					for (let i = 0; i < length; i += 4) {
 						/* do not render visualiser lines that are too short*/
 						if (visualiserData[i] < 80) {
 							continue;
 						}
-						let mag = (visualiserData[i] ** 1.5 / (255 ** 0.6) + 100);
+						let mag = (visualiserData[i] ** 1.6 / (255 ** 0.7) + 100);
 						let angle = utils.map(i, 0, length, Math.PI, 3 * Math.PI);
 						/* optimised rendering by not rendering parts of lines that are unseen */
 						ctx.moveTo(audioVisualiser.width / 2 + Math.sin(angle) * audioVisualiser.width / 4, audioVisualiser.height / 2 + Math.cos(angle) * audioVisualiser.height / 4);
 						ctx.lineTo(audioVisualiser.width / 2 + Math.sin(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2), audioVisualiser.height / 2 + Math.cos(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2));
 					}
 					ctx.stroke();
-					let logo = document.getElementById("logo");
 					/* beat detection */
-					if (audioAnalyserDataSum - audioAnalyserDataPreviousSum > audioAnalyserDataSum * beatThreshold && audioAnalyserDataSum > volumeThreshold * (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100) && menuAudio.currentTime - lastBeat > lastBeatThreshold) {
-						beat = 0;
-						lastBeat = menuAudio.currentTime;
-						/* logo pulse*/
-						logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.05s";
-						logo.style.width = logoSize + "vh";
-						logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
-						logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
-						logo.style.backgroundSize = logoSize + "vh";
-						logo.style.filter = "brightness(1.25)";
-						if (framesSinceLastBeat % 2 === 0) {
-							let leftBeat = document.getElementById("left-beat");
-							leftBeat.style.transition = "opacity 0.05s";
-							leftBeat.style.opacity = "1";
-						} else {
-							let rightBeat = document.getElementById("right-beat");
-							rightBeat.style.transition = "opacity 0.05s";
-							rightBeat.style.opacity = "1";
-						}
-						framesSinceLastBeat++;
-						/* snow only in december, maximum 50 to prevent lag */
-						/* last tested:
-						 *	
-						 *	27/12/2020, works
-						 *	9/01/2021, works
-						 */
-						if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
-							let snowflake = document.createElement("img");
-							snowflake.src = "./src/images/snowflake.png";
-							snowflake.style.position = "fixed";
-							snowflake.style.width = Math.random() * 2 + 1 + "vh";
-							snowflake.style.top = "-10vh";
-							snowflake.style.left = Math.random() * 100 + "vw";
-							snowflake.style.opacity = 0.4;
-							snowflake.style.zIndex = -5;
-							document.getElementById("snow").appendChild(snowflake);
-						}
-					}
-					if (beat === 3) {
-						logo.style.transition = "width 0.25s, top 0.25s, left 0.25s, background-size 0.25s, filter 0.25s";
-						logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
-						logo.style.width = logoSize * logoSizeIncrease + "vh";
-						logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
-						logo.style.left = "calc(5vw + " + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
-						logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
-						logo.style.filter = "brightness(1)";
-						let leftBeat = document.getElementById("left-beat");
-						let rightBeat = document.getElementById("right-beat");
-						leftBeat.style.transition = "opacity 1s";
-						leftBeat.style.opacity = "0";
-						rightBeat.style.transition = "opacity 1s";
-						rightBeat.style.opacity = "0";
-					}
-					beat++;
 					if (new Date().getMonth() === 11) {
 						let snow = document.getElementById("snow").querySelectorAll("img");
 						for (let i = 0; i < snow.length; i++) {
@@ -394,6 +397,11 @@ define(function(require) {
 				if (gameplay.isRunning()) {
 					gameplay.tick();
 					gameplayRenderAccumulator.tick(time - previousTime);
+				}
+				if (logoBeatAccumulator && menuAudio.paused === false) {
+					logoBeatAccumulator.tick(time - previousTime);
+				} else {
+					logoResetBeat();
 				}
 				if (beatmapQueue.length > 0) {
 					Beatmaps.checkForNewMaps(beatmapQueue);
@@ -669,7 +677,6 @@ define(function(require) {
 	/* logo listener */
 	AttachAudio(document.getElementById("logo"), "click", "./src/audio/effects/menuHit.wav", "settings-master-volume", "settings-effects-volume");
 	document.getElementById("logo").addEventListener("click", function() {
-		beat = 3;
 		logoX = 30;
 		logoY = 50;
 		logoSize = 25;
@@ -714,7 +721,6 @@ define(function(require) {
 	/* Helper */
 	let menuTimeout;
 	function resetMenu() {
-		beat = 3;
 		logoX = 50;
 		logoY = 50;
 		logoSize = 70;
