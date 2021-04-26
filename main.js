@@ -82,20 +82,22 @@ define(function(require) {
 						let that = this;
 						database.addEventListener("success", function(event) {
 							let database = event.target.result;
-							let objectStore = databaseManager.getObjectStore(database, "audio", "readonly");
-							let request = objectStore.get(that.getAttribute("data-audiosource"));
-							request.addEventListener("error", function(event) {
+							let audioObjectStore = databaseManager.getObjectStore(database, "audio", "readonly");
+							let beatmapObjectStore = databaseManager.getObjectStore(database, "beatmaps", "readonly")
+							let audioRequest = audioObjectStore.get(that.getAttribute("data-audiosource"));
+							audioRequest.addEventListener("error", function(event) {
 								console.error(`Attempt to find query failed: ${event.target.error}`);
 							});
-							request.addEventListener("success", function(event) {
+							audioRequest.addEventListener("success", function(event) {
 								let audioType;
 								if (event.target.result.name.includes(".mp3")) {
 									audioType = "mp3";
 								} else if (event.target.result.name.includes(".ogg")) {
 									audioType = "ogg";
 								}
-								menuAudio.src = `data:audio/${audioType};base64,${event.target.result.data}`;
 								let first = that.parentNode.getElementsByClassName("beatmap-selection-group-pane-maps")[0].getElementsByClassName("beatmap-selection-map-pane")[0];
+								logoBeatAccumulator.milliseconds = loadedMaps[first.getAttribute("data-group-index")][first.getAttribute("data-map-index")].timingPoints[0].beatLength * 1000;
+								menuAudio.src = `data:audio/${audioType};base64,${event.target.result.data}`;
 								menuAudio.currentTime = loadedMaps[first.getAttribute("data-group-index")][first.getAttribute("data-map-index")].PreviewTime / 1000;
 								menuAudio.play();
 							});
@@ -117,6 +119,8 @@ define(function(require) {
 					document.getElementById("webpage-state-gameplay").style.display = "block";
 					document.getElementById("bottom-bar").style.display = "none";
 					document.getElementById("menu-audio").pause();
+					document.getElementById("sidenav").style.width = "0";
+					document.getElementById("sidenav").style.opacity = "0.2";
 					gameplay.playMap(this.getAttribute("data-group-index"), this.getAttribute("data-map-index"));
 				});
 			}
@@ -441,7 +445,7 @@ define(function(require) {
 		document.getElementById("heart-loader").style.display = "none";
 	});
 	window.addEventListener("blur", function() {
-		if (document.getElementById("webpage-state-gameplay").style.display === "block") {
+		if (document.getElementById("webpage-state-gameplay").style.display === "block" && document.getElementById("webpage-state-fail-screen").style.display === "none") {
 			document.getElementById("webpage-state-pause-screen").style.display = "block";
 			gameplay.pause();
 		}
@@ -496,8 +500,15 @@ define(function(require) {
 		AttachAudio(buttons[i], "click", clickSrc, "settings-master-volume", "settings-effects-volume");
 		AttachAudio(buttons[i], "mouseenter", "./src/audio/effects/menu-hover.wav", "settings-master-volume", "settings-effects-volume");
 		buttons[i].addEventListener("mouseenter", function() {
-			this.getElementsByClassName("menu-bar-buttons-icon")[0].classList.add("menu-bar-buttons-icon-animation");
-			this.getElementsByClassName("menu-bar-image-move")[0].classList.add("menu-bar-image-move-animation");
+			let icon = this.getElementsByClassName("menu-bar-buttons-icon")[0];
+			let image = this.getElementsByClassName("menu-bar-image-move")[0]
+			icon.classList.add("menu-bar-buttons-icon-animation");
+			image.classList.add("menu-bar-image-move-animation");
+			if (logoBeatAccumulator.milliseconds !== parseFloat(image.style.animationDuration)) {
+				console.log("change");
+				icon.style.animationDuration = logoBeatAccumulator.milliseconds * 4 + "ms";
+				image.style.animationDuration = logoBeatAccumulator.milliseconds + "ms";
+			}
 		});
 		buttons[i].addEventListener("mouseleave", function() {
 			this.getElementsByClassName("menu-bar-buttons-icon")[0].classList.remove("menu-bar-buttons-icon-animation");

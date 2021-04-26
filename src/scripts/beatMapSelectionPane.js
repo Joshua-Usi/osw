@@ -7,8 +7,9 @@ define(function(require) {
 			let mapsHTML = "";
 			let iconsHTML = "";
 			for (let j = 0; j < maps.length; j++) {
-				iconsHTML += `<img class="beatmap-selection-group-pane-difficulties-icon" src="./src/images/difficulty-icons/${Formulas.beatmapDifficultyIcon(starRating.calculate(maps[j]))}-difficulty.png">`
-				mapsHTML += this.map(maps[j], i, j);
+				let mapStarRating = starRating.calculate(maps[j]);
+				iconsHTML += `<img class="beatmap-selection-group-pane-difficulties-icon" src="./src/images/difficulty-icons/${Formulas.beatmapDifficultyIcon(mapStarRating)}-difficulty.png">`
+				mapsHTML += this.map(maps[j], i, j, mapStarRating);
 			}
 			return `<div class="beatmap-selection-group">
 					<div data-audiosource="${maps[0].Creator + maps[0].Title + maps[0].AudioFilename}" class="beatmap-selection-group-pane triangle-background">
@@ -26,8 +27,7 @@ define(function(require) {
 					</div>
 				</div>`;
 		},
-		map: function(beatmap, groupIndex, mapIndex) {
-			let mapStarRating = starRating.calculate(beatmap);
+		map: function(beatmap, groupIndex, mapIndex, mapStarRating) {
 			let stars = "";
 			if (mapStarRating <= 10) {
 				for (var i = 0; i < 10; i++) {

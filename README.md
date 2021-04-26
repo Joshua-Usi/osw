@@ -6,3 +6,13 @@
  Currently in heavy development
 
  Accessible via https://joshua-usi.github.io/osw
+
+ ### TODO:
+ - Star rating
+ - PP
+ - Mods
+ - Replays
+ - Replay saving
+ - Star rating caching
+ - Score saving
+ - lots of caching
