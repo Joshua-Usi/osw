@@ -4,6 +4,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v0.6.4b] - 2021-04-26
 ### Changed
 - Menu screen now pulses to the beat!
+- Mod icons upscaled to twice the size (75 * 50 -> 150 * 100))
 ### Optimised
 - Beatmap selection generator to only calculate star rating once
 ### Fixed
@@ -12,9 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 ## [0.6.3b] - 2021-04-25
 ### Changed
-- new hexagon background
-- spiced audio visualiser effects
-- slight performance optimisations (main menu and slider generation)
+- New hexagon background
+- Spiced audio visualiser effects
+- Slight performance optimisations (main menu and slider generation)
 ### Removed
 - hitEvents.js, now merged with hitObjects.js
 ---
