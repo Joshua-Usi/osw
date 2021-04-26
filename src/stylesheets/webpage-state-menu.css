@@ -177,8 +177,8 @@
 	top: 0;
 	left: 0;
 	height: 100vh;
-	width: 20vw;
-	background: linear-gradient(to right, #fff5, #fff0);
+	width: 12.5vw;
+	background: linear-gradient(to right, #348feb22, #348feb00);
 	opacity: 0;
 }
 
@@ -187,8 +187,8 @@
 	top: 0;
 	right: 0;
 	height: 100vh;
-	width: 20vw;
+	width: 12.5vw;
 	background-color: #fff;
-	background: linear-gradient(to left, #fff5, #fff0);
+	background: linear-gradient(to left, #348feb22, #348feb00);
 	opacity: 0;
 }

@@ -135,7 +135,6 @@ define(function(require) {
 		logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
 		logo.style.backgroundSize = logoSize + "vh";
 		logo.style.filter = "brightness(1.25)";
-		console.log(loudness);
 		if (loudness > 5000 * (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100)) {
 			if (beatNumber % 2 === 0 || beatNumber % 4 === 0) {
 				let leftBeat = document.getElementById("left-beat");
@@ -310,12 +309,12 @@ define(function(require) {
 					analyser.getByteFrequencyData(audioAnalyserData); // passing our Uint audioAnalyserData array
 					audioAnalyserData = [...audioAnalyserData];
 					loudness = utils.sum(audioAnalyserData);
-					visualiserOffset += 16;
+					visualiserOffset += 12;
 					ctx.clearRect(0, 0, audioVisualiser.width, audioVisualiser.height);
 					if (logoSize === 70) {
-						ctx.lineWidth = window.innerWidth * 0.005;
+						ctx.lineWidth = window.innerHeight * 0.01;
 					} else {
-						ctx.lineWidth = window.innerWidth * 0.003;
+						ctx.lineWidth = window.innerHeight * 0.007;
 					}
 					ctx.beginPath();
 					ctx.strokeStyle = "#fff2";

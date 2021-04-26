@@ -293,7 +293,7 @@
 	width: 175vh;
 	height: 175vh;
 	transition: left 0.8s, top 0.8s, width 0.8s, height 0.8s;
-	transition-timing-function: cubic-bezier(1,.75,.85,.3);
+	transition-timing-function: cubic-bezier(0.8,.4,.85,.3);
 }
 
 #intro-text {
