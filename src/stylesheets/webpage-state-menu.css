@@ -1,6 +1,10 @@
 #audio-visualiser {
 	z-index: 5;
 	position: absolute;
+	width: calc(70vh * 1.6);
+	height: calc(70vh * 1.6);
+	top: -6vh;
+	left: calc(55vw - 56vh);
 	transition: left top width height;
 	transition-timing-function: ease;
 	transition-duration: 0.05s;
