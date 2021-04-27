@@ -3,6 +3,7 @@
 
 #shhh top secret!
 **/framework
+**/experimental
 
 # user specific vs files
 **/.vs
