@@ -12,12 +12,12 @@ define(function(require) {
 			this.accumulator += deltaTime;
 			if (this.allowMultipleRuns) {
 				while (this.accumulator >= this.milliseconds) {
-					this.accumulator -= this.milliseconds;
+					this.accumulator = this.accumulator % this.milliseconds;
 					this.callback(...this.args);	
 				}
 			} else {
 				if (this.accumulator >= this.milliseconds) {
-					this.accumulator -= this.milliseconds;
+					this.accumulator = this.accumulator % this.milliseconds;
 					this.callback(...this.args);
 				}
 			}
