@@ -14,6 +14,7 @@
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-pause-screen.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-fail-screen.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-results-screen.css">
+		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-mods.css">
 		<link rel="icon" href="./src/images/osw-small.png">
 	</head>
 	<body id="body">
@@ -331,6 +332,112 @@
 			<span id="accuracy-container"></span>
 			<span id="combo-container"></span>
 			<canvas id="gameplay"></canvas>
+		</div>
+		<div class="webpage-state" id="webpage-state-mods">
+			<div id="mods-blue-one" class="mods-blue"></div>
+			<div id="mods-blue-two" class="mods-blue"></div>
+			<div id="mods-blue-three" class="mods-blue"></div>
+			<div id="mods-blue-four" class="mods-blue"></div>
+			<div id="mods-ui">
+				<div id="mods-text">
+					<div id="width-limiter">
+						<p style="font-weight: bold;">Gameplay Mods</p>
+						<p>Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve. Others	are just for fun</p>
+					</div>
+				</div>
+				<div id="mods">
+					<p style="font-size: 1.75vh;"><b>Difficulty Reduction</b></p>
+					<!-- difficulty reduction -->
+					<div class="mod-container">
+						<div class="mod-height-limiter">
+							<img class="mod-icons" id="mod-easy" src="./src/images/mod-icons/mod-easy.png">
+						</div>
+						<p class="mods-text">Easy</p>
+					</div>
+					<div class="mod-container">
+						<div class="mod-height-limiter">
+							<img class="mod-icons" id="mod-noFail" src="./src/images/mod-icons/mod-nofail.png">
+						</div>
+						<p class="mods-text">No Fail</p>
+					</div>
+					<div class="mod-container">
+						<div class="mod-height-limiter">
+							<img class="mod-icons" id="mod-halfTime" src="./src/images/mod-icons/mod-halftime.png">
+						</div>
+						<p class="mods-text">Half Time</p>
+					</div>
+					<p style="font-size: 1.75vh;"><b>Difficulty Increase</b></p>
+					<!-- difficulty increasing -->
+					<div class="mod-container">
+						<div class="mod-height-limiter">
+							<img class="mod-icons" id="mod-hardRock" src="./src/images/mod-icons/mod-hardrock.png">
+						</div>
+						<p class="mods-text">Hard Rock</p>
+					</div>
+					<div class="mod-container">
+						<div class="mod-height-limiter">
+							<img class="mod-icons" id="mod-suddenDeath" src="./src/images/mod-icons/mod-suddendeath.png">
+						</div>
+						<p class="mods-text">Sudden Death</p>
+					</div>
+					<div class="mod-container">
+						<div class="mod-height-limiter">
+							<img class="mod-icons" id="mod-perfect" src="./src/images/mod-icons/mod-perfect.png">
+						</div>
+						<p class="mods-text">Perfect</p>
+					</div>
+					<div class="mod-container">
+						<div class="mod-height-limiter">
+							<img class="mod-icons" id="mod-doubleTime" src="./src/images/mod-icons/mod-doubletime.png">
+						</div>
+						<p class="mods-text">Double Time</p>
+					</div>
+					<div class="mod-container">
+						<div class="mod-height-limiter">
+							<img class="mod-icons" id="mod-hidden" src="./src/images/mod-icons/mod-hidden.png">
+						</div>
+						<p class="mods-text">Hidden</p>
+					</div>
+					<div class="mod-container">
+						<div class="mod-height-limiter">
+							<img class="mod-icons" id="mod-flashlight" src="./src/images/mod-icons/mod-flashlight.png">
+						</div>
+						<p class="mods-text">Flashlight</p>
+					</div>
+					<p style="font-size: 1.75vh;"><b>Automation</b></p>
+					<!-- automation mods -->
+					<div class="mod-container">
+						<div class="mod-height-limiter">
+							<img class="mod-icons" id="mod-auto" src="./src/images/mod-icons/mod-auto.png">
+						</div>
+						<p class="mods-text">Auto</p>
+					</div>
+					<div class="mod-container">
+						<div class="mod-height-limiter">
+							<img class="mod-icons" id="mod-relax" src="./src/images/mod-icons/mod-relax.png">
+						</div>
+						<p class="mods-text">Relax</p>
+					</div>
+					<div class="mod-container">
+						<div class="mod-height-limiter">
+							<img class="mod-icons" id="mod-autopilot" src="./src/images/mod-icons/mod-autopilot.png">
+						</div>
+						<p class="mods-text">AutoPilot</p>
+					</div>
+					<div class="mod-container">
+						<div class="mod-height-limiter">
+							<img class="mod-icons" id="mod-spunOut" src="./src/images/mod-icons/mod-spunout.png">
+						</div>
+						<p class="mods-text">Spun Out</p>
+					</div>
+				</div>
+				<div style="height: 10vh; background-color: #FD67AE99;">
+					<button type="button" style="margin-left: 10vw;" class="mods-button triangle-background blue">Deselect All</button>
+					<button type="button" class="mods-button triangle-background blue">Customisation</button>
+					<button type="button" class="mods-button triangle-background blue" id="mods-close-button">Close</button>
+					<p style="display: inline-block;">Score Multiplier: <b>1.00x</b></p>
+				</div>
+			</div>
 		</div>
 		<div class="webpage-state" id="webpage-state-pause-screen">
 			<div id="pause-menu-pause-text-container">

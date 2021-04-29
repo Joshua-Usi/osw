@@ -761,7 +761,7 @@ define(function(require) {
 		}
 		if (currentHP < 0) {
 			currentHP = 0;
-			if ((playDetails.mods.auto || playDetails.mods.relax || playDetails.mods.autoPilot || playDetails.mods.noFail) === false) {
+			if ((playDetails.mods.auto || playDetails.mods.relax || playDetails.mods.autopilot || playDetails.mods.noFail) === false) {
 				document.getElementById("webpage-state-fail-screen").style.display = "block";
 				audio.pause();
 				isRunning = false;

@@ -26,6 +26,10 @@
 	display: none;
 }
 
+#webpage-state-mods {
+	display: block;
+}
+
 body {
 	/* Helvetica for fallback*/
 	font-family: Varela Round, Helvetica;

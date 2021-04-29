@@ -35,6 +35,7 @@ define(function(require) {
 	const Accumulator = require("./src/scripts/accumulator.js");
 	const databaseManager = require("./src/scripts/databaseManager.js");
 	const Parser = require("./src/scripts/parser.js");
+	require("./src/scripts/modsUI.js");
 	/* Offline context checks, needed to ensure for some effects to work */
 	/* Text suggested by jylescoad-ward */
 	if (window.origin === null) {
