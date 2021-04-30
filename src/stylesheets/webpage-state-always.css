@@ -78,6 +78,13 @@
 	color: #000;
 }
 
+.splash-screen-warning-img {
+	height: 1.5em;
+	vertical-align: middle;
+	opacity: 0;
+	transition: opacity 1s;
+}
+
 #orientation-vertical {
 	position: absolute;
 	display: none;

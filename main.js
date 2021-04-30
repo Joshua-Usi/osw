@@ -36,6 +36,19 @@ define(function(require) {
 	const databaseManager = require("./src/scripts/databaseManager.js");
 	const Parser = require("./src/scripts/parser.js");
 	require("./src/scripts/modsUI.js");
+	const Mods = require("./src/scripts/mods.js");
+	let selectedMods;
+
+	function showWebpageStates(idList) {
+		for (let i = 0; i < idList.length; i++) {
+			document.getElementById(idList[i]).style.display = "block";
+		}
+	}
+	function hideWebpageStates(idList) {
+		for (let i = 0; i < idList.length; i++) {
+			document.getElementById(idList[i]).style.display = "none";
+		}
+	}
 	/* Offline context checks, needed to ensure for some effects to work */
 	/* Text suggested by jylescoad-ward */
 	if (window.origin === null) {
@@ -45,7 +58,7 @@ define(function(require) {
 		console.warn("IndexedDB is not supported on your browser, this means you will be unable to save beatmaps");
 	}
 	/* osw! version incremented manually */
-	const version = "osw! 0.6.4b";
+	const version = "osw! 0.7.0b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
@@ -107,22 +120,31 @@ define(function(require) {
 				});
 			}
 			let beatmapSelectionPanes = document.getElementsByClassName("beatmap-selection-map-pane");
-			for (var i = 0; i < beatmapSelectionPanes.length; i++) {
+			for (let i = 0; i < beatmapSelectionPanes.length; i++) {
 				beatmapSelectionPanes[i].addEventListener("click", function() {
-					let elements = document.getElementsByClassName("webpage-state");
-					for (var i = 0; i < elements.length; i++) {
-						if (elements[i].id === "webpage-state-always") {
-							continue;
-						}
-						elements[i].style.display = "none";
-					}
-					document.getElementById("top-bar").style.display = "none";
-					document.getElementById("webpage-state-gameplay").style.display = "block";
-					document.getElementById("bottom-bar").style.display = "none";
+					showWebpageStates([
+						"webpage-state-gameplay",
+					]);
+					hideWebpageStates([
+						"webpage-state-menu",
+						"webpage-state-beatmap-selection",
+						"webpage-state-mods",
+						"webpage-state-pause-screen", 
+						"webpage-state-fail-screen",
+						"webpage-state-results-screen",
+						"top-bar",
+						"bottom-bar",
+					]);
 					document.getElementById("menu-audio").pause();
 					document.getElementById("sidenav").style.width = "0";
 					document.getElementById("sidenav").style.opacity = "0.2";
-					gameplay.playMap(this.getAttribute("data-group-index"), this.getAttribute("data-map-index"));
+					selectedMods = Mods();
+					let selectedModElements = document.getElementsByClassName("mod-selected");
+					for (let i = 0; i < selectedModElements.length; i++) {
+						selectedMods[selectedModElements[i].id.replace("mod-", "")] = true;
+					}
+					console.log(selectedMods);
+					gameplay.playMap(this.getAttribute("data-group-index"), this.getAttribute("data-map-index"), selectedMods);
 				});
 			}
 		} else {
@@ -236,7 +258,7 @@ define(function(require) {
 	let logoY = 50;
 	let logoSize = 70;
 	let audioVisualiserSize = 1.6;
-	/* Profiling variables */
+	/* Profiling letiables */
 	let recordedFramesPerSecond = [];
 	/* Accumulators */
 	let time = 0;
@@ -435,11 +457,15 @@ define(function(require) {
 		audioVisualiser.style.top = "calc(" + logoY + "vh - " + (logoSize * audioVisualiserSize / 2) + "vh)";
 		audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + (logoSize * audioVisualiserSize / 2) + "vh)";
 		let paragraphElements = document.getElementById("splash-screen").querySelectorAll("p");
-		for (var i = 0; i < paragraphElements.length; i++) {
+		let imageElements = document.getElementById("splash-screen").querySelectorAll("img");
+		for (let i = 0; i < paragraphElements.length; i++) {
 			paragraphElements[i].style.animation = "splash-screen-text forwards 1s";
 			if (paragraphElements[i].id === "splash-screen-warning") {
 				paragraphElements[i].style.animation = "splash-screen-text-2 forwards 1s";
 			}
+		}
+		for (let i = 0; i < imageElements.length; i++) {
+			imageElements[i].style.opacity = "1";
 		}
 		document.getElementById("splash-screen").style.animationDuration = "1s";
 		document.getElementById("splash-screen").style.animationDelay = "1s";
@@ -447,7 +473,7 @@ define(function(require) {
 	});
 	window.addEventListener("blur", function() {
 		if (document.getElementById("webpage-state-gameplay").style.display === "block" && document.getElementById("webpage-state-fail-screen").style.display === "none") {
-			document.getElementById("webpage-state-pause-screen").style.display = "block";
+			showWebpageStates(["webpage-state-pause-screen"]);
 			gameplay.pause();
 		}
 	});
@@ -506,7 +532,6 @@ define(function(require) {
 			icon.classList.add("menu-bar-buttons-icon-animation");
 			image.classList.add("menu-bar-image-move-animation");
 			if (logoBeatAccumulator.milliseconds !== parseFloat(image.style.animationDuration)) {
-				console.log("change");
 				icon.style.animationDuration = logoBeatAccumulator.milliseconds * 4 + "ms";
 				image.style.animationDuration = logoBeatAccumulator.milliseconds + "ms";
 			}
@@ -697,9 +722,12 @@ define(function(require) {
 	AttachAudio(document.getElementById("back-button"), "click", "./src/audio/effects/back-button-click.wav", "settings-master-volume", "settings-effects-volume");
 	AttachAudio(document.getElementById("back-button"), "mouseenter", "./src/audio/effects/menu-hover.wav", "settings-master-volume", "settings-effects-volume");
 	document.getElementById("menu-bar-play").addEventListener("click", function() {
-		document.getElementById("webpage-state-menu").style.display = "none";
-		document.getElementById("webpage-state-beatmap-selection").style.display = "block";
-		document.getElementById("bottom-bar").style.display = "block";
+		showWebpageStates([
+			"webpage-state-beatmap-selection",
+			"webpage-state-mods",
+			"bottom-bar",
+		]);
+		hideWebpageStates(["webpage-state-menu"]);
 		let els = document.getElementsByClassName("beatmap-selection-group-pane");
 		if (els.length >= 1) {
 			let selectedElement = els[utils.randomInt(0, els.length - 1)];
@@ -779,41 +807,57 @@ define(function(require) {
 		passive: false
 	});
 	document.getElementById("back-button").addEventListener("click", function() {
-		let elements = document.getElementsByClassName("webpage-state");
-		for (var i = 0; i < elements.length; i++) {
-			if (elements[i].id === "webpage-state-always") {
-				continue;
-			}
-			if (elements[i].id === "webpage-state-state-beatmap-selection" && document.getElementById("webpage-state-end-results").style.display === "block") {
-				continue;
-			}
-			elements[i].style.display = "none";
+		if (document.getElementById("webpage-state-results-screen").style.display === "block") {
+			showWebpageStates([
+				"webpage-state-beatmap-selection",
+				"webpage-state-mods",
+				"top-bar",
+			]);
+			hideWebpageStates([
+				"bottom-bar",
+				"webpage-state-results-screen",
+			]);
+		} else {
+			showWebpageStates([
+				"webpage-state-menu",
+			]);
+			hideWebpageStates([
+				"webpage-state-mods",
+				"webpage-state-beatmap-selection",
+				"bottom-bar",
+			]);
 		}
-		document.getElementById("webpage-state-menu").style.display = "block";
-		document.getElementById("bottom-bar").style.display = "none";
 		document.getElementById("menu-audio").play();
 	});
 	document.getElementById("pause-menu-continue").addEventListener("click", function() {
 		gameplay.continue();
-		document.getElementById("webpage-state-pause-screen").style.display = "none";
-		document.getElementById("webpage-state-fail-screen").style.display = "none";
+		hideWebpageStates([
+			"webpage-state-pause-screen",
+			"webpage-state-fail-screen",
+		]);
 	});
 	function retry() {
 		gameplay.retry();
-		document.getElementById("webpage-state-pause-screen").style.display = "none";
-		document.getElementById("webpage-state-fail-screen").style.display = "none";
+		hideWebpageStates([
+			"webpage-state-pause-screen",
+			"webpage-state-fail-screen",
+		]);
 	}
 	document.getElementById("pause-menu-retry").addEventListener("click", retry);
 	document.getElementById("fail-menu-retry").addEventListener("click", retry);
 	function quit() {
 		document.getElementById("menu-audio").play();
-		document.getElementById("webpage-state-always").style.display = "block";
-		document.getElementById("top-bar").style.display = "block";
-		document.getElementById("webpage-state-beatmap-selection").style.display = "block";
-		document.getElementById("webpage-state-gameplay").style.display = "none";
-		document.getElementById("webpage-state-pause-screen").style.display = "none";
-		document.getElementById("webpage-state-fail-screen").style.display = "none";
-		document.getElementById("bottom-bar").style.display = "block";
+		showWebpageStates([
+			"webpage-state-beatmap-selection",
+			"webpage-state-mods",
+			"top-bar",
+			"bottom-bar",
+		]);
+		hideWebpageStates([
+			"webpage-state-gameplay",
+			"webpage-state-pause-screen",
+			"webpage-state-fail-screen",
+		]);
 	}
 	document.getElementById("pause-menu-quit").addEventListener("click", quit);
 	document.getElementById("fail-menu-quit").addEventListener("click", quit);

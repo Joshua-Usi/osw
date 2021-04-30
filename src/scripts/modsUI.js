@@ -1,4 +1,5 @@
 define(function(require) {
+	let isOpen = false;
 	let elements = document.getElementsByClassName("mod-icons");
 	for (let i = 0; i < elements.length; i++) {
 		elements[i].addEventListener("click", function() {
@@ -26,31 +27,33 @@ define(function(require) {
 	]
 	let elCloseTimes = [
 		"0.75s",
-		"1.15s",
+		"1.45s",
+		"1.25s",
 		"1.05s",
-		"0.95s",
 		"0.85s",
 	]
-	document.getElementById("mods-close-button").addEventListener("click", function() {
+	function closeModsUI() {
 		for (let i = 0; i < el.length; i++) {
 			let element = document.getElementById(el[i]);
 			element.style.transitionDuration = elCloseTimes[i];
-			element.style.bottom = "-70vh";	
+			element.style.bottom = "-76vh";	
+			isOpen = false;
 		}
-	});
+	}
+	function openModsUI() {
+		for (let i = 0; i < el.length; i++) {
+			let element = document.getElementById(el[i]);
+			element.style.transitionDuration = elOpenTimes[i];
+			element.style.bottom = "0";	
+			isOpen = true;
+		}
+	}
+	document.getElementById("mods-close-button").addEventListener("click", closeModsUI);
 	document.getElementById("bottom-bar-mods").addEventListener("click", function() {
-		if (document.getElementById(el[0]).style.bottom === "-70vh") {
-			for (let i = 0; i < el.length; i++) {
-				let element = document.getElementById(el[i]);
-				element.style.transitionDuration = elOpenTimes[i];
-				element.style.bottom = "0";	
-			}
+		if (isOpen === false) {
+			openModsUI();
 		} else {
-			for (let i = 0; i < el.length; i++) {
-				let element = document.getElementById(el[i]);
-				element.style.transitionDuration = elOpenTimes[i];
-				element.style.bottom = "-70vh";	
-			}
+			closeModsUI();
 		}
 	});
 });

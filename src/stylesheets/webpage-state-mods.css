@@ -1,14 +1,17 @@
 #mods-ui {
+	background: url("../../src/images/triangles.png");
+	background-size: 100vw;
 	background-color: #313e4f;
-	height: 70vh;
+	height: 76vh;
 	width: 100vw;
 	position: absolute;
-	bottom: -70vh;
+	bottom: -76vh;
 	transition: bottom;
 	color: #e4ecef;
 }
 
 #mods-text {
+	background-size: 100vw;
 	background-color: #0003;
 	height: 21vh;
 }
@@ -39,6 +42,11 @@
 
 .triangle-background {
 	background-attachment: fixed;
+}
+
+#mod-buttons-container {
+	height: 16vh;
+	background-color: #FD67AE99;
 }
 
 .mods-button {

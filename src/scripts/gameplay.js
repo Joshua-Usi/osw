@@ -96,9 +96,6 @@ define(function(require) {
 	audio.addEventListener("canplaythrough", function() {
 		audio.play();
 	});
-	// audio.addEventListener("ended", function() {
-		
-	// });
 	/* Beatmap difficulty data constants */
 	let arTime;
 	let arFadeIn;
@@ -1102,14 +1099,16 @@ define(function(require) {
 						audioType = "ogg";
 					}
 					audio.src = `data:audio/${audioType};base64,${event.target.result.data}`;
+					audio.currentTime = 0;
+					if (playDetails.mods.doubleTime) {
+						audio.playbackRate = 1.5;
+					} else if (playDetails.mods.halfTime) {
+						audio.playbackRate = 0.75;
+					} else {
+						audio.playbackRate = 1;
+					}
 				});
 			});
-			audio.currentTime = 0;
-			if (playDetails.mods.doubleTime) {
-				audio.playbackRate = 1.5;
-			} else if (playDetails.mods.halfTime) {
-				audio.playbackRate = 0.75;
-			}
 			/* Beatmap difficulty data */
 			arTime = Formulas.AR(loadedMap.ApproachRate, playDetails.mods);
 			arFadeIn = Formulas.ARFadeIn(loadedMap.ApproachRate, playDetails.mods);

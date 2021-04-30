@@ -1,6 +1,17 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v0.7.0b] - 2021-04-30
+### Added
+- Mods
+- Volume warning on splash screen
+
+### Optimised
+- HTML loading (500 lines of html typically took over 4 seconds, now at < 2 seconds)
+
+### Removed
+- Text "many things can change at any moment"
+---
 ## [v0.6.5b] - 2021-04-29
 ### Added
 - Mods UI

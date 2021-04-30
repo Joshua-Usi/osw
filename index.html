@@ -5,9 +5,9 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title class="client-version">osw!</title>
 		<link rel="stylesheet" type="text/css" href="./style.css">
+		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-always.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/forms.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/lib.css">
-		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-always.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-menu.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-beatmap-selection.css">
 		<link rel="stylesheet" type="text/css" href="./src/stylesheets/webpage-state-gameplay.css">
@@ -24,8 +24,12 @@
 				<div id="heart-loader" class="lds-heart">
 					<div></div>
 				</div>
+				<div>
+					<img src="./src/images/warning.png" class="splash-screen-warning-img" style="opacity: 0;">
+					<p style="margin: 0; display: inline-block;">volume warning! first run is often loud!</p>
+					<img src="./src/images/warning.png" class="splash-screen-warning-img" style="opacity: 0;">
+				</div>
 				<p style="margin: 0;">osw! is in heavy development</p>
-				<p style="margin: 0;">many things can change at any moment</p>
 				<p style="margin: 0;" id="splash-screen-warning">this is not an official osu! distribution</p>
 				<p style="margin: 0;" class="client-version"></p>
 				<p style="margin: 0;">click to continue...</p>
@@ -338,7 +342,7 @@
 			<div id="mods-blue-two" class="mods-blue"></div>
 			<div id="mods-blue-three" class="mods-blue"></div>
 			<div id="mods-blue-four" class="mods-blue"></div>
-			<div id="mods-ui">
+			<div id="mods-ui" class="triangle-background">
 				<div id="mods-text">
 					<div id="width-limiter">
 						<p style="font-weight: bold;">Gameplay Mods</p>
@@ -350,19 +354,19 @@
 					<!-- difficulty reduction -->
 					<div class="mod-container">
 						<div class="mod-height-limiter">
-							<img class="mod-icons" id="mod-easy" src="./src/images/mod-icons/mod-easy.png">
+							<img loading="lazy" decoding="async" class="mod-icons" id="mod-easy" src="./src/images/mod-icons/mod-easy.png">
 						</div>
 						<p class="mods-text">Easy</p>
 					</div>
 					<div class="mod-container">
 						<div class="mod-height-limiter">
-							<img class="mod-icons" id="mod-noFail" src="./src/images/mod-icons/mod-nofail.png">
+							<img loading="lazy" decoding="async" class="mod-icons" id="mod-noFail" src="./src/images/mod-icons/mod-nofail.png">
 						</div>
 						<p class="mods-text">No Fail</p>
 					</div>
 					<div class="mod-container">
 						<div class="mod-height-limiter">
-							<img class="mod-icons" id="mod-halfTime" src="./src/images/mod-icons/mod-halftime.png">
+							<img loading="lazy" decoding="async" class="mod-icons" id="mod-halfTime" src="./src/images/mod-icons/mod-halftime.png">
 						</div>
 						<p class="mods-text">Half Time</p>
 					</div>
@@ -370,37 +374,37 @@
 					<!-- difficulty increasing -->
 					<div class="mod-container">
 						<div class="mod-height-limiter">
-							<img class="mod-icons" id="mod-hardRock" src="./src/images/mod-icons/mod-hardrock.png">
+							<img loading="lazy" decoding="async" class="mod-icons" id="mod-hardRock" src="./src/images/mod-icons/mod-hardrock.png">
 						</div>
 						<p class="mods-text">Hard Rock</p>
 					</div>
 					<div class="mod-container">
 						<div class="mod-height-limiter">
-							<img class="mod-icons" id="mod-suddenDeath" src="./src/images/mod-icons/mod-suddendeath.png">
+							<img loading="lazy" decoding="async" class="mod-icons" id="mod-suddenDeath" src="./src/images/mod-icons/mod-suddendeath.png">
 						</div>
 						<p class="mods-text">Sudden Death</p>
 					</div>
 					<div class="mod-container">
 						<div class="mod-height-limiter">
-							<img class="mod-icons" id="mod-perfect" src="./src/images/mod-icons/mod-perfect.png">
+							<img loading="lazy" decoding="async" class="mod-icons" id="mod-perfect" src="./src/images/mod-icons/mod-perfect.png">
 						</div>
 						<p class="mods-text">Perfect</p>
 					</div>
 					<div class="mod-container">
 						<div class="mod-height-limiter">
-							<img class="mod-icons" id="mod-doubleTime" src="./src/images/mod-icons/mod-doubletime.png">
+							<img loading="lazy" decoding="async" class="mod-icons" id="mod-doubleTime" src="./src/images/mod-icons/mod-doubletime.png">
 						</div>
 						<p class="mods-text">Double Time</p>
 					</div>
 					<div class="mod-container">
 						<div class="mod-height-limiter">
-							<img class="mod-icons" id="mod-hidden" src="./src/images/mod-icons/mod-hidden.png">
+							<img loading="lazy" decoding="async" class="mod-icons" id="mod-hidden" src="./src/images/mod-icons/mod-hidden.png">
 						</div>
 						<p class="mods-text">Hidden</p>
 					</div>
 					<div class="mod-container">
 						<div class="mod-height-limiter">
-							<img class="mod-icons" id="mod-flashlight" src="./src/images/mod-icons/mod-flashlight.png">
+							<img loading="lazy" decoding="async" class="mod-icons" id="mod-flashlight" src="./src/images/mod-icons/mod-flashlight.png">
 						</div>
 						<p class="mods-text">Flashlight</p>
 					</div>
@@ -408,31 +412,31 @@
 					<!-- automation mods -->
 					<div class="mod-container">
 						<div class="mod-height-limiter">
-							<img class="mod-icons" id="mod-auto" src="./src/images/mod-icons/mod-auto.png">
+							<img loading="lazy" decoding="async" class="mod-icons" id="mod-auto" src="./src/images/mod-icons/mod-auto.png">
 						</div>
 						<p class="mods-text">Auto</p>
 					</div>
 					<div class="mod-container">
 						<div class="mod-height-limiter">
-							<img class="mod-icons" id="mod-relax" src="./src/images/mod-icons/mod-relax.png">
+							<img loading="lazy" decoding="async" class="mod-icons" id="mod-relax" src="./src/images/mod-icons/mod-relax.png">
 						</div>
 						<p class="mods-text">Relax</p>
 					</div>
 					<div class="mod-container">
 						<div class="mod-height-limiter">
-							<img class="mod-icons" id="mod-autopilot" src="./src/images/mod-icons/mod-autopilot.png">
+							<img loading="lazy" decoding="async" class="mod-icons" id="mod-autopilot" src="./src/images/mod-icons/mod-autopilot.png">
 						</div>
 						<p class="mods-text">AutoPilot</p>
 					</div>
 					<div class="mod-container">
 						<div class="mod-height-limiter">
-							<img class="mod-icons" id="mod-spunOut" src="./src/images/mod-icons/mod-spunout.png">
+							<img loading="lazy" decoding="async" class="mod-icons" id="mod-spunOut" src="./src/images/mod-icons/mod-spunout.png">
 						</div>
 						<p class="mods-text">Spun Out</p>
 					</div>
 				</div>
-				<div style="height: 10vh; background-color: #FD67AE99;">
-					<button type="button" style="margin-left: 10vw;" class="mods-button triangle-background blue">Deselect All</button>
+				<div id="mod-buttons-container">
+					<button type="button" style="margin-left: 10vw;" class="mods-button triangle-background blue" id="mods-deselect-all">Deselect All</button>
 					<button type="button" class="mods-button triangle-background blue">Customisation</button>
 					<button type="button" class="mods-button triangle-background blue" id="mods-close-button">Close</button>
 					<p style="display: inline-block;">Score Multiplier: <b>1.00x</b></p>
@@ -539,6 +543,7 @@
 		</div>
 		<script type="text/javascript" src="src/scripts/libs/jszip.js"></script>
 		<script data-main="main" type="text/javascript" src=require.js></script>
+		<!-- deferred css -->
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Varela Round">
 	</body>
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Varela Round">
 </html>
