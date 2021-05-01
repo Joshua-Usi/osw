@@ -28,6 +28,11 @@ define(function(require) {
 	let loadedMap;
 	/* canvas setup */
 	let canvas = new Canvas("gameplay");
+	let flashlightCanvas = document.getElementById("gameplay-flashlight");
+	flashlightCanvas.width = window.innerWidth;
+	flashlightCanvas.height = window.innerHeight;
+	let flashlightCtx = flashlightCanvas.getContext("2d");
+	let flashlightSize = utils.map(100, 0, 512, 0, window.innerWidth);
 	canvas.setHeight(window.innerHeight);
 	canvas.setWidth(window.innerWidth);
 	let ctx = canvas.context;
@@ -534,7 +539,7 @@ define(function(require) {
 				} else if (utils.map(useTime - (hitObject.time - arTime), 0, arTime, 0, 1) <= hiddenFadeOutPercent) {
 					canvas.setGlobalAlpha(utils.map(useTime - (hitObject.time - arTime), arTime * hiddenFadeInPercent, arTime * hiddenFadeOutPercent, 1, 0));
 				} else {
-					/* if fully transparent, don't bother rendering */
+					/* if fully transparent, don"t bother rendering */
 					return;
 				}
 			} else {
@@ -587,7 +592,7 @@ define(function(require) {
 				}
 				/* Slider Curve calculated the at the hitobject time - ar time */
 				ctx.lineCap = "round";
-				ctx.lineJoin = 'round';
+				ctx.lineJoin = "round";
 				/* Draw Outer Slider Body */
 				ctx.lineWidth = circleDiameter;
 				canvas.setStrokeStyle("rgba(255, 255, 255, " + canvas.getGlobalAlpha() + ")");
@@ -828,7 +833,7 @@ define(function(require) {
 	}
 
 	function nextHitObject() {
-		/* create copy not reference, otherwise retrying wouldn't work*/
+		/* create copy not reference, otherwise retrying wouldn"t work*/
 		hitObjects.push(JSON.parse(JSON.stringify(loadedMap.hitObjects[currentHitObject])));
 		/* second bit flag determines new combo */
 		if (loadedMap.hitObjects[currentHitObject].type[2] === "1") {
@@ -916,6 +921,24 @@ define(function(require) {
 			}
 			ctx.fillRect(window.innerWidth / 2 + hitErrors[i] * 1000, window.innerHeight * 0.975 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.025);
 		}
+	}
+	function renderFlashlight() {
+		flashlightCtx.globalCompositeOperation = "source-over";
+		flashlightCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+		flashlightCtx.fillStyle = "rgba(0, 0, 0, 1)";
+		flashlightCtx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+		flashlightCtx.globalCompositeOperation = "destination-out";
+		flashlightCtx.beginPath();
+		flashlightCtx.arc(mouse.position.x, mouse.position.y, flashlightSize, 0, Math.PI * 2, false);
+		flashlightCtx.fillStyle = "white";
+		flashlightCtx.shadowOffsetX = 1;
+		flashlightCtx.shadowOffsetY = 1;
+		flashlightCtx.shadowBlur = 20;
+		flashlightCtx.shadowColor = "rgba(255, 255, 255, 1)";
+		flashlightCtx.fill();
+		flashlightCtx.fill();
+		flashlightCtx.fill();
+		flashlightCtx.fill();
 	}
 	return {
 		tick: function() {
@@ -1029,6 +1052,9 @@ define(function(require) {
 			renderHitErrors();
 			updateScore();
 			renderMouse();
+			if (playDetails.mods.flashlight) {
+				renderFlashlight();
+			}
 		},
 		continue: function() {
 			audio.play();

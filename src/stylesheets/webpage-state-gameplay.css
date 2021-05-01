@@ -47,3 +47,10 @@
 	top: 0;
 	bottom: 0;
 }
+
+#gameplay-flashlight {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 100;
+}
