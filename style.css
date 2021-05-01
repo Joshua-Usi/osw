@@ -16,10 +16,12 @@
 
 #webpage-state-pause-screen {
 	display: none;
+	z-index: 25;
 }
 
 #webpage-state-fail-screen {
 	display: none;
+	z-index: 25;
 }
 
 #webpage-state-results-screen {
