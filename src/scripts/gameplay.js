@@ -10,7 +10,7 @@ define(function(require) {
 	const HitObject = require("./hitObjects.js");
 	const Assets = require("./gameplayAssets.js");
 	const Canvas = require("./canvas.js");
-	const skin = require("./defaultSkin.js");
+	const skin = "ajax-transparent";
 	const PlayDetails = require("./playDetails.js");
 	const endScreen = require("./endScreen.js");
 	const databaseManager = require("./databaseManager.js");
@@ -539,7 +539,7 @@ define(function(require) {
 				} else if (utils.map(useTime - (hitObject.time - arTime), 0, arTime, 0, 1) <= hiddenFadeOutPercent) {
 					canvas.setGlobalAlpha(utils.map(useTime - (hitObject.time - arTime), arTime * hiddenFadeInPercent, arTime * hiddenFadeOutPercent, 1, 0));
 				} else {
-					/* if fully transparent, don"t bother rendering */
+					/* if fully transparent, don't bother rendering */
 					return;
 				}
 			} else {
@@ -833,7 +833,7 @@ define(function(require) {
 	}
 
 	function nextHitObject() {
-		/* create copy not reference, otherwise retrying wouldn"t work*/
+		/* create copy not reference, otherwise retrying wouldn't work*/
 		hitObjects.push(JSON.parse(JSON.stringify(loadedMap.hitObjects[currentHitObject])));
 		/* second bit flag determines new combo */
 		if (loadedMap.hitObjects[currentHitObject].type[2] === "1") {
@@ -1019,6 +1019,14 @@ define(function(require) {
 			playDetails.maxCombo = highestCombo;
 			previousTime = useTime;
 
+			if (highestCombo >= 100) {
+				flashlightSize = utils.map(80, 0, 512, 0, window.innerWidth);
+			} else if (highestCombo >= 200) {
+				flashlightSize = utils.map(60, 0, 512, 0, window.innerWidth);
+			} else {
+				flashlightSize = utils.map(100, 0, 512, 0, window.innerWidth);
+			}
+
 			if (keyboard.getKeyDown("esc")) {
 				document.getElementById("webpage-state-pause-screen").style.display = "block";
 				audio.pause();
@@ -1057,16 +1065,17 @@ define(function(require) {
 			}
 		},
 		continue: function() {
+			isRunning = true;
 			audio.play();
 			mouse.lockPointer();
-			isRunning = true;
 		},
 		pause: function() {
+			isRunning = false;
 			audio.pause();
 			mouse.unlockPointer();
-			isRunning = false;
 		},
 		retry: function() {
+			isRunning = false;
 			this.playMap(useBeatmapSet, useBeatmap, playDetails.mods);
 		},
 		playMap: function(groupIndex, mapIndex, mods) {
@@ -1074,6 +1083,11 @@ define(function(require) {
 			useBeatmap = mapIndex;
 			loadedMap = loadedMaps[useBeatmapSet][useBeatmap];
 			playDetails = PlayDetails(mods);
+			if (mods.flashlight === false) {
+				document.getElementById("gameplay-flashlight").style.display = "none";
+			} else {
+				document.getElementById("gameplay-flashlight").style.display = "block";
+			}
 			currentHitObject = 0;
 			hitEvents = [];
 			hitObjects = [];
@@ -1125,7 +1139,6 @@ define(function(require) {
 						audioType = "ogg";
 					}
 					audio.src = `data:audio/${audioType};base64,${event.target.result.data}`;
-					audio.currentTime = 0;
 					if (playDetails.mods.doubleTime) {
 						audio.playbackRate = 1.5;
 					} else if (playDetails.mods.halfTime) {
@@ -1135,6 +1148,7 @@ define(function(require) {
 					}
 				});
 			});
+			audio.currentTime = 0;
 			/* Beatmap difficulty data */
 			arTime = Formulas.AR(loadedMap.ApproachRate, playDetails.mods);
 			arFadeIn = Formulas.ARFadeIn(loadedMap.ApproachRate, playDetails.mods);
@@ -1143,7 +1157,6 @@ define(function(require) {
 			difficultyMultiplier = Formulas.difficultyPoints(loadedMap.CircleSize, loadedMap.HPDrainRate, loadedMap.OverallDifficulty);
 			odTime = Formulas.ODHitWindow(loadedMap.OverallDifficulty, playDetails.mods);
 			mouse.lockPointer();
-			isRunning = true;
 			hitCircleComboBuffers = [];
 			approachCircleComboBuffers = [];
 			let hitCircleRgbks = canvas.generateRGBKs(Assets.hitCircle);
@@ -1153,6 +1166,7 @@ define(function(require) {
 				hitCircleComboBuffers.push(canvas.generateTintImage(Assets.hitCircle, hitCircleRgbks, comboColours.r, comboColours.g, comboColours.b, circleDiameter, circleDiameter));
 				approachCircleComboBuffers.push(canvas.generateTintImage(Assets.approachCircle, approachCircleRgbks, comboColours.r, comboColours.g, comboColours.b));
 			}
+			isRunning = true;
 		},
 		playDetails: function() {
 			return playDetails;

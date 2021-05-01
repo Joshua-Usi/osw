@@ -39,6 +39,9 @@ define(function(require) {
 	const Mods = require("./src/scripts/mods.js");
 	let selectedMods;
 
+	let backgroundImageParallax = document.getElementById("background-dim");
+	let menuParallax = document.getElementById("menu-parallax");
+
 	function showWebpageStates(idList) {
 		for (let i = 0; i < idList.length; i++) {
 			document.getElementById(idList[i]).style.display = "block";
@@ -58,7 +61,7 @@ define(function(require) {
 		console.warn("IndexedDB is not supported on your browser, this means you will be unable to save beatmaps");
 	}
 	/* osw! version incremented manually */
-	const version = "osw! 0.7.1b";
+	const version = "osw! 0.7.2b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
@@ -143,7 +146,6 @@ define(function(require) {
 					for (let i = 0; i < selectedModElements.length; i++) {
 						selectedMods[selectedModElements[i].id.replace("mod-", "")] = true;
 					}
-					console.log(selectedMods);
 					gameplay.playMap(this.getAttribute("data-group-index"), this.getAttribute("data-map-index"), selectedMods);
 				});
 			}
@@ -435,8 +437,6 @@ define(function(require) {
 	});
 	window.addEventListener("mousemove", function(mouse) {
 		if (Options.UserInterface.menuParallax === true && (document.getElementById("webpage-state-gameplay").style.display === "none" || document.getElementById("webpage-state-gameplay").style.display === "")) {
-			let backgroundImageParallax = document.getElementById("background-blur");
-			let menuParallax = document.getElementById("menu-parallax");
 			backgroundImageParallax.style.top = (mouse.y - window.innerHeight * 0.5) / 128 - window.innerHeight * 0.05 + "px";
 			backgroundImageParallax.style.left = (mouse.x - window.innerWidth * 0.5) / 128 - window.innerWidth * 0.05 + "px";
 			menuParallax.style.top = "calc(5vh + " + ((mouse.y - window.innerHeight * 0.5) / 256 - window.innerHeight * 0.05) + "px)";
@@ -893,5 +893,18 @@ define(function(require) {
 			});
 		});
 		fileReader.readAsBinaryString(this.files[0]);
+	});
+	document.getElementById("bottom-bar-random").addEventListener("click", function() {
+		let els = document.getElementsByClassName("beatmap-selection-group-pane");
+		if (els.length >= 1) {
+			let selectedElement = els[utils.randomInt(0, els.length - 1)];
+			selectedElement.scrollIntoView({
+				block: "center",
+				inline: "end"
+			});
+			selectedElement.parentNode.parentNode.scrollTo(0, selectedElement.parentNode.parentNode.scrollTop);
+			window.scrollTo(0, 0);
+			selectedElement.dispatchEvent(new CustomEvent("click"));
+		}
 	});
 });

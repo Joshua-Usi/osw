@@ -36,6 +36,7 @@
 	/* if javascript isn't enabled */
 	top: calc(50vh - 70vh / 2);
 	left: calc(50vw - 70vh / 2);
+	will-change: width top left background-size filter;
 }
 
 #menu-bar {

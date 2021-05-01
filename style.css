@@ -120,7 +120,7 @@ img {
 	transform: skew(-10deg);
 }
 
-#bottom-bar-anti-skew {
+.bottom-bar-anti-skew {
 	transform: skew(10deg);
 }
 

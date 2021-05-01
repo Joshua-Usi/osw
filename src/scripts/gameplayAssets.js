@@ -1,6 +1,7 @@
 define(function(require) {
 	const AssetLoader = require("./assetLoader.js");
-	const skin = require("./defaultSkin.js");
+	const skin = "ajax-transparent";
+	console.log(AssetLoader.image(`./src/images/skins/${skin}/cursor.png`).src);
 	return {
 		/* cursor assets */
 		cursor: AssetLoader.image(`${window.location.href}src/images/skins/${skin}/cursor.png`),

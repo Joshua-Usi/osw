@@ -1,13 +1,8 @@
-#background-blur {
-	position: absolute;
-	z-index: -10;
-	transition: filter 0.5s, opacity 1s;
-}
-
 #background-dim {
 	position: absolute;
 	z-index: -10;
 	transition: filter 0.5s;
+	will-change: top left;
 }
 
 #background {

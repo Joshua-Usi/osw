@@ -1,7 +1,18 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
-## [v0.7.1b] - 2021-05--1
+## [v0.7.2b] - 2021-05-01
+### Optimised
+- Page loading in the HTML
+
+### Removed
+- defaultSkin.js
+### Fixed
+- A huge bug preventing proper restarting of maps
+- A bug preventing doubleTime and halfTime from working properly
+- Flashlight not going off screen when flashlight mod is off
+---
+## [v0.7.1b] - 2021-05-01
 ### Added
 - Basic flashlight
 ---
