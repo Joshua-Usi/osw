@@ -183,7 +183,7 @@ define(function(require) {
 		 *	27/12/2020, works
 		 *	9/01/2021, works
 		 */
-		if (new Date().getMonth() === 11 && document.getElementById("snow").querySelectorAll("img").length <= 50) {
+		if (new Date().getMonth() === 11 && document.getElementById("snow").getElementsByTagName("img").length <= 50) {
 			let snowflake = document.createElement("img");
 			snowflake.src = "./src/images/snowflake.png";
 			snowflake.style.position = "fixed";
@@ -347,8 +347,8 @@ define(function(require) {
 					}
 					ctx.beginPath();
 					ctx.strokeStyle = "#fff2";
-					for (let i = 0; i < analyserLength; i++) {
-						let l = (i * 4 * 5 + visualiserOffset) % (analyserLength * 4);
+					for (let i = 0; i < visualiserData.length; i++) {
+						let l = (i * 4 * 5 + visualiserOffset) % (visualiserData.length * 4);
 						if (visualiserData[i] < audioAnalyserData[l]) {
 							visualiserData[i] += audioAnalyserData[l] / 8 * (255 / (l + 64) - 0.25);
 						} else {
@@ -359,7 +359,7 @@ define(function(require) {
 							continue;
 						}
 						let mag = (visualiserData[i] ** 1.6 / (255 ** 0.7) + 100);
-						let angle = utils.map(i, 0, analyserLength, Math.PI, 3 * Math.PI);
+						let angle = utils.map(i, 0, visualiserData.length, Math.PI, 3 * Math.PI);
 						/* optimised rendering by not rendering parts of lines that are unseen */
 						ctx.moveTo(audioVisualiser.width / 2 + Math.sin(angle) * audioVisualiser.width / 4, audioVisualiser.height / 2 + Math.cos(angle) * audioVisualiser.height / 4);
 						ctx.lineTo(audioVisualiser.width / 2 + Math.sin(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2), audioVisualiser.height / 2 + Math.cos(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2));
@@ -367,7 +367,7 @@ define(function(require) {
 					ctx.stroke();
 					/* beat detection */
 					if (new Date().getMonth() === 11) {
-						let snow = document.getElementById("snow").querySelectorAll("img");
+						let snow = document.getElementById("snow").getElementsByTagName("img");
 						for (let i = 0; i < snow.length; i++) {
 							if (parseFloat(snow[i].style.top) >= 100) {
 								snow[i].remove();
@@ -456,8 +456,8 @@ define(function(require) {
 		audioVisualiser.style.height = logoSize * audioVisualiserSize + "vh";
 		audioVisualiser.style.top = "calc(" + logoY + "vh - " + (logoSize * audioVisualiserSize / 2) + "vh)";
 		audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + (logoSize * audioVisualiserSize / 2) + "vh)";
-		let paragraphElements = document.getElementById("splash-screen").querySelectorAll("p");
-		let imageElements = document.getElementById("splash-screen").querySelectorAll("img");
+		let paragraphElements = document.getElementById("splash-screen").getElementsByTagName("p");
+		let imageElements = document.getElementById("splash-screen").getElementsByTagName("img");
 		for (let i = 0; i < paragraphElements.length; i++) {
 			paragraphElements[i].style.animation = "splash-screen-text forwards 1s";
 			if (paragraphElements[i].id === "splash-screen-warning") {
@@ -571,10 +571,10 @@ define(function(require) {
 		let selectBoxes = document.getElementsByClassName("select-box");
 		for (let i = 0; i < selectBoxes.length; i++) {
 			let selectBoxSelections = selectBoxes[i].getElementsByClassName("select-box-selections")[0];
-			let selections = selectBoxSelections.querySelectorAll("p");
+			let selections = selectBoxSelections.getElementsByTagName("p");
 			for (let j = 0; j < selections.length; j++) {
 				selections[j].addEventListener("click", function() {
-					let p = this.parentNode.querySelectorAll("p");
+					let p = this.parentNode.getElementsByTagName("p");
 					for (let k = 0; k < p.length; k++) {
 						if (p[k] === this) {
 							p[k].setAttribute("class", "selected");

@@ -117,6 +117,20 @@ define(function(require) {
 	let hitObjectOffsetX = playfieldXOffset + window.innerWidth / 2 - window.innerHeight * playfieldSize * (4 / 3) / 2;
 	let hitObjectOffsetY = playfieldYOffset + window.innerHeight / 2 - window.innerHeight * playfieldSize / 2;
 
+	window.addEventListener("resize", function() {
+		document.getElementById("gameplay").width = window.innerWidth;
+		document.getElementById("gameplay").height = window.innerHeight;
+		document.getElementById("gameplay-flashlight").width = window.innerWidth;
+		document.getElementById("gameplay-flashlight").height = window.innerHeight;
+		hitObjectOffsetX = playfieldXOffset + window.innerWidth / 2 - window.innerHeight * playfieldSize * (4 / 3) / 2;
+		hitObjectOffsetY = playfieldYOffset + window.innerHeight / 2 - window.innerHeight * playfieldSize / 2;
+		/* Playfield calculations and data */
+		playfieldSize = 0.8;
+		playfieldXOffset = 0;
+		playfieldYOffset = window.innerHeight / 50;
+		mouse.positionBound(0, 0, window.innerWidth, window.innerHeight);
+	});
+
 	function setHitObjectCache(hitObject, useTime, hitObjectOffsetX, hitObjectOffsetY) {
 		/* Cache Setup */
 		let sliderSpeedMultiplier = loadedMap.SliderMultiplier;
@@ -1094,10 +1108,6 @@ define(function(require) {
 			hitErrors = [];
 			scoreObjects = [];
 			effectObjects = [];
-			/* Playfield calculations and data */
-			playfieldSize = 0.8;
-			playfieldXOffset = 0;
-			playfieldYOffset = window.innerHeight / 50;
 			/* HP values */
 			currentHP = 1;
 			hpDisplay = 1;
