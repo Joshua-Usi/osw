@@ -1,6 +1,16 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v0.7.3b] - 2021-05-02
+### Added
+- new Audio API to simplify audio
+### Changed
+- menuHit.wav to menu-hit.wav
+### Optimised
+- Sound effects (still problematic as browser requests every time)
+### Removed
+- attachAudio.js file and API
+---
 ## [v0.7.2b] - 2021-05-01
 ### Optimised
 - Page loading in the HTML

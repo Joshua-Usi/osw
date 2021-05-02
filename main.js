@@ -26,8 +26,20 @@ define(function(require) {
 	/* RequireJS Module Loading */
 	let Options = require("./src/scripts/options.js");
 	const AssetLoader = require("./src/scripts/assetLoader.js");
+	const AudioManager = new (require("./src/scripts/audioManager.js"))();
+	AudioManager.load("back-button-click", "./src/audio/effects/back-button-click.wav", "effects", true);
+	AudioManager.load("menu-options-click", "./src/audio/effects/menu-options-click.wav", "effects", true);
+	AudioManager.load("menu-freeplay-click", "./src/audio/effects/menu-freeplay-click.wav", "effects", true);
+	AudioManager.load("menu-edit-click", "./src/audio/effects/menu-edit-click.wav", "effects", true);
+	AudioManager.load("menu-direct-click", "./src/audio/effects/menu-direct-click.wav", "effects", true);
+	AudioManager.load("menu-exit-click", "./src/audio/effects/menu-exit-click.wav", "effects", true);
+	AudioManager.load("menu-hover", "./src/audio/effects/menu-hover.wav", "effects", true);
+	AudioManager.load("check-on", "./src/audio/effects/menu-hover.wav", "effects", true);
+	AudioManager.load("check-off", "./src/audio/effects/menu-hover.wav", "effects", true);
+	AudioManager.load("settings-hover", "./src/audio/effects/settings-hover.wav", "effects", true);
+	AudioManager.load("sliderbar", "./src/audio/effects/sliderbar.wav", "effects", true);
+	AudioManager.load("menu-hit", "./src/audio/effects/menu-hit.wav", "effects", true);
 	const utils = require("./src/scripts/utils.js");
-	const AttachAudio = require("./src/scripts/attachAudio.js");
 	const Beatmaps = require("./src/scripts/beatmapFetcher.js");
 	const BeatMapSelectionPaneTemplate = require("./src/scripts/beatMapSelectionPane.js");
 	let gameplay = require("./src/scripts/gameplay.js");
@@ -61,7 +73,7 @@ define(function(require) {
 		console.warn("IndexedDB is not supported on your browser, this means you will be unable to save beatmaps");
 	}
 	/* osw! version incremented manually */
-	const version = "osw! 0.7.2b";
+	const version = "osw! 0.7.3b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
@@ -495,10 +507,10 @@ define(function(require) {
 		}
 	});
 	/* Sidenav event listener */
-	AttachAudio(document.getElementById("close-btn"), "click", "./src/audio/effects/back-button-click.wav", "settings-master-volume", "settings-effects-volume");
 	document.getElementById("close-btn").addEventListener("click", function() {
 		document.getElementById("sidenav").style.width = "0";
 		document.getElementById("sidenav").style.opacity = 0.2;
+		AudioManager.play("back-button-click");
 	});
 	document.getElementById("settings-icon").addEventListener("click", function() {
 		document.getElementById("menu-bar-settings").dispatchEvent(new CustomEvent("click"));
@@ -506,26 +518,25 @@ define(function(require) {
 	/* Menu bar buttons listeners */
 	let buttons = document.getElementsByClassName("menu-bar-buttons-parent");
 	for (let i = 0; i < buttons.length; i++) {
-		let clickSrc = "";
-		switch (buttons[i].id) {
-			case "menu-bar-settings":
-				clickSrc = "./src/audio/effects/menu-options-click.wav";
-				break;
-			case "menu-bar-play":
-				clickSrc = "./src/audio/effects/menu-freeplay-click.wav";
-				break;
-			case "menu-bar-edit":
-				clickSrc = "./src/audio/effects/menu-edit-click.wav";
-				break;
-			case "menu-bar-direct":
-				clickSrc = "./src/audio/effects/menu-direct-click.wav";
-				break;
-			case "menu-bar-exit":
-				clickSrc = "./src/audio/effects/menu-exit-click.wav";
-				break;
-		}
-		AttachAudio(buttons[i], "click", clickSrc, "settings-master-volume", "settings-effects-volume");
-		AttachAudio(buttons[i], "mouseenter", "./src/audio/effects/menu-hover.wav", "settings-master-volume", "settings-effects-volume");
+		buttons[i].addEventListener("click", function() {
+			switch (buttons[i].id) {
+				case "menu-bar-settings":
+					AudioManager.play("menu-options-click");
+					break;
+				case "menu-bar-play":
+					AudioManager.play("menu-freeplay-click");
+					break;
+				case "menu-bar-edit":
+					AudioManager.play("menu-edit-click");
+					break;
+				case "menu-bar-direct":
+					AudioManager.play("menu-direct-click");
+					break;
+				case "menu-bar-exit":
+					AudioManager.play("menu-exit-click");
+					break;
+			}
+		});
 		buttons[i].addEventListener("mouseenter", function() {
 			let icon = this.getElementsByClassName("menu-bar-buttons-icon")[0];
 			let image = this.getElementsByClassName("menu-bar-image-move")[0]
@@ -535,6 +546,7 @@ define(function(require) {
 				icon.style.animationDuration = logoBeatAccumulator.milliseconds * 4 + "ms";
 				image.style.animationDuration = logoBeatAccumulator.milliseconds + "ms";
 			}
+			AudioManager.play("menu-hover");
 		});
 		buttons[i].addEventListener("mouseleave", function() {
 			this.getElementsByClassName("menu-bar-buttons-icon")[0].classList.remove("menu-bar-buttons-icon-animation");
@@ -546,26 +558,26 @@ define(function(require) {
 		for (let i = 0; i < checkbox.length; i++) {
 			checkbox[i].addEventListener("change", function() {
 				if (this.checked === true) {
-					let checkOn = AssetLoader.audio("./src/audio/effects/check-on.wav");
-					checkOn.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-					checkOn.play();
+					AudioManager.play("check-on");
 				} else {
-					let checkOff = AssetLoader.audio("./src/audio/effects/check-off.wav");
-					checkOff.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-effects-volume").value / 100);
-					checkOff.play();
+					AudioManager.play("check-off");
 				}
 				setSettings();
 			});
-			AttachAudio(checkbox[i], "mouseenter", "./src/audio/effects/settings-hover.wav", "settings-master-volume", "settings-effects-volume");
+			checkbox[i].addEventListener("mouseenter", function() {
+				AudioManager.play("settings-hover");
+			});
 		}
 		/* All range slider listeners */
 		let sliders = document.getElementsByClassName("slider");
 		for (let i = 0; i < sliders.length; i++) {
 			sliders[i].addEventListener("input", function() {
 				this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
+				AudioManager.play("sliderbar");
 			});
-			AttachAudio(sliders[i], "input", "./src/audio/effects/sliderbar.wav", "settings-master-volume", "settings-effects-volume");
-			AttachAudio(sliders[i], "mouseenter", "./src/audio/effects/settings-hover.wav", "settings-master-volume", "settings-effects-volume");
+			sliders[i].addEventListener("mouseenter", function() {
+				AudioManager.play("settings-hover");
+			});
 		}
 		/* All selectbox listeners */
 		let selectBoxes = document.getElementsByClassName("select-box");
@@ -599,7 +611,9 @@ define(function(require) {
 					selectBoxSelections.style.opacity = 0;
 				}
 			});
-			AttachAudio(selectBoxes[i], "mouseenter", "./src/audio/effects/settings-hover.wav", "settings-master-volume", "settings-effects-volume");
+			selectBoxes[i].addEventListener("mouseenter", function() {
+				AudioManager.play("settings-hover");
+			});
 		}
 	/* Specific menu bar button listeners */
 	document.getElementById("menu-bar-settings").addEventListener("click", function() {
@@ -649,6 +663,7 @@ define(function(require) {
 	});
 	document.getElementById("settings-effects-volume").addEventListener("input", function() {
 		document.getElementById("settings-effects-volume-text").textContent = "Effects volume: " + this.value + "%";
+		AudioManager.setEffectsVolume(document.getElementById("settings-master-volume").value / 100 * this.value / 100);
 		setSettings();
 	});
 	document.getElementById("settings-mouse-sensitivity").addEventListener("input", function() {
@@ -696,8 +711,8 @@ define(function(require) {
 		}, 1000);
 	});
 	/* logo listener */
-	AttachAudio(document.getElementById("logo"), "click", "./src/audio/effects/menuHit.wav", "settings-master-volume", "settings-effects-volume");
 	document.getElementById("logo").addEventListener("click", function() {
+		AudioManager.play("menu-hit");
 		logoX = 30;
 		logoY = 50;
 		logoSize = 25;
@@ -719,8 +734,6 @@ define(function(require) {
 		clearTimeout(menuTimeout);
 		menuTimeout = setTimeout(resetMenu, 15000);
 	});
-	AttachAudio(document.getElementById("back-button"), "click", "./src/audio/effects/back-button-click.wav", "settings-master-volume", "settings-effects-volume");
-	AttachAudio(document.getElementById("back-button"), "mouseenter", "./src/audio/effects/menu-hover.wav", "settings-master-volume", "settings-effects-volume");
 	document.getElementById("menu-bar-play").addEventListener("click", function() {
 		showWebpageStates([
 			"webpage-state-beatmap-selection",
@@ -807,6 +820,7 @@ define(function(require) {
 		passive: false
 	});
 	document.getElementById("back-button").addEventListener("click", function() {
+		AudioManager.play("back-button-click");
 		if (document.getElementById("webpage-state-results-screen").style.display === "block") {
 			showWebpageStates([
 				"webpage-state-beatmap-selection",
@@ -828,6 +842,9 @@ define(function(require) {
 			]);
 		}
 		document.getElementById("menu-audio").play();
+	});
+	document.getElementById("back-button").addEventListener("mouseenter", function() {
+		AudioManager.play("menu-hover")
 	});
 	document.getElementById("pause-menu-continue").addEventListener("click", function() {
 		gameplay.continue();
