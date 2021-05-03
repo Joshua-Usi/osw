@@ -947,7 +947,7 @@ define(function(require) {
 		flashlightCtx.fillStyle = "white";
 		flashlightCtx.shadowOffsetX = 1;
 		flashlightCtx.shadowOffsetY = 1;
-		flashlightCtx.shadowBlur = 20;
+		flashlightCtx.shadowBlur = 40;
 		flashlightCtx.shadowColor = "rgba(255, 255, 255, 1)";
 		flashlightCtx.fill();
 		flashlightCtx.fill();
@@ -1033,10 +1033,10 @@ define(function(require) {
 			playDetails.maxCombo = highestCombo;
 			previousTime = useTime;
 
-			if (highestCombo >= 100) {
-				flashlightSize = utils.map(80, 0, 512, 0, window.innerWidth);
-			} else if (highestCombo >= 200) {
+			if (highestCombo >= 200) {
 				flashlightSize = utils.map(60, 0, 512, 0, window.innerWidth);
+			} else if (highestCombo >= 100) {
+				flashlightSize = utils.map(80, 0, 512, 0, window.innerWidth);
 			} else {
 				flashlightSize = utils.map(100, 0, 512, 0, window.innerWidth);
 			}

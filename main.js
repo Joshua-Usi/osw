@@ -27,18 +27,6 @@ define(function(require) {
 	let Options = require("./src/scripts/options.js");
 	const AssetLoader = require("./src/scripts/assetLoader.js");
 	const AudioManager = new (require("./src/scripts/audioManager.js"))();
-	AudioManager.load("back-button-click", "./src/audio/effects/back-button-click.wav", "effects", true);
-	AudioManager.load("menu-options-click", "./src/audio/effects/menu-options-click.wav", "effects", true);
-	AudioManager.load("menu-freeplay-click", "./src/audio/effects/menu-freeplay-click.wav", "effects", true);
-	AudioManager.load("menu-edit-click", "./src/audio/effects/menu-edit-click.wav", "effects", true);
-	AudioManager.load("menu-direct-click", "./src/audio/effects/menu-direct-click.wav", "effects", true);
-	AudioManager.load("menu-exit-click", "./src/audio/effects/menu-exit-click.wav", "effects", true);
-	AudioManager.load("menu-hover", "./src/audio/effects/menu-hover.wav", "effects", true);
-	AudioManager.load("check-on", "./src/audio/effects/menu-hover.wav", "effects", true);
-	AudioManager.load("check-off", "./src/audio/effects/menu-hover.wav", "effects", true);
-	AudioManager.load("settings-hover", "./src/audio/effects/settings-hover.wav", "effects", true);
-	AudioManager.load("sliderbar", "./src/audio/effects/sliderbar.wav", "effects", true);
-	AudioManager.load("menu-hit", "./src/audio/effects/menu-hit.wav", "effects", true);
 	const utils = require("./src/scripts/utils.js");
 	const Beatmaps = require("./src/scripts/beatmapFetcher.js");
 	const BeatMapSelectionPaneTemplate = require("./src/scripts/beatMapSelectionPane.js");
@@ -73,7 +61,7 @@ define(function(require) {
 		console.warn("IndexedDB is not supported on your browser, this means you will be unable to save beatmaps");
 	}
 	/* osw! version incremented manually */
-	const version = "osw! 0.7.3b";
+	const version = "osw! 0.7.4b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
@@ -462,6 +450,18 @@ define(function(require) {
 		window.dispatchEvent(new CustomEvent("orientationchange"));
 	});
 	window.addEventListener("load", function() {
+		AudioManager.load("back-button-click", "./src/audio/effects/back-button-click.wav", "effects", true);
+		AudioManager.load("menu-options-click", "./src/audio/effects/menu-options-click.wav", "effects", true);
+		AudioManager.load("menu-freeplay-click", "./src/audio/effects/menu-freeplay-click.wav", "effects", true);
+		AudioManager.load("menu-edit-click", "./src/audio/effects/menu-edit-click.wav", "effects", true);
+		AudioManager.load("menu-direct-click", "./src/audio/effects/menu-direct-click.wav", "effects", true);
+		AudioManager.load("menu-exit-click", "./src/audio/effects/menu-exit-click.wav", "effects", true);
+		AudioManager.load("menu-hover", "./src/audio/effects/menu-hover.wav", "effects", true);
+		AudioManager.load("check-on", "./src/audio/effects/menu-hover.wav", "effects", true);
+		AudioManager.load("check-off", "./src/audio/effects/menu-hover.wav", "effects", true);
+		AudioManager.load("settings-hover", "./src/audio/effects/settings-hover.wav", "effects", true);
+		AudioManager.load("sliderbar", "./src/audio/effects/sliderbar.wav", "effects", true);
+		AudioManager.load("menu-hit", "./src/audio/effects/menu-hit.wav", "effects", true);
 		audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";

@@ -1,5 +1,12 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
+## [v0.7.4b] - 2021-05-02
+### Changed
+- Bug report issue file
+### Optimised
+- Page loading by only loading sounds after page load
+### Fixed
+- Flashlight not having the correct sizes
 ---
 ## [v0.7.3b] - 2021-05-02
 ### Added
