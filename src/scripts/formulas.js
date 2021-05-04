@@ -213,13 +213,13 @@ define(function(require) {
 			if (mods.hardRock) {
 				multiplier *= 1.06;
 			}
-			if (mods.hiddden) {
+			if (mods.hidden) {
 				multiplier *= 1.06;
 			}
-			if (mods.doubleTime) {
+			if (mods.doubleTime || mods.nightCore) {
 				multiplier *= 1.12;
 			}
-			if (mods.flashLight) {
+			if (mods.flashlight) {
 				multiplier *= 1.12;
 			}
 			/* decreases */
@@ -231,6 +231,16 @@ define(function(require) {
 			}
 			if (mods.halfTime) {
 				multiplier *= 0.3;
+			}
+			if (mods.spunOut) {
+				multiplier *= 0.9;	
+			}
+			/* special mods */
+			if (mods.relax) {
+				multiplier *= 0;
+			}
+			if (mods.autopilot) {
+				multiplier *= 0;
 			}
 			return multiplier;
 		}

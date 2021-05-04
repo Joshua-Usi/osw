@@ -27,6 +27,7 @@
 				<div>
 					<img src="./src/images/warning.png" class="splash-screen-warning-img" style="opacity: 0;">
 					<p style="margin: 0; display: inline-block;">volume warning! first run is often loud!</p>
+					<p style="margin: 0;" class="inline-block">volume warning! first run is often loud!</p>
 					<img src="./src/images/warning.png" class="splash-screen-warning-img" style="opacity: 0;">
 				</div>
 				<p style="margin: 0;">osw! is in heavy development</p>
@@ -65,7 +66,7 @@
 					<button type="button" class="settings-button triangle-background blue" onclick="window.open('https://github.com/Joshua-Usi/unofficial-osu-web', '_blank');">Visit Github repository</button>
 					<button type="button" class="settings-button triangle-background blue" onclick="window.open('https://github.com/Joshua-Usi/osw/issues/new/choose', '_blank');">Found a bug? Submit a bug report</button>
 					<button type="button" class="settings-button triangle-background blue" onclick="window.open('http://osu.ppy.sh/', '_blank');">Visit official osu! website</button>
-					<p style="display: inline;">Client version: <span style="display: inline;" class="client-version"></span></p>
+					<p style="display: inline;">Client version: <span class="client-version"></span></p>
 					<!-- Audio Settings -->
 					<div class="sidenav-divider"></div>
 					<p class="sidenav-title-text">Audio</p>
@@ -232,8 +233,8 @@
 			<p id="frame-rate">0 / 60 fps</p>
 		</div>
 		<div class="webpage-state" id="webpage-state-menu">
-			<div id="left-beat"></div>
-			<div id="right-beat"></div>
+			<div class="beat-bar" id="left-beat"></div>
+			<div class="beat-bar" id="right-beat"></div>
 			<div id="menu-parallax">
 				<img id="logo" src="./src/images/osw.png">
 				<canvas id="audio-visualiser"></canvas>
@@ -308,25 +309,23 @@
 			</div>
 			<div style="width: 7.5vw;" class="buttons-container" id="bottom-bar-mods">
 				<div class="bottom-bar-anti-skew">
-						<p class="buttons-container-text">Mods</p>
-					</div>
+					<p class="buttons-container-text">Mods</p>
+				</div>
 			</div>
 			<div style="width: 7.5vw;" class="buttons-container" id="bottom-bar-random">
 				<div class="bottom-bar-anti-skew">
-						<p class="buttons-container-text">Random</p>
-					</div>
+					<p class="buttons-container-text">Random</p>
+				</div>
 			</div>
 			<div style="width: 7.5vw;" class="buttons-container" id="bottom-bar-options">
 				<div class="bottom-bar-anti-skew">
-						<p class="buttons-container-text">Options</p>
-					</div>
+					<p class="buttons-container-text">Options</p>
+				</div>
 			</div>
 		</div>
 		<div class="webpage-state" id="webpage-state-beatmap-selection">
 			<div id="beatmap-selection-left"></div>
-			<div id="beatmap-selection-right">
-				
-			</div>
+			<div id="beatmap-selection-right"></div>
 		</div>
 		<div class="webpage-state" id="webpage-state-gameplay">
 			<img id="grade" src="//:0">
@@ -438,7 +437,7 @@
 					<button type="button" style="margin-left: 10vw;" class="mods-button triangle-background blue" id="mods-deselect-all">Deselect All</button>
 					<button type="button" class="mods-button triangle-background blue">Customisation</button>
 					<button type="button" class="mods-button triangle-background blue" id="mods-close-button">Close</button>
-					<p style="display: inline-block;">Score Multiplier: <b>1.00x</b></p>
+					<p class="inline-block" id="mod-score-multiplier">Score Multiplier: <b>1.00x</b></p>
 				</div>
 			</div>
 		</div>
@@ -496,8 +495,8 @@
 					<div class="end-results-3-part">
 						<p class="end-results-header">COMBO</p>
 						<div>
-							<p id="end-results-max-combo" style="display: inline;">0</p>
-							<p id="end-results-combo-type" style="display: inline; font-size: 1.5vh;">PERFECT</p>
+							<p id="end-results-max-combo" class="inline-block">0</p>
+							<p id="end-results-combo-type" class="inline-block" style="font-size: 1.5vh;">PERFECT</p>
 						</div>
 					</div>
 					<div class="end-results-3-part">

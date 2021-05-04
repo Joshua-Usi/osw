@@ -1,4 +1,6 @@
 define(function(require) {
+	const formulas = require("./formulas.js");
+	const mods = require("./mods.js")();
 	let isOpen = false;
 	let elements = document.getElementsByClassName("mod-icons");
 	for (let i = 0; i < elements.length; i++) {
@@ -6,9 +8,12 @@ define(function(require) {
 			let modName = this.id.replace("mod-", "");
 			if (this.classList.contains("mod-selected")) {
 				this.className = this.className.replace(/\bmod-selected\b/g, "");
+				mods[modName] = false;
 			} else {
 				this.classList.add("mod-selected");
+				mods[modName] = true;
 			}
+			document.getElementById("mod-score-multiplier").innerHTML = `Score Multiplier: <b>${formulas.modScoreMultiplier(mods).toFixed(2)}x</b>`;
 		});
 	}
 	let el = [

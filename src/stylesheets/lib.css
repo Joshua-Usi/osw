@@ -1,13 +1,17 @@
 .red {
-	background: url("../../src/images/triangles.png");
 	background-color: #FD67AE;
-	background-size: 25vw;
 }
 
 .blue {
-	background: url("../../src/images/triangles.png");
 	background-color: #2ca4cc;
-	background-size: 25vw;
+}
+
+.red:hover {
+	background-color: #ff9ccb;
+}
+
+.blue:hover {
+	background-color: #45b0de;
 }
 
 .inline-block {

@@ -1,22 +1,24 @@
 #end-results {
-	font-family: Varela Round;
-	width: 25vw;
-	height: 80vh;
-	/* fallback for browsers that don't support gradients*/
-	border-radius: 2vh;
-	background-color: #545454;
-	background-image: linear-gradient(#545454, #343434);
-	padding: 1vh;
-	font-size: 2.5vh;
 	position: absolute;
 	top: calc(50vh - 80vh / 2);
 	left: calc(50vw - 25vw / 2);
+
+	width: 25vw;
+	height: 80vh;
+	padding: 1vh;
+	border-radius: 2vh;
+
+	background-image: linear-gradient(#545454, #343434);
+
+	font-size: 2.5vh;
 }
 
 #end-results * {
-	color: #e4ecef;
-	text-align: center;
 	margin: 0;
+
+	color: #e4ecef;
+
+	text-align: center;
 }
 
 #end-results-map-name {
@@ -32,26 +34,31 @@
 }
 
 #end-results-date-played {
-	font-size: 2vh;
 	position: relative;
 	top: 27.5vh;
+
+	font-size: 2vh;
 }
 
 .end-results-3-part {
-	width: calc(100% / 3);
-	display: inline-block;
 	float: left;
+
+	display: inline-block;
+	width: calc(100% / 3);
 }
 
 .end-results-4-part {
-	width: calc(100% / 4.0);
-	display: inline-block;
 	float: left;
+	
+	display: inline-block;
+	width: calc(100% / 4);
 }
 
 .end-results-header {
-	background-color: #222222;
 	border-radius: 5vh;
+
+	background-color: #222222;
+
 	font-size: 1.75vh;
 }
 
@@ -65,6 +72,7 @@
 	height: 1em;
 	margin: auto;
 	border-radius: 1em;
+
 	background-color: #000;
 }
 
@@ -72,8 +80,10 @@
 	width: 0;
 	height: 1em;
 	border-radius: 1em;
+
 	background-color: #2fa0b7;
-	transition: width 0.5s;
+
+	transition: width 2s;
 }
 
 #end-results-grade {

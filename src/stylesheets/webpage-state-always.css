@@ -1,22 +1,25 @@
 #background-dim {
 	position: absolute;
 	z-index: -10;
+
 	transition: filter 0.5s;
 	will-change: top left;
 }
 
 #background {
-	z-index: -10;
-	object-fit: cover;
 	top: -5vh;
 	left: -5vh;
+	z-index: -10;
+
 	width: 110vw;
 	height: 110vh;
+
+	object-fit: cover;
 }
 
 .gamemode-icons {
-	padding: 1.6vh;
 	border-radius: 100px;
+	padding: 1.6vh;
 }
 
 #avatar {
@@ -27,45 +30,35 @@
 
 .settings-button {
 	width: 100%;
-	outline: none;
+	height: calc(5vh + 1em);
+	margin: 0.5vh 0;
+	border: none;
 	border-radius: 1.5vh;
-	background: url("../../src/images/triangles.png");
-	background-color: #2ca4cc;
 	background-size: 25vw;
+
+	background-color: #2ca4cc;
 	color: #e4ecef;
+
 	text-align: center;
 	font-family: inherit;
-	font-size: 1vw;
-	border: none;
-	margin-bottom: 1vh;
-	height: calc(5vh + 1em);
+	font-size: 1.75vh;
+
 	transition: background 0.2s;
-}
-
-.settings-button .red:hover {
-	background: url("../../src/images/triangles.png");
-	background-color: #ff9ccb;
-	background-size: 25vw;
-
-}
-
-.settings-button .blue:hover {
-	background: url("../../src/images/triangles.png");
-	background-color: #45b0de;
-	background-size: 25vw;
-
+	outline: none;
 }
 
 #splash-screen {
 	position: absolute;
-	top: 0;
-	left: 0;
+	z-index: 1000;
+
 	width: 100vw;
 	height: 100vh;
-	text-align: center;
 	padding-top: calc(50vh - 3em);
+	
 	background: #000;
-	z-index: 1000;
+
+	text-align: center;
+	
 	transition: opacity 1s;
 }
 
@@ -77,21 +70,23 @@
 	height: 1.5em;
 	vertical-align: middle;
 	opacity: 0;
+
 	transition: opacity 1s;
 }
 
 #orientation-vertical {
 	position: absolute;
+	z-index: 1001;
+
 	display: none;
-	top: 0;
-	left: 0;
 	width: 100vw;
 	height: 100vh;
-	text-align: center;
 	padding-top: calc(50vh - 1em);
+
 	background: #000;
-	z-index: 1001;
-	color: #fff; 
+	color: #e4ecef;
+
+	text-align: center;
 }
 
 @keyframes splash-screen-text {
@@ -118,44 +113,50 @@
 
 #menu-parallax {
 	position: relative;
+
 	transition: filter 0.5s;
 }
 
 #sidenav {
-	height: 100%;
-	width: 0;
 	position: fixed;
 	z-index: 10000;
+
 	height: 100vh;
-	left: 0;
-	background: #0d0d0d;
+	width: 0;
 	overflow-x: hidden;
-	overflow-y: scroll;
-	transition: 0.7s;
-	transition-timing-function: cubic-bezier(0.15, 0.6, 0.3, 1);
+	background: #0d0d0d;
 	opacity: 0;
+
+	transition: width opacity;
+	transition-duration: 0.7s;
+	transition-timing-function: cubic-bezier(0.15, 0.6, 0.3, 1);
 }
 
 #sidenav p,
 #sidenav a {
-	padding: 1vh;
 	margin: 0;
+	padding: 1vh;
+
+	color: #e4ecef;
+
+	font-size: 2.2vh;
 	white-space: nowrap;
 	text-decoration: none;
-	font-size: 2.2vh;
-	color: #e4ecef;
 }
 
 #sidenav #close-btn {
 	position: absolute;
 	top: 0;
 	right: 1vw;
-	font-size: 3.3vh;
+
 	margin-left: 50px;
+
+	font-size: 3.3vh;
 }
 
 .sidenav-title-text {
 	color: #f8c621 !important;
+
 	font-size: 3.3vh !important;
 }
 
@@ -164,65 +165,81 @@
 }
 
 .sidenav-divider {
-	margin-top: 2vh;
-	margin-bottom: 2vh;
+	margin: 2vh 0;
 	padding: 0.25vh;
+
 	background: #000;
 }
 
 .character {
-	margin: auto;
 	display: inline-block;
 	width: 1.5vh;
 	height: 1.5vh;
-	text-align: center;
-	border-radius: 1.5vh;
+	margin: auto;
 	border: 0.4vh solid #FD67AE;
+	border-radius: 1.5vh;
+
 	background: #0d0d0d;
-	transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.1s ease;
+
+	line-height: 0.6;
+	text-align: center;
+
+	transition: background border-color box-shadow;
+	transition-duration: 0.2s;
+	transition-timing-function: ease;
 }
 
 .character:hover {
 	border-color: #ffc4ff;
+
 	box-shadow: -3px -3px 6px #FD67AE55, 3px -3px 6px #FD67AE55, 3px 3px 6px #FD67AE55, -3px 3px 6px #FD67AE55;
 }
 
 .lds-heart {
-	display: inline-block;
 	position: relative;
+
+	display: inline-block;
 	width: 80px;
 	height: 80px;
+
 	transform: rotate(45deg);
 	transform-origin: 40px 40px;
 }
 
 .lds-heart div {
+	position: absolute;
 	top: 32px;
 	left: 32px;
-	position: absolute;
+	
 	width: 32px;
 	height: 32px;
+
 	background: #FD67AE;
+
 	animation: lds-heart 0.7s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 .lds-heart div:after,
 .lds-heart div:before {
-	content: " ";
 	position: absolute;
+
 	display: block;
 	width: 32px;
 	height: 32px;
+	content: " ";
+	
 	background: #FD67AE;
 }
 
 .lds-heart div:before {
 	left: -24px;
+
 	border-radius: 50% 0 0 50%;
 }
 
 .lds-heart div:after {
 	top: -24px;
+
 	border-radius: 50% 50% 0 0;
 }
 
@@ -249,42 +266,50 @@
 
 #frame-rate {
 	position: absolute;
+	z-index: 100;
 	bottom: 1vh;
 	right: 1vh;
-	font-size: 1.25vh;
-	font-family: Varela Round, Helvetica;
-	color: #fff;
+
 	margin: 0;
-	padding: 0.5em;
 	border-radius: 1em;
+	padding: 0.5em;
+
 	background: #0f0;
-	transition: background 1s, opacity 1s;
-	z-index: 100;
+	color: #e4ecef;
+
+	font-size: 1.25vh;
+
+	transition: background 1s, opacity 1s;	
 }
 
 .triangle-background {
+	background: url("../../src/images/triangles.png");
 	background-attachment: fixed;
 }
 
 #goodbye {
+	position: absolute;
+	z-index: -10000;
+
 	width: 100vw;
 	height: 100vh;
-	position: absolute;
-	top: 0;
-	left: 0;
-	background-color: #000;
 	opacity: 0;
-	z-index: -10000;
+
+	background-color: #000;
+
 	transition: opacity 4s;
 }
 
 #intro {
-	color: #e4ecef;
-	background: #000;
 	position: absolute;
 	z-index: 999;
+
 	width: 100vw;
 	height: 100vh;
+
+	background: #000;
+	color: #e4ecef;
+
 	transition: opacity 0.75s;
 }
 
@@ -292,19 +317,22 @@
 	position: absolute;
 	top: calc(50vh - 175vh / 2);
 	left: calc(50vw - 175vh / 2);
+
 	width: 175vh;
 	height: 175vh;
-	transition: left 0.8s, top 0.8s, width 0.8s, height 0.8s;
+
+	transition: left top width height;
+	transition-duration: 0.8s;
 	transition-timing-function: cubic-bezier(0.8,.4,.85,.3);
 }
 
 #intro-text {
-	text-align: center;
 	position: relative;
 	top: calc(50vh - 1em);
+
+	text-align: center;
 	font-size: 5vh;
-	font-family: Varela Round;
-	letter-spacing: 0px;
+
 	transition: letter-spacing 0.8s;
 	transition-timing-function: linear;
 }
@@ -312,7 +340,9 @@
 .intro-gamemodes {
 	position: absolute;
 	top: -10vh;
+
 	width: 4vh;
+	
 	transition-timing-function: linear;
 }
 
