@@ -85,26 +85,29 @@ define(function(require) {
 		},
 		/* 90 sided circle */
 		circleToPoints: function(x, y, r, length, startingAngle, clockwise) {
+			if (isFinite(r) === false) {
+				r = 10000000;
+			}
 			let points = [];
 			let totalLength = 0;
 			let direction;
+			let inc = length / r;
+			let currentAngle = 0;
 			if (clockwise === 2) {
 				direction = 1;
 			}
 			if (clockwise === 1) {
 				direction = -1;
 			}
-			for (let i = 0; i < 360; i += 1) {
+			while (totalLength < length) {
 				points.push({
-					x: x + Math.cos(startingAngle + direction * i * Math.PI / 180) * r,
-					y: y + Math.sin(startingAngle + direction * i * Math.PI / 180) * r,
+					x: x + Math.cos(startingAngle + direction * currentAngle * Math.PI / 180) * r,
+					y: y + Math.sin(startingAngle + direction * currentAngle * Math.PI / 180) * r,
 				});
-				if (i >= 1) {
-					totalLength += this.dist(points[i].x, points[i].y, points[i - 1].x, points[i - 1].y);
+				if (currentAngle > 0) {
+					totalLength += this.dist(points[points.length - 1].x, points[points.length - 1].y, points[points.length - 2].x, points[points.length - 2].y);
 				}
-				if (totalLength >= length) {
-					break;
-				}
+				currentAngle += inc;
 			}
 			return points;
 		},

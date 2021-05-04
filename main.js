@@ -819,7 +819,6 @@ define(function(require) {
 				"top-bar",
 			]);
 			hideWebpageStates([
-				"bottom-bar",
 				"webpage-state-results-screen",
 			]);
 		} else {
