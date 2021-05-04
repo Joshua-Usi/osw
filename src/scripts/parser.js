@@ -59,6 +59,47 @@ define(function(require) {
 			}
 			return beatmap;
 		},
+		quickParseMap: function(data) {
+			let splited = data.split("\n");
+			let beatmap = {
+				version: splited[0],
+			};
+			let section = "";
+			/* start from 1 to ignore version */
+			let len = splited.length;
+			for (var i = 1; i < len; i++) {
+				if (splited[i] === "" || splited[i].substr(0, 2) === "//") {
+					continue;
+				}
+				if (splited[i][0] === "[") {
+					section = splited[i].replace(/[\n\r]/g, "");
+					continue;
+				}
+				if (section === "[TimingPoints]" || section === "[HitObjects]" || section === "[Colours]") {
+					break;
+				}
+				let keyValuePair = splited[i].split(/:(.+)/);
+				if (keyValuePair.length === 1) {
+					continue;
+				}
+				if (keyValuePair[0] === "AudioFilename") {
+					if (keyValuePair[1].substr(0, 1) === " ") {
+						keyValuePair[1] = keyValuePair[1].substr(1);
+					}
+					beatmap[keyValuePair[0]] = keyValuePair[1];
+					continue;
+				}
+				if (isNaN(parseFloat(keyValuePair[1]))) {
+					if (keyValuePair[1].substr(0, 1) === " ") {
+						keyValuePair[1] = keyValuePair[1].substr(1);
+					}
+					beatmap[keyValuePair[0]] = keyValuePair[1];
+				} else {
+					beatmap[keyValuePair[0]] = parseFloat(keyValuePair[1]);
+				}
+			}
+			return beatmap;
+		},
 		parseHitObject: function(data) {
 			let splited = data.split(",");
 			let len = splited.length;

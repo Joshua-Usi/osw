@@ -39,7 +39,7 @@
 			</div>
 			<div id="goodbye"></div>
 			<div id="background-dim">
-				<img id="background" src="./src/images/osw_background.png">
+				<img decoding="async" id="background" src="./src/images/osw_background.png">
 			</div>
 			<div id="intro">
 				<div id="intro-text"></div>
@@ -298,12 +298,10 @@
 					</div>
 				</div>
 			</div>
-			<div style="width: 15vw;" class="buttons-container" id="bottom-bar-upload">
+			<div style="width: 15vw;" class="buttons-container" id="bottom-bar-upload" onclick="document.getElementById('upload-beatmap').click();">
 				<input type="file" name="upload-beatmap" id="upload-beatmap" style="display: none;"/>
-				<div onclick="document.getElementById('upload-beatmap').click()">
-					<div class="bottom-bar-anti-skew">
-						<p class="buttons-container-text">Upload a beatmap</p>
-					</div>
+				<div class="bottom-bar-anti-skew">
+					<p class="buttons-container-text">Upload a beatmap</p>
 				</div>
 			</div>
 			<div style="width: 7.5vw;" class="buttons-container" id="bottom-bar-mods">

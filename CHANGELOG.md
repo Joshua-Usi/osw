@@ -4,6 +4,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v0.7.5b] - 2021-05-02
 ### Optimised
 - CSS codebase cleanup
+### Fixed
+- A z-index bug preventing beatmap uploading
 ---
 ## [v0.7.4b] - 2021-05-02
 ### Changed
@@ -26,7 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v0.7.2b] - 2021-05-01
 ### Optimised
 - Page loading in the HTML
-
 ### Removed
 - defaultSkin.js
 ### Fixed

@@ -67,14 +67,17 @@
 	display: block;
 }
 
+* {
+	/* Helvetica for fallback */
+	font-family: Varela Round, Helvetica;
+}
+
 body {
 	margin: 0;
 	overflow: hidden;
 
 	background: #000;
 
-	/* Helvetica for fallback */
-	font-family: Varela Round, Helvetica;
 	font-display: fallback;
 	font-size: 2.5vh;
 

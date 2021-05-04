@@ -25,12 +25,11 @@ define(function(require) {
 	"use strict";
 	/* RequireJS Module Loading */
 	let Options = require("./src/scripts/options.js");
-	const AssetLoader = require("./src/scripts/assetLoader.js");
 	const AudioManager = new (require("./src/scripts/audioManager.js"))();
 	const utils = require("./src/scripts/utils.js");
 	const Beatmaps = require("./src/scripts/beatmapFetcher.js");
 	const BeatMapSelectionPaneTemplate = require("./src/scripts/beatMapSelectionPane.js");
-	let gameplay = require("./src/scripts/gameplay.js");
+	const gameplay = require("./src/scripts/gameplay.js");
 	const introSequence = require("./src/scripts/introSequence.js");
 	const Accumulator = require("./src/scripts/accumulator.js");
 	const databaseManager = require("./src/scripts/databaseManager.js");
@@ -100,7 +99,6 @@ define(function(require) {
 						database.addEventListener("success", function(event) {
 							let database = event.target.result;
 							let audioObjectStore = databaseManager.getObjectStore(database, "audio", "readonly");
-							let beatmapObjectStore = databaseManager.getObjectStore(database, "beatmaps", "readonly")
 							let audioRequest = audioObjectStore.get(that.getAttribute("data-audiosource"));
 							audioRequest.addEventListener("error", function(event) {
 								console.error(`Attempt to find query failed: ${event.target.error}`);
@@ -215,12 +213,7 @@ define(function(require) {
 
 	/* Initial menu song pool */
 	let songs = ["cYsmix - Triangles.mp3", "nekodex - circles.mp3", "nekodex - aureole.mp3"];
-	let defaultSongsMs = [
-		375,
-		333,
-		429,
-
-	];
+	let defaultSongsMs = [375, 333, 429];
 	let chosenSong;
 	let menuAudio = new Audio();
 	menuAudio.id = "menu-audio";
@@ -272,6 +265,18 @@ define(function(require) {
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
 			introSequence.animate();
+			AudioManager.load("back-button-click", "./src/audio/effects/back-button-click.wav", "effects", true);
+			AudioManager.load("menu-options-click", "./src/audio/effects/menu-options-click.wav", "effects", true);
+			AudioManager.load("menu-freeplay-click", "./src/audio/effects/menu-freeplay-click.wav", "effects", true);
+			AudioManager.load("menu-edit-click", "./src/audio/effects/menu-edit-click.wav", "effects", true);
+			AudioManager.load("menu-direct-click", "./src/audio/effects/menu-direct-click.wav", "effects", true);
+			AudioManager.load("menu-exit-click", "./src/audio/effects/menu-exit-click.wav", "effects", true);
+			AudioManager.load("menu-hover", "./src/audio/effects/menu-hover.wav", "effects", true);
+			AudioManager.load("check-on", "./src/audio/effects/menu-hover.wav", "effects", true);
+			AudioManager.load("check-off", "./src/audio/effects/menu-hover.wav", "effects", true);
+			AudioManager.load("settings-hover", "./src/audio/effects/settings-hover.wav", "effects", true);
+			AudioManager.load("sliderbar", "./src/audio/effects/sliderbar.wav", "effects", true);
+			AudioManager.load("menu-hit", "./src/audio/effects/menu-hit.wav", "effects", true);
 			/* Setting settings */
 			let index = 0;
 			for (let group in Options) {
@@ -286,9 +291,7 @@ define(function(require) {
 										mapped = utils.map(mapped, 10, 14, 1, 5);
 									}
 									element.value = Math.round(mapped);
-									element.dispatchEvent(new CustomEvent("input", {
-										detail: true
-									}));
+									element.dispatchEvent(new CustomEvent("input"));
 									break;
 								case "checkbox":
 									element.checked = Options[group][setting];
@@ -314,7 +317,7 @@ define(function(require) {
 				menuAudio.src = `src/audio/${songs[chosenSong]}`;
 			}
 			if (new Date().getMonth() === 11) {
-				chosenSong = 3;
+				chosenSong = 2;
 				menuAudio.src = `src/audio/${songs[chosenSong]}`;
 			}
 			logoBeatAccumulator = new Accumulator(logoBeat, defaultSongsMs[chosenSong]);
@@ -450,18 +453,6 @@ define(function(require) {
 		window.dispatchEvent(new CustomEvent("orientationchange"));
 	});
 	window.addEventListener("load", function() {
-		AudioManager.load("back-button-click", "./src/audio/effects/back-button-click.wav", "effects", true);
-		AudioManager.load("menu-options-click", "./src/audio/effects/menu-options-click.wav", "effects", true);
-		AudioManager.load("menu-freeplay-click", "./src/audio/effects/menu-freeplay-click.wav", "effects", true);
-		AudioManager.load("menu-edit-click", "./src/audio/effects/menu-edit-click.wav", "effects", true);
-		AudioManager.load("menu-direct-click", "./src/audio/effects/menu-direct-click.wav", "effects", true);
-		AudioManager.load("menu-exit-click", "./src/audio/effects/menu-exit-click.wav", "effects", true);
-		AudioManager.load("menu-hover", "./src/audio/effects/menu-hover.wav", "effects", true);
-		AudioManager.load("check-on", "./src/audio/effects/menu-hover.wav", "effects", true);
-		AudioManager.load("check-off", "./src/audio/effects/menu-hover.wav", "effects", true);
-		AudioManager.load("settings-hover", "./src/audio/effects/settings-hover.wav", "effects", true);
-		AudioManager.load("sliderbar", "./src/audio/effects/sliderbar.wav", "effects", true);
-		AudioManager.load("menu-hit", "./src/audio/effects/menu-hit.wav", "effects", true);
 		audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";
@@ -539,7 +530,7 @@ define(function(require) {
 		});
 		buttons[i].addEventListener("mouseenter", function() {
 			let icon = this.getElementsByClassName("menu-bar-buttons-icon")[0];
-			let image = this.getElementsByClassName("menu-bar-image-move")[0]
+			let image = this.getElementsByClassName("menu-bar-image-move")[0];
 			icon.classList.add("menu-bar-buttons-icon-animation");
 			image.classList.add("menu-bar-image-move-animation");
 			if (logoBeatAccumulator.milliseconds !== parseFloat(image.style.animationDuration)) {
@@ -844,7 +835,7 @@ define(function(require) {
 		document.getElementById("menu-audio").play();
 	});
 	document.getElementById("back-button").addEventListener("mouseenter", function() {
-		AudioManager.play("menu-hover")
+		AudioManager.play("menu-hover");
 	});
 	document.getElementById("pause-menu-continue").addEventListener("click", function() {
 		gameplay.continue();
@@ -896,7 +887,7 @@ define(function(require) {
 					} else if (key.includes(".osu")) {
 						zip.files[key].async("string").then(function(content) {
 							if (uniqueIdentifier === undefined) {
-								let parsedMap = Parser.parseBeatMap(content);
+								let parsedMap = Parser.quickParseMap(content);
 								uniqueIdentifier = parsedMap.Creator + parsedMap.Title;
 							}
 							beatmapQueue.push({
