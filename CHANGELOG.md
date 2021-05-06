@@ -7,14 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Options API to be more friendly
 - Gameplay API to use less memory
-- Improved Auto accuracy by making auto hit earlier
+- Improved Auto accuracy by making auto hit earlier	
 ### Removed
 - Loading loop in gameplay that costs unnecessary processing power
 ### Fixed
 - Auto bug that causes misses
 - Sliders with infinite radius causing errors (cause of Sotarks maps)
-### Security
--
 ---
 ## [v0.7.5b] - 2021-05-02
 ### Optimised
