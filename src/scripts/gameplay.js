@@ -255,16 +255,16 @@ define(function(require) {
 					mouse.changePosition((hitObjectMapped.x - mouse.position.x) / 4, (hitObjectMapped.y - mouse.position.y) / 4);
 				}
 			}
-			if (hitObject.type[0] === "1" && useTime >= hitObject.time) {
+			if (hitObject.type[0] === "1" && useTime > hitObject.time - odTime[2] / 2) {
 				mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y);
 				keyboard.emulateKeyDown("z");
 			}
-			if (hitObject.type[1] === "1" && useTime >= hitObject.time) {
+			if (hitObject.type[1] === "1" && useTime > hitObject.time - odTime[2] / 2) {
 				let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 				mouse.setPosition(sliderFollowCirclePos.x, sliderFollowCirclePos.y);
 				keyboard.emulateKeyDown("z");
 			}
-			if (hitObject.type[3] === "1" && useTime >= hitObject.time) {
+			if (hitObject.type[3] === "1" && useTime > hitObject.time) {
 				angleChange = 50;
 				mouse.setPosition(hitObjectMapped.x + 100 * Math.cos(hitObject.cache.currentAngle), hitObjectMapped.y + 100 * Math.sin(hitObject.cache.currentAngle));
 				keyboard.emulateKeyDown("z");
