@@ -78,7 +78,21 @@ define(function(require) {
 			localStorage.setItem("options", JSON.stringify(defaultOptions));
 			console.log("Your options was reset due to new version");
 		}
-		return optionsTemp;
+		defaultOptions = optionsTemp;
 	}
-	return defaultOptions;
+	return {
+		get: function() {
+			return defaultOptions;
+		},
+		getProperty(group, option) {
+			return defaultOptions[group][option];
+		},
+		save: function() {
+			localStorage.setItem("options", JSON.stringify(defaultOptions));
+			console.log("settings saved!");
+		},
+		update: function(group, option, value) {
+			defaultOptions[group][option] = value;
+		},
+	}
 });

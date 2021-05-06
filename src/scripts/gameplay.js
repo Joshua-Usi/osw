@@ -4,7 +4,6 @@ define(function(require) {
 	const Formulas = require("./formulas.js");
 	const Mouse = require("./mouse.js");
 	const Keyboard = require("./keyboard.js");
-	const beatmap = require("./beatmapFetcher.js");
 	const Bezier = require("./bezier.js");
 	const utils = require("./utils.js");
 	const HitObject = require("./hitObjects.js");
@@ -14,29 +13,19 @@ define(function(require) {
 	const PlayDetails = require("./playDetails.js");
 	const endScreen = require("./endScreen.js");
 	const databaseManager = require("./databaseManager.js");
-	let loadedMaps;
-	function loadMaps() {
-		if (beatmap.allMapsLoaded() === true) {
-			loadedMaps = beatmap.get();
-		} else {
-			setTimeout(loadMaps, 250);
-		}
-	}
-	loadMaps();
-	let useBeatmapSet;
-	let useBeatmap;
-	let loadedMap;
+	let currentLoadedMap;
 	/* canvas setup */
 	let canvas = new Canvas("gameplay");
+	canvas.setHeight(window.innerHeight);
+	canvas.setWidth(window.innerWidth);
+	let ctx = canvas.context;
+	canvas.setFillStyle("#fff");
+	/* flashlight canvas setup */
 	let flashlightCanvas = document.getElementById("gameplay-flashlight");
 	flashlightCanvas.width = window.innerWidth;
 	flashlightCanvas.height = window.innerHeight;
 	let flashlightCtx = flashlightCanvas.getContext("2d");
 	let flashlightSize = utils.map(100, 0, 512, 0, window.innerWidth);
-	canvas.setHeight(window.innerHeight);
-	canvas.setWidth(window.innerWidth);
-	let ctx = canvas.context;
-	canvas.setFillStyle("#fff");
 	let isRunning = false;
 	/* inputs setup */
 	let mouse = new Mouse("body", 30);
@@ -51,6 +40,7 @@ define(function(require) {
 	let keyboardRightReleased = false;
 	/* Details about the play, including replays */
 	let playDetails;
+	/* object arrays */
 	let currentHitObject = 0;
 	let hitEvents = [];
 	let hitObjects = [];
@@ -122,29 +112,27 @@ define(function(require) {
 		document.getElementById("gameplay").height = window.innerHeight;
 		document.getElementById("gameplay-flashlight").width = window.innerWidth;
 		document.getElementById("gameplay-flashlight").height = window.innerHeight;
+		/* Playfield calculations and data */
+		playfieldYOffset = window.innerHeight / 50;
 		hitObjectOffsetX = playfieldXOffset + window.innerWidth / 2 - window.innerHeight * playfieldSize * (4 / 3) / 2;
 		hitObjectOffsetY = playfieldYOffset + window.innerHeight / 2 - window.innerHeight * playfieldSize / 2;
-		/* Playfield calculations and data */
-		playfieldSize = 0.8;
-		playfieldXOffset = 0;
-		playfieldYOffset = window.innerHeight / 50;
 		mouse.positionBound(0, 0, window.innerWidth, window.innerHeight);
 	});
 
 	function setHitObjectCache(hitObject, useTime, hitObjectOffsetX, hitObjectOffsetY) {
-		/* Cache Setup */
-		let sliderSpeedMultiplier = loadedMap.SliderMultiplier;
+		/* Cache setup */
+		let sliderSpeedMultiplier = currentLoadedMap.SliderMultiplier;
 		if (hitObject.cache.cacheSet === false) {
-			/* Immediate Cache Setup */
+			/* Immediate Cache setup */
 			hitObject.cache.comboNumber = currentComboNumber;
 			hitObject.cache.comboColour = currentComboColour;
 			currentComboNumber++;
 			if (hitObject.type[0] === "1") {
-				/* Cache Setup for HitCircle */
+				/* Cache setup for HitCircle */
 				hitObject.cache.cacheSet = true;
 			} else if (hitObject.type[1] === "1") {
 				hitObject.cache.cacheSet = true;
-				/* Cache Setup for Slider */
+				/* Cache setup for Slider */
 				hitObject.cache.hitHead = false;
 				hitObject.cache.hitEnd = false;
 				hitObject.cache.onFollowCircle = false;
@@ -159,8 +147,13 @@ define(function(require) {
 				hitObject.cache.timingPointUninheritedIndex = timingPointUninheritedIndex;
 				/* Precalculate Slider Curve Points */
 				/* Calculate Slider Points */
-				if (hitObject.curveType === "B" || hitObject.curveType === "C" || hitObject.curveType === "L") {
+				let circle;
+				if (hitObject.curvePoints.length === 3) {
+					circle = utils.circumcircle(hitObject.curvePoints[0], hitObject.curvePoints[1], hitObject.curvePoints[2]);
+				}
+				if (hitObject.curveType === "B" || hitObject.curveType === "C" || hitObject.curveType === "L" || isFinite(circle.r) === false) {
 					/* Slider Type Bezier, Catmull and Linear */
+					/* I will likely not support catmull sliders */
 					/* determine slider red / white anchor */
 					let bezierTemp = [];
 					for (let j = 0; j < hitObject.curvePoints.length; j++) {
@@ -179,17 +172,16 @@ define(function(require) {
 					for (let k = 0; k < point.length; k++) {
 						hitObject.cache.points.push(point[k]);
 					}
-					bezierTemp = [];
 				} else if (hitObject.curveType === "P" && hitObject.curvePoints.length === 3) {
 					/* Slider Type Perfect Circle */
-					let circle = utils.circumcircle(hitObject.curvePoints[0], hitObject.curvePoints[1], hitObject.curvePoints[2]);
+					/* There are a select few maps that have infinity circle radius. Im look at your sotarks */
 					hitObject.cache.points = utils.circleToPoints(circle.x, circle.y, circle.r, Math.abs(hitObject.length), -utils.direction(circle.x, circle.y, hitObject.curvePoints[0].x, hitObject.curvePoints[0].y) - Math.PI / 2, utils.orientation(hitObject.curvePoints[0], hitObject.curvePoints[1], hitObject.curvePoints[2]));
 				}
 			} else if (hitObject.type[3] === "1") {
 				hitObject.cache.cacheSet = true;
-				/* Cache Setup for Spinner */
+				/* Cache setup for Spinner */
+				/* In spinners are measured in radians */
 				hitObject.cache.spins = 0;
-				/* in rad/s */
 				hitObject.cache.velocity = 0;
 				hitObject.cache.spinnerBonus = false;
 				hitObject.cache.currentAngle = 0;
@@ -198,26 +190,26 @@ define(function(require) {
 				hitObject.cache.cleared = false;
 			}
 		}
-		/* inherited timing point */
-		if (loadedMap.timingPoints[currentTimingPoint].uninherited === 0) {
-			sliderSpeedMultiplier *= Formulas.sliderMultiplier(loadedMap.timingPoints[currentTimingPoint].beatLength);
+		/* Inherited timing point */
+		if (currentLoadedMap.timingPoints[currentTimingPoint].uninherited === 0) {
+			sliderSpeedMultiplier *= Formulas.sliderMultiplier(currentLoadedMap.timingPoints[currentTimingPoint].beatLength);
 		}
-		/* Cache Setup */
+		/* Cache setup after hit objects expected hit time*/
 		if (useTime >= hitObject.time) {
-			/* Cache Setup After Object Hit Time */
+			/* Cache setup After Object Hit Time */
 			if (hitObject.type[0] === "1" && hitObject.cache.cacheSetAfterHit === false) {
-				/* Cache Setup for HitCircle */
+				/* Cache setup for HitCircle */
 				hitObject.cache.cacheSetAfterHit = true;
 			} else if (hitObject.type[1] === "1" && hitObject.cache.cacheSetAfterHit === false) {
 				hitObject.cache.cacheSetAfterHit = true;
-				/* Cache Setup for Slider */
+				/* Cache setup for Slider */
 				hitObject.cache.sliderInheritedMultiplier = sliderSpeedMultiplier;
 				hitObject.cache.timingPointUninheritedIndex = timingPointUninheritedIndex;
-				hitObject.cache.sliderOnceTime = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * loadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
+				hitObject.cache.sliderOnceTime = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * currentLoadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
 				hitObject.cache.sliderTotalTime = hitObject.cache.sliderOnceTime * hitObject.slides;
-				let time = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * loadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
+				let time = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * currentLoadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
 				/* Actual ticks is -1 due to unexplicable phenomenon */
-				hitObject.cache.totalTicks = time / loadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength * loadedMap.SliderTickRate;
+				hitObject.cache.totalTicks = time / currentLoadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength * currentLoadedMap.SliderTickRate;
 				hitObject.cache.specificSliderTicksHit = [];
 				for (let j = 0; j < hitObject.slides; j++) {
 					let tempArray = [];
@@ -248,7 +240,7 @@ define(function(require) {
 				hitObject.cache.totalTicks = hitObject.cache.specificSliderTicksPosition[0].length;
 			} else if (hitObject.type[3] === "1" && hitObject.cache.cacheSetAfterHit === false) {
 				hitObject.cache.cacheSetAfterHit = true;
-				/* Cache Setup for Spinner */
+				/* Cache setup for Spinner */
 			}
 		}
 	}
@@ -257,6 +249,7 @@ define(function(require) {
 		let hasSpliced = false;
 		let hitObjectMapped = utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 		if (playDetails.mods.auto) {
+			keyboard.emulateKeyUp("z");
 			if (index === 0) {
 				if ((hitObject.cache.hasHitAtAll === false || hitObject.cache.hasHitAtAll === undefined) && hitObject.type[3] !== "1") {
 					mouse.changePosition((hitObjectMapped.x - mouse.position.x) / 4, (hitObjectMapped.y - mouse.position.y) / 4);
@@ -298,8 +291,10 @@ define(function(require) {
 				hitObject.cache.hasHit = true;
 				hitObject.cache.hitTime = useTime;
 				hitEvents.push(new HitObject.Event("hit-circle", hitWindowScore, "increasing", hitObjectMapped.x, hitObjectMapped.y));
-				effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObject.cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
-				effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
+				if (playDetails.mods.hidden === false) {
+					effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObject.cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
+					effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
+				}
 			} else {
 				hitEvents.push(new HitObject.Event("hit-circle", 0, "reset", hitObjectMapped.x, hitObjectMapped.y));
 			}
@@ -312,7 +307,7 @@ define(function(require) {
 			hitObject.cache.sliderFollowCircleSize += (1 - hitObject.cache.sliderFollowCircleSize) / 8;
 			if (hitObject.cache.currentSlide < hitObject.slides) {
 				let sliderRepeat = false;
-				let time = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * loadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
+				let time = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * currentLoadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
 				if (hitObject.cache.currentSlide % 2 === 0) {
 					hitObject.cache.sliderFollowCirclePosition = Math.floor(utils.map(useTime, hitObject.time + time * hitObject.cache.currentSlide, hitObject.time + time * (hitObject.cache.currentSlide + 1), 0, hitObject.cache.points.length - 1));
 					/* Prevent Index Errors */
@@ -364,8 +359,10 @@ define(function(require) {
 						if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * followCircleSize / 2 && hitObject.cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 							hitObject.cache.repeatsHit++;
 							hitEvents.push(new HitObject.Event("slider-element", 30, "increasing", sliderFollowCirclePos.x));
-							effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObject.cache.comboColour], sliderFollowCirclePos.x, sliderFollowCirclePos.y, useTime, useTime + 0.2));
-							effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, sliderFollowCirclePos.x, sliderFollowCirclePos.y, useTime, useTime + 0.2));
+							if (playDetails.mods.hidden === false) {
+								effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObject.cache.comboColour], sliderFollowCirclePos.x, sliderFollowCirclePos.y, useTime, useTime + 0.2));
+								effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, sliderFollowCirclePos.x, sliderFollowCirclePos.y, useTime, useTime + 0.2));
+							}
 						} else if (hitObject.cache.currentSlide < hitObject.slides) {
 							hitEvents.push(new HitObject.Event("slider-element-miss", 0, "reset", sliderFollowCirclePos.x, sliderFollowCirclePos.y));
 						}
@@ -396,8 +393,10 @@ define(function(require) {
 			}
 			hitErrors.push(useTime - hitObject.time);
 			hitEvents.push(new HitObject.Event("slider-element", 30, "increasing", hitObjectMapped.x, hitObjectMapped.y));
-			effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObject.cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
-			effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
+			if (playDetails.mods.hidden === false) {
+				effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObject.cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
+				effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, useTime, useTime + 0.2));
+			}
 			hitObject.cache.hitHead = true;
 			hitObject.cache.hasHitAtAll = true;
 		}
@@ -445,8 +444,10 @@ define(function(require) {
 			}
 			if (hitScore !== 0) {
 				hitEvents.push(new HitObject.Event("hit-circle", hitScore, "increasing", mapped.x, mapped.y));
-				effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObject.cache.comboColour], mapped.x, mapped.y, useTime, useTime + 0.2));
-				effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, mapped.x, mapped.y, useTime, useTime + 0.2));
+				if (playDetails.mods.hidden === false) {
+					effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObject.cache.comboColour], mapped.x, mapped.y, useTime, useTime + 0.2));
+					effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, mapped.x, mapped.y, useTime, useTime + 0.2));
+				}
 			} else {
 				hitEvents.push(new HitObject.Event("hit-circle", 0, "reset", mapped.x, mapped.y));
 			}
@@ -479,7 +480,7 @@ define(function(require) {
 			hitObject.cache.velocity += (angleChange - hitObject.cache.velocity) / 32;
 			hitObject.cache.currentAngle += hitObject.cache.velocity * (useTime - previousTime);
 			hitObject.cache.spinAngle += hitObject.cache.velocity * (useTime - previousTime);
-			if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && Math.abs(hitObject.cache.velocity / (Math.PI)) >= Formulas.ODSpinner(loadedMap.OverallDifficulty, playDetails.mods)) {
+			if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && Math.abs(hitObject.cache.velocity / (Math.PI)) >= Formulas.ODSpinner(currentLoadedMap.OverallDifficulty, playDetails.mods)) {
 				hitObject.cache.timeSpentAboveSpinnerMinimum += useTime - previousTime;
 			}
 			if (hitObject.cache.timeSpentAboveSpinnerMinimum >= (hitObject.endTime - hitObject.time) * 0.25) {
@@ -725,9 +726,12 @@ define(function(require) {
 			for (let j = 0; j <= distance; j++) {
 				canvas.drawImage(Assets.cursorTrail, utils.map(j, 0, distance, mouse.previousPositions.x[i], mouse.previousPositions.x[i + 1]) - Assets.cursorTrail.width / 2, utils.map(j, 0, distance, mouse.previousPositions.y[i], mouse.previousPositions.y[i + 1]));
 				numberOfMouseTrailsRendered++;
+					/* prevent the rendering of too many trails otherwise it will lag */
+					if (numberOfMouseTrailsRendered > 128) {
+						break;
+					}
 			}
-			/* prevent the rendering of too many trails otherwise it will lag */
-			if (numberOfMouseTrailsRendered > 256) {
+			if (numberOfMouseTrailsRendered > 128) {
 				break;
 			}
 		}
@@ -785,8 +789,8 @@ define(function(require) {
 			}
 		}
 		/* only start draining health 2 seconds before the first hit object*/
-		if (useTime > loadedMap.hitObjects[0].time - 2) {
-			currentHP -= Formulas.HPDrain(loadedMap.HPDrainRate, useTime - previousTime);
+		if (useTime > currentLoadedMap.hitObjects[0].time - 2) {
+			currentHP -= Formulas.HPDrain(currentLoadedMap.HPDrainRate, useTime - previousTime);
 		}
 		hpDisplay += (currentHP - hpDisplay) / 8;
 	}
@@ -828,7 +832,7 @@ define(function(require) {
 		}
 		if ((hitEvents[0].score >= 50 || hitEvents[0].score === 0) && hitEvents[0].type === "hit-circle") {
 			score += Formulas.hitScore(hitEvents[0].score, combo, difficultyMultiplier, scoreMultiplier);
-			scoreObjects.push(new HitObject.ScoreObject(hitEvents[0].score, hitEvents[0].x, hitEvents[0].y, useTime, useTime + 1));
+			scoreObjects.push(new HitObject.ScoreObject(hitEvents[0].score, hitEvents[0].x, hitEvents[0].y, useTime, useTime + 0.5));
 		} else {
 			score += hitEvents[0].score;
 		}
@@ -842,18 +846,18 @@ define(function(require) {
 			combo = 0;
 			document.getElementById("combo-container").innerHTML = "";
 		}
-		currentHP += Formulas.HP(loadedMap.HPDrainRate, hitEvents[0].score, hitEvents[0].type, playDetails.mods);
+		currentHP += Formulas.HP(currentLoadedMap.HPDrainRate, hitEvents[0].score, hitEvents[0].type, playDetails.mods);
 		hitEvents.splice(0, 1);
 	}
 
 	function nextHitObject() {
 		/* create copy not reference, otherwise retrying wouldn't work*/
-		hitObjects.push(JSON.parse(JSON.stringify(loadedMap.hitObjects[currentHitObject])));
+		hitObjects.push(JSON.parse(JSON.stringify(currentLoadedMap.hitObjects[currentHitObject])));
 		/* second bit flag determines new combo */
-		if (loadedMap.hitObjects[currentHitObject].type[2] === "1") {
+		if (currentLoadedMap.hitObjects[currentHitObject].type[2] === "1") {
 			currentComboNumber = 1;
 			currentComboColour++;
-			if (currentComboColour > loadedMap.comboColours.length - 1) {
+			if (currentComboColour > currentLoadedMap.comboColours.length - 1) {
 				currentComboColour = 0;
 			}
 		}
@@ -862,7 +866,7 @@ define(function(require) {
 
 	function nextTimingPoint() {
 		currentTimingPoint++;
-		if (loadedMap.timingPoints[currentTimingPoint].uninherited === 1) {
+		if (currentLoadedMap.timingPoints[currentTimingPoint].uninherited === 1) {
 			timingPointUninheritedIndex = currentTimingPoint;
 		}
 	}
@@ -965,14 +969,14 @@ define(function(require) {
 					useTime *= 0.75;
 				}
 			}
-			if (currentHitObject >= loadedMap.hitObjects.length) {
+			if (currentHitObject >= currentLoadedMap.hitObjects.length) {
 				let endingTime;
-				let lastHitObject = loadedMap.hitObjects[loadedMap.hitObjects.length - 1];
+				let lastHitObject = currentLoadedMap.hitObjects[currentLoadedMap.hitObjects.length - 1];
 				if (lastHitObject.type[0] === "1") {
 					endingTime = lastHitObject.time + 2;
 				}
 				if (lastHitObject.type[1] === "1") {
-					let sliderOnceTime = Math.abs(lastHitObject.length) / (Formulas.sliderMultiplier(loadedMap.timingPoints[currentTimingPoint].beatLength) * 100) * loadedMap.timingPoints[timingPointUninheritedIndex].beatLength;
+					let sliderOnceTime = Math.abs(lastHitObject.length) / (Formulas.sliderMultiplier(currentLoadedMap.timingPoints[currentTimingPoint].beatLength) * 100) * currentLoadedMap.timingPoints[timingPointUninheritedIndex].beatLength;
 					let sliderTotalTime = sliderOnceTime * lastHitObject.slides;
 					endingTime = lastHitObject.time + sliderTotalTime + 2;
 				}
@@ -981,21 +985,25 @@ define(function(require) {
 				}
 				if (useTime > endingTime) {
 					mouse.unlockPointer();
-					document.getElementById("webpage-state-always").style.display = "block";
-					document.getElementById("top-bar").style.display = "block";
-					document.getElementById("webpage-state-beatmap-selection").style.display = "none";
-					document.getElementById("webpage-state-gameplay").style.display = "none";
-					document.getElementById("webpage-state-pause-screen").style.display = "none";
-					document.getElementById("webpage-state-fail-screen").style.display = "none";
-					document.getElementById("webpage-state-results-screen").style.display = "block";
-					document.getElementById("bottom-bar").style.display = "block";
+					utils.showWebpageStates([
+						"webpage-state-always",
+						"top-bar",
+						"webpage-state-results-screen",
+						"bottom-bar"
+					]);
+					utils.hideWebpageStates([
+						"webpage-state-beatmap-selection",
+						"webpage-state-gameplay",
+						"webpage-state-fail-screen",
+						"webpage-state-pause-screen"
+					]);
 					let date = new Date();
 					playDetails.datePlayed = utils.formatDate(date.getDate(), date.getMonth(), date.getFullYear(), date.getHours(), date.getMinutes());
 					playDetails.unstableRate = utils.standardDeviation(hitErrors) * 1000 * 10;
-					playDetails.mapName = loadedMap.Title;
-					playDetails.mapperName = loadedMap.Creator;
-					playDetails.artist = loadedMap.Artist;
-					playDetails.difficultyName = loadedMap.Version;
+					playDetails.mapName = currentLoadedMap.Title;
+					playDetails.mapperName = currentLoadedMap.Creator;
+					playDetails.artist = currentLoadedMap.Artist;
+					playDetails.difficultyName = currentLoadedMap.Version;
 					endScreen.displayResults(playDetails);
 					isRunning = false;
 				}
@@ -1006,11 +1014,11 @@ define(function(require) {
 			while (hitEvents.length > 0) {
 				processHitEvent(useTime);
 			}
-			while (currentHitObject < loadedMap.hitObjects.length && useTime >= loadedMap.hitObjects[currentHitObject].time - arTime) {
+			while (currentHitObject < currentLoadedMap.hitObjects.length && useTime >= currentLoadedMap.hitObjects[currentHitObject].time - arTime) {
 				nextHitObject();
 			}
 			/* +1 because the given time is beginning time, not end time */
-			while (currentTimingPoint < loadedMap.timingPoints.length - 1 && useTime >= loadedMap.timingPoints[currentTimingPoint + 1].time) {
+			while (currentTimingPoint < currentLoadedMap.timingPoints.length - 1 && useTime >= currentLoadedMap.timingPoints[currentTimingPoint + 1].time) {
 				nextTimingPoint();
 			}
 			/* Cache Loop */
@@ -1090,12 +1098,10 @@ define(function(require) {
 		},
 		retry: function() {
 			isRunning = false;
-			this.playMap(useBeatmapSet, useBeatmap, playDetails.mods);
+			this.playMap(currentLoadedMap, playDetails.mods);
 		},
-		playMap: function(groupIndex, mapIndex, mods) {
-			useBeatmapSet = groupIndex;
-			useBeatmap = mapIndex;
-			loadedMap = loadedMaps[useBeatmapSet][useBeatmap];
+		playMap: function(mapData, mods) {
+			currentLoadedMap = mapData;
 			playDetails = PlayDetails(mods);
 			if (mods.flashlight === false) {
 				document.getElementById("gameplay-flashlight").style.display = "none";
@@ -1137,7 +1143,7 @@ define(function(require) {
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
 				let objectStore = databaseManager.getObjectStore(database, "audio", "readonly");
-				let request = objectStore.get(loadedMap.Creator + loadedMap.Title + loadedMap.AudioFilename);
+				let request = objectStore.get(mapData.Creator + mapData.Title + mapData.AudioFilename);
 				request.addEventListener("error", function(event) {
 					console.error(`Attempt to find query failed: ${event.target.error}`);
 				});
@@ -1147,6 +1153,8 @@ define(function(require) {
 						audioType = "mp3";
 					} else if (event.target.result.name.includes(".ogg")) {
 						audioType = "ogg";
+					} else if (event.target.result.name.includes(".wav")) {
+						audioType = "wav";
 					}
 					audio.src = `data:audio/${audioType};base64,${event.target.result.data}`;
 					if (playDetails.mods.doubleTime) {
@@ -1160,19 +1168,19 @@ define(function(require) {
 			});
 			audio.currentTime = 0;
 			/* Beatmap difficulty data */
-			arTime = Formulas.AR(loadedMap.ApproachRate, playDetails.mods);
-			arFadeIn = Formulas.ARFadeIn(loadedMap.ApproachRate, playDetails.mods);
+			arTime = Formulas.AR(mapData.ApproachRate, playDetails.mods);
+			arFadeIn = Formulas.ARFadeIn(mapData.ApproachRate, playDetails.mods);
 			/* Map from osu!pixels to screen pixels */
-			circleDiameter = utils.map(Formulas.CS(loadedMap.CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * playfieldSize * (4 / 3));
-			difficultyMultiplier = Formulas.difficultyPoints(loadedMap.CircleSize, loadedMap.HPDrainRate, loadedMap.OverallDifficulty);
-			odTime = Formulas.ODHitWindow(loadedMap.OverallDifficulty, playDetails.mods);
+			circleDiameter = utils.map(Formulas.CS(mapData.CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * playfieldSize * (4 / 3));
+			difficultyMultiplier = Formulas.difficultyPoints(mapData.CircleSize, mapData.HPDrainRate, mapData.OverallDifficulty);
+			odTime = Formulas.ODHitWindow(mapData.OverallDifficulty, playDetails.mods);
 			mouse.lockPointer();
 			hitCircleComboBuffers = [];
 			approachCircleComboBuffers = [];
 			let hitCircleRgbks = canvas.generateRGBKs(Assets.hitCircle);
 			let approachCircleRgbks = canvas.generateRGBKs(Assets.approachCircle);
-			for (let i = 0; i < loadedMap.comboColours.length; i++) {
-				let comboColours = loadedMap.comboColours[i];
+			for (let i = 0; i < mapData.comboColours.length; i++) {
+				let comboColours = mapData.comboColours[i];
 				hitCircleComboBuffers.push(canvas.generateTintImage(Assets.hitCircle, hitCircleRgbks, comboColours.r, comboColours.g, comboColours.b, circleDiameter, circleDiameter));
 				approachCircleComboBuffers.push(canvas.generateTintImage(Assets.approachCircle, approachCircleRgbks, comboColours.r, comboColours.g, comboColours.b));
 			}
@@ -1184,8 +1192,5 @@ define(function(require) {
 		isRunning: function() {
 			return isRunning;
 		},
-		updateMaps: function() {
-			loadMaps();
-		}
 	};
 });

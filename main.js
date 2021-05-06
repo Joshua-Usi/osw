@@ -24,7 +24,7 @@
 define(function(require) {
 	"use strict";
 	/* RequireJS Module Loading */
-	let Options = require("./src/scripts/options.js");
+	const Options = require("./src/scripts/options.js");
 	const AudioManager = new (require("./src/scripts/audioManager.js"))();
 	const utils = require("./src/scripts/utils.js");
 	const Beatmaps = require("./src/scripts/beatmapFetcher.js");
@@ -41,26 +41,19 @@ define(function(require) {
 	let backgroundImageParallax = document.getElementById("background-dim");
 	let menuParallax = document.getElementById("menu-parallax");
 
-	function showWebpageStates(idList) {
-		for (let i = 0; i < idList.length; i++) {
-			document.getElementById(idList[i]).style.display = "block";
-		}
-	}
-	function hideWebpageStates(idList) {
-		for (let i = 0; i < idList.length; i++) {
-			document.getElementById(idList[i]).style.display = "none";
-		}
-	}
 	/* Offline context checks, needed to ensure for some effects to work */
 	/* Text suggested by jylescoad-ward */
+	if (!window.localStorage) {
+		console.warn("LocalStorage is not supported on this browser. You will not be able to save your options")
+	}
 	if (window.origin === null) {
-		console.warn("Looks like you're running this without a web server, some audio based effects will not work due to CORS :/");
+		console.warn("The CORS origin is not set correctly. You may experience audio visualiser bugs");
 	}
 	if (!window.indexedDB) {
-		console.warn("IndexedDB is not supported on your browser, this means you will be unable to save beatmaps");
+		console.warn("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
 	}
 	/* osw! version incremented manually */
-	const version = "osw! 0.7.5b";
+	const version = "osw! 0.7.6b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
@@ -123,10 +116,10 @@ define(function(require) {
 			let beatmapSelectionPanes = document.getElementsByClassName("beatmap-selection-map-pane");
 			for (let i = 0; i < beatmapSelectionPanes.length; i++) {
 				beatmapSelectionPanes[i].addEventListener("click", function() {
-					showWebpageStates([
+					utils.showWebpageStates([
 						"webpage-state-gameplay",
 					]);
-					hideWebpageStates([
+					utils.hideWebpageStates([
 						"webpage-state-menu",
 						"webpage-state-beatmap-selection",
 						"webpage-state-mods",
@@ -144,7 +137,7 @@ define(function(require) {
 					for (let i = 0; i < selectedModElements.length; i++) {
 						selectedMods[selectedModElements[i].id.replace("mod-", "")] = true;
 					}
-					gameplay.playMap(this.getAttribute("data-group-index"), this.getAttribute("data-map-index"), selectedMods);
+					gameplay.playMap(loadedMaps[this.getAttribute("data-group-index")][this.getAttribute("data-map-index")], selectedMods);
 				});
 			}
 		} else {
@@ -279,14 +272,15 @@ define(function(require) {
 			AudioManager.load("menu-hit", "./src/audio/effects/menu-hit.wav", "effects", true);
 			/* Setting settings */
 			let index = 0;
-			for (let group in Options) {
-				if (Options.hasOwnProperty(group) && typeof(Options[group]) === "object" && group !== "types") {
-					for (let setting in Options[group]) {
-						if (Options[group].hasOwnProperty(setting)) {
+			let userOptions = Options.get();
+			for (let group in userOptions) {
+				if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object" && group !== "types") {
+					for (let setting in userOptions[group]) {
+						if (userOptions[group].hasOwnProperty(setting)) {
 							let element = document.getElementById("settings-" + utils.camelCaseToDash(setting));
-							switch (Options.types[index]) {
+							switch (userOptions.types[index]) {
 								case "slider":
-									let mapped = utils.map(Options[group][setting], 0, 1, element.min, element.max);
+									let mapped = utils.map(userOptions[group][setting], 0, 1, element.min, element.max);
 									if (setting === "sliderResolution") {
 										mapped = utils.map(mapped, 10, 14, 1, 5);
 									}
@@ -294,13 +288,13 @@ define(function(require) {
 									element.dispatchEvent(new CustomEvent("input"));
 									break;
 								case "checkbox":
-									element.checked = Options[group][setting];
+									element.checked = userOptions[group][setting];
 									break;
 								case "selectbox":
-									element.getElementsByClassName("select-box-selected")[0].textContent = Options[group][setting];
+									element.getElementsByClassName("select-box-selected")[0].textContent = userOptions[group][setting];
 									break;
 								case "text":
-									element.textContent = Options[group][setting];
+									element.textContent = userOptions[group][setting];
 									break;
 							}
 							index++;
@@ -390,7 +384,7 @@ define(function(require) {
 				recordedFramesPerSecond.push(now);
 				/* Update frame counter */
 				let frameCounter = document.getElementById("frame-rate");
-				switch (Options.Performance.maxFrameRate) {
+				switch (Options.getProperty("Performance", "maxFrameRate")) {
 					case "VSync":
 						frameCounter.textContent = recordedFramesPerSecond.length + " / 60fps";
 						break;
@@ -425,7 +419,6 @@ define(function(require) {
 				} else if (loadedNewMaps === false) {
 					Beatmaps.refresh();
 					loadMaps();
-					gameplay.updateMaps();
 					loadedNewMaps = true;
 				}
 				previousTime = time;
@@ -439,7 +432,7 @@ define(function(require) {
 		}
 	});
 	window.addEventListener("mousemove", function(mouse) {
-		if (Options.UserInterface.menuParallax === true && (document.getElementById("webpage-state-gameplay").style.display === "none" || document.getElementById("webpage-state-gameplay").style.display === "")) {
+		if (Options.getProperty("UserInterface", "menuParallax") === true && (document.getElementById("webpage-state-gameplay").style.display === "none" || document.getElementById("webpage-state-gameplay").style.display === "")) {
 			backgroundImageParallax.style.top = (mouse.y - window.innerHeight * 0.5) / 128 - window.innerHeight * 0.05 + "px";
 			backgroundImageParallax.style.left = (mouse.x - window.innerWidth * 0.5) / 128 - window.innerWidth * 0.05 + "px";
 			menuParallax.style.top = "calc(5vh + " + ((mouse.y - window.innerHeight * 0.5) / 256 - window.innerHeight * 0.05) + "px)";
@@ -476,7 +469,7 @@ define(function(require) {
 	});
 	window.addEventListener("blur", function() {
 		if (document.getElementById("webpage-state-gameplay").style.display === "block" && document.getElementById("webpage-state-fail-screen").style.display === "none") {
-			showWebpageStates(["webpage-state-pause-screen"]);
+			utils.showWebpageStates(["webpage-state-pause-screen"]);
 			gameplay.pause();
 		}
 	});
@@ -726,12 +719,16 @@ define(function(require) {
 		menuTimeout = setTimeout(resetMenu, 15000);
 	});
 	document.getElementById("menu-bar-play").addEventListener("click", function() {
-		showWebpageStates([
+		utils.showWebpageStates([
 			"webpage-state-beatmap-selection",
 			"webpage-state-mods",
 			"bottom-bar",
 		]);
-		hideWebpageStates(["webpage-state-menu"]);
+		chooseRandomMap();
+		utils.hideWebpageStates(["webpage-state-menu"]);
+	});
+	/* Helper */
+	function chooseRandomMap() {
 		let els = document.getElementsByClassName("beatmap-selection-group-pane");
 		if (els.length >= 1) {
 			let selectedElement = els[utils.randomInt(0, els.length - 1)];
@@ -743,8 +740,7 @@ define(function(require) {
 			window.scrollTo(0, 0);
 			selectedElement.dispatchEvent(new CustomEvent("click"));
 		}
-	});
-	/* Helper */
+	}
 	let menuTimeout;
 	function resetMenu() {
 		logoX = 50;
@@ -770,23 +766,24 @@ define(function(require) {
 	function setSettings() {
 		if (settingsSet === true) {
 			let index = 0;
-			for (let group in Options) {
-				if (Options.hasOwnProperty(group) && typeof(Options[group]) === "object" && group !== "types") {
-					for (let setting in Options[group]) {
-						if (Options[group].hasOwnProperty(setting)) {
+			let userOptions = Options.get();
+			for (let group in userOptions) {
+				if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object" && group !== "types") {
+					for (let setting in userOptions[group]) {
+						if (userOptions[group].hasOwnProperty(setting)) {
 							let element = document.getElementById("settings-" + utils.camelCaseToDash(setting));
-							switch (Options.types[index]) {
+							switch (userOptions.types[index]) {
 								case "slider":
-									Options[group][setting] = utils.map(element.value, element.min, element.max, 0, 1);
+									Options.update(group, setting, utils.map(element.value, element.min, element.max, 0, 1));
 									break;
 								case "checkbox":
-									Options[group][setting] = element.checked;
+									Options.update(group, setting, element.checked);
 									break;
 								case "selectbox":
-									Options[group][setting] = element.getElementsByClassName("select-box-selected")[0].textContent;
+									Options.update(group, setting, element.getElementsByClassName("select-box-selected")[0].textContent);
 									break;
 								case "text":
-									Options[group][setting] = element.textContent;
+									Options.update(group, setting, element.textContent);
 									break;
 							}
 							index++;
@@ -794,8 +791,7 @@ define(function(require) {
 					}
 				}
 			}
-			localStorage.setItem("options", JSON.stringify(Options));
-			console.log("settings saved!");
+			Options.save();
 		}
 	}
 	window.addEventListener("orientationchange", function(event) {
@@ -813,19 +809,19 @@ define(function(require) {
 	document.getElementById("back-button").addEventListener("click", function() {
 		AudioManager.play("back-button-click");
 		if (document.getElementById("webpage-state-results-screen").style.display === "block") {
-			showWebpageStates([
+			utils.showWebpageStates([
 				"webpage-state-beatmap-selection",
 				"webpage-state-mods",
 				"top-bar",
 			]);
-			hideWebpageStates([
+			utils.hideWebpageStates([
 				"webpage-state-results-screen",
 			]);
 		} else {
-			showWebpageStates([
+			utils.showWebpageStates([
 				"webpage-state-menu",
 			]);
-			hideWebpageStates([
+			utils.hideWebpageStates([
 				"webpage-state-mods",
 				"webpage-state-beatmap-selection",
 				"bottom-bar",
@@ -838,14 +834,14 @@ define(function(require) {
 	});
 	document.getElementById("pause-menu-continue").addEventListener("click", function() {
 		gameplay.continue();
-		hideWebpageStates([
+		utils.hideWebpageStates([
 			"webpage-state-pause-screen",
 			"webpage-state-fail-screen",
 		]);
 	});
 	function retry() {
 		gameplay.retry();
-		hideWebpageStates([
+		utils.hideWebpageStates([
 			"webpage-state-pause-screen",
 			"webpage-state-fail-screen",
 		]);
@@ -854,13 +850,13 @@ define(function(require) {
 	document.getElementById("fail-menu-retry").addEventListener("click", retry);
 	function quit() {
 		document.getElementById("menu-audio").play();
-		showWebpageStates([
+		utils.showWebpageStates([
 			"webpage-state-beatmap-selection",
 			"webpage-state-mods",
 			"top-bar",
 			"bottom-bar",
 		]);
-		hideWebpageStates([
+		utils.hideWebpageStates([
 			"webpage-state-gameplay",
 			"webpage-state-pause-screen",
 			"webpage-state-fail-screen",
@@ -902,16 +898,6 @@ define(function(require) {
 		fileReader.readAsBinaryString(this.files[0]);
 	});
 	document.getElementById("bottom-bar-random").addEventListener("click", function() {
-		let els = document.getElementsByClassName("beatmap-selection-group-pane");
-		if (els.length >= 1) {
-			let selectedElement = els[utils.randomInt(0, els.length - 1)];
-			selectedElement.scrollIntoView({
-				block: "center",
-				inline: "end"
-			});
-			selectedElement.parentNode.parentNode.scrollTo(0, selectedElement.parentNode.parentNode.scrollTop);
-			window.scrollTo(0, 0);
-			selectedElement.dispatchEvent(new CustomEvent("click"));
-		}
+		chooseRandomMap();
 	});
 });

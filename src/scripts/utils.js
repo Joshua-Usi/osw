@@ -50,7 +50,7 @@ define(function(require) {
 		},
 		binary: function(number, length) {
 			let asBinary = (number >>> 0).toString(2);
-			while (asBinary.length <= 8) {
+			while (asBinary.length <= length) {
 				asBinary = "0" + asBinary;
 			}
 			return asBinary;
@@ -85,29 +85,25 @@ define(function(require) {
 		},
 		/* 90 sided circle */
 		circleToPoints: function(x, y, r, length, startingAngle, clockwise) {
-			if (isFinite(r) === false) {
-				r = 10000000;
-			}
 			let points = [];
 			let totalLength = 0;
 			let direction;
-			let inc = length / r;
 			let currentAngle = 0;
 			if (clockwise === 2) {
 				direction = 1;
 			}
 			if (clockwise === 1) {
-				direction = -1;
+				direction = -1;`	`
 			}
 			while (totalLength < length) {
 				points.push({
-					x: x + Math.cos(startingAngle + direction * currentAngle * Math.PI / 180) * r,
-					y: y + Math.sin(startingAngle + direction * currentAngle * Math.PI / 180) * r,
+					x: x + Math.cos(startingAngle + direction * currentAngle) * r,
+					y: y + Math.sin(startingAngle + direction * currentAngle) * r,
 				});
 				if (currentAngle > 0) {
-					totalLength += this.dist(points[points.length - 1].x, points[points.length - 1].y, points[points.length - 2].x, points[points.length - 2].y);
+					totalLength++;
 				}
-				currentAngle += inc;
+				currentAngle += 1 / r;
 			}
 			return points;
 		},
@@ -221,7 +217,7 @@ define(function(require) {
 			return {
 				x: x,
 				y: y,
-			}
+			};
 		},
 		formatDate: function(day, month, year, hour, minute) {
 			let monthWords = [
@@ -245,6 +241,16 @@ define(function(require) {
 				minute = "0" + minute;
 			}
 			return `${day} ${monthWords[month]} ${year} ${hour}:${minute}`; 
-		}
+		},
+		showWebpageStates: function(idList) {
+			for (let i = 0; i < idList.length; i++) {
+				document.getElementById(idList[i]).style.display = "block";
+			}
+		},
+		hideWebpageStates: function(idList) {
+			for (let i = 0; i < idList.length; i++) {
+				document.getElementById(idList[i]).style.display = "none";
+			}
+		},
 	};
 });

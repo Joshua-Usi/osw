@@ -108,7 +108,7 @@ define(function(require) {
 					splited[i] = parseFloat(splited[i]);
 				}
 			}
-			let asBinary = utils.reverse(utils.binary(splited[3]));
+			let asBinary = utils.reverse(utils.binary(splited[3], 8));
 			if (asBinary[0] === "1") {
 				/* hitCircle */
 				return new HitObject.HitCircle(...splited);

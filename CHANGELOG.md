@@ -1,6 +1,20 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v0.7.6b] - 2021-05-06
+### Added
+- Detection if browser lacks LocalStorage (no error handling yet)
+### Changed
+- Options API to be more friendly
+- Gameplay API to use less memory
+### Removed
+- Loading loop in gameplay that costs unnecessary processing power
+### Fixed
+- Auto bug that causes misses
+- Sliders with infinite radius causing errors (cause of Sotarks maps)
+### Security
+-
+---
 ## [v0.7.5b] - 2021-05-02
 ### Optimised
 - CSS codebase cleanup
@@ -17,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 ## [v0.7.3b] - 2021-05-02
 ### Added
-- new Audio API to simplify audio
+- New Audio API to simplify audio
 ### Changed
 - menuHit.wav to menu-hit.wav
 ### Optimised
