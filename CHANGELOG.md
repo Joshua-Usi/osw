@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Options API to be more friendly
 - Gameplay API to use less memory
-- Improved Auto accuracy by making auto hit earlier	
+- Improved Auto accuracy by making auto hit earlier
+- Mouse trails to look nicer	
 ### Removed
 - Loading loop in gameplay that costs unnecessary processing power
 ### Fixed

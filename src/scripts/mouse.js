@@ -35,15 +35,8 @@ define(function(require) {
 			/* needed to access outside scope */
 			let that = this;
 			/* References to functions for destroying */
-			this.removeOldEvents = function(context) {
-				for (var i = 0; i < context.events.length; i++) {
-					if (context.events[i] < Date.now() - 1000) {
-						context.events.splice(i, 1);
-					}
-				}
-			};
 			this.mousemove = function(event) {
-				that.removeOldEvents(that);
+				// that.removeOldEvents(that);
 				if (that.canUserControl) {
 					that.events.push(Date.now());
 					that.previousPositions.x.push(that.position.x);
@@ -59,7 +52,7 @@ define(function(require) {
 				}
 			};
 			this.mousemovelocked = function(event) {
-				that.removeOldEvents(that);
+				// that.removeOldEvents(that);
 				if (that.canUserControl) {
 					that.events.push(Date.now());
 					that.previousPositions.x.push(that.position.x);
@@ -117,7 +110,7 @@ define(function(require) {
 			document.getElementById(this.element).removeEventListener("mouseup", this.mouseup);
 		}
 		setPosition(x, y) {
-			this.removeOldEvents(this);
+			// this.removeOldEvents(this);
 			this.events.push(Date.now());
 			this.previousPositions.x.push(this.position.x);
 			this.previousPositions.y.push(this.position.y);
@@ -131,7 +124,7 @@ define(function(require) {
 			this.position.y = y;
 		}
 		changePosition(x, y) {
-			this.removeOldEvents(this);
+			// this.removeOldEvents(this);
 			this.events.push(Date.now());
 			this.previousPositions.x.push(this.position.x);
 			this.previousPositions.y.push(this.position.y);
@@ -178,10 +171,13 @@ define(function(require) {
 		unbound() {
 			this.positionLimit = false;
 		}
-		deleteMouseTrail(n) {
-			if (this.previousPositions.x.length > n) {
-				this.previousPositions.x.shift();
-				this.previousPositions.y.shift();
+		deleteMouseTrail(mouseTrailDuration) {
+		for (let i = 0; i < this.events.length; i++) {
+				while (this.events[0] < Date.now() - mouseTrailDuration) {
+					this.events.shift();
+					this.previousPositions.x.shift();
+					this.previousPositions.y.shift();
+				}
 			}
 		}
 	};

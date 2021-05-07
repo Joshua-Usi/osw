@@ -28,7 +28,7 @@ define(function(require) {
 	let flashlightSize = utils.map(100, 0, 512, 0, window.innerWidth);
 	let isRunning = false;
 	/* inputs setup */
-	let mouse = new Mouse("body", 30);
+	let mouse = new Mouse("body", 100);
 	let keyboard = new Keyboard("body");
 	mouse.setPosition(window.innerWidth / 2, window.innerHeight / 2);
 	mouse.init();
@@ -252,7 +252,7 @@ define(function(require) {
 			keyboard.emulateKeyUp("z");
 			if (index === 0) {
 				if ((hitObject.cache.hasHitAtAll === false || hitObject.cache.hasHitAtAll === undefined) && hitObject.type[3] !== "1") {
-					mouse.changePosition((hitObjectMapped.x - mouse.position.x) / 4, (hitObjectMapped.y - mouse.position.y) / 4);
+					mouse.changePosition((hitObjectMapped.x - mouse.position.x) / 8, (hitObjectMapped.y - mouse.position.y) / 8);
 				}
 			}
 			if (hitObject.type[0] === "1" && useTime > hitObject.time - odTime[2] / 2) {
@@ -718,22 +718,23 @@ define(function(require) {
 	}
 
 	function renderMouse() {
+		mouse.deleteMouseTrail(500);
 		/* mouse trails */
 		let numberOfMouseTrailsRendered = 0;
-		for (let i = 0; i < mouse.previousPositions.x.length - 1; i++) {
+		for (let i = mouse.previousPositions.x.length - 1; i >= 0; i--) {
 			let distance = utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]);
-			for (let j = 0; j < distance; j++) {
-				canvas.setGlobalAlpha(utils.map(i, 0, mouse.previousPositions.x.length, 0, 1));
+			for (let j = distance; j >= 0; j -= 2) {
+				canvas.setGlobalAlpha(utils.map(numberOfMouseTrailsRendered, 0, 256, 0.5, 0));
 				canvas.drawImage(Assets.cursorTrail, utils.map(j, 0, distance, mouse.previousPositions.x[i], mouse.previousPositions.x[i + 1]), utils.map(j, 0, distance, mouse.previousPositions.y[i], mouse.previousPositions.y[i + 1]));
 				numberOfMouseTrailsRendered++;
-					/* prevent the rendering of too many trails otherwise it will lag */
-					// if (numberOfMouseTrailsRendered > 128) {
-						// break;
-					// }
+				/* prevent the rendering of too many trails otherwise it will lag */
+				if (numberOfMouseTrailsRendered >= 256) {
+					break;
+				}
 			}
-			// if (numberOfMouseTrailsRendered > 128) {
-				// break;
-			// }
+			if (numberOfMouseTrailsRendered >= 256) {
+				break;
+			}
 		}
 		canvas.setGlobalAlpha(1);
 		if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
@@ -763,7 +764,7 @@ define(function(require) {
 		}
 		/* Detect sudden sign changes due to rollover every spin */
 		if (previousSigns.length > 10) {
-			previousSigns.splice(0, 1);
+			previousSigns.shift();
 		}
 		previousSigns.push(Math.sign(angleChange));
 		let averageSign = 0;
@@ -847,7 +848,7 @@ define(function(require) {
 			document.getElementById("combo-container").innerHTML = "";
 		}
 		currentHP += Formulas.HP(currentLoadedMap.HPDrainRate, hitEvents[0].score, hitEvents[0].type, playDetails.mods);
-		hitEvents.splice(0, 1);
+		hitEvents.shift();
 	}
 
 	function nextHitObject() {
@@ -958,7 +959,6 @@ define(function(require) {
 		flashlightCtx.fill();
 		flashlightCtx.fill();
 	}
-	let l = 0;
 	return {
 		tick: function() {
 			let useTime = audio.currentTime;
@@ -1083,10 +1083,6 @@ define(function(require) {
 			renderHitErrors();
 			updateScore();
 			renderMouse();
-			if (l % 2 === 0) {
-				mouse.deleteMouseTrail();
-			}
-			l++;
 			if (playDetails.mods.flashlight) {
 				renderFlashlight();
 			}
