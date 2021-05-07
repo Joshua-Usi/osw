@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Loading loop in gameplay that costs unnecessary processing power
 ### Fixed
 - Auto bug that causes misses
-- Sliders with infinite radius causing errors (cause of Sotarks maps)
+- Sliders with infinite radius causing errors (replaced with straight sliders) (caused by Sotarks - FLying out to the sky - ENDGAME)
 ---
 ## [v0.7.5b] - 2021-05-02
 ### Optimised

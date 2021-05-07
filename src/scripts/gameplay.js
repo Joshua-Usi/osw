@@ -75,7 +75,7 @@ define(function(require) {
 	let angle = 0;
 	/* Audio letiables */
 	let backupStartTime = 0;
-	let audio = new Audio();
+	let audio = document.getElementById("menu-audio");
 	let audioFailedToLoad = false;
 	/* combo colour tints*/
 	let hitCircleComboBuffers = [];
@@ -721,19 +721,19 @@ define(function(require) {
 		/* mouse trails */
 		let numberOfMouseTrailsRendered = 0;
 		for (let i = 0; i < mouse.previousPositions.x.length - 1; i++) {
-			canvas.setGlobalAlpha(utils.map(i, 0, mouse.previousPositions.x.length - 1, 0, 1));
-			let distance = utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]) / (Assets.cursorTrail.width / 2);
-			for (let j = 0; j <= distance; j++) {
-				canvas.drawImage(Assets.cursorTrail, utils.map(j, 0, distance, mouse.previousPositions.x[i], mouse.previousPositions.x[i + 1]) - Assets.cursorTrail.width / 2, utils.map(j, 0, distance, mouse.previousPositions.y[i], mouse.previousPositions.y[i + 1]));
+			let distance = utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]);
+			for (let j = 0; j < distance; j++) {
+				canvas.setGlobalAlpha(utils.map(i, 0, mouse.previousPositions.x.length, 0, 1));
+				canvas.drawImage(Assets.cursorTrail, utils.map(j, 0, distance, mouse.previousPositions.x[i], mouse.previousPositions.x[i + 1]), utils.map(j, 0, distance, mouse.previousPositions.y[i], mouse.previousPositions.y[i + 1]));
 				numberOfMouseTrailsRendered++;
 					/* prevent the rendering of too many trails otherwise it will lag */
-					if (numberOfMouseTrailsRendered > 128) {
-						break;
-					}
+					// if (numberOfMouseTrailsRendered > 128) {
+						// break;
+					// }
 			}
-			if (numberOfMouseTrailsRendered > 128) {
-				break;
-			}
+			// if (numberOfMouseTrailsRendered > 128) {
+				// break;
+			// }
 		}
 		canvas.setGlobalAlpha(1);
 		if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
@@ -958,6 +958,7 @@ define(function(require) {
 		flashlightCtx.fill();
 		flashlightCtx.fill();
 	}
+	let l = 0;
 	return {
 		tick: function() {
 			let useTime = audio.currentTime;
@@ -1082,6 +1083,10 @@ define(function(require) {
 			renderHitErrors();
 			updateScore();
 			renderMouse();
+			if (l % 2 === 0) {
+				mouse.deleteMouseTrail();
+			}
+			l++;
 			if (playDetails.mods.flashlight) {
 				renderFlashlight();
 			}

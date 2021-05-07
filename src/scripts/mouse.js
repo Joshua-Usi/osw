@@ -178,5 +178,11 @@ define(function(require) {
 		unbound() {
 			this.positionLimit = false;
 		}
+		deleteMouseTrail(n) {
+			if (this.previousPositions.x.length > n) {
+				this.previousPositions.x.shift();
+				this.previousPositions.y.shift();
+			}
+		}
 	};
 });

@@ -208,8 +208,7 @@ define(function(require) {
 	let songs = ["cYsmix - Triangles.mp3", "nekodex - circles.mp3", "nekodex - aureole.mp3"];
 	let defaultSongsMs = [375, 333, 429];
 	let chosenSong;
-	let menuAudio = new Audio();
-	menuAudio.id = "menu-audio";
+	let menuAudio = document.getElementById("menu-audio");
 	menuAudio.addEventListener("play", function() {
 		beatNumber = 0;
 		audioCtx.resume();

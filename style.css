@@ -86,6 +86,7 @@ body {
 
 img {
 	user-drag: none;
+	-webkit-user-drag: none;
 }
 
 #version {
