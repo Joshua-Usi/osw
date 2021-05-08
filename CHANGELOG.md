@@ -4,6 +4,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v0.7.6b] - 2021-05-06
 ### Added
 - Detection if browser lacks LocalStorage (no error handling yet)
+- Bar to tell how far you are in a map
 ### Changed
 - Options API to be more friendly
 - Gameplay API to use less memory
@@ -14,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Auto bug that causes misses
 - Sliders with infinite radius causing errors (replaced with straight sliders) (caused by Sotarks - FLying out to the sky - ENDGAME)
+- Certain maps not ending due to audio ending before the song ends
+- Audio playing back too fast in the main menu
 ---
 ## [v0.7.5b] - 2021-05-02
 ### Optimised

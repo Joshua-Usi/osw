@@ -41,6 +41,7 @@ define(function(require) {
 	/* Details about the play, including replays */
 	let playDetails;
 	/* object arrays */
+	let endingTime;
 	let currentHitObject = 0;
 	let hitEvents = [];
 	let hitObjects = [];
@@ -970,21 +971,8 @@ define(function(require) {
 					useTime *= 0.75;
 				}
 			}
-			if (currentHitObject >= currentLoadedMap.hitObjects.length) {
-				let endingTime;
-				let lastHitObject = currentLoadedMap.hitObjects[currentLoadedMap.hitObjects.length - 1];
-				if (lastHitObject.type[0] === "1") {
-					endingTime = lastHitObject.time + 2;
-				}
-				if (lastHitObject.type[1] === "1") {
-					let sliderOnceTime = Math.abs(lastHitObject.length) / (Formulas.sliderMultiplier(currentLoadedMap.timingPoints[currentTimingPoint].beatLength) * 100) * currentLoadedMap.timingPoints[timingPointUninheritedIndex].beatLength;
-					let sliderTotalTime = sliderOnceTime * lastHitObject.slides;
-					endingTime = lastHitObject.time + sliderTotalTime + 2;
-				}
-				if (lastHitObject.type[3] === "1") {
-					endingTime = lastHitObject.endTime + 2;
-				}
-				if (useTime > endingTime) {
+			if (currentHitObject >= currentLoadedMap.hitObjects.length || (audio.currentTime > 0 && audio.paused)) {
+				if (useTime > endingTime || (audio.currentTime > 0 && audio.paused)) {
 					mouse.unlockPointer();
 					utils.showWebpageStates([
 						"webpage-state-always",
@@ -1074,6 +1062,10 @@ define(function(require) {
 			canvas.drawImage(Assets.scoreBarBg, 10, 10, window.innerWidth / 2, Assets.scoreBarBg.height);
 			canvas.drawImage(Assets.scoreBarColour, 0, 0, utils.map(hpDisplay, 0, 1, 0, Assets.scoreBarColour.width), Assets.scoreBarColour.height, 15, 10 + Assets.scoreBarColour.height / 1.5, utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2 - 0.01 * window.innerWidth), Assets.scoreBarColour.height);
 			canvas.setImageAlignment("center");
+
+			canvas.setFillStyle("#ffdf0044");
+			let x = utils.map(audio.currentTime, 0, endingTime, 0, window.innerWidth * 0.13);
+			ctx.fillRect(window.innerWidth * 0.85, window.innerHeight * 0.065, x, 5);
 			/* Render Loop */
 			for (let i = hitObjects.length - 1; i >= 0; i--) {
 				renderHitObject(hitObjects[i], useTime, hitObjectOffsetX, hitObjectOffsetY);
@@ -1175,6 +1167,18 @@ define(function(require) {
 			circleDiameter = utils.map(Formulas.CS(mapData.CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * playfieldSize * (4 / 3));
 			difficultyMultiplier = Formulas.difficultyPoints(mapData.CircleSize, mapData.HPDrainRate, mapData.OverallDifficulty);
 			odTime = Formulas.ODHitWindow(mapData.OverallDifficulty, playDetails.mods);
+			let lastHitObject = currentLoadedMap.hitObjects[currentLoadedMap.hitObjects.length - 1];
+			if (lastHitObject.type[0] === "1") {
+				endingTime = lastHitObject.time + 2;
+			}
+			if (lastHitObject.type[1] === "1") {
+				let sliderOnceTime = Math.abs(lastHitObject.length) / (Formulas.sliderMultiplier(currentLoadedMap.timingPoints[currentTimingPoint].beatLength) * 100) * currentLoadedMap.timingPoints[timingPointUninheritedIndex].beatLength;
+				let sliderTotalTime = sliderOnceTime * lastHitObject.slides;
+				endingTime = lastHitObject.time + sliderTotalTime + 2;
+			}
+			if (lastHitObject.type[3] === "1") {
+				endingTime = lastHitObject.endTime + 2;
+			}
 			mouse.lockPointer();
 			hitCircleComboBuffers = [];
 			approachCircleComboBuffers = [];

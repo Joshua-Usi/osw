@@ -214,7 +214,9 @@ define(function(require) {
 		audioCtx.resume();
 	});
 	menuAudio.addEventListener("ended", function() {
-		this.play();
+		if (document.getElementById("webpage-state-gameplay").style.display === "none") {
+			this.play();
+		}
 	});
 	/* Beat detection */
 	document.getElementById("body").appendChild(menuAudio);
@@ -848,7 +850,8 @@ define(function(require) {
 	document.getElementById("pause-menu-retry").addEventListener("click", retry);
 	document.getElementById("fail-menu-retry").addEventListener("click", retry);
 	function quit() {
-		document.getElementById("menu-audio").play();
+		menuAudio.playbackRate = 1;
+		menuAudio.play();
 		utils.showWebpageStates([
 			"webpage-state-beatmap-selection",
 			"webpage-state-mods",
