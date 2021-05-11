@@ -203,12 +203,18 @@ define(function(require) {
 			}
 			return sum;
 		},
-		mean: function(array) {
+		mean: function(array, startingIndex, endingIndex) {
+			if (startingIndex === undefined) {
+				startingIndex = 0;
+			}
+			if (endingIndex === undefined) {
+				endingIndex = array.length;
+			}
 			let sum = 0;
-			for (let i = 0; i < array.length; i++) {
+			for (let i = startingIndex; i < endingIndex; i++) {
 				sum += array[i];
 			}
-			return sum / array.length;
+			return sum / (endingIndex - startingIndex);
 		},
 		camelCaseToDash: function(string) {
 			return string.replace(/[A-Z]/g, m => "-" + m.toLowerCase());

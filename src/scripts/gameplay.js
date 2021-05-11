@@ -943,6 +943,11 @@ define(function(require) {
 			}
 			ctx.fillRect(window.innerWidth / 2 + useError * 1000, window.innerHeight * 0.975 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.025);
 		}
+		let mean = utils.mean(hitErrors, (hitErrors.length > 40) ? hitErrors.length - 40 : 0, hitErrors.length);
+		canvas.setGlobalAlpha(1);
+		canvas.setFillStyle("#fff");
+		ctx.fillRect(window.innerWidth / 2 + mean * 1000, window.innerHeight * 0.965 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.005);
+
 	}
 	function renderFlashlight() {
 		flashlightCtx.globalCompositeOperation = "source-over";
