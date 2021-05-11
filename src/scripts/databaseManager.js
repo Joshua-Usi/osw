@@ -10,8 +10,7 @@ define(function(require) {
 				data: data,
 			};
 			let objectStore = this.getObjectStore(database, store, "readwrite");
-			let request;
-			request = objectStore.add(object);
+			let request = objectStore.add(object);
 			request.addEventListener("error", function(event) {
 				console.error(`Attempt to insert into object store ${store} failed: ${event.target.error}`);
 			});

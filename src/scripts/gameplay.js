@@ -7,9 +7,9 @@ define(function(require) {
 	const Bezier = require("./bezier.js");
 	const utils = require("./utils.js");
 	const HitObject = require("./hitObjects.js");
-	const Assets = require("./gameplayAssets.js");
-	const Canvas = require("./canvas.js");
-	const skin = "ajax-transparent";
+	const skin = "ajax-transparent"
+	const Assets = require("./gameplayAssets.js")(skin);
+	const Canvas = require("./canvas.js");;
 	const PlayDetails = require("./playDetails.js");
 	const endScreen = require("./endScreen.js");
 	const databaseManager = require("./databaseManager.js");

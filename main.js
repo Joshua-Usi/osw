@@ -31,7 +31,6 @@ define(function(require) {
 	const BeatMapSelectionPaneTemplate = require("./src/scripts/beatMapSelectionPane.js");
 	const gameplay = require("./src/scripts/gameplay.js");
 	const introSequence = require("./src/scripts/introSequence.js");
-	const Accumulator = require("./src/scripts/accumulator.js");
 	const databaseManager = require("./src/scripts/databaseManager.js");
 	const Parser = require("./src/scripts/parser.js");
 	require("./src/scripts/modsUI.js");
@@ -42,12 +41,11 @@ define(function(require) {
 	let menuParallax = document.getElementById("menu-parallax");
 
 	/* Offline context checks, needed to ensure for some effects to work */
-	/* Text suggested by jylescoad-ward */
 	if (!window.localStorage) {
-		console.warn("LocalStorage is not supported on this browser. You will not be able to save your options")
+		console.warn("LocalStorage is not supported on this browser. You will not be able to save your options");
 	}
 	if (window.origin === null) {
-		console.warn("The CORS origin is not set correctly. You may experience audio visualiser bugs");
+		console.warn("The CORS origin is not set correctly or you may be running this client on the file system. You may experience audio visualiser bugs");
 	}
 	if (!window.indexedDB) {
 		console.warn("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
@@ -252,7 +250,7 @@ define(function(require) {
 	/* Accumulators */
 	let time = 0;
 	let previousTime = 0;
-	let gameplayRenderAccumulator = new Accumulator(gameplay.render, 1000 / 60);
+	let gameplayRenderAccumulator = new utils.Accumulator(gameplay.render, 1000 / 60);
 	let logoBeatAccumulator;
 	let beatmapQueue = [];
 	/* Event Listeners */
@@ -315,7 +313,7 @@ define(function(require) {
 				chosenSong = 2;
 				menuAudio.src = `src/audio/${songs[chosenSong]}`;
 			}
-			logoBeatAccumulator = new Accumulator(logoBeat, defaultSongsMs[chosenSong]);
+			logoBeatAccumulator = new utils.Accumulator(logoBeat, defaultSongsMs[chosenSong]);
 			menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 			menuAudio.play();
 			isFirstClick = false;

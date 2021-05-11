@@ -10,7 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Options API to be more friendly
 - Gameplay API to use less memory
 - Improved Auto accuracy by making auto hit earlier
-- Mouse trails to look nicer	
+- Mouse trails to look nicer
+### Optimised
+- accumulator.js into utils.js, less file loads
 ### Removed
 - Loading loop in gameplay that costs unnecessary processing power
 ### Fixed
