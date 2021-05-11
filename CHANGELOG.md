@@ -5,6 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Detection if browser lacks LocalStorage (no error handling yet)
 - Bar to tell how far you are in a map
+- Nightcore support
 ### Changed
 - Options API to be more friendly
 - Gameplay API to use less memory
@@ -15,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Auto bug that causes misses
 - Sliders with infinite radius causing errors (replaced with straight sliders) (caused by Sotarks - FLying out to the sky - ENDGAME)
+- Hit errors showing the correct errors (it showed first 40, it should show last 40)
 - Certain maps not ending due to audio ending before the song ends
 - Audio playing back too fast in the main menu
 ---

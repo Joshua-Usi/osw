@@ -599,6 +599,7 @@ define(function(require) {
 					canvas.setGlobalAlpha(sliderOpacity);
 				}
 				/* Draw Slider */
+				/* Slider slide in code */
 				let sliderDrawPercent = Math.floor(utils.map(useTime, hitObject.time - arTime, hitObject.time - arTime / 4, hitObject.cache.points.length / 4, hitObject.cache.points.length));
 				if (sliderDrawPercent < Math.floor(hitObject.cache.points.length / 4)) {
 					sliderDrawPercent = Math.floor(hitObject.cache.points.length / 4);
@@ -613,7 +614,7 @@ define(function(require) {
 				ctx.lineWidth = circleDiameter;
 				canvas.setStrokeStyle("rgba(255, 255, 255, " + canvas.getGlobalAlpha() + ")");
 				ctx.beginPath();
-				for (let j = 0; j < sliderDrawPercent; j += 1) {
+				for (let j = 0; j < sliderDrawPercent; j++) {
 					let mapped = utils.mapToOsuPixels(hitObject.cache.points[j].x, hitObject.cache.points[j].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					ctx.lineTo(mapped.x, mapped.y);
 				}
@@ -622,7 +623,7 @@ define(function(require) {
 				ctx.lineWidth = circleDiameter * sliderStrokeSize;
 				canvas.setStrokeStyle("#222");
 				ctx.beginPath();
-				for (let j = 0; j < sliderDrawPercent; j += 1) {
+				for (let j = 0; j < sliderDrawPercent; j++) {
 					let mapped = utils.mapToOsuPixels(hitObject.cache.points[j].x, hitObject.cache.points[j].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					ctx.lineTo(mapped.x, mapped.y);
 				}
@@ -671,7 +672,7 @@ define(function(require) {
 					ctx.resetTransform();
 				}
 			}
-			if (hitObject.cache.sliderFollowCirclePosition !== undefined && useTime >= hitObject.time) {
+			if (/*hitObject.cache.sliderFollowCirclePosition !== undefined && */useTime >= hitObject.time) {
 				let mapped = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 				let tempAlpha = canvas.getGlobalAlpha();
 				canvas.setGlobalAlpha(1);
@@ -927,32 +928,32 @@ define(function(require) {
 			if (i > 40) {
 				break;
 			}
-			let alpha = utils.map(i, 40, 0, 0, 1);
+			let useError = hitErrors[hitErrors.length - 1 - i];
+			let alpha = utils.map(i, 40, 0, 0, 0.5);
 			if (alpha <= 0) {
 				alpha = 0;
 			}
 			canvas.setGlobalAlpha(alpha);
-			if (utils.withinRange(hitErrors[i], 0, odTime[2])) {
+			if (utils.withinRange(useError, 0, odTime[2])) {
 				canvas.setFillStyle("#66ccff");
-			} else if (utils.withinRange(hitErrors[i], 0, odTime[1])) {
+			} else if (utils.withinRange(useError, 0, odTime[1])) {
 				canvas.setFillStyle("#88b300");
-			} else if (utils.withinRange(hitErrors[i], 0, odTime[0])) {
+			} else if (utils.withinRange(useError, 0, odTime[0])) {
 				canvas.setFillStyle("#ffcc22");
 			}
-			ctx.fillRect(window.innerWidth / 2 + hitErrors[i] * 1000, window.innerHeight * 0.975 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.025);
+			ctx.fillRect(window.innerWidth / 2 + useError * 1000, window.innerHeight * 0.975 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.025);
 		}
 	}
 	function renderFlashlight() {
 		flashlightCtx.globalCompositeOperation = "source-over";
-		flashlightCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 		flashlightCtx.fillStyle = "rgba(0, 0, 0, 1)";
 		flashlightCtx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 		flashlightCtx.globalCompositeOperation = "destination-out";
 		flashlightCtx.beginPath();
 		flashlightCtx.arc(mouse.position.x, mouse.position.y, flashlightSize, 0, Math.PI * 2, false);
 		flashlightCtx.fillStyle = "white";
-		flashlightCtx.shadowOffsetX = 1;
-		flashlightCtx.shadowOffsetY = 1;
+		flashlightCtx.shadowOffsetX = 0;
+		flashlightCtx.shadowOffsetY = 0;
 		flashlightCtx.shadowBlur = 40;
 		flashlightCtx.shadowColor = "rgba(255, 255, 255, 1)";
 		flashlightCtx.fill();
@@ -1150,12 +1151,17 @@ define(function(require) {
 						audioType = "wav";
 					}
 					audio.src = `data:audio/${audioType};base64,${event.target.result.data}`;
-					if (playDetails.mods.doubleTime) {
+					if (playDetails.mods.doubleTime || playDetails.mods.nightcore) {
 						audio.playbackRate = 1.5;
 					} else if (playDetails.mods.halfTime) {
 						audio.playbackRate = 0.75;
 					} else {
 						audio.playbackRate = 1;
+					}
+					if (playDetails.mods.nightcore) {
+						audio.preservesPitch = false;
+					} else {
+						audio.preservesPitch = true;
 					}
 				});
 			});

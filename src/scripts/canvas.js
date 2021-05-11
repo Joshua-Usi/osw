@@ -157,5 +157,16 @@ define(function(require) {
 			bufferAsImage.src = buff.toDataURL("image/png");
 			return bufferAsImage;
 		}
+		combineImages(img1, img2) {
+			let buff = document.createElement("canvas");
+			buff.width = img1.width;
+			buff.height = img1.width;
+			let ctx = buff.getContext("2d");
+			ctx.drawImage(img2, 0, 0, buff.width, buff.height);
+			ctx.drawImage(img1, 0, 0, buff.width, buff.height);
+			let bufferAsImage = document.createElement("img");
+			bufferAsImage.src = buff.toDataURL("image/png");
+			return bufferAsImage;
+		}
 	}
 });
