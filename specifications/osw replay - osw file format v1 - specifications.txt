@@ -1,0 +1,23 @@
+osw file format v1
+
+[Metadata]
+PlayerName: Experimentators
+PlayDate: 13th May 2021 23:22
+Score: 13304033
+Combo: 796
+Great: 727
+Ok: 69
+Meh: 0
+Miss: 0
+SliderBreaks: 0
+ComboBreaks: 0
+ComboType: Perfect
+PerformancePoints: 0
+
+[Mods]
+hardRock
+doubleTime
+
+[Events]
+M,x,y,time
+K,d|u,l|r,time

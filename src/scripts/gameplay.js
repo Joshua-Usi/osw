@@ -999,6 +999,13 @@ define(function(require) {
 					playDetails.mapperName = currentLoadedMap.Creator;
 					playDetails.artist = currentLoadedMap.Artist;
 					playDetails.difficultyName = currentLoadedMap.Version;
+					if (playDetails.hitDetails.totalMiss === 0) {
+						playDetails.fc = "Perfect";
+					} else if (playDetails.hitDetails.totalMiss <= 3) {
+						playDetails.fc = "Choke";
+					} else {
+						playDetails.fc = "Clear";
+					}
 					endScreen.displayResults(playDetails);
 					isRunning = false;
 				}
