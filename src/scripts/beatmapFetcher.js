@@ -27,6 +27,9 @@ define(function(require) {
 				db.createObjectStore("audio", {
 					keyPath: "name"
 				});
+				db.createObjectStore("scores", {
+					keyPath: "map_name"
+				});
 				break;
 		}
 	});
