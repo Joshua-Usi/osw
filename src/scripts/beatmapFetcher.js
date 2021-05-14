@@ -18,15 +18,21 @@ define(function(require) {
 	database.addEventListener("upgradeneeded", function(event) {
 		console.log("A new version of the database exists and will need to be updated");
 		let db = event.target.result;
-		db.createObjectStore("beatmaps", {
-			keyPath: "name"
-		});
-		db.createObjectStore("audio", {
-			keyPath: "name"
-		});
-		db.createObjectStore("scores", {
-			keyPath: "name"
-		});
+		if (db.objectStoreNames.contains("beatmaps") === false) {
+			db.createObjectStore("beatmaps", {
+				keyPath: "name"
+			});
+		}
+		if (db.objectStoreNames.contains("audio") === false) {
+			db.createObjectStore("audio", {
+				keyPath: "name"
+			});
+		}
+		if (db.objectStoreNames.contains("scores") === false) {
+			db.createObjectStore("scores", {
+				keyPath: "name"
+			});
+		}
 	});
 	database.addEventListener("error", function(event) {
 		console.error(`Attempt to open database failed: ${event.target.error}`);
