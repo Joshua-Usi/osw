@@ -2,7 +2,7 @@ define(function(require) {
 	"use strict";
 	const utils = require("./utils.js");
 	let defaultOptions = {
-		version: 3,
+		version: 4,
 		types: [
 			"slider",
 			"slider",
@@ -10,7 +10,6 @@ define(function(require) {
 
 			"text",
 			"text",
-			"checkbox",
 			"slider",
 
 			"selectbox",
@@ -21,14 +20,12 @@ define(function(require) {
 			"checkbox",
 
 			"checkbox",
-			"checkbox",
+			// "checkbox",
 			"selectbox",
 
-			"checkbox",
 			"selectbox",
 			"checkbox",
 			"slider",
-			"checkbox",
 			"selectbox",
 
 			"selectbox",
@@ -41,7 +38,6 @@ define(function(require) {
 		Inputs: {
 			keyboardLeftButton: "z",
 			keyboardRightButton: "x",
-			enableMouseButtonsInGameplay: true,
 			mouseSensitivity: utils.map(100, 0, 1000, 0, 1),
 		},
 		UserInterface: {
@@ -55,15 +51,13 @@ define(function(require) {
 		},
 		GameplayRendering: {
 			snakingSlidersIn: true,
-			snakingSlidersOut: true,
+			// snakingSlidersOut: true,
 			cursorTrails: "Interpolated",
 		},
 		Performance: {
-			lowPowerMode: false,
 			maxFrameRate: "VSync",
-			showFps: false,
+			showFps: true,
 			sliderResolution: 0,
-			drawHitValues: true,
 			scoreUpdateRate: "Equal to frame rate",
 		},
 		Skin: {
@@ -93,6 +87,9 @@ define(function(require) {
 		},
 		update: function(group, option, value) {
 			defaultOptions[group][option] = value;
+		},
+		read: function() {
+			return JSON.parse(window.localStorage.getItem("options"));	
 		},
 	}
 });

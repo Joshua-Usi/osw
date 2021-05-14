@@ -51,7 +51,7 @@ define(function(require) {
 		console.warn("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
 	}
 	/* osw! version incremented manually */
-	const version = "osw! 0.7.6b";
+	const version = "osw! 0.7.7b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
@@ -390,7 +390,7 @@ define(function(require) {
 					case "2x VSync":
 						frameCounter.textContent = recordedFramesPerSecond.length + " / 120fps";
 						break;
-					case "Browser Maximum (250fps)":
+					case "Browser maximum (250fps)":
 						frameCounter.textContent = recordedFramesPerSecond.length + " / 250fps";
 						break;
 				}
@@ -402,6 +402,14 @@ define(function(require) {
 					frameCounter.style.background = "#ffa500";
 				} else {
 					frameCounter.style.background = "#B00020";
+				}
+				let maxFramerate = Options.getProperty("Performance", "maxFrameRate");
+				if (maxFramerate === "VSync") {
+					gameplayRenderAccumulator.milliseconds = 1000 / 60;
+				} else if (maxFramerate === "2x VSync") {
+					gameplayRenderAccumulator.milliseconds = 1000 / 120;
+				} else if (maxFramerate === "Browser maximum (250fps)") {
+					gameplayRenderAccumulator.milliseconds = 1000 / 250;
 				}
 				if (gameplay.isRunning()) {
 					gameplay.tick();

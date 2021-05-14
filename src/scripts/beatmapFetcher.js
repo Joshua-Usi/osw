@@ -14,24 +14,19 @@ define(function(require) {
 	};
 	let fullyCompletedLoading = false;
 
-	let database = indexedDB.open("osw-database", 1);
+	let database = indexedDB.open("osw-database", 2);
 	database.addEventListener("upgradeneeded", function(event) {
 		console.log("A new version of the database exists and will need to be updated");
 		let db = event.target.result;
-		// existing db version
-		switch (event.oldVersion) {
-			case 0:
-				db.createObjectStore("beatmaps", {
-					keyPath: "name"
-				});
-				db.createObjectStore("audio", {
-					keyPath: "name"
-				});
-				db.createObjectStore("scores", {
-					keyPath: "map_name"
-				});
-				break;
-		}
+		db.createObjectStore("beatmaps", {
+			keyPath: "name"
+		});
+		db.createObjectStore("audio", {
+			keyPath: "name"
+		});
+		db.createObjectStore("scores", {
+			keyPath: "name"
+		});
 	});
 	database.addEventListener("error", function(event) {
 		console.error(`Attempt to open database failed: ${event.target.error}`);
@@ -45,7 +40,7 @@ define(function(require) {
 		function checkComplete() {
 			if (returns.complete && fullyCompletedLoading === false) {
 				for (let i = 0; i < returns.values.length; i++) {
-					let parsedMap = Parser.parseBeatMap(returns.values[i].data);
+					let parsedMap = returns.values[i].data;
 					if (i === 0) {
 						previous = parsedMap.Creator + parsedMap.Title;
 					}
@@ -91,7 +86,7 @@ define(function(require) {
 				complete: false,
 			};
 			fullyCompletedLoading = false;
-			let database = indexedDB.open("osw-database", 1);
+			let database = indexedDB.open("osw-database");
 			database.addEventListener("error", function(event) {
 				console.error(`Attempt to open database failed: ${event.target.error}`);
 			});
@@ -101,7 +96,7 @@ define(function(require) {
 			});
 		},
 		checkForNewMaps: function(beatmapQueue) {
-			let database = indexedDB.open("osw-database", 1);
+			let database = indexedDB.open("osw-database");
 			database.addEventListener("error", function(event) {
 				console.error(`Attempt to open database failed: ${event.target.error}`);
 			});
@@ -111,7 +106,7 @@ define(function(require) {
 					while (beatmapQueue.length > 0) {
 						if (beatmapQueue[0].type === "beatmap") {
 							console.log("Adding beatmaps");
-							databaseManager.addToDatabase(database, "beatmaps", beatmapQueue[0].name, beatmapQueue[0].data);
+							databaseManager.addToDatabase(database, "beatmaps", beatmapQueue[0].name, Parser.parseBeatmap(beatmapQueue[0].data));
 							fetchedMaps.push(beatmapQueue[0].data);
 						} else if (beatmapQueue[0].type === "audio") {
 							console.log("Adding audio");

@@ -82,9 +82,6 @@
 					<p class="inline-block character float-right" id="settings-keyboard-left-button">z</p>
 					<p class="inline-block">Keyboard right button</p>
 					<p class="inline-block character float-right" id="settings-keyboard-right-button">x</p>
-					<p style="color: #999;">Note! osw! does not support right clicks</p>
-					<p class="inline-block" style="letter-spacing: -0.075vw;">Enable mouse buttons in gameplay</p>
-					<input type="checkbox" id="settings-enable-mouse-buttons-in-gameplay" class="checkbox inline-block float-right" name="settings-enable-mouse-buttons-in-gameplay" checked>
 					<p style="color: #999;">Note! sensitivity only applies during gameplay</p>
 					<p id="settings-mouse-sensitivity-text">Mouse sensitivity: 1.0x</p>
 					<input type="range" id="settings-mouse-sensitivity" class="slider" min="0" max="1000" value="100">
@@ -136,8 +133,8 @@
 					<div>
 						<p class="inline-block">Snaking In sliders</p>
 						<input type="checkbox" id="settings-snaking-sliders-in" class="checkbox inline-block float-right" name="settings-snaking-sliders" checked>
-						<p class="inline-block">Snaking Out sliders</p>
-						<input type="checkbox" id="settings-snaking-sliders-out" class="checkbox inline-block float-right" name="settings-snaking-sliders-out" checked>
+						<!-- <p class="inline-block">Snaking Out sliders</p> -->
+						<!-- <input type="checkbox" id="settings-snaking-sliders-out" class="checkbox inline-block float-right" name="settings-snaking-sliders-out" checked> -->
 					</div>
 					<p>Cursor Trails</p>
 					<div class="select-box" id="settings-cursor-trails">
@@ -155,12 +152,8 @@
 					<!-- Performance Settings -->
 					<div class="sidenav-divider"></div>
 					<p class="sidenav-title-text">Performance</p>
-					<div>
-						<p class="inline-block">Low power mode</p>
-						<input type="checkbox" id="settings-low-power-mode" class="checkbox inline-block float-right" name="settings-low-power-mode">
-					</div>
 					<!-- setTimeout has a minimum timeout time of 4ms, thus making 250fps the limit -->
-					<!-- Vsync, 2x Vsync, Browser Maximum (250fps) -->
+					<!-- Vsync, 2x Vsync, Browser maximum (250fps) -->
 					<p>Max Frame Rate</p>
 					<div class="select-box" id="settings-max-frame-rate">
 						<div class="select-box-selected-container">
@@ -171,7 +164,7 @@
 						<div class="select-box-selections">
 							<p class="selected">VSync</p>
 							<p>2x VSync</p>
-							<p>Browser Maximum (250fps)</p>
+							<p>Browser maximum (250fps)</p>
 						</div>
 					</div>
 					<div>
@@ -181,8 +174,6 @@
 					<!-- Full, Half, Quarter, Eighth, Sixteenth -->
 					<p id="settings-slider-resolution-text">Slider Resolution: Full</p>
 					<input type="range" id="settings-slider-resolution" class="slider" min="1" max="5" value="1">
-					<p class="inline-block">Draw Hit Values</p>
-					<input type="checkbox" id="settings-draw-hit-values" class="checkbox inline-block float-right" name="settings-draw-hit-values" checked>
 					<p>Score Update Rate</p>
 					<div class="select-box" id="settings-score-update-rate">
 						<div class="select-box-selected-container">
@@ -191,12 +182,8 @@
 							<p class="select-box-arrow">&#709;</p>
 						</div>
 						<div class="select-box-selections">
-							<p class="selected">Equal to frame rate</p>
-							<p>Only on Change (fastest)</p>
-							<p>15fps</p>
-							<p>30fps</p>
-							<p>60fps</p>
-							<p>Browser Maximum (250fps)</p>
+							<p class="selected">Every frame</p>
+							<p>Only on change (fastest)</p>
 						</div>
 					</div>
 					<!-- Skin Settings -->

@@ -1,5 +1,5 @@
 define(function(require) {
-	return function(easy, noFail, halfTime, hardRock, suddenDeath, perfect, doubleTime, nightcore, hidden, flashlight, relax, autopilot, spunOut, auto, cinema, scoreV2) {
+	return function(easy, noFail, halfTime, hardRock, suddenDeath, perfect, doubleTime, nightcore, hidden, flashlight, relax, autopilot, spunOut, auto, scoreV2) {
 		return {
 			/* difficulty reduction*/
 			easy: easy || false,
@@ -18,7 +18,6 @@ define(function(require) {
 			autopilot: autopilot || false,
 			spunOut: spunOut || false,
 			auto: auto || false,
-			cinema: cinema || false,
 			scoreV2: scoreV2 || false,
 		};
 	};

@@ -1,5 +1,6 @@
 define(function(require) {
 	"use strict";
+	const Mods = require("./mods.js");
 	function applyModMultiplier(n, mods) {
 		if (mods) {
 			if (mods.easy) {
@@ -28,6 +29,46 @@ define(function(require) {
 		}
 		return n;
 	}
+	const toShorthand = {
+		/* difficulty reduction */
+		easy: "EZ",
+		noFail: "NF",
+		halfTime: "HT",
+		/* difficulty increases */
+		hardRock: "HR",
+		suddenDeath: "SD",
+		perfect: "PF",
+		doubleTime: "DT",
+		nightcore: "NC",
+		hidden: "HD",
+		flashlight: "FL",
+		/* special */
+		relax: "RX",
+		autopilot: "AP",
+		spunOut: "SO",
+		auto: "AT",
+		scoreV2: "V2",
+	};
+	const toLonghand = {
+		/* difficulty reduction */
+		EZ: "easy",
+		NF: "noFail",
+		HT: "halfTime",
+		/* difficulty increases */
+		HR: "hardRock",
+		SD: "suddenDeath",
+		PF: "perfect",
+		DT: "doubleTime",
+		NC: "nightcore",
+		HD: "hidden",
+		FL: "flashlight",
+		/* special */
+		RX: "relax",
+		AP: "autopilot",
+		SO: "spunOut",
+		AT: "auto",
+		V2: "scoreV2",
+	};
 	return {
 		AR: function(n, mods) {
 			n = applyModMultiplier(n, mods);
@@ -173,16 +214,16 @@ define(function(require) {
 		hitScore: function(hitValue, comboMultiplier, difficultyMultiplier, modMultiplier) {
 			return hitValue + (hitValue * ((comboMultiplier * difficultyMultiplier * modMultiplier) / 25));
 		},
-		grade: function(perfects, goods, bads, misses, hiddenOrFlashlight) {
+		grade: function(perfects, goods, bads, misses, mods) {
 			let total = perfects + goods + bads + misses;
 			if (perfects >= total) {
-				if (hiddenOrFlashlight) {
+				if (mods.hidden || mods.flashlight) {
 					return "xh";
 				} else {
 					return "x";
 				}
 			} else if (perfects >= total * 0.9 && bads <= total * 0.01 && misses === 0) {
-				if (hiddenOrFlashlight) {
+				if (mods.hidden || mods.flashlight) {
 					return "sh";
 				} else {
 					return "s";
@@ -216,7 +257,7 @@ define(function(require) {
 			if (mods.hidden) {
 				multiplier *= 1.06;
 			}
-			if (mods.doubleTime || mods.nightCore) {
+			if (mods.doubleTime || mods.nightcore) {
 				multiplier *= 1.12;
 			}
 			if (mods.flashlight) {
@@ -243,6 +284,76 @@ define(function(require) {
 				multiplier *= 0;
 			}
 			return multiplier;
+		},
+		modsShorthand: function(mods) {
+			let shorthand = "";
+			if (mods.hidden) {
+				shorthand += "HD";
+			}
+			if (mods.suddenDeath) {
+				shorthand += "SD";
+			}
+			if (mods.perfect) {
+				shorthand += "PF";
+			}
+			if (mods.doubleTime) {
+				shorthand += "DT";
+			}
+			if (mods.mods.nightCore) {
+				shorthand += "NC";
+			}
+			if (mods.hardRock) {
+				shorthand += "HR";
+			}
+			if (mods.flashlight) {
+				shorthand += "FL";
+			}
+			/* decreases */
+			if (mods.easy) {
+				shorthand += "EZ";
+			}
+			if (mods.noFail) {
+				shorthand += "NF";
+			}
+			if (mods.halfTime) {
+				shorthand += "HT";
+			}
+			if (mods.spunOut) {
+				shorthand += "SO";
+			}
+			/* special mods */
+			if (mods.relax) {
+				shorthand += "RX";
+			}
+			if (mods.autopilot) {
+				shorthand += "AP";
+			}
+			if (mods.auto) {
+				shorthand += "AT";
+			}
+		},
+		parseShorthand: function(string) {
+			let splitMods = string.match(/.{1,2}/g);
+			let mods = new Mods();
+			for (var i = 0; i < splitMods.length; i++) {
+				mods[this.shorthandToMod(splitMods[i])] = true;
+			}
+			return mods;
+		},
+		convertModsToShorthand: function(mods) {
+			let output = "";
+			for (let mod in mods) {
+				if (mods[mod] === true) {
+					output += modToShorthand(mod);
+				}
+			}
+			return output;
+		},
+		modToShorthand: function(mod) {
+			return toShorthand[mod];
+		},
+		shorthandToMod: function(shorthand) {
+			return toLonghand[shorthand];
 		}
 	};
 });

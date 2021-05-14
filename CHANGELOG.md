@@ -1,6 +1,25 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v0.7.7] - 2021-05-14
+### Added
+- most options now work such as max framerate and mouse sensitivity
+- Started adding replay support
+### Changed
+- Playdetails to only include essential details. all others are derived
+### Optimised
+- Beatmap saving to now save the parsed map instead of raw map data to increase performance
+- Improved database upgrade algorithm
+### Deprecated
+-
+### Removed
+- Cinema mod (will not support)
+- Excess options
+### Fixed
+- Show the correct grade when using hidden or flashlight mods
+### Security
+-
+---
 ## [v0.7.6b] - 2021-05-06
 ### Added
 - Detection if browser lacks LocalStorage (no error handling yet)

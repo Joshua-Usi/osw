@@ -1,6 +1,7 @@
 define(function(require) {
 	"use strict";
 	/* RequireJS Module Loading */
+	const Options = require("./options.js");
 	const Formulas = require("./formulas.js");
 	const Mouse = require("./mouse.js");
 	const Keyboard = require("./keyboard.js");
@@ -32,7 +33,6 @@ define(function(require) {
 	let keyboard = new Keyboard("body");
 	mouse.setPosition(window.innerWidth / 2, window.innerHeight / 2);
 	mouse.init();
-	mouse.sensitivity = 1;
 	mouse.positionBound(0, 0, window.innerWidth, window.innerHeight);
 	let mouseSize = 1;
 	keyboard.init();
@@ -40,6 +40,7 @@ define(function(require) {
 	let keyboardRightReleased = false;
 	/* Details about the play, including replays */
 	let playDetails;
+	let currentOptions;
 	/* object arrays */
 	let endingTime;
 	let currentHitObject = 0;
@@ -65,7 +66,6 @@ define(function(require) {
 	let displayedScore = 0;
 	/* Combo letiables */
 	let combo = 0;
-	let highestCombo = 0;
 	let currentComboNumber = 1;
 	let currentComboColour = 0;
 	let comboPulseSize = 1;
@@ -607,6 +607,27 @@ define(function(require) {
 				if (sliderDrawPercent > hitObject.cache.points.length - 1) {
 					sliderDrawPercent = hitObject.cache.points.length - 1;
 				}
+				let inc;
+				switch (currentOptions.Performance.sliderResolution) {
+					case 0:
+						inc = 1;
+						break;
+					case 0.25:
+						inc = 2;
+						break;
+					case 0.5:
+						inc = 4;
+						break;
+					case 0.75:
+						inc = 8;
+						break;
+					case 1:
+						inc = 16;
+						break;
+				}
+				if (sliderDrawPercent <= 16) {
+					inc = 1;
+				}
 				/* Slider Curve calculated the at the hitobject time - ar time */
 				ctx.lineCap = "round";
 				ctx.lineJoin = "round";
@@ -614,7 +635,7 @@ define(function(require) {
 				ctx.lineWidth = circleDiameter;
 				canvas.setStrokeStyle("rgba(255, 255, 255, " + canvas.getGlobalAlpha() + ")");
 				ctx.beginPath();
-				for (let j = 0; j < sliderDrawPercent; j++) {
+				for (let j = 0; j < sliderDrawPercent; j += inc) {
 					let mapped = utils.mapToOsuPixels(hitObject.cache.points[j].x, hitObject.cache.points[j].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					ctx.lineTo(mapped.x, mapped.y);
 				}
@@ -623,7 +644,7 @@ define(function(require) {
 				ctx.lineWidth = circleDiameter * sliderStrokeSize;
 				canvas.setStrokeStyle("#222");
 				ctx.beginPath();
-				for (let j = 0; j < sliderDrawPercent; j++) {
+				for (let j = 0; j < sliderDrawPercent; j += inc) {
 					let mapped = utils.mapToOsuPixels(hitObject.cache.points[j].x, hitObject.cache.points[j].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					ctx.lineTo(mapped.x, mapped.y);
 				}
@@ -704,14 +725,15 @@ define(function(require) {
 	function updateScore() {
 		comboPulseSize -= comboPulseSize / 8;
 		displayedScore += (score - displayedScore) / 8;
+		let scoreUpdateRate = currentOptions.Performance.scoreUpdateRate;
 		/* update score html element */
-		utils.htmlCounter(utils.reverse(Math.round(displayedScore) + ""), "score-container", "score-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "left", "calc(100vw - " + (document.getElementById("score-container").childNodes.length * 2) + "vw)");
+		utils.htmlCounter(utils.reverse(Math.round((scoreUpdateRate === "Only on change (fastest)") ? score : displayedScore) + ""), "score-container", "score-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "left", "calc(100vw - " + (document.getElementById("score-container").childNodes.length * 2) + "vw)");
 		/* update combo html element */
 		utils.htmlCounter(utils.reverse(combo + "x"), "combo-container", "combo-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "top", "calc(100vh - 52 / 32 * " + 2 * (comboPulseSize + 1) + "vw)");
 		/* update accuracy html element */
-		utils.htmlCounter("%" + utils.reverse("" + (Formulas.accuracy(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss) * 100).toFixed(2)), "accuracy-container", "accuracy-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
+		utils.htmlCounter("%" + utils.reverse("" + playDetails.accuracy.toFixed(2)), "accuracy-container", "accuracy-digit-", `src/images/skins/${skin}/fonts/aller/score-`, "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
 		/* rank grade */
-		document.getElementById("grade").src = `./src/images/skins/${skin}/ranking-` + Formulas.grade(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss, false) + "-small.png";
+		document.getElementById("grade").src = `./src/images/skins/${skin}/ranking-` + playDetails.grade + "-small.png";
 		/* combo pulse size */
 		let els = document.getElementById("combo-container").querySelectorAll("img");
 		for (let i = 0; i < els.length; i++) {
@@ -723,19 +745,21 @@ define(function(require) {
 		mouse.deleteMouseTrail(500);
 		/* mouse trails */
 		let numberOfMouseTrailsRendered = 0;
-		for (let i = mouse.previousPositions.x.length - 1; i >= 0; i--) {
-			let distance = utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]);
-			for (let j = distance; j >= 0; j -= 2) {
-				canvas.setGlobalAlpha(utils.map(numberOfMouseTrailsRendered, 0, 256, 0.5, 0));
-				canvas.drawImage(Assets.cursorTrail, utils.map(j, 0, distance, mouse.previousPositions.x[i], mouse.previousPositions.x[i + 1]), utils.map(j, 0, distance, mouse.previousPositions.y[i], mouse.previousPositions.y[i + 1]));
-				numberOfMouseTrailsRendered++;
-				/* prevent the rendering of too many trails otherwise it will lag */
+		if (currentOptions.GameplayRendering.cursorTrails === "Interpolated") {
+			for (let i = mouse.previousPositions.x.length - 1; i >= 0; i--) {
+				let distance = utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]);
+				for (let j = distance; j >= 0; j -= 2) {
+					canvas.setGlobalAlpha(utils.map(numberOfMouseTrailsRendered, 0, 256, 0.5, 0));
+					canvas.drawImage(Assets.cursorTrail, utils.map(j, 0, distance, mouse.previousPositions.x[i], mouse.previousPositions.x[i + 1]), utils.map(j, 0, distance, mouse.previousPositions.y[i], mouse.previousPositions.y[i + 1]));
+					numberOfMouseTrailsRendered++;
+					/* prevent the rendering of too many trails otherwise it will lag */
+					if (numberOfMouseTrailsRendered >= 256) {
+						break;
+					}
+				}
 				if (numberOfMouseTrailsRendered >= 256) {
 					break;
 				}
-			}
-			if (numberOfMouseTrailsRendered >= 256) {
-				break;
 			}
 		}
 		canvas.setGlobalAlpha(1);
@@ -800,37 +824,23 @@ define(function(require) {
 
 	function processHitEvent(useTime) {
 		switch (hitEvents[0].score) {
-			/* slider bonus spin */
-			case 1000:
-				playDetails.hitDetails.totalSliderBonusSpin++;
-				break;
-				/* great*/
+			/* great*/
 			case 300:
-				playDetails.hitDetails.total300++;
+				playDetails.great++;
 				break;
-				/* good or spinner spin */
+				/* ok */
 			case 100:
 				if (hitEvents[0].type === "hit-circle") {
-					playDetails.hitDetails.total100++;
-				} else {
-					playDetails.hitDetails.totalSpinnerSpins++;
+					playDetails.ok++;
 				}
 				break;
 				/* meh */
 			case 50:
-				playDetails.hitDetails.total50++;
+				playDetails.meh++;
 				break;
-				/* complete miss */
+				/* miss */
 			case 0:
-				playDetails.hitDetails.totalMiss++;
-				break;
-				/* Slider head, repeat and end */
-			case 30:
-				playDetails.hitDetails.totalSliderElements++;
-				break;
-				/* Slider tick */
-			case 10:
-				playDetails.hitDetails.totalSliderTicks++;
+				playDetails.miss++;
 				break;
 		}
 		if ((hitEvents[0].score >= 50 || hitEvents[0].score === 0) && hitEvents[0].type === "hit-circle") {
@@ -841,11 +851,12 @@ define(function(require) {
 		}
 		if (hitEvents[0].combo === "increasing") {
 			combo++;
-			if (combo > highestCombo) {
-				highestCombo = combo;
+			if (combo > playDetails.maxCombo) {
+				playDetails.maxCombo = combo;
 			}
 			comboPulseSize = 1;
 		} else if (hitEvents[0].combo === "reset") {
+			playDetails.comboBreaks++;
 			combo = 0;
 			document.getElementById("combo-container").innerHTML = "";
 		}
@@ -877,6 +888,10 @@ define(function(require) {
 	function renderEffects(useTime) {
 		for (let i = 0; i < scoreObjects.length; i++) {
 			if (scoreObjects[i].lifetime - useTime >= 0) {
+				/* ignore 300 hits */
+				if (currentOptions.Gameplay.draw300Hits === false && scoreObjects[i].score === 300) {
+					continue;
+				}
 				let useImage = -1;
 				switch (scoreObjects[i].score) {
 					case 300:
@@ -999,15 +1014,19 @@ define(function(require) {
 					playDetails.mapperName = currentLoadedMap.Creator;
 					playDetails.artist = currentLoadedMap.Artist;
 					playDetails.difficultyName = currentLoadedMap.Version;
-					if (playDetails.hitDetails.totalMiss === 0) {
-						playDetails.fc = "Perfect";
-					} else if (playDetails.hitDetails.totalMiss <= 3) {
-						playDetails.fc = "Choke";
+					if (playDetails.miss === 0 && playDetails.sliderBreaks === 0) {
+						playDetails.comboType = "Perfect";
+					} else if (playDetails.miss === 0) {
+						playDetails.comboType = "Full Combo";
+					} else if (playDetails.miss <= 3) {
+						playDetails.comboType = "Choke";
 					} else {
-						playDetails.fc = "Clear";
+						playDetails.comboType = "Clear";
 					}
 					endScreen.displayResults(playDetails);
+					console.log(playDetails);
 					isRunning = false;
+					audio.playbackRate = 1;
 				}
 			}
 			detectSpinSpeed(useTime, previousTime, hitObjectOffsetX, hitObjectOffsetY);
@@ -1038,14 +1057,13 @@ define(function(require) {
 				}
 			}
 			playDetails.score = score;
-			playDetails.accuracy = Formulas.accuracy(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss) * 100;
-			playDetails.grade = Formulas.grade(playDetails.hitDetails.total300, playDetails.hitDetails.total100, playDetails.hitDetails.total50, playDetails.hitDetails.totalMiss, false);
-			playDetails.maxCombo = highestCombo;
+			playDetails.accuracy = Formulas.accuracy(playDetails.great, playDetails.ok, playDetails.meh, playDetails.miss) * 100;
+			playDetails.grade = Formulas.grade(playDetails.great, playDetails.ok, playDetails.meh, playDetails.miss, playDetails.mods);
 			previousTime = useTime;
 
-			if (highestCombo >= 200) {
+			if (combo >= 200) {
 				flashlightSize = utils.map(60, 0, 512, 0, window.innerWidth);
-			} else if (highestCombo >= 100) {
+			} else if (combo >= 100) {
 				flashlightSize = utils.map(80, 0, 512, 0, window.innerWidth);
 			} else {
 				flashlightSize = utils.map(100, 0, 512, 0, window.innerWidth);
@@ -1107,6 +1125,8 @@ define(function(require) {
 			this.playMap(currentLoadedMap, playDetails.mods);
 		},
 		playMap: function(mapData, mods) {
+			currentOptions = Options.read();
+			mouse.sensitivity = currentOptions.Inputs.mouseSensitivity * 10;
 			currentLoadedMap = mapData;
 			playDetails = PlayDetails(mods);
 			if (mods.flashlight === false) {
@@ -1133,7 +1153,6 @@ define(function(require) {
 			displayedScore = 0;
 			/* Combo letiables */
 			combo = 0;
-			highestCombo = 0;
 			currentComboNumber = 1;
 			currentComboColour = 0;
 			comboPulseSize = 1;
@@ -1145,7 +1164,7 @@ define(function(require) {
 			/* Audio letiables */
 			backupStartTime = window.performance.now();
 			audioFailedToLoad = false;
-			let database = indexedDB.open("osw-database", 1);
+			let database = indexedDB.open("osw-database");
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
 				let objectStore = databaseManager.getObjectStore(database, "audio", "readonly");

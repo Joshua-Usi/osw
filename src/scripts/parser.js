@@ -3,7 +3,7 @@ define(function(require) {
 	const HitObject = require("./hitObjects.js");
 	const utils = require("./utils.js");
 	return {
-		parseBeatMap: function(data) {
+		parseBeatmap: function(data) {
 			let splited = data.split("\n");
 			let beatmap = {
 				version: splited[0],
