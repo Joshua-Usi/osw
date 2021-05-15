@@ -7,23 +7,23 @@ Accessible [here](https://joshua-usi.github.io/osw)
 ##### Have a feature request or found a bug? submit an issue report [here](https://github.com/Joshua-Usi/osw/issues/new/choose)
  
 ## FAQs
-##### Will you support _____ browser or device?
+### Will you support _____ browser or device?
 osw! will gaurantee support for Chrome, Firefox and Edge. All other browsers are subject to their own risks. Internet explorer is not supported at any version. Safari is planned to be supported if it is within the project scope
- 
-#### Will touch screen be supported?
+
+### Will touch screen be supported?
 Touch screen will be supported if Safari is planned to be supported
 
-#### Im experiencing poor performance on my device! pls fix game!
+### Im experiencing poor performance on my device! pls fix game!
 Sorry to hear that. Unfortunately theres not much I can do about it in the short term. While processing takes minimal cpu power. Rendering is horrendously slow on low powered devices. Though chromebooks have been tested with 45fps.
 
-#### Will you support tablets?
+### Will you support tablets?
 As of current browser specficiations and to my knowledge. it is currently impossible to provide hardware tablet support for customisable area. Though tablet area can be emulated by changing sensitivity this is a hacky way of doing area
 
-#### Will the PP and star rating systems be accurate?
+### Will the PP and star rating systems be accurate?
 osw! will use custom PP and star rating systems that will try to be as close as possible to the original osu! system. Though I am not a data analyst, i will try to work hard to keep the PP and star rating system as close as possible
  
  #### So and so feature does not work exactly the same as osu!, will you fix it?
  Some osu features are near impossible to emulate unless of course i were to deep dive into the lazer codebase. Things such as HP and spinners work on custom algorithms that try to be as fair as possible
   
-#### Will the beatmap editor be supported?
+### Will the beatmap editor be supported?
 Though there is a button there for the beatmap editor. It is highly unlikely to be supported unless there is a feature request with high enough demand
