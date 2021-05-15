@@ -634,11 +634,14 @@ define(function(require) {
 				/* Draw Outer Slider Body */
 				ctx.lineWidth = circleDiameter;
 				canvas.setStrokeStyle("rgba(255, 255, 255, " + canvas.getGlobalAlpha() + ")");
+				let mapped = utils.mapToOsuPixels(hitObject.cache.points[sliderDrawPercent].x, hitObject.cache.points[sliderDrawPercent].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 				ctx.beginPath();
 				for (let j = 0; j < sliderDrawPercent; j += inc) {
 					let mapped = utils.mapToOsuPixels(hitObject.cache.points[j].x, hitObject.cache.points[j].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					ctx.lineTo(mapped.x, mapped.y);
 				}
+				/* draw last point to make sure slider ends properly */
+				ctx.lineTo(mapped.x, mapped.y);
 				ctx.stroke();
 				/* Draw Inner Slider Body */
 				ctx.lineWidth = circleDiameter * sliderStrokeSize;
@@ -648,6 +651,8 @@ define(function(require) {
 					let mapped = utils.mapToOsuPixels(hitObject.cache.points[j].x, hitObject.cache.points[j].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 					ctx.lineTo(mapped.x, mapped.y);
 				}
+				/* draw last point to make sure slider ends properly */
+				ctx.lineTo(mapped.x, mapped.y);
 				ctx.stroke();
 				/* Draw Slider Ticks */
 				if (hitObject.cache.totalTicks >= 1 && hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide]) {
@@ -660,7 +665,6 @@ define(function(require) {
 					}
 				}
 				/* Draw Slider End */
-				let mapped = utils.mapToOsuPixels(hitObject.cache.points[sliderDrawPercent].x, hitObject.cache.points[sliderDrawPercent].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 				if (hitObject.slides > 1 && hitObject.cache.currentSlide < hitObject.slides - 1) {
 					ctx.translate(mapped.x, mapped.y);
 					ctx.rotate(-utils.direction(hitObject.cache.points[hitObject.cache.points.length - 2].x, hitObject.cache.points[hitObject.cache.points.length - 2].y, hitObject.cache.points[hitObject.cache.points.length - 1].x, hitObject.cache.points[hitObject.cache.points.length - 1].y) + Math.PI / 2);
@@ -1024,7 +1028,6 @@ define(function(require) {
 						playDetails.comboType = "Clear";
 					}
 					endScreen.displayResults(playDetails);
-					console.log(playDetails);
 					isRunning = false;
 					audio.playbackRate = 1;
 				}

@@ -1,6 +1,23 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v0.7.8] - 2021-05-15
+### Added
+-
+### Changed
+-
+### Optimised
+-
+### Deprecated
+-
+### Removed
+-
+### Fixed
+- Songs not playing when map is selected
+- Issue where sliders when slider resolution is not "Full" not ending properly 
+### Security
+-
+---
 ## [v0.7.7] - 2021-05-14
 ### Added
 - most options now work such as max framerate and mouse sensitivity
@@ -10,15 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Optimised
 - Beatmap saving to now save the parsed map instead of raw map data to increase performance
 - Improved database upgrade algorithm
-### Deprecated
--
 ### Removed
 - Cinema mod (will not support)
 - Excess options
 ### Fixed
 - Show the correct grade when using hidden or flashlight mods
-### Security
--
 ---
 ## [v0.7.6b] - 2021-05-06
 ### Added

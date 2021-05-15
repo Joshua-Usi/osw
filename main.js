@@ -51,7 +51,7 @@ define(function(require) {
 		console.warn("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
 	}
 	/* osw! version incremented manually */
-	const version = "osw! 0.7.7b";
+	const version = "osw! 0.7.8b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
@@ -85,7 +85,7 @@ define(function(require) {
 							mapsChildren[i].classList.add("beatmap-selection-selected");
 						}
 						let menuAudio = document.getElementById("menu-audio");
-						let database = indexedDB.open("osw-database", 1);
+						let database = indexedDB.open("osw-database");
 						let that = this;
 						database.addEventListener("success", function(event) {
 							let database = event.target.result;
