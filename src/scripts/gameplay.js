@@ -604,7 +604,7 @@ define(function(require) {
 				if (sliderDrawPercent < Math.floor(hitObject.cache.points.length / 4)) {
 					sliderDrawPercent = Math.floor(hitObject.cache.points.length / 4);
 				}
-				if (sliderDrawPercent > hitObject.cache.points.length - 1) {
+				if (sliderDrawPercent > hitObject.cache.points.length - 1 || currentOptions.GameplayRendering.snakingSlidersIn === false) {
 					sliderDrawPercent = hitObject.cache.points.length - 1;
 				}
 				let inc;
