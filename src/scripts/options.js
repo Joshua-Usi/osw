@@ -20,7 +20,6 @@ define(function(require) {
 			"checkbox",
 
 			"checkbox",
-			// "checkbox",
 			"selectbox",
 
 			"selectbox",
@@ -51,7 +50,6 @@ define(function(require) {
 		},
 		GameplayRendering: {
 			snakingSlidersIn: true,
-			// snakingSlidersOut: true,
 			cursorTrails: "Interpolated",
 		},
 		Performance: {
