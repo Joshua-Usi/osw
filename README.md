@@ -27,3 +27,6 @@ osw! will use custom PP and star rating systems that will try to be as close as 
   
 ### Will the beatmap editor be supported?
 Though there is a button there for the beatmap editor. It is highly unlikely to be supported unless there is a feature request with high enough demand
+
+### So and so map does not work on the browser client
+Over the years, many beatmap creators have tried their best to break osu in their own way. As osw! is coded with different algorithms, some of these beatmaps will work differently compared to osu!. Maps such as [Solice of Oblivion](https://osu.ppy.sh/s/594751) by Professional Box do not correctly display the distorted sliders
