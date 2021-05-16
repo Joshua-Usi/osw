@@ -178,6 +178,12 @@ define(function(require) {
 	}
 	return {
 		animate: animate,
+		hide: function() {
+			document.getElementById("intro").style.opacity = 0;
+			setTimeout(function() {
+				document.getElementById("intro").style.display = "none";
+			}, 750);
+		},
 		events: eventDone,
 	};
 });

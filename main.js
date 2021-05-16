@@ -51,7 +51,7 @@ define(function(require) {
 		console.warn("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
 	}
 	/* osw! version incremented manually */
-	const version = "osw! 0.7.8b";
+	const version = "osw! v0.7.8b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
@@ -150,7 +150,7 @@ define(function(require) {
 		logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.05s";
 		logo.style.width = logoSize + "vh";
 		logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
-		logo.style.left = "calc(5vw + " + logoX + "vw - " + logoSize / 2 + "vh)";
+		logo.style.left = "calc(" + logoX + "vw - " + logoSize / 2 + "vh)";
 		logo.style.backgroundSize = logoSize + "vh";
 		logo.style.filter = "brightness(1.25)";
 		if (loudness > 5000 * (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100)) {
@@ -191,7 +191,7 @@ define(function(require) {
 		logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
 		logo.style.width = logoSize * logoSizeIncrease + "vh";
 		logo.style.top = "calc(" + logoY + "vh - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
-		logo.style.left = "calc(5vw + " + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
+		logo.style.left = "calc(" + logoX + "vw - " + ((logoSize * logoSizeIncrease) / 2) + "vh)";
 		logo.style.backgroundSize = logoSize * logoSizeIncrease + "vh";
 		logo.style.filter = "brightness(1)";
 		let leftBeat = document.getElementById("left-beat");
@@ -212,7 +212,7 @@ define(function(require) {
 		audioCtx.resume();
 	});
 	menuAudio.addEventListener("ended", function() {
-		if (document.getElementById("webpage-state-gameplay").style.display === "none") {
+		if (document.getElementById("webpage-state-gameplay").style.display !== "block") {
 			this.play();
 		}
 	});
@@ -241,7 +241,7 @@ define(function(require) {
 	let settingsSet = false;
 	let isFirstClick = true;
 	let offset = 0;
-	let logoX = 50;
+	let logoX = 55;
 	let logoY = 50;
 	let logoSize = 70;
 	let audioVisualiserSize = 1.6;
@@ -256,7 +256,12 @@ define(function(require) {
 	/* Event Listeners */
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
-			introSequence.animate();
+			let userOptions = Options.get();
+			if (userOptions.UserInterface.introSequence === "Triangles") {
+				introSequence.animate();
+			} else {
+				introSequence.hide();
+			}
 			AudioManager.load("back-button-click", "./src/audio/effects/back-button-click.wav", "effects", true);
 			AudioManager.load("menu-options-click", "./src/audio/effects/menu-options-click.wav", "effects", true);
 			AudioManager.load("menu-freeplay-click", "./src/audio/effects/menu-freeplay-click.wav", "effects", true);
@@ -264,14 +269,13 @@ define(function(require) {
 			AudioManager.load("menu-direct-click", "./src/audio/effects/menu-direct-click.wav", "effects", true);
 			AudioManager.load("menu-exit-click", "./src/audio/effects/menu-exit-click.wav", "effects", true);
 			AudioManager.load("menu-hover", "./src/audio/effects/menu-hover.wav", "effects", true);
-			AudioManager.load("check-on", "./src/audio/effects/menu-hover.wav", "effects", true);
-			AudioManager.load("check-off", "./src/audio/effects/menu-hover.wav", "effects", true);
+			AudioManager.load("check-on", "./src/audio/effects/check-on.wav", "effects", true);
+			AudioManager.load("check-off", "./src/audio/effects/check-off.wav", "effects", true);
 			AudioManager.load("settings-hover", "./src/audio/effects/settings-hover.wav", "effects", true);
 			AudioManager.load("sliderbar", "./src/audio/effects/sliderbar.wav", "effects", true);
 			AudioManager.load("menu-hit", "./src/audio/effects/menu-hit.wav", "effects", true);
 			/* Setting settings */
 			let index = 0;
-			let userOptions = Options.get();
 			for (let group in userOptions) {
 				if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object" && group !== "types") {
 					for (let setting in userOptions[group]) {
@@ -458,7 +462,7 @@ define(function(require) {
 		audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";
 		audioVisualiser.style.height = logoSize * audioVisualiserSize + "vh";
 		audioVisualiser.style.top = "calc(" + logoY + "vh - " + (logoSize * audioVisualiserSize / 2) + "vh)";
-		audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + (logoSize * audioVisualiserSize / 2) + "vh)";
+		audioVisualiser.style.left = "calc(" + logoX + "vw - " + (logoSize * audioVisualiserSize / 2) + "vh)";
 		let paragraphElements = document.getElementById("splash-screen").getElementsByTagName("p");
 		let imageElements = document.getElementById("splash-screen").getElementsByTagName("img");
 		for (let i = 0; i < paragraphElements.length; i++) {
@@ -704,7 +708,7 @@ define(function(require) {
 	/* logo listener */
 	document.getElementById("logo").addEventListener("click", function() {
 		AudioManager.play("menu-hit");
-		logoX = 30;
+		logoX = 35;
 		logoY = 50;
 		logoSize = 25;
 		audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
@@ -712,7 +716,7 @@ define(function(require) {
 		audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";
 		audioVisualiser.style.height = logoSize * audioVisualiserSize + "vh";
 		audioVisualiser.style.top = "calc(" + logoY + "vh - " + (logoSize * audioVisualiserSize / 2) + "vh)";
-		audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + (logoSize * audioVisualiserSize / 2) + "vh)";
+		audioVisualiser.style.left = "calc(" + logoX + "vw - " + (logoSize * audioVisualiserSize / 2) + "vh)";
 		let menuBar = document.getElementById("menu-bar");
 		menuBar.style.visibility = "visible";
 		menuBar.style.opacity = 1;
@@ -750,7 +754,7 @@ define(function(require) {
 	}
 	let menuTimeout;
 	function resetMenu() {
-		logoX = 50;
+		logoX = 55;
 		logoY = 50;
 		logoSize = 70;
 		audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
@@ -758,7 +762,7 @@ define(function(require) {
 		audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";
 		audioVisualiser.style.height = logoSize * audioVisualiserSize + "vh";
 		audioVisualiser.style.top = "calc(" + logoY + "vh - " + (logoSize * audioVisualiserSize / 2) + "vh)";
-		audioVisualiser.style.left = "calc(5vw + " + logoX + "vw - " + (logoSize * audioVisualiserSize / 2) + "vh)";
+		audioVisualiser.style.left = "calc(" + logoX + "vw - " + (logoSize * audioVisualiserSize / 2) + "vh)";
 		let menuBar = document.getElementById("menu-bar");
 		menuBar.style.opacity = 0;
 		menuBar.style.top = "50vh";

@@ -3,7 +3,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 ## [v0.7.8] - 2021-05-15
 ### Added
--
+- Skip intro sequence if circles theme is selected
 ### Changed
 -
 ### Optimised
@@ -14,7 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -
 ### Fixed
 - Songs not playing when map is selected
+- Songs not looping when ended
 - Issue where sliders when slider resolution is not "Full" not ending properly 
+- Checkboxes having the wrong sound effect
+- Menu logo not being in the correct position
+- Maps ending with long sliders not ending at the correct time
 ### Security
 -
 ---

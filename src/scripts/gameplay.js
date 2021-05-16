@@ -860,7 +860,9 @@ define(function(require) {
 			}
 			comboPulseSize = 1;
 		} else if (hitEvents[0].combo === "reset") {
-			playDetails.comboBreaks++;
+			if (combo >= 1) {
+				playDetails.comboBreaks++;
+			}
 			combo = 0;
 			document.getElementById("combo-container").innerHTML = "";
 		}
@@ -1212,7 +1214,18 @@ define(function(require) {
 				endingTime = lastHitObject.time + 2;
 			}
 			if (lastHitObject.type[1] === "1") {
-				let sliderOnceTime = Math.abs(lastHitObject.length) / (Formulas.sliderMultiplier(currentLoadedMap.timingPoints[currentTimingPoint].beatLength) * 100) * currentLoadedMap.timingPoints[timingPointUninheritedIndex].beatLength;
+				let lastUninheritedTimingPoint = 0;
+				let i = 0;
+				for (i = 0; i < currentLoadedMap.timingPoints.length; i++) {
+					if (currentLoadedMap.timingPoints[i].uninherited === 1) {
+						lastUninheritedTimingPoint = i;
+					}
+				}
+				let sliderSpeedMultiplier = currentLoadedMap.SliderMultiplier;
+				if (currentLoadedMap.timingPoints[currentLoadedMap.timingPoints.length - 1].uninherited === 0) {
+					sliderSpeedMultiplier *= Formulas.sliderMultiplier(currentLoadedMap.timingPoints[currentLoadedMap.timingPoints.length - 1].beatLength);
+				}
+				let sliderOnceTime = Math.abs(lastHitObject.length) / (sliderSpeedMultiplier) * currentLoadedMap.timingPoints[lastUninheritedTimingPoint].beatLength;
 				let sliderTotalTime = sliderOnceTime * lastHitObject.slides;
 				endingTime = lastHitObject.time + sliderTotalTime + 2;
 			}
