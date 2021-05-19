@@ -52,23 +52,7 @@ define(function(require) {
 
 	let fullyCompletedLoading = false;
 
-	let database = indexedDB.open("osw-database", 1);
-	database.addEventListener("upgradeneeded", function(event) {
-		console.log("A new version of the database exists and will need to be updated");
-		let db = event.target.result;
-		// existing db version
-		console.log(event.oldVersion);
-		switch (event.oldVersion) {
-			case 0:
-				db.createObjectStore("beatmaps", {
-					keyPath: "name"
-				});
-				db.createObjectStore("audio", {
-					keyPath: "name"
-				});
-				break;
-		}
-	});
+	let database = indexedDB.open("osw-database");
 	database.addEventListener("error", function(event) {
 		console.error(`Attempt to open database failed: ${event.target.error}`);
 	});
@@ -81,7 +65,7 @@ define(function(require) {
 		function checkComplete() {
 			if (returns.complete && fullyCompletedLoading === false) {
 				for (let i = 0; i < returns.values.length; i++) {
-					let parsedMap = Parser.parseBeatMap(returns.values[i].data);
+					let parsedMap = returns.values[i].data;
 					fetch(`https://osu.ppy.sh/api/get_beatmaps?s=${parsedMap.BeatmapSetID}&bs=${parsedMap.BeatmapID}&k=${apiKey}`).then(function(response) {
 						if (response.status !== 200) {
 							console.log('Looks like there was a problem. Status Code: ' + response.status);
