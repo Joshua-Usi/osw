@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - More beatmap loading by allowing you to choose maps while a beatmap is pending to load
 - Separated beatmap loading from audio loading to optimise performance
 ### Fixed
-- Issue with (Sound Chimera)[https://osu.ppy.sh/beatmapsets/813569#osu/1706210] and file type endings (by converting to lower case before checking)
+- Issue with [Sound Chimera](https://osu.ppy.sh/beatmapsets/813569#osu/1706210) and file type endings (by converting to lower case before checking)
 - README.md markdown errors
 ---
 ## [v0.7.8b] - 2021-05-15
@@ -55,7 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Loading loop in gameplay that costs unnecessary processing power
 ### Fixed
 - Auto bug that causes misses
-- Sliders with infinite radius causing errors (replaced with straight sliders) (caused by (Flying Out to the Sky)[https://osu.ppy.sh/beatmapsets/1212452#osu/2534559] - ENDGAME)
+- Sliders with infinite radius causing errors (replaced with straight sliders) (caused by [Flying Out to the Sky](https://osu.ppy.sh/beatmapsets/1212452#osu/2534559) - ENDGAME)
 - Hit errors showing the correct errors (it showed first 40, it should show last 40)
 - Certain maps not ending due to audio ending before the song ends
 - Audio playing back too fast in the main menu
