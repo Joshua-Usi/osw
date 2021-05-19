@@ -1,17 +1,21 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
-## [v0.7.8] - 2021-05-15
+## [v0.7.9b] - 2021-05-19
+### Added
+- Multiple beatmap uploads at the same time (tried with 250, works like a charm)
+### Optimised
+- Beatmap loading (further inspection showed that beatmaps would often try to load twice)
+- Beatmap loading again by concatenating all beatmaps in a string and adding it to the DOM in one go (reduced the lag in the intro sequence)
+- More beatmap loading by allowing you to choose maps while a beatmap is pending to load
+- Separated beatmap loading from audio loading to optimise performance
+### Fixed
+- Issue with (Sound Chimera)[https://osu.ppy.sh/beatmapsets/813569#osu/1706210] and file type endings (by converting to lower case before checking)
+- README.md markdown errors
+---
+## [v0.7.8b] - 2021-05-15
 ### Added
 - Skip intro sequence if circles theme is selected
-### Changed
--
-### Optimised
--
-### Deprecated
--
-### Removed
--
 ### Fixed
 - Songs not playing when map is selected
 - Songs not looping when ended
@@ -19,10 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Checkboxes having the wrong sound effect
 - Menu logo not being in the correct position
 - Maps ending with long sliders not ending at the correct time
-### Security
--
 ---
-## [v0.7.7] - 2021-05-14
+## [v0.7.7b] - 2021-05-14
 ### Added
 - most options now work such as max framerate and mouse sensitivity
 - Started adding replay support
@@ -53,7 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Loading loop in gameplay that costs unnecessary processing power
 ### Fixed
 - Auto bug that causes misses
-- Sliders with infinite radius causing errors (replaced with straight sliders) (caused by Sotarks - FLying out to the sky - ENDGAME)
+- Sliders with infinite radius causing errors (replaced with straight sliders) (caused by (Flying Out to the Sky)[https://osu.ppy.sh/beatmapsets/1212452#osu/2534559] - ENDGAME)
 - Hit errors showing the correct errors (it showed first 40, it should show last 40)
 - Certain maps not ending due to audio ending before the song ends
 - Audio playing back too fast in the main menu

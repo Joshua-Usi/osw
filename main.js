@@ -51,21 +51,22 @@ define(function(require) {
 		console.warn("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
 	}
 	/* osw! version incremented manually */
-	const version = "osw! v0.7.8b";
+	const version = "osw! v0.7.9b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].textContent = version;
 	}
-	let loadedNewMaps = false;
+	let loadedNewMaps = true;
 	function loadMaps() {
-		document.getElementById("beatmap-selection-right").innerHTML = "";
 		if (Beatmaps.allMapsLoaded() === true) {
 			let loadedMaps = Beatmaps.get();
 			/* Beatmap loading and adding to dom */
+			let concatenated = ""
 			for (let i = 0; i < loadedMaps.length; i++) {
-				document.getElementById("beatmap-selection-right").innerHTML += BeatMapSelectionPaneTemplate.group(loadedMaps[i], i);
+				concatenated += BeatMapSelectionPaneTemplate.group(loadedMaps[i], i);
 			}
+			document.getElementById("beatmap-selection-right").innerHTML = concatenated;
 			let beatMapGroups = document.getElementsByClassName("beatmap-selection-group-pane");
 			for (let i = 0; i < beatMapGroups.length; i++) {
 				beatMapGroups[i].addEventListener("click", function() {
@@ -96,9 +97,9 @@ define(function(require) {
 							});
 							audioRequest.addEventListener("success", function(event) {
 								let audioType;
-								if (event.target.result.name.includes(".mp3")) {
+								if (event.target.result.name.toLowerCase().includes(".mp3")) {
 									audioType = "mp3";
-								} else if (event.target.result.name.includes(".ogg")) {
+								} else if (event.target.result.name.toLowerCase().includes(".ogg")) {
 									audioType = "ogg";
 								}
 								let first = that.parentNode.getElementsByClassName("beatmap-selection-group-pane-maps")[0].getElementsByClassName("beatmap-selection-map-pane")[0];
@@ -253,6 +254,7 @@ define(function(require) {
 	let gameplayRenderAccumulator = new utils.Accumulator(gameplay.render, 1000 / 60);
 	let logoBeatAccumulator;
 	let beatmapQueue = [];
+	let audioQueue = [];
 	/* Event Listeners */
 	window.addEventListener("click", function() {
 		if (isFirstClick === true && document.readyState === "complete") {
@@ -423,6 +425,9 @@ define(function(require) {
 					logoBeatAccumulator.tick(time - previousTime);
 				} else {
 					logoResetBeat();
+				}
+				if (audioQueue.length > 0) {
+					Beatmaps.addAudio(audioQueue);
 				}
 				if (beatmapQueue.length > 0) {
 					Beatmaps.checkForNewMaps(beatmapQueue);
@@ -877,37 +882,37 @@ define(function(require) {
 	document.getElementById("pause-menu-quit").addEventListener("click", quit);
 	document.getElementById("fail-menu-quit").addEventListener("click", quit);
 	document.getElementById("upload-beatmap").addEventListener("change", function() {
-		let fileReader = new FileReader();
-		fileReader.addEventListener("load", function() {
-			let new_zip = new JSZip();
-			new_zip.loadAsync(event.target.result).then(function(zip) {
-				let uniqueIdentifier;
-				for (let key in zip.files) {
-					if (key.includes(".mp3") || key.includes(".ogg")) {
-						zip.files[key].async("binarystring").then(function(content) {
-							beatmapQueue.push({
-								type: "audio",
-								name: uniqueIdentifier + key,
-								data: btoa(content)
+		for (let i = 0; i < this.files.length; i++) {
+			let fileReader = new FileReader();
+			fileReader.addEventListener("load", function() {
+				let new_zip = new JSZip();
+				new_zip.loadAsync(event.target.result).then(function(zip) {
+					let uniqueIdentifier;
+					for (let key in zip.files) {
+						if (key.toLowerCase().includes(".mp3") || key.toLowerCase().includes(".ogg")) {
+							zip.files[key].async("binarystring").then(function(content) {
+								audioQueue.push({
+									name: uniqueIdentifier + key,
+									data: btoa(content)
+								});
 							});
-						});
-					} else if (key.includes(".osu")) {
-						zip.files[key].async("string").then(function(content) {
-							if (uniqueIdentifier === undefined) {
-								let parsedMap = Parser.quickParseMap(content);
-								uniqueIdentifier = parsedMap.Creator + parsedMap.Title;
-							}
-							beatmapQueue.push({
-								type: "beatmap",
-								name: key,
-								data: content
+						} else if (key.toLowerCase().includes(".osu")) {
+							zip.files[key].async("string").then(function(content) {
+								if (uniqueIdentifier === undefined) {
+									let parsedMap = Parser.quickParseMap(content);
+									uniqueIdentifier = parsedMap.Creator + parsedMap.Title;
+								}
+								beatmapQueue.push({
+									name: key,
+									data: content
+								});
 							});
-						});
+						}
 					}
-				}
+				});
 			});
-		});
-		fileReader.readAsBinaryString(this.files[0]);
+			fileReader.readAsBinaryString(this.files[i]);
+		}
 	});
 	document.getElementById("bottom-bar-random").addEventListener("click", function() {
 		chooseRandomMap();

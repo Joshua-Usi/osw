@@ -1178,12 +1178,13 @@ define(function(require) {
 					console.error(`Attempt to find query failed: ${event.target.error}`);
 				});
 				request.addEventListener("success", function(event) {
+
 					let audioType;
-					if (event.target.result.name.includes(".mp3")) {
+					if (event.target.result.name.toLowerCase().includes(".mp3")) {
 						audioType = "mp3";
-					} else if (event.target.result.name.includes(".ogg")) {
+					} else if (event.target.result.name.toLowerCase().includes(".ogg")) {
 						audioType = "ogg";
-					} else if (event.target.result.name.includes(".wav")) {
+					} else if (event.target.result.name.toLowerCase().includes(".wav")) {
 						audioType = "wav";
 					}
 					audio.src = `data:audio/${audioType};base64,${event.target.result.data}`;

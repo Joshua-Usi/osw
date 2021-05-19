@@ -108,18 +108,23 @@ define(function(require) {
 			});
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
-				if (beatmapQueue.length > 0) {
-					while (beatmapQueue.length > 0) {
-						if (beatmapQueue[0].type === "beatmap") {
-							console.log("Adding beatmaps");
-							databaseManager.addToDatabase(database, "beatmaps", beatmapQueue[0].name, Parser.parseBeatmap(beatmapQueue[0].data));
-							fetchedMaps.push(beatmapQueue[0].data);
-						} else if (beatmapQueue[0].type === "audio") {
-							console.log("Adding audio");
-							databaseManager.addToDatabase(database, "audio", beatmapQueue[0].name, beatmapQueue[0].data);
-						}
-						beatmapQueue.splice(0, 1);
-					}
+				while (beatmapQueue.length > 0) {
+					databaseManager.addToDatabase(database, "beatmaps", beatmapQueue[0].name, Parser.parseBeatmap(beatmapQueue[0].data));
+					fetchedMaps.push(beatmapQueue[0].data);
+					beatmapQueue.splice(0, 1);
+				}
+			});
+		},
+		addAudio: function(audioQueue) {
+			let database = indexedDB.open("osw-database");
+			database.addEventListener("error", function(event) {
+				console.error(`Attempt to open database failed: ${event.target.error}`);
+			});
+			database.addEventListener("success", function(event) {
+				let database = event.target.result;
+				while (audioQueue.length > 0) {
+					databaseManager.addToDatabase(database, "audio", audioQueue[0].name, audioQueue[0].data);
+					audioQueue.splice(0, 1);
 				}
 			});
 		}
