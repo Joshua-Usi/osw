@@ -175,7 +175,7 @@ define(function(require) {
 					}
 				} else if (hitObject.curveType === "P" && hitObject.curvePoints.length === 3) {
 					/* Slider Type Perfect Circle */
-					/* There are a select few maps that have infinity circle radius. Im look at your sotarks */
+					/* There are a select few maps that have infinity circle radius. I'm look at your sotarks */
 					hitObject.cache.points = utils.circleToPoints(circle.x, circle.y, circle.r, Math.abs(hitObject.length), -utils.direction(circle.x, circle.y, hitObject.curvePoints[0].x, hitObject.curvePoints[0].y) - Math.PI / 2, utils.orientation(hitObject.curvePoints[0], hitObject.curvePoints[1], hitObject.curvePoints[2]));
 				}
 			} else if (hitObject.type[3] === "1") {
@@ -1214,21 +1214,26 @@ define(function(require) {
 			if (lastHitObject.type[0] === "1") {
 				endingTime = lastHitObject.time + 2;
 			}
-			if (lastHitObject.type[1] === "1") {
+			if (lastHitObject.type[1] === "1") {	
 				let lastUninheritedTimingPoint = 0;
-				let i = 0;
-				for (i = 0; i < currentLoadedMap.timingPoints.length; i++) {
+				for (let i = 0; i < currentLoadedMap.timingPoints.length; i++) {
 					if (currentLoadedMap.timingPoints[i].uninherited === 1) {
 						lastUninheritedTimingPoint = i;
+						
 					}
 				}
+				/* thanks to https://github.com/N3bby/osuBMParser/issues/2 */
 				let sliderSpeedMultiplier = currentLoadedMap.SliderMultiplier;
-				if (currentLoadedMap.timingPoints[currentLoadedMap.timingPoints.length - 1].uninherited === 0) {
+				if (currentLoadedMap.timingPoints[currentLoadedMap.timingPoints.length - 1].uninherited === 1) {
 					sliderSpeedMultiplier *= Formulas.sliderMultiplier(currentLoadedMap.timingPoints[currentLoadedMap.timingPoints.length - 1].beatLength);
 				}
-				let sliderOnceTime = Math.abs(lastHitObject.length) / (sliderSpeedMultiplier) * currentLoadedMap.timingPoints[lastUninheritedTimingPoint].beatLength;
-				let sliderTotalTime = sliderOnceTime * lastHitObject.slides;
-				endingTime = lastHitObject.time + sliderTotalTime + 2;
+				let pixelsPerBeat = sliderSpeedMultiplier * currentLoadedMap.timingPoints[lastUninheritedTimingPoint].beatLength;
+				let sliderLengthInBeats = (Math.abs(lastHitObject.length) * lastHitObject.slides) / pixelsPerBeat;
+				let sliderTime = pixelsPerBeat * sliderLengthInBeats / 250;
+
+				// let sliderOnceTime = Math.abs(lastHitObject.length) / (sliderSpeedMultiplier) * currentLoadedMap.timingPoints[lastUninheritedTimingPoint].beatLength;
+				// let sliderTotalTime = sliderOnceTime * lastHitObject.slides;
+				endingTime = lastHitObject.time + sliderTime + 2;
 			}
 			if (lastHitObject.type[3] === "1") {
 				endingTime = lastHitObject.endTime + 2;

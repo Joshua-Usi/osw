@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Issue with [Sound Chimera](https://osu.ppy.sh/beatmapsets/813569#osu/1706210) and file type endings (by converting to lower case before checking)
 - Issue with the main logo not shrinking when being clicked on or on reset
 - When songs restart, the beats of the logo being off-beat
+- Issue when maps ending on sliders not ending at the correct time
 - README.md markdown errors
 ---
 ## [v0.7.8b] - 2021-05-15
