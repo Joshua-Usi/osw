@@ -37,9 +37,9 @@ define(function(require) {
 	*/
 	function aimDifficultyMultiplier(distance, hitObject) {
 		if (hitObject.type[1] === "1") {
-			return 1.75 * Math.E ** (Math.E * 0.0035 * distance) * (gaussianDistribution(distance, 200, -110, 8400) + 1) - 10;
+			return 1.75 * Math.E ** (Math.E * 0.0035 * distance);
 		} else {
-			return 1.5 * Math.E ** (Math.E * 0.004 * distance) * (gaussianDistribution(distance, 200, -110, 8400) + 1) - 10;
+			return 1.5 * Math.E ** (Math.E * 0.004 * distance);
 		}
 	}
 
@@ -60,7 +60,7 @@ define(function(require) {
 		} else {
 			distanceBetweenObjects = utils.dist(previousHitObject.x, previousHitObject.y, hitObject.x, hitObject.y);
 		}
-		let a = utils.dist(previousHitObject.x, previousHitObject.y, hitObject.x, hitObject.y);
+		let a = distanceBetweenObjects;
 		let b = utils.dist(hitObject.x, hitObject.y, nextHitObject.x, nextHitObject.y);
 		let c = utils.dist(previousHitObject.x, previousHitObject.y, nextHitObject.x, nextHitObject.y);
 		/* cosine rule, one of the only uses outside of school lol */
@@ -69,14 +69,14 @@ define(function(require) {
 			angleBetweenHitobjects = 0;
 		}
 		let angleDifficulty = -((angleBetweenHitobjects - Math.PI) ** 2) / (Math.PI ** (Math.E / 1.05)) + 1;
-		return aimDifficultyMultiplier(distanceBetweenObjects, hitObject) * 0.15 * angleDifficulty * sliderLengthBonus * CSDifficulty(circleSize, mods);
+		return aimDifficultyMultiplier(distanceBetweenObjects, hitObject) * 0.35 * angleDifficulty * sliderLengthBonus * CSDifficulty(circleSize, mods);
 	}
 
 	function speedDifficulty(hitObject, previousHitObject, mods) {
 		let time = Math.abs(hitObject.time - previousHitObject.time);
-		let multiplier = 0.5;
+		let multiplier = 0.60;
 		if (hitObject.type[1] === "1") {
-			multiplier = 0.45;
+			multiplier = 0.55;
 		}
 		if (time < 1 / 60) {
 			time = 1 / 60;
@@ -114,7 +114,7 @@ define(function(require) {
 					highest = difficulty;
 				}
 			}
-			return (sum / (beatmap.hitObjects.length - 1) + highest / 150) * aimWeightMultiplier;
+			return (sum / (beatmap.hitObjects.length - 1) + highest / 20) * aimWeightMultiplier;
 		},
 		calculateSpeedDifficulty: function(beatmap, mods) {
 			if (mods === undefined) {
@@ -139,7 +139,7 @@ define(function(require) {
 				}
 				numberOfConsideredHitObjects++;
 			}
-			return (sum / numberOfConsideredHitObjects + highest / 150) * speedWeightMultiplier;
+			return (sum / numberOfConsideredHitObjects + highest / 20) * speedWeightMultiplier;
 		},
 	}
 });

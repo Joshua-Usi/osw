@@ -123,13 +123,12 @@
 	display: inline;
 }
 
-.beatmap-selection-map-pane-star-wrapper img {
-	width: 3.5vh;
-}
-
 .beatmap-selection-map-pane-difficulty-icon {
 	display: inline;
+	float: left;
 	height: 6vh;
+	padding-right: 1vh;
+	padding-top: 1vh;
 }
 
 .beatmap-selection-map-pane-right-pane {

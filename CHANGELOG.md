@@ -9,8 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Beatmap loading again by concatenating all beatmaps in a string and adding it to the DOM in one go (reduced the lag in the intro sequence)
 - More beatmap loading by allowing you to choose maps while a beatmap is pending to load
 - Separated beatmap loading from audio loading to optimise performance
+- Removed excess stars (optimised DOM tree ALOT)
+- Optimised DOM tree (when loading 329 beatmaps, went down from 7055 -> 4111)
+- star rating for performance
 ### Fixed
 - Issue with [Sound Chimera](https://osu.ppy.sh/beatmapsets/813569#osu/1706210) and file type endings (by converting to lower case before checking)
+- Issue with the main logo not shrinking when being clicked on or on reset
+- When songs restart, the beats of the logo being off-beat
 - README.md markdown errors
 ---
 ## [v0.7.8b] - 2021-05-15

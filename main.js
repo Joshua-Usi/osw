@@ -71,17 +71,16 @@ define(function(require) {
 			for (let i = 0; i < beatMapGroups.length; i++) {
 				beatMapGroups[i].addEventListener("click", function() {
 					let maps = this.parentNode.getElementsByClassName("beatmap-selection-group-pane-maps");
+					let mapsChildren = maps[0].getElementsByClassName("beatmap-selection-map-pane");
 					if (maps[0].style.display === "block") {
 						maps[0].style.display = "none";
 						this.classList.remove("beatmap-selection-selected");
-						let mapsChildren = maps[0].getElementsByClassName("beatmap-selection-map-pane");
 						for (let i = 0; i < mapsChildren.length; i++) {
 							mapsChildren[i].classList.remove("beatmap-selection-selected");
 						}
 					} else {
 						maps[0].style.display = "block";
 						this.classList.add("beatmap-selection-selected");
-						let mapsChildren = maps[0].getElementsByClassName("beatmap-selection-map-pane");
 						for (let i = 0; i < mapsChildren.length; i++) {
 							mapsChildren[i].classList.add("beatmap-selection-selected");
 						}
@@ -210,6 +209,7 @@ define(function(require) {
 	let menuAudio = document.getElementById("menu-audio");
 	menuAudio.addEventListener("play", function() {
 		beatNumber = 0;
+		logoBeatAccumulator.accumulator = 0;
 		audioCtx.resume();
 	});
 	menuAudio.addEventListener("ended", function() {
@@ -716,6 +716,10 @@ define(function(require) {
 		logoX = 35;
 		logoY = 50;
 		logoSize = 25;
+		logo.style.width = logoSize + "vh";
+		logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
+		logo.style.left = "calc(" + logoX + "vw - " + logoSize / 2 + "vh)";
+		logo.style.backgroundSize = logoSize + "vh";
 		audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";
@@ -762,6 +766,10 @@ define(function(require) {
 		logoX = 55;
 		logoY = 50;
 		logoSize = 70;
+		logo.style.width = logoSize + "vh";
+		logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
+		logo.style.left = "calc(" + logoX + "vw - " + logoSize / 2 + "vh)";
+		logo.style.backgroundSize = logoSize + "vh";
 		audioVisualiser.width = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.height = (logoSize / 100) * audioVisualiserSize * window.innerHeight;
 		audioVisualiser.style.width = logoSize * audioVisualiserSize + "vh";

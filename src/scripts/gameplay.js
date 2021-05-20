@@ -206,8 +206,8 @@ define(function(require) {
 				/* Cache setup for Slider */
 				hitObject.cache.sliderInheritedMultiplier = sliderSpeedMultiplier;
 				hitObject.cache.timingPointUninheritedIndex = timingPointUninheritedIndex;
-				hitObject.cache.sliderOnceTime = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * currentLoadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
-				hitObject.cache.sliderTotalTime = hitObject.cache.sliderOnceTime * hitObject.slides;
+				// hitObject.cache.sliderOnceTime = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * currentLoadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
+				// hitObject.cache.sliderTotalTime = hitObject.cache.sliderOnceTime * hitObject.slides;
 				let time = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * currentLoadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
 				/* Actual ticks is -1 due to unexplicable phenomenon */
 				hitObject.cache.totalTicks = time / currentLoadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength * currentLoadedMap.SliderTickRate;
@@ -253,7 +253,7 @@ define(function(require) {
 			keyboard.emulateKeyUp("z");
 			if (index === 0) {
 				if ((hitObject.cache.hasHitAtAll === false || hitObject.cache.hasHitAtAll === undefined) && hitObject.type[3] !== "1") {
-					mouse.changePosition((hitObjectMapped.x - mouse.position.x) / 8, (hitObjectMapped.y - mouse.position.y) / 8);
+					mouse.changePosition((hitObjectMapped.x - mouse.position.x) / 4, (hitObjectMapped.y - mouse.position.y) / 4);
 				}
 			}
 			if (hitObject.type[0] === "1" && useTime > hitObject.time - odTime[2] / 2) {
