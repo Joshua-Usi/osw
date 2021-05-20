@@ -139,6 +139,7 @@ define(function(require) {
 				hitObject.cache.onFollowCircle = false;
 				hitObject.cache.hasHitAtAll = false;
 				hitObject.cache.hasEnded = false;
+				hitObject.cache.sliderFollowCirclePreviousPosition = 0;
 				hitObject.cache.sliderFollowCirclePosition = 0;
 				hitObject.cache.sliderFollowCircleSize = 0;
 				hitObject.cache.currentSlide = 0;
@@ -206,37 +207,32 @@ define(function(require) {
 				/* Cache setup for Slider */
 				hitObject.cache.sliderInheritedMultiplier = sliderSpeedMultiplier;
 				hitObject.cache.timingPointUninheritedIndex = timingPointUninheritedIndex;
-				// hitObject.cache.sliderOnceTime = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * currentLoadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
-				// hitObject.cache.sliderTotalTime = hitObject.cache.sliderOnceTime * hitObject.slides;
 				let time = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * currentLoadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
 				/* Actual ticks is -1 due to unexplicable phenomenon */
 				hitObject.cache.totalTicks = time / currentLoadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength * currentLoadedMap.SliderTickRate;
 				hitObject.cache.specificSliderTicksHit = [];
-				for (let j = 0; j < hitObject.slides; j++) {
-					let tempArray = [];
-					for (let k = 0; k < hitObject.cache.totalTicks - 1; k++) {
-						tempArray.push(false);
-					}
-					hitObject.cache.specificSliderTicksHit.push(tempArray);
-				}
 				hitObject.cache.specificSliderTicksPosition = [];
 				let inc = hitObject.cache.points.length / (hitObject.cache.totalTicks);
 				for (let j = 0; j < hitObject.slides; j++) {
-					let tempArray = [];
+					let temporaryTickPositions = [];
+					let tempArrayBoolean = [];
 					if (j % 2 === 0) {
 						for (let k = 0; k < hitObject.cache.points.length; k += inc) {
-							if (Math.floor(k) !== 0) {
-								tempArray.push(Math.floor(k));
+							if (k > 1 && k < hitObject.cache.points.length - 1) {
+								temporaryTickPositions.push(Math.floor(k));
+								tempArrayBoolean.push(false);
 							}
 						}
 					} else {
 						for (let k = hitObject.cache.points.length - 1; k >= 0; k -= inc) {
-							if (Math.floor(k) !== hitObject.cache.points.length - 1) {
-								tempArray.push(Math.floor(k));
+							if (k > 1 && k < hitObject.cache.points.length - 1) {
+								temporaryTickPositions.push(Math.floor(k));
+								tempArrayBoolean.push(false);
 							}
 						}
 					}
-					hitObject.cache.specificSliderTicksPosition.push(tempArray);
+					hitObject.cache.specificSliderTicksHit.push(tempArrayBoolean);
+					hitObject.cache.specificSliderTicksPosition.push(temporaryTickPositions);
 				}
 				hitObject.cache.totalTicks = hitObject.cache.specificSliderTicksPosition[0].length;
 			} else if (hitObject.type[3] === "1" && hitObject.cache.cacheSetAfterHit === false) {
@@ -309,25 +305,26 @@ define(function(require) {
 			if (hitObject.cache.currentSlide < hitObject.slides) {
 				let sliderRepeat = false;
 				let time = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * currentLoadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
+				hitObject.cache.sliderFollowCirclePreviousPosition = hitObject.cache.sliderFollowCirclePosition - 10;
 				if (hitObject.cache.currentSlide % 2 === 0) {
 					hitObject.cache.sliderFollowCirclePosition = Math.floor(utils.map(useTime, hitObject.time + time * hitObject.cache.currentSlide, hitObject.time + time * (hitObject.cache.currentSlide + 1), 0, hitObject.cache.points.length - 1));
 					/* Prevent Index Errors */
-					if (hitObject.cache.sliderFollowCirclePosition <= 0) {
+					if (hitObject.cache.sliderFollowCirclePosition < 0) {
 						hitObject.cache.sliderFollowCirclePosition = 0;
 					}
 					/* Check if slider repeats, then switch direction */
-					if (hitObject.cache.sliderFollowCirclePosition >= hitObject.cache.points.length - 1) {
+					if (hitObject.cache.sliderFollowCirclePosition > hitObject.cache.points.length - 1) {
 						hitObject.cache.sliderFollowCirclePosition = hitObject.cache.points.length - 1;
 						sliderRepeat = true;
 					}
 				} else if (hitObject.cache.currentSlide % 2 === 1) {
 					hitObject.cache.sliderFollowCirclePosition = Math.floor(utils.map(useTime, hitObject.time + time * hitObject.cache.currentSlide, hitObject.time + time * (hitObject.cache.currentSlide + 1), hitObject.cache.points.length - 1, 0));
 					/* Prevent Index Errors */
-					if (hitObject.cache.sliderFollowCirclePosition >= hitObject.cache.points.length - 1) {
+					if (hitObject.cache.sliderFollowCirclePosition > hitObject.cache.points.length - 1) {
 						hitObject.cache.sliderFollowCirclePosition = hitObject.cache.points.length - 1;
 					}
-					/* Check if Slider Repeats, then switch direction */
-					if (hitObject.cache.sliderFollowCirclePosition <= 0) {
+					/* Check if slider repeats, then switch direction */
+					if (hitObject.cache.sliderFollowCirclePosition < 0) {
 						hitObject.cache.sliderFollowCirclePosition = 0;
 						sliderRepeat = true;
 					}
@@ -337,7 +334,7 @@ define(function(require) {
 					if (hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] === false && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 						let mapped = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].x, hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 						let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-						if (utils.dist(mapped.x, mapped.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter / 4 && utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * followCircleSize / 2 && hitObject.cache.onFollowCircle) {
+						if (hitObject.cache.sliderFollowCirclePreviousPosition < hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j] && hitObject.cache.sliderFollowCirclePosition > hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]) {
 							hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] = true;
 							hitObject.cache.sliderTicksHit++;
 							hitObject.cache.sliderFollowCircleSize += 0.125;
@@ -364,7 +361,7 @@ define(function(require) {
 								effectObjects.push(new HitObject.EffectObject(hitCircleComboBuffers[hitObject.cache.comboColour], sliderFollowCirclePos.x, sliderFollowCirclePos.y, useTime, useTime + 0.2));
 								effectObjects.push(new HitObject.EffectObject(Assets.hitCircleOverlay, sliderFollowCirclePos.x, sliderFollowCirclePos.y, useTime, useTime + 0.2));
 							}
-						} else if (hitObject.cache.currentSlide < hitObject.slides) {
+						} else {
 							hitEvents.push(new HitObject.Event("slider-element-miss", 0, "reset", sliderFollowCirclePos.x, sliderFollowCirclePos.y));
 						}
 					}

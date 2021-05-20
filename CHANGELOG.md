@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - When songs restart, the beats of the logo being off-beat
 - Issue when maps ending on sliders not ending at the correct time
 - README.md markdown errors
+- Slider tick algorithm (matching osu!)
 ---
 ## [v0.7.8b] - 2021-05-15
 ### Added
