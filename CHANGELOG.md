@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README.md markdown errors
 - Slider tick algorithm (matching osu!)
 - Moved hit events to process on same frame (instead of 1 frame delay)
+- Moved timingPoint processing to happen before hitObject addition and processing
 - Score to more closely match osu!
 ---
 ## [v0.7.8b] - 2021-05-15

@@ -1033,12 +1033,12 @@ define(function(require) {
 			}
 			detectSpinSpeed(useTime, previousTime, hitObjectOffsetX, hitObjectOffsetY);
 			updateHp(useTime, previousTime);
-			while (currentHitObject < currentLoadedMap.hitObjects.length && useTime >= currentLoadedMap.hitObjects[currentHitObject].time - arTime) {
-				nextHitObject();
-			}
 			/* +1 because the given time is beginning time, not end time */
 			while (currentTimingPoint < currentLoadedMap.timingPoints.length - 1 && useTime >= currentLoadedMap.timingPoints[currentTimingPoint + 1].time) {
 				nextTimingPoint();
+			}
+			while (currentHitObject < currentLoadedMap.hitObjects.length && useTime >= currentLoadedMap.hitObjects[currentHitObject].time - arTime) {
+				nextHitObject();
 			}
 			/* Cache Loop */
 			for (let i = 0; i < hitObjects.length; i++) {
