@@ -162,7 +162,7 @@ define(function(require) {
 						if (hitObject.curvePoints[j + 1] && hitObject.curvePoints[j].x === hitObject.curvePoints[j + 1].x && hitObject.curvePoints[j].y === hitObject.curvePoints[j + 1].y) {
 							bezierTemp.push(hitObject.curvePoints[j]);
 							let point = Bezier(bezierTemp);
-							for (let k = 0; k < point.length - 1; k++) {
+							for (let k = 0; k < point.length; k++) {
 								hitObject.cache.points.push(point[k]);
 							}
 							bezierTemp = [];
@@ -844,8 +844,8 @@ define(function(require) {
 				playDetails.miss++;
 				break;
 		}
-		if ((hitEvents[0].score >= 50 || hitEvents[0].score === 0) && hitEvents[0].type === "hit-circle") {
-			score += Formulas.hitScore(hitEvents[0].score, combo, difficultyMultiplier, scoreMultiplier);
+		if ((hitEvents[0].score > 50 || hitEvents[0].score === 0) && hitEvents[0].type === "hit-circle") {
+			score += Formulas.hitScore(hitEvents[0].score, (combo === 0) ? combo : combo - 1, difficultyMultiplier, scoreMultiplier);
 			scoreObjects.push(new HitObject.ScoreObject(hitEvents[0].score, hitEvents[0].x, hitEvents[0].y, useTime, useTime + 0.5));
 		} else {
 			score += hitEvents[0].score;
@@ -1033,10 +1033,6 @@ define(function(require) {
 			}
 			detectSpinSpeed(useTime, previousTime, hitObjectOffsetX, hitObjectOffsetY);
 			updateHp(useTime, previousTime);
-			/* Hit Events */
-			while (hitEvents.length > 0) {
-				processHitEvent(useTime);
-			}
 			while (currentHitObject < currentLoadedMap.hitObjects.length && useTime >= currentLoadedMap.hitObjects[currentHitObject].time - arTime) {
 				nextHitObject();
 			}
@@ -1057,6 +1053,10 @@ define(function(require) {
 						i = 0;
 					}
 				}
+			}
+			/* Hit Events */
+			while (hitEvents.length > 0) {
+				processHitEvent(useTime);
 			}
 			playDetails.score = score;
 			playDetails.accuracy = Formulas.accuracy(playDetails.great, playDetails.ok, playDetails.meh, playDetails.miss) * 100;
@@ -1205,7 +1205,9 @@ define(function(require) {
 			arFadeIn = Formulas.ARFadeIn(mapData.ApproachRate, playDetails.mods);
 			/* Map from osu!pixels to screen pixels */
 			circleDiameter = utils.map(Formulas.CS(mapData.CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * playfieldSize * (4 / 3));
-			difficultyMultiplier = Formulas.difficultyPoints(mapData.CircleSize, mapData.HPDrainRate, mapData.OverallDifficulty);
+			let drainTime = mapData.hitObjects[mapData.hitObjects.length - 1].time - mapData.hitObjects[0].time;
+			difficultyMultiplier = Formulas.difficultyPoints(mapData.CircleSize, mapData.HPDrainRate, mapData.OverallDifficulty, mapData.hitObjects.length, drainTime);
+			console.log(difficultyMultiplier);
 			odTime = Formulas.ODHitWindow(mapData.OverallDifficulty, playDetails.mods);
 			let lastHitObject = currentLoadedMap.hitObjects[currentLoadedMap.hitObjects.length - 1];
 			if (lastHitObject.type[0] === "1") {

@@ -1,6 +1,7 @@
 define(function(require) {
 	"use strict";
 	const Mods = require("./mods.js");
+	const utils = require("./utils.js");
 	function applyModMultiplier(n, mods) {
 		if (mods) {
 			if (mods.easy) {
@@ -197,19 +198,9 @@ define(function(require) {
 				return "expert+";
 			}
 		},
-		difficultyPoints: function(cs, hp, od) {
-			let total = cs + hp + od;
-			if (total < 5) {
-				return 2;
-			} else if (total < 12) {
-				return 3;
-			} else if (total < 17) {
-				return 4;
-			} else if (total < 24) {
-				return 5;
-			} else {
-				return 6;
-			}
+		/* https://osu.ppy.sh/wiki/en/Score#scoring */
+		difficultyPoints: function(cs, hp, od, objectCount, drainTime) {
+			return Math.round((cs + hp + od + utils.clamp(objectCount / drainTime * 8, 0, 16)) / 38 * 5);
 		},
 		hitScore: function(hitValue, comboMultiplier, difficultyMultiplier, modMultiplier) {
 			return hitValue + (hitValue * ((comboMultiplier * difficultyMultiplier * modMultiplier) / 25));

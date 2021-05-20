@@ -28,6 +28,15 @@ define(function(require) {
 		map: function(num, numMin, numMax, mapMin, mapMax) {
 			return mapMin + ((mapMax - mapMin) / (numMax - numMin)) * (num - numMin);
 		},
+		clamp: function(value, min, max) {
+			if (value < min) {
+				return min;
+			} else if (value > max) {
+				return max;
+			} else {
+				return value;
+			}
+		},
 		randomInt: function(min, max) {
 			return Math.round((Math.random() * (max - min)) + min);
 		},

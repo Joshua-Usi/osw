@@ -3,7 +3,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 ## [v0.7.9b] - 2021-05-19
 ### Added
-- Multiple beatmap uploads at the same time (tried with 250, works like a charm)
+- Multiple beatmap uploads at the same time (tried with 300, works like a charm)
 ### Optimised
 - Beatmap loading (further inspection showed that beatmaps would often try to load twice)
 - Beatmap loading again by concatenating all beatmaps in a string and adding it to the DOM in one go (reduced the lag in the intro sequence)
@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Issue when maps ending on sliders not ending at the correct time
 - README.md markdown errors
 - Slider tick algorithm (matching osu!)
+- Moved hit events to process on same frame (instead of 1 frame delay)
+- Score to more closely match osu!
 ---
 ## [v0.7.8b] - 2021-05-15
 ### Added
