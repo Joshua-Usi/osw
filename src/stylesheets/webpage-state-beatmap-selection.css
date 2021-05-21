@@ -33,27 +33,20 @@
 	right: 0;
 
 	display: inline-block;
-	width: 50vw;
+	width: 40vw;
 	height: 90vh;
 	margin: 0;
 	padding-top: 10vh;
 	overflow-x: hidden;
 }
 
-.beatmap-selection-group {
-	position: relative;
-	left: 10vw;
-}
-
 .beatmap-selection-group-pane {
-	position: relative;
-
 	width: 50vw;
 	margin-bottom: 1vh;
 	border: 0.5vh solid #0000;
 	border-radius: 1.25vw 0 0 1.25vw;
 	padding: 1vh;
-	background: url("../../src/images/triangles.png"), linear-gradient(to right, #396f82, #061b24);
+	background: url("../../src/images/triangles.png"), linear-gradient(to right, #396f82, #061b24); 
 	background-size: 100%;
 
 	color: #e4ecef;
