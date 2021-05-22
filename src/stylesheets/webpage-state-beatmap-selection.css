@@ -129,10 +129,7 @@
 }
 
 .beatmap-selection-group-map-difficulty-name {
-	display: inline;
-
 	font-size: 3vh;
-	font-weight: 600;
 }
 
 .beatmap-selection-map-pane-mapper-name {

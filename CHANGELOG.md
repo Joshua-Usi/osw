@@ -1,6 +1,10 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v0.7.10b] - 2021-05-22
+### Optimised
+- Reduced total event listeners using event delegation (when loading 329 beatmaps, went down from 502 -> 144)
+---
 ## [v0.7.9b] - 2021-05-19
 ### Added
 - Multiple beatmap uploads at the same time (tried with 300, works like a charm)
@@ -11,7 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Separated beatmap loading from audio loading to optimise performance
 - Removed excess stars (optimised DOM tree ALOT)
 - Optimised DOM tree (when loading 329 beatmaps, went down from 7055 -> 4111)
-- star rating for performance
 ### Fixed
 - Issue with [Sound Chimera](https://osu.ppy.sh/beatmapsets/813569#osu/1706210) and file type endings (by converting to lower case before checking)
 - Issue with the main logo not shrinking when being clicked on or on reset

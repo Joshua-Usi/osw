@@ -13,7 +13,7 @@ define(function(require) {
 			}
 			return `<div class="beatmap-selection-group">
 						<div data-audiosource="${maps[0].Creator + maps[0].Title + maps[0].AudioFilename}" class="beatmap-selection-group-pane triangle-background">
-							<div class="beatmap-selection-group-pane-name">${maps[0].Title}</div>
+							<div>${maps[0].Title}</div>
 							<div class="beatmap-selection-group-pane-artist-name">${maps[0].Artist}</div>
 							${iconsHTML}
 						</div>
@@ -25,23 +25,23 @@ define(function(require) {
 		map: function(beatmap, groupIndex, mapIndex, mapStarRating) {
 			let stars = "";
 			if (mapStarRating < 10) {
-				for (var i = 0; i < mapStarRating; i++) {
-					let size = utils.map(mapStarRating - i, 1, 0, 1, 0.5);
+				for (let i = 0; i < mapStarRating; i++) {
+					let size = Math.round(utils.map(mapStarRating - i, 1, 0, 1, 0.5) * 100) / 100;
 					if (size >= 1) {
 						size = 1;
 					}
 					if (size <= 0.5) {
 						size = 0.5;
 					}
-					stars += `<img style="transform: scale(${size}); opacity: ${(size > 0.5) ? 1 : 0.5}; width: 3.5vh;" class="beatmap-selection-map-pane-star" src="./src/images/star.png">`;
+					stars += `<img style="transform: scale(${size}); opacity: ${(size > 0.5) ? 1 : 0.5}; width: 3.5vh;" src="./src/images/star.png">`;
 				}
 			} else {
-				stars = `<img class="beatmap-selection-map-pane-star" src="./src/images/star.png" style="width: 3.5vh;"><p style="display: inline;">${"x" + (Math.round(mapStarRating * 100) / 100)}</p>`
+				stars = `<img src="./src/images/star.png" style="width: 3.5vh;"><p style="display: inline;">${"x" + (Math.round(mapStarRating * 100) / 100)}</p>`
 			}
 			return `<div data-group-index="${groupIndex}" data-map-index="${mapIndex}" class="beatmap-selection-map-pane triangle-background">
 						<img class="beatmap-selection-map-pane-difficulty-icon" src="./src/images/difficulty-icons/${Formulas.beatmapDifficultyIcon(mapStarRating)}-difficulty.png">
 							<div>
-								<div class="beatmap-selection-group-map-difficulty-name">${beatmap.Version}</div>
+								<b class="beatmap-selection-group-map-difficulty-name">${beatmap.Version}</b>
 								<div class="beatmap-selection-map-pane-mapper-name">mapped by ${beatmap.Creator}</div>
 							</div>
 							${stars}						

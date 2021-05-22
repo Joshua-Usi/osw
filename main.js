@@ -51,102 +51,106 @@ define(function(require) {
 		console.warn("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
 	}
 	/* osw! version incremented manually */
-	const version = "osw! v0.7.9b";
+	const version = "osw! v0.7.10b";
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].textContent = version;
 	}
 	let loadedNewMaps = true;
+	let loadedMaps
+	/* event delegation - reduces event listeners */
+	document.getElementById("beatmap-selection-right").addEventListener("click", function(event) {
+		let parent = event.target;
+		console.log(parent);
+		while (parent.classList.contains("beatmap-selection-group") === false && parent.classList.contains("beatmap-selection-map-pane") === false) {
+			parent = parent.parentNode;
+			console.log(parent);
+		}
+		if (parent.classList.contains("beatmap-selection-group")) {
+			let details = parent.getElementsByClassName("beatmap-selection-group-pane")[0];
+			let maps = parent.getElementsByClassName("beatmap-selection-group-pane-maps")[0];
+			let mapsChildren = maps.getElementsByClassName("beatmap-selection-map-pane");
+			if (maps.style.display === "block") {
+				maps.style.display = "none";
+				details.classList.remove("beatmap-selection-selected");
+				for (let i = 0; i < mapsChildren.length; i++) {
+					mapsChildren[i].classList.remove("beatmap-selection-selected");
+				}
+			} else {
+				maps.style.display = "block";
+				details.classList.add("beatmap-selection-selected");
+				for (let i = 0; i < mapsChildren.length; i++) {
+					mapsChildren[i].classList.add("beatmap-selection-selected");
+				}
+				let menuAudio = document.getElementById("menu-audio");
+				let database = indexedDB.open("osw-database");
+				let that = parent;
+				database.addEventListener("success", function(event) {
+					let database = event.target.result;
+					let audioObjectStore = databaseManager.getObjectStore(database, "audio", "readonly");
+					let audioRequest = audioObjectStore.get(details.getAttribute("data-audiosource"));
+					audioRequest.addEventListener("error", function(event) {
+						console.error(`Attempt to find query failed: ${event.target.error}`);
+					});
+					audioRequest.addEventListener("success", function(event) {
+						let audioType;
+						if (event.target.result.name.toLowerCase().includes(".mp3")) {
+							audioType = "mp3";
+						} else if (event.target.result.name.toLowerCase().includes(".ogg")) {
+							audioType = "ogg";
+						}
+						let first = maps.getElementsByClassName("beatmap-selection-map-pane")[0];
+						logoBeatAccumulator.milliseconds = loadedMaps[first.getAttribute("data-group-index")][first.getAttribute("data-map-index")].timingPoints[0].beatLength * 1000;
+						menuAudio.src = `data:audio/${audioType};base64,${event.target.result.data}`;
+						menuAudio.currentTime = loadedMaps[first.getAttribute("data-group-index")][first.getAttribute("data-map-index")].PreviewTime / 1000;
+						menuAudio.play();
+					});
+				});
+			}
+		} else if (parent.classList.contains("beatmap-selection-map-pane")) {
+			utils.showWebpageStates([
+				"webpage-state-gameplay",
+			]);
+			utils.hideWebpageStates([
+				"webpage-state-menu",
+				"webpage-state-beatmap-selection",
+				"webpage-state-mods",
+				"webpage-state-pause-screen", 
+				"webpage-state-fail-screen",
+				"webpage-state-results-screen",
+				"top-bar",
+				"bottom-bar",
+			]);
+			document.getElementById("menu-audio").pause();
+			document.getElementById("sidenav").style.width = "0";
+			document.getElementById("sidenav").style.opacity = "0.2";
+			selectedMods = Mods();
+			let selectedModElements = document.getElementsByClassName("mod-selected");
+			for (let i = 0; i < selectedModElements.length; i++) {
+				selectedMods[selectedModElements[i].id.replace("mod-", "")] = true;
+			}
+			gameplay.playMap(loadedMaps[parent.getAttribute("data-group-index")][parent.getAttribute("data-map-index")], selectedMods);
+		}
+	});
 	function loadMaps() {
 		if (Beatmaps.allMapsLoaded() === true) {
-			let loadedMaps = Beatmaps.get();
+			loadedMaps = Beatmaps.get();
 			/* Beatmap loading and adding to dom */
 			let concatenated = ""
 			for (let i = 0; i < loadedMaps.length; i++) {
 				concatenated += BeatMapSelectionPaneTemplate.group(loadedMaps[i], i);
 			}
 			document.getElementById("beatmap-selection-right").innerHTML = concatenated;
-			let beatMapGroups = document.getElementsByClassName("beatmap-selection-group-pane");
-			for (let i = 0; i < beatMapGroups.length; i++) {
-				beatMapGroups[i].addEventListener("click", function() {
-					let maps = this.parentNode.getElementsByClassName("beatmap-selection-group-pane-maps");
-					let mapsChildren = maps[0].getElementsByClassName("beatmap-selection-map-pane");
-					if (maps[0].style.display === "block") {
-						maps[0].style.display = "none";
-						this.classList.remove("beatmap-selection-selected");
-						for (let i = 0; i < mapsChildren.length; i++) {
-							mapsChildren[i].classList.remove("beatmap-selection-selected");
-						}
-					} else {
-						maps[0].style.display = "block";
-						this.classList.add("beatmap-selection-selected");
-						for (let i = 0; i < mapsChildren.length; i++) {
-							mapsChildren[i].classList.add("beatmap-selection-selected");
-						}
-						let menuAudio = document.getElementById("menu-audio");
-						let database = indexedDB.open("osw-database");
-						let that = this;
-						database.addEventListener("success", function(event) {
-							let database = event.target.result;
-							let audioObjectStore = databaseManager.getObjectStore(database, "audio", "readonly");
-							let audioRequest = audioObjectStore.get(that.getAttribute("data-audiosource"));
-							audioRequest.addEventListener("error", function(event) {
-								console.error(`Attempt to find query failed: ${event.target.error}`);
-							});
-							audioRequest.addEventListener("success", function(event) {
-								let audioType;
-								if (event.target.result.name.toLowerCase().includes(".mp3")) {
-									audioType = "mp3";
-								} else if (event.target.result.name.toLowerCase().includes(".ogg")) {
-									audioType = "ogg";
-								}
-								let first = that.parentNode.getElementsByClassName("beatmap-selection-group-pane-maps")[0].getElementsByClassName("beatmap-selection-map-pane")[0];
-								logoBeatAccumulator.milliseconds = loadedMaps[first.getAttribute("data-group-index")][first.getAttribute("data-map-index")].timingPoints[0].beatLength * 1000;
-								menuAudio.src = `data:audio/${audioType};base64,${event.target.result.data}`;
-								menuAudio.currentTime = loadedMaps[first.getAttribute("data-group-index")][first.getAttribute("data-map-index")].PreviewTime / 1000;
-								menuAudio.play();
-							});
-						});
-					}
-				});
-			}
-			let beatmapSelectionPanes = document.getElementsByClassName("beatmap-selection-map-pane");
-			for (let i = 0; i < beatmapSelectionPanes.length; i++) {
-				beatmapSelectionPanes[i].addEventListener("click", function() {
-					utils.showWebpageStates([
-						"webpage-state-gameplay",
-					]);
-					utils.hideWebpageStates([
-						"webpage-state-menu",
-						"webpage-state-beatmap-selection",
-						"webpage-state-mods",
-						"webpage-state-pause-screen", 
-						"webpage-state-fail-screen",
-						"webpage-state-results-screen",
-						"top-bar",
-						"bottom-bar",
-					]);
-					document.getElementById("menu-audio").pause();
-					document.getElementById("sidenav").style.width = "0";
-					document.getElementById("sidenav").style.opacity = "0.2";
-					selectedMods = Mods();
-					let selectedModElements = document.getElementsByClassName("mod-selected");
-					for (let i = 0; i < selectedModElements.length; i++) {
-						selectedMods[selectedModElements[i].id.replace("mod-", "")] = true;
-					}
-					gameplay.playMap(loadedMaps[this.getAttribute("data-group-index")][this.getAttribute("data-map-index")], selectedMods);
-				});
-			}
 		} else {
-			/* every 250ms try and load maps from the server*/
+			/* every 250ms try and load maps from the indexedDB */
 			setTimeout(loadMaps, 250);
 		}
 	}
 	loadMaps();
 
 	function logoBeat() {
-		/* logo pulse*/
+		/* logo pulse */
 		logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.05s";
 		logo.style.width = logoSize + "vh";
 		logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
