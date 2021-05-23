@@ -655,6 +655,7 @@ define(function(require) {
 	document.getElementById("settings-master-volume").addEventListener("input", function() {
 		document.getElementById("settings-master-volume-text").textContent = "Master volume: " + this.value + "%";
 		menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
+		AudioManager.setEffectsVolume(document.getElementById("settings-master-volume").value / 100 * this.value / 100);
 		setSettings();
 	});
 	document.getElementById("settings-music-volume").addEventListener("input", function() {

@@ -53,3 +53,26 @@
 	position: absolute;
 	z-index: 10;
 }
+
+#skip-button {
+	position: absolute;
+	bottom: 10vh;
+	right: 5vw;
+	z-index: 101;
+
+	color: #fff9;
+	opacity: 0;
+
+	transition: opacity 1s;
+}
+
+#skip-button-space-bar {
+	display: inline-block;
+	width: 15vw;
+	border: 2px solid #fff3;
+	padding: 0.5em;
+
+	background: #fff1;
+
+	text-align: center;
+}

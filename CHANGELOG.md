@@ -4,6 +4,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v0.7.10b] - 2021-05-23
 ### Added
 - Tablet support (must be enabled via settings)
+- Ability to skip the beginning of the map by pressing the space bar
 ### Optimised
 - Reduced total event listeners using event delegation (when loading 329 beatmaps, went down from 502 -> 144)
 ---

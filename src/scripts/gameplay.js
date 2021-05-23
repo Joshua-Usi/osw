@@ -212,7 +212,7 @@ define(function(require) {
 		if (currentLoadedMap.timingPoints[currentTimingPoint].uninherited === 0) {
 			sliderSpeedMultiplier *= Formulas.sliderMultiplier(currentLoadedMap.timingPoints[currentTimingPoint].beatLength);
 		}
-		/* Cache setup after hit objects expected hit time*/
+		/* Cache setup after hit objects expected hit time */
 		if (useTime >= hitObject.time) {
 			/* Cache setup After Object Hit Time */
 			if (hitObject.type[0] === "1" && hitObject.cache.cacheSetAfterHit === false) {
@@ -892,14 +892,14 @@ define(function(require) {
 	}
 
 	function nextHitObject() {
-		/* create copy not reference, otherwise retrying wouldn't work*/
+		/* create copy not reference, otherwise retrying wouldn't work */
 		hitObjects.push(JSON.parse(JSON.stringify(currentLoadedMap.hitObjects[currentHitObject])));
 		/* second bit flag determines new combo */
 		if (currentLoadedMap.hitObjects[currentHitObject].type[2] === "1") {
 			currentComboNumber = 1;
 			currentComboColour++;
-			if (currentComboColour > currentLoadedMap.comboColours.length - 1) {
-				currentComboColour = 0;
+			if (currentComboColour >= currentLoadedMap.comboColours.length) {
+				currentComboColour -= currentLoadedMap.comboColours.length;
 			}
 		}
 		currentHitObject++;
@@ -1018,6 +1018,12 @@ define(function(require) {
 				} else if (playDetails.mods.halfTime) {
 					useTime *= 0.75;
 				}
+			}
+			if (keyboard.getKeyDown("space") && document.getElementById("skip-button").style.opacity === "1") {
+				audio.currentTime = currentLoadedMap.hitObjects[0].time - 2.5;
+			}
+			if (useTime > currentLoadedMap.hitObjects[0].time - 2 && currentHitObject === 0) {
+				document.getElementById("skip-button").style.opacity = "0";
 			}
 			if (currentHitObject >= currentLoadedMap.hitObjects.length || (audio.currentTime > 0 && audio.paused)) {
 				if (useTime > endingTime || (audio.currentTime > 0 && audio.paused)) {
@@ -1154,6 +1160,11 @@ define(function(require) {
 			currentOptions = Options.read();
 			mouse.sensitivity = currentOptions.Inputs.mouseSensitivity * 10;
 			enterPointerLock();
+			if (mapData.hitObjects[0].time > 10) {
+				document.getElementById("skip-button").style.opacity = "1";
+			} else {
+				document.getElementById("skip-button").style.opacity = "0";
+			}
 			currentLoadedMap = mapData;
 			playDetails = PlayDetails(mods);
 			if (mods.flashlight === false) {
