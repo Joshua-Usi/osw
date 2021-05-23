@@ -24,6 +24,7 @@ define(function(require) {
 			this.events = [];
 			this.canUserControl = true;
 			this.locked = false;
+			this.useRawPosition = false;
 			this.sensitivity = 1.0;
 			this.positionLimit = false;
 			this.bounds = {
@@ -36,7 +37,6 @@ define(function(require) {
 			let that = this;
 			/* References to functions for destroying */
 			this.mousemove = function(event) {
-				// that.removeOldEvents(that);
 				if (that.canUserControl) {
 					that.events.push(Date.now());
 					that.previousPositions.x.push(that.position.x);
@@ -52,7 +52,6 @@ define(function(require) {
 				}
 			};
 			this.mousemovelocked = function(event) {
-				// that.removeOldEvents(that);
 				if (that.canUserControl) {
 					that.events.push(Date.now());
 					that.previousPositions.x.push(that.position.x);
@@ -179,6 +178,12 @@ define(function(require) {
 					this.previousPositions.y.shift();
 				}
 			}
+		}
+		show() {
+			document.getElementById(this.element).style.cursor = "pointer";
+		}
+		hide() {
+			document.getElementById(this.element).style.cursor = "none";
 		}
 	};
 });

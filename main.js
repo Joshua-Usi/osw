@@ -58,14 +58,13 @@ define(function(require) {
 		classes[i].textContent = version;
 	}
 	let loadedNewMaps = true;
-	let loadedMaps
+	let loadedMaps;
 	/* event delegation - reduces event listeners */
 	document.getElementById("beatmap-selection-right").addEventListener("click", function(event) {
 		let parent = event.target;
-		console.log(parent);
+		/* find the highest beatmap group or beatmap pane from the click target */
 		while (parent.classList.contains("beatmap-selection-group") === false && parent.classList.contains("beatmap-selection-map-pane") === false) {
 			parent = parent.parentNode;
-			console.log(parent);
 		}
 		if (parent.classList.contains("beatmap-selection-group")) {
 			let details = parent.getElementsByClassName("beatmap-selection-group-pane")[0];
@@ -83,7 +82,6 @@ define(function(require) {
 				for (let i = 0; i < mapsChildren.length; i++) {
 					mapsChildren[i].classList.add("beatmap-selection-selected");
 				}
-				let menuAudio = document.getElementById("menu-audio");
 				let database = indexedDB.open("osw-database");
 				let that = parent;
 				database.addEventListener("success", function(event) {
@@ -122,7 +120,7 @@ define(function(require) {
 				"top-bar",
 				"bottom-bar",
 			]);
-			document.getElementById("menu-audio").pause();
+			menuAudio.pause();
 			document.getElementById("sidenav").style.width = "0";
 			document.getElementById("sidenav").style.opacity = "0.2";
 			selectedMods = Mods();
@@ -134,7 +132,7 @@ define(function(require) {
 		}
 	});
 	function loadMaps() {
-		if (Beatmaps.allMapsLoaded() === true) {
+		if (Beatmaps.allMapsLoaded()) {
 			loadedMaps = Beatmaps.get();
 			/* Beatmap loading and adding to dom */
 			let concatenated = ""
@@ -261,7 +259,7 @@ define(function(require) {
 	let audioQueue = [];
 	/* Event Listeners */
 	window.addEventListener("click", function() {
-		if (isFirstClick === true && document.readyState === "complete") {
+		if (isFirstClick && document.readyState === "complete") {
 			let userOptions = Options.get();
 			if (userOptions.UserInterface.introSequence === "Triangles") {
 				introSequence.animate();
@@ -452,7 +450,7 @@ define(function(require) {
 		}
 	});
 	window.addEventListener("mousemove", function(mouse) {
-		if (Options.getProperty("UserInterface", "menuParallax") === true && (document.getElementById("webpage-state-gameplay").style.display === "none" || document.getElementById("webpage-state-gameplay").style.display === "")) {
+		if (Options.getProperty("UserInterface", "menuParallax") && (document.getElementById("webpage-state-gameplay").style.display === "none" || document.getElementById("webpage-state-gameplay").style.display === "")) {
 			backgroundImageParallax.style.top = (mouse.y - window.innerHeight * 0.5) / 128 - window.innerHeight * 0.05 + "px";
 			backgroundImageParallax.style.left = (mouse.x - window.innerWidth * 0.5) / 128 - window.innerWidth * 0.05 + "px";
 			menuParallax.style.top = "calc(5vh + " + ((mouse.y - window.innerHeight * 0.5) / 256 - window.innerHeight * 0.05) + "px)";
@@ -501,7 +499,6 @@ define(function(require) {
 		utils.brighten("background-dim", 1);
 	});
 	document.getElementById("pause").addEventListener("click", function() {
-		let menuAudio = document.getElementById("menu-audio");
 		if (menuAudio.paused) {
 			menuAudio.play();
 			this.innerHTML = "&#x275A;&#x275A;";
@@ -561,7 +558,7 @@ define(function(require) {
 		let checkbox = document.getElementsByClassName("checkbox");
 		for (let i = 0; i < checkbox.length; i++) {
 			checkbox[i].addEventListener("change", function() {
-				if (this.checked === true) {
+				if (this.checked) {
 					AudioManager.play("check-on");
 				} else {
 					AudioManager.play("check-off");
@@ -648,7 +645,7 @@ define(function(require) {
 	});
 	/* Specific checkbox listeners */
 	document.getElementById("settings-show-fps").addEventListener("input", function() {
-		if (this.checked === true) {
+		if (this.checked) {
 			document.getElementById("frame-rate").style.opacity = 1;
 		} else {
 			document.getElementById("frame-rate").style.opacity = 0;
@@ -657,12 +654,12 @@ define(function(require) {
 	/* Specific range slider listeners */
 	document.getElementById("settings-master-volume").addEventListener("input", function() {
 		document.getElementById("settings-master-volume-text").textContent = "Master volume: " + this.value + "%";
-		document.getElementById("menu-audio").volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
+		menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 		setSettings();
 	});
 	document.getElementById("settings-music-volume").addEventListener("input", function() {
 		document.getElementById("settings-music-volume-text").textContent = "Music volume: " + this.value + "%";
-		document.getElementById("menu-audio").volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
+		menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 		setSettings();
 	});
 	document.getElementById("settings-effects-volume").addEventListener("input", function() {
@@ -792,7 +789,7 @@ define(function(require) {
 	}
 
 	function setSettings() {
-		if (settingsSet === true) {
+		if (settingsSet) {
 			let index = 0;
 			let userOptions = Options.get();
 			for (let group in userOptions) {
@@ -855,7 +852,7 @@ define(function(require) {
 				"bottom-bar",
 			]);
 		}
-		document.getElementById("menu-audio").play();
+		menuAudio.play();
 	});
 	document.getElementById("back-button").addEventListener("mouseenter", function() {
 		AudioManager.play("menu-hover");

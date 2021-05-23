@@ -2,7 +2,7 @@ define(function(require) {
 	"use strict";
 	const utils = require("./utils.js");
 	let defaultOptions = {
-		version: 4,
+		version: 5,
 		types: [
 			"slider",
 			"slider",
@@ -11,6 +11,7 @@ define(function(require) {
 			"text",
 			"text",
 			"slider",
+			"checkbox",
 
 			"selectbox",
 			"checkbox",
@@ -38,6 +39,7 @@ define(function(require) {
 			keyboardLeftButton: "z",
 			keyboardRightButton: "x",
 			mouseSensitivity: utils.map(100, 0, 1000, 0, 1),
+			useRawPosition: false,
 		},
 		UserInterface: {
 			introSequence: "Triangles",

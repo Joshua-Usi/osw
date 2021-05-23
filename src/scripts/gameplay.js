@@ -8,9 +8,9 @@ define(function(require) {
 	const Bezier = require("./bezier.js");
 	const utils = require("./utils.js");
 	const HitObject = require("./hitObjects.js");
-	const skin = "ajax-transparent"
+	const skin = "ajax-transparent";
 	const Assets = require("./gameplayAssets.js")(skin);
-	const Canvas = require("./canvas.js");;
+	const Canvas = require("./canvas.js");
 	const PlayDetails = require("./playDetails.js");
 	const endScreen = require("./endScreen.js");
 	const databaseManager = require("./databaseManager.js");
@@ -109,16 +109,32 @@ define(function(require) {
 	let hitObjectOffsetY = playfieldYOffset + window.innerHeight / 2 - window.innerHeight * playfieldSize / 2;
 
 	window.addEventListener("resize", function() {
-		document.getElementById("gameplay").width = window.innerWidth;
-		document.getElementById("gameplay").height = window.innerHeight;
-		document.getElementById("gameplay-flashlight").width = window.innerWidth;
-		document.getElementById("gameplay-flashlight").height = window.innerHeight;
+		canvas.canvas.width = window.innerWidth;
+		canvas.canvas.height = window.innerHeight;
+		flashlightCanvas.width = window.innerWidth;
+		flashlightCanvas.height = window.innerHeight;
 		/* Playfield calculations and data */
 		playfieldYOffset = window.innerHeight / 50;
 		hitObjectOffsetX = playfieldXOffset + window.innerWidth / 2 - window.innerHeight * playfieldSize * (4 / 3) / 2;
 		hitObjectOffsetY = playfieldYOffset + window.innerHeight / 2 - window.innerHeight * playfieldSize / 2;
 		mouse.positionBound(0, 0, window.innerWidth, window.innerHeight);
 	});
+
+	function enterPointerLock() {
+		if (currentOptions.Inputs.useRawPosition === false) {
+			mouse.lockPointer();
+		} else {
+			mouse.hide();
+		}
+	}
+
+	function exitPointerLock() {
+		if (currentOptions.Inputs.useRawPosition === false) {
+			mouse.unlockPointer();
+		} else {
+			mouse.show();
+		}
+	}
 
 	function setHitObjectCache(hitObject, useTime, hitObjectOffsetX, hitObjectOffsetY) {
 		/* Cache setup */
@@ -186,7 +202,7 @@ define(function(require) {
 				hitObject.cache.spins = 0;
 				hitObject.cache.velocity = 0;
 				hitObject.cache.spinnerBonus = false;
-				hitObject.cache.currentAngle = 0;
+				hitObject.cache.spinAngle = 0;
 				hitObject.cache.spinAngle = 0;
 				hitObject.cache.timeSpentAboveSpinnerMinimum = 0;
 				hitObject.cache.cleared = false;
@@ -263,7 +279,7 @@ define(function(require) {
 			}
 			if (hitObject.type[3] === "1" && useTime > hitObject.time) {
 				angleChange = 50;
-				mouse.setPosition(hitObjectMapped.x + 100 * Math.cos(hitObject.cache.currentAngle), hitObjectMapped.y + 100 * Math.sin(hitObject.cache.currentAngle));
+				mouse.setPosition(hitObjectMapped.x + 100 * Math.cos(hitObject.cache.spinAngle), hitObjectMapped.y + 100 * Math.sin(hitObject.cache.spinAngle));
 				keyboard.emulateKeyDown("z");
 			}
 		}
@@ -333,7 +349,6 @@ define(function(require) {
 				for (let j = 0; j < hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide].length; j++) {
 					if (hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] === false && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
 						let mapped = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].x, hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
-						let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 						if (hitObject.cache.sliderFollowCirclePreviousPosition < hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j] && hitObject.cache.sliderFollowCirclePosition > hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]) {
 							hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] = true;
 							hitObject.cache.sliderTicksHit++;
@@ -475,12 +490,13 @@ define(function(require) {
 		}
 		/* Spinner handling */
 		if (hitObject.type[3] === "1") {
+			/* velocity changes slowly due to spinner inertia*/
 			hitObject.cache.velocity += (angleChange - hitObject.cache.velocity) / 32;
-			hitObject.cache.currentAngle += hitObject.cache.velocity * (useTime - previousTime);
 			hitObject.cache.spinAngle += hitObject.cache.velocity * (useTime - previousTime);
 			if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && Math.abs(hitObject.cache.velocity / (Math.PI)) >= Formulas.ODSpinner(currentLoadedMap.OverallDifficulty, playDetails.mods)) {
 				hitObject.cache.timeSpentAboveSpinnerMinimum += useTime - previousTime;
 			}
+			/* spinner is officialy cleared if time spent spinning is above 25% */
 			if (hitObject.cache.timeSpentAboveSpinnerMinimum >= (hitObject.endTime - hitObject.time) * 0.25) {
 				hitObject.cache.cleared = true;
 			}
@@ -506,13 +522,17 @@ define(function(require) {
 		/* Spinner end handling */
 		if (hitObject.type[3] === "1" && useTime >= hitObject.endTime) {
 			let mapped = utils.mapToOsuPixels(256, 192, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
+			/* spinner is cleared is if the time spent spinning is over 18.75% of the spinner length */
 			if (hitObject.cache.cleared) {
 				hitEvents.push(new HitObject.Event("hit-circle", 300, "increasing", mapped.x, mapped.y));
-			} else if (hitObject.cache.timeSpentAboveSpinnerMinimum >= (hitObject.endTime - hitObject.time) * 0.25 * 0.75) {
+				/* award 100 if time spent spinning is between 25% and 18.75% */
+			} else if (hitObject.cache.timeSpentAboveSpinnerMinimum >= (hitObject.endTime - hitObject.time) * 18.75) {
 				hitEvents.push(new HitObject.Event("hit-circle", 100, "increasing", mapped.x, mapped.y));
-			} else if (hitObject.cache.timeSpentAboveSpinnerMinimum >= (hitObject.endTime - hitObject.time) * 0.25 * 0.25) {
+				/* award 50 if time spent spinning is between 18.75% and 6.25% */
+			} else if (hitObject.cache.timeSpentAboveSpinnerMinimum >= (hitObject.endTime - hitObject.time) * 0.0625) {
 				hitEvents.push(new HitObject.Event("hit-circle", 50, "increasing", mapped.x, mapped.y));
-			} else if (hitObject.cache.timeSpentAboveSpinnerMinimum < (hitObject.endTime - hitObject.time) * 0.25 * 0.25) {
+				/* award miss if time spent spinning is below 6.25% */
+			} else if (hitObject.cache.timeSpentAboveSpinnerMinimum < (hitObject.endTime - hitObject.time) * 0.0625) {
 				hitEvents.push(new HitObject.Event("hit-circle", 0, "reset", mapped.x, mapped.y));
 			}
 			hitObjects.splice(index, 1);
@@ -662,13 +682,17 @@ define(function(require) {
 					}
 				}
 				/* Draw Slider End */
-				if (hitObject.slides > 1 && hitObject.cache.currentSlide < hitObject.slides - 1) {
+				let showHead = true;
+				let isHeadRepeat = false;
+				let showEnd = true;
+				let isEndRepeat = false;
+				if (hitObject.slides > 1 && hitObject.cache.currentSlide < hitObject.slides) {
 					ctx.translate(mapped.x, mapped.y);
 					ctx.rotate(-utils.direction(hitObject.cache.points[hitObject.cache.points.length - 2].x, hitObject.cache.points[hitObject.cache.points.length - 2].y, hitObject.cache.points[hitObject.cache.points.length - 1].x, hitObject.cache.points[hitObject.cache.points.length - 1].y) + Math.PI / 2);
 					canvas.drawImage(hitCircleComboBuffers[hitObject.cache.comboColour], 0, 0, circleDiameter, circleDiameter);
 					canvas.drawImage(Assets.reverseArrow, 0, 0, circleDiameter, circleDiameter);
 					ctx.resetTransform();
-				} else if (hitObject.slides === 1 || hitObject.cache.currentSlide < hitObject.slides - 2) {
+				} else if (hitObject.slides === 1 || hitObject.cache.currentSlide === hitObject.slides - 1) {
 					canvas.drawImage(hitCircleComboBuffers[hitObject.cache.comboColour], mapped.x, mapped.y, circleDiameter, circleDiameter);
 					canvas.drawImage(Assets.hitCircleOverlay, mapped.x, mapped.y, circleDiameter, circleDiameter);
 				}
@@ -711,7 +735,7 @@ define(function(require) {
 			/* draw spinner */
 			let mapped = utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * playfieldSize * (4 / 3), window.innerHeight * playfieldSize, hitObjectOffsetX, hitObjectOffsetY);
 			ctx.translate(mapped.x, mapped.y);
-			ctx.rotate(hitObject.cache.currentAngle);
+			ctx.rotate(hitObject.cache.spinAngle);
 			let size = utils.map(hitObject.endTime - useTime, 0, hitObject.endTime - (hitObject.time - arTime), 0, 0.8) * utils.map(Math.abs(hitObject.cache.velocity), 0, 50, 1, 1.2);
 			canvas.drawImage(Assets.spinnerApproachCircle, 0, 0, size * window.innerHeight, size * window.innerHeight);
 			let tempAlpha = ctx.globalAlpha;
@@ -813,7 +837,7 @@ define(function(require) {
 				document.getElementById("webpage-state-fail-screen").style.display = "block";
 				audio.pause();
 				isRunning = false;
-				mouse.unlockPointer();
+				exitPointerLock();
 			}
 		}
 		/* only start draining health 2 seconds before the first hit object*/
@@ -997,7 +1021,7 @@ define(function(require) {
 			}
 			if (currentHitObject >= currentLoadedMap.hitObjects.length || (audio.currentTime > 0 && audio.paused)) {
 				if (useTime > endingTime || (audio.currentTime > 0 && audio.paused)) {
-					mouse.unlockPointer();
+					exitPointerLock();
 					utils.showWebpageStates([
 						"webpage-state-always",
 						"top-bar",
@@ -1074,7 +1098,7 @@ define(function(require) {
 			if (keyboard.getKeyDown("esc")) {
 				document.getElementById("webpage-state-pause-screen").style.display = "block";
 				audio.pause();
-				mouse.unlockPointer();
+				exitPointerLock();
 				isRunning = false;
 			}
 		},
@@ -1115,12 +1139,12 @@ define(function(require) {
 		continue: function() {
 			isRunning = true;
 			audio.play();
-			mouse.lockPointer();
+			enterPointerLock();
 		},
 		pause: function() {
 			isRunning = false;
 			audio.pause();
-			mouse.unlockPointer();
+			exitPointerLock();
 		},
 		retry: function() {
 			isRunning = false;
@@ -1129,6 +1153,7 @@ define(function(require) {
 		playMap: function(mapData, mods) {
 			currentOptions = Options.read();
 			mouse.sensitivity = currentOptions.Inputs.mouseSensitivity * 10;
+			enterPointerLock();
 			currentLoadedMap = mapData;
 			playDetails = PlayDetails(mods);
 			if (mods.flashlight === false) {
@@ -1205,9 +1230,6 @@ define(function(require) {
 			arFadeIn = Formulas.ARFadeIn(mapData.ApproachRate, playDetails.mods);
 			/* Map from osu!pixels to screen pixels */
 			circleDiameter = utils.map(Formulas.CS(mapData.CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * playfieldSize * (4 / 3));
-			let drainTime = mapData.hitObjects[mapData.hitObjects.length - 1].time - mapData.hitObjects[0].time;
-			difficultyMultiplier = Formulas.difficultyPoints(mapData.CircleSize, mapData.HPDrainRate, mapData.OverallDifficulty, mapData.hitObjects.length, drainTime);
-			console.log(difficultyMultiplier);
 			odTime = Formulas.ODHitWindow(mapData.OverallDifficulty, playDetails.mods);
 			let lastHitObject = currentLoadedMap.hitObjects[currentLoadedMap.hitObjects.length - 1];
 			if (lastHitObject.type[0] === "1") {
@@ -1229,15 +1251,13 @@ define(function(require) {
 				let pixelsPerBeat = sliderSpeedMultiplier * currentLoadedMap.timingPoints[lastUninheritedTimingPoint].beatLength;
 				let sliderLengthInBeats = (Math.abs(lastHitObject.length) * lastHitObject.slides) / pixelsPerBeat;
 				let sliderTime = pixelsPerBeat * sliderLengthInBeats / 250;
-
-				// let sliderOnceTime = Math.abs(lastHitObject.length) / (sliderSpeedMultiplier) * currentLoadedMap.timingPoints[lastUninheritedTimingPoint].beatLength;
-				// let sliderTotalTime = sliderOnceTime * lastHitObject.slides;
 				endingTime = lastHitObject.time + sliderTime + 2;
 			}
 			if (lastHitObject.type[3] === "1") {
 				endingTime = lastHitObject.endTime + 2;
 			}
-			mouse.lockPointer();
+			let drainTime = endingTime - mapData.hitObjects[0].time;
+			difficultyMultiplier = Formulas.difficultyPoints(mapData.CircleSize, mapData.HPDrainRate, mapData.OverallDifficulty, mapData.hitObjects.length, drainTime);
 			hitCircleComboBuffers = [];
 			approachCircleComboBuffers = [];
 			let hitCircleRgbks = canvas.generateRGBKs(Assets.hitCircle);
