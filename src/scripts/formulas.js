@@ -2,27 +2,13 @@ define(function(require) {
 	"use strict";
 	const Mods = require("./mods.js");
 	const utils = require("./utils.js");
-	function applyModMultiplier(n, mods) {
+	function applyModMultiplier(n, mods, multiplier) {
 		if (mods) {
 			if (mods.easy) {
 				n *= 0.5;
 			}
 			if (mods.hardRock) {
-				n *= 1.4;
-				if (n >= 10) {
-					n = 10;
-				}
-			}
-		}
-		return n;
-	}
-	function applyModMultiplierCS(n, mods) {
-		if (mods) {
-			if (mods.easy) {
-				n *= 0.5;
-			}
-			if (mods.hardRock) {
-				n *= 1.3;
+				n *= multiplier;
 				if (n >= 10) {
 					n = 10;
 				}
@@ -72,7 +58,7 @@ define(function(require) {
 	};
 	return {
 		AR: function(n, mods) {
-			n = applyModMultiplier(n, mods);
+			n = applyModMultiplier(n, mods, 1.4);
 			if (n < 5) {
 				return 1.2 + 0.6 * (5 - n) / 5;
 			} else if (n === 5) {
@@ -96,7 +82,7 @@ define(function(require) {
 			return ar;
 		},
 		ARFadeIn: function(n, mods) {
-			n = applyModMultiplier(n, mods);
+			n = applyModMultiplier(n, mods, 1.4);
 			let ar;
 			if (n < 5) {
 				ar = 0.8 + 0.4 * (5 - n) / 5;
@@ -108,22 +94,22 @@ define(function(require) {
 			return ar;
 		},
 		CS: function(n, mods) {
-			n = applyModMultiplierCS(n, mods);
+			n = applyModMultiplier(n, mods, 1.3);
 			return 54.4 - 4.48 * n;
 		},
-		/* values for hit windows (centered around hit object time for 50, 100, 300)*/
+		/* values for hit windows (centered around hit object time for 50, 100, 300) */
 		ODHitWindow: function(n, mods) {
-			n = applyModMultiplier(n, mods);
-			/* in order 50, 100, 300*/
+			n = applyModMultiplier(n, mods, 1.4);
+			/* in order 50, 100, 300 */
 			return [
 				0.4 - 0.02 * n,
 				0.28 - 0.016 * n,
 				0.16 - 0.012 * n,
 			];
 		},
-		/* measured in spins per second required for clear*/
+		/* measured in spins per second required for clear */
 		ODSpinner: function(n, mods) {
-			n = applyModMultiplier(n, mods);
+			n = applyModMultiplier(n, mods, 1.4);
 			let od;
 			if (n < 5) {
 				od = 5 - 2 * (5 - n) / 5;
@@ -153,11 +139,11 @@ define(function(require) {
 				case 1100:
 					return 0.025;
 					break;
-					/* great*/
+				/* great */
 				case 300:
 					return 0.5 / ((n / 4) + 1);
 					break;
-					/* good or spinner spin */
+				/* good or spinner spin */
 				case 100:
 					if (type === "hit-circle") {
 						return 0.2 / ((n / 4) + 1);
@@ -165,19 +151,19 @@ define(function(require) {
 						return 0.01;
 					}
 					break;
-					/* meh */
+				/* meh */
 				case 50:
 					return 0;
 					break;
-					/* complete miss */
+				/* complete miss */
 				case 0:
 					return -(n + 1) / 55;
 					break;
-					/* Slider head, repeat and end */
+				/* Slider head, repeat and end */
 				case 30:
 					return 0.05 / ((n / 4) + 1);
 					break;
-					/* Slider tick */
+				/* Slider tick */
 				case 10:
 					return 0.01 / ((n / 4) + 1);
 					break;
