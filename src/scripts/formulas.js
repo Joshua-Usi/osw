@@ -150,7 +150,7 @@ define(function(require) {
 			}
 			switch (hitScore) {
 				/* slider bonus spin */
-				case 1000:
+				case 1100:
 					return 0.025;
 					break;
 					/* great*/
@@ -205,36 +205,36 @@ define(function(require) {
 		hitScore: function(hitValue, comboMultiplier, difficultyMultiplier, modMultiplier) {
 			return hitValue + (hitValue * ((comboMultiplier * difficultyMultiplier * modMultiplier) / 25));
 		},
-		grade: function(perfects, goods, bads, misses, mods) {
-			let total = perfects + goods + bads + misses;
-			if (perfects >= total) {
+		grade: function(great, ok, meh, miss, mods) {
+			let total = great + ok + meh + miss;
+			if (great >= total) {
 				if (mods.hidden || mods.flashlight) {
 					return "xh";
 				} else {
 					return "x";
 				}
-			} else if (perfects >= total * 0.9 && bads <= total * 0.01 && misses === 0) {
+			} else if (great >= total * 0.9 && meh <= total * 0.01 && miss === 0) {
 				if (mods.hidden || mods.flashlight) {
 					return "sh";
 				} else {
 					return "s";
 				}
-			} else if ((perfects >= total * 0.8 && misses === 0) || perfects >= total * 0.9) {
+			} else if ((great >= total * 0.8 && miss === 0) || great >= total * 0.9) {
 				return "a";
-			} else if ((perfects >= total * 0.7 && misses === 0) || perfects >= total * 0.8) {
+			} else if ((great >= total * 0.7 && miss === 0) || great >= total * 0.8) {
 				return "b";
-			} else if (perfects >= total * 0.6) {
+			} else if (great >= total * 0.6) {
 				return "c";
 			} else {
 				return "d";
 			}
 		},
-		accuracy: function(perfects, goods, bads, misses) {
-			let total = perfects + goods + bads + misses;
+		accuracy: function(great, ok, meh, miss) {
+			let total = great + ok + meh + miss;
 			if (total === 0) {
 				return 1;
 			}
-			return (50 * bads + 100 * goods + 300 * perfects) / (300 * total);
+			return (50 * meh + 100 * ok + 300 * great) / (300 * total);
 		},
 		sliderMultiplier: function(multiplier) {
 			return 1 / (-multiplier / 100);

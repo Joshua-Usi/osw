@@ -506,7 +506,7 @@ define(function(require) {
 				if (hitObject.cache.cleared === false) {
 					hitEvents.push(new HitObject.Event("spinner-spin", 100, "no-increase", mapped.x, mapped.y));
 				} else {
-					hitEvents.push(new HitObject.Event("spinner-bonus-spin", 1000, "no-increase", mapped.x, mapped.y));
+					hitEvents.push(new HitObject.Event("spinner-bonus-spin", 1100, "no-increase", mapped.x, mapped.y));
 				}
 			}
 			while (hitObject.cache.spinAngle <= -Math.PI * 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
@@ -515,7 +515,7 @@ define(function(require) {
 				if (hitObject.cache.cleared === false) {
 					hitEvents.push(new HitObject.Event("spinner-spin", 100, "no-increase", mapped.x, mapped.y));
 				} else {
-					hitEvents.push(new HitObject.Event("spinner-bonus-spin", 1000, "no-increase", mapped.x, mapped.y));
+					hitEvents.push(new HitObject.Event("spinner-bonus-spin", 1100, "no-increase", mapped.x, mapped.y));
 				}
 			}
 		}
@@ -1127,7 +1127,10 @@ define(function(require) {
 			canvas.setImageAlignment("center");
 
 			canvas.setFillStyle("#ffdf0044");
-			let x = utils.map(audio.currentTime, 0, endingTime, 0, window.innerWidth * 0.13);
+			let x = utils.map(audio.currentTime, currentLoadedMap.hitObjects[0].time, endingTime, 0, window.innerWidth * 0.13);
+			if (x < 0) {
+				x = 0;
+			}
 			ctx.fillRect(window.innerWidth * 0.85, window.innerHeight * 0.065, x, 5);
 			/* Render Loop */
 			for (let i = hitObjects.length - 1; i >= 0; i--) {
