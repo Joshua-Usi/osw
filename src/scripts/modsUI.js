@@ -61,4 +61,10 @@ define(function(require) {
 			closeModsUI();
 		}
 	});
+	document.getElementById("mods-deselect-all").addEventListener("click", function() {
+		let elements = document.getElementsByClassName("mod-icons");
+		for (let i = 0; i < elements.length; i++) {
+			elements[i].className = elements[i].className.replace(/\bmod-selected\b/g, "");
+		}
+	});
 });

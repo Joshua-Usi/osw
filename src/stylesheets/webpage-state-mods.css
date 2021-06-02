@@ -1,6 +1,7 @@
 #mods-ui {
 	position: absolute;
 	bottom: -76vh;
+	z-index: 900;
 
 	width: 100vw;
 	height: 76vh;
@@ -101,19 +102,23 @@
 #mods-blue-one {
 	background: #1ab0e2;
 	clip-path: polygon(0 0, 100% 20%, 100% 100%, 0% 100%);
+	z-index: 896;
 }
 
 #mods-blue-two {
 	background: #2181a1;
 	clip-path: polygon(0 15%, 100% 0, 100% 100%, 0% 100%);
+	z-index: 897;
 }
 
 #mods-blue-three {
 	background: #005673;
 	clip-path: polygon(0 0, 100% 10%, 100% 100%, 0% 100%);
+	z-index: 898;
 }
 
 #mods-blue-four {
 	background: #00394f;
 	clip-path: polygon(0 5%, 100% 0, 100% 100%, 0% 100%);
+	z-index: 899;
 }

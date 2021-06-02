@@ -97,9 +97,8 @@
 
 /* custom select box css */
 .select-box-selected-container {
-	margin-bottom: 1vh;
 	border-radius: 1vh;
-	padding: 0.5vw 0.5vw 0 0.5vw;	
+	padding: 0.5vw 0.5vw 0 0.5vw;
 
 	background: #060606;
 
@@ -112,6 +111,8 @@
 
 .select-box-selected {
 	display: inline-block;
+	position: relative;
+	bottom: 0.25em;
 }
 
 .select-box-arrow {
@@ -148,4 +149,12 @@
 
 .selected {
 	background: #FD67AE;
+}
+
+button:disabled {
+	background-color: #666 !important;
+}
+
+button:disabled:hover {
+	background-color: #777 !important;
 }

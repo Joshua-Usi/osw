@@ -77,6 +77,7 @@ body {
 	overflow: hidden;
 
 	background: #000;
+	color: #e4ecef;
 
 	font-display: fallback;
 	font-size: 2.5vh;
@@ -101,32 +102,6 @@ img {
 	text-align: center;
 }
 
-#top-bar {
-	position: fixed;
-	z-index: 10;
-	top: 0;
-	left: 0;
-
-	width: 100vw;
-	height: 7.5vh;
-
-	background: #191919;
-	background-size: 25vw;
-}
-
-.top-bar-text {
-	float: left;
-
-	display: inline;
-	padding: 2.23vh;
-	margin: 0;
-
-	color: #e4ecef;
-
-	border-collapse: collapse;
-	transition: background 0.5s ease;
-}
-
 #back-button {
 	position: relative;
 	bottom: 0;
@@ -142,10 +117,6 @@ img {
 	transition: width 0.75s;
 	transition-timing-function: ease-out;
 	transform: skew(-10deg);
-}
-
-.bottom-bar-anti-skew {
-	transform: skew(10deg);
 }
 
 #back-button:hover {
@@ -196,31 +167,32 @@ img {
 	text-align: center;
 }
 
-.buttons-container {
+.bottom-bar-buttons {
 	position: relative;
 	float: left;
 
 	display: inline-block;
-	width: 20vw;
+	width: 7.5vw;
 	height: 6vh;
 	box-sizing: border-box;
 
 	color: #e4ecef;
 
 	transition: border-top background;
-	transition-duration: 0.4s;
+	transition-duration: 0.2s;
 	transform: skew(-10deg);
 }
 
-.buttons-container:active {
+.bottom-bar-buttons:active {
 	transition-duration: 0s;
 }
 
-.buttons-container-text {
+.bottom-bar-buttons-text {
 	position: relative;
 	bottom: calc(1em / 1.5);
 
 	height: 6vh;
+	transform: skew(10deg);
 
 	text-align: center;
 }
@@ -283,4 +255,34 @@ img {
 
 #bottom-bar-options:active {
 	background: #66ccff;
+}
+
+#top-bar {
+	position: fixed;
+	z-index: 300;
+	top: 0;
+	left: 0;
+
+	width: 100vw;
+	height: 6.25vh;
+
+	background: #191919;
+	background-size: 25vw;
+}
+
+.top-bar-text {
+	float: left;
+	display: inline;
+	padding: calc((6.25vh - 1.25em) / 2);
+	margin: 0;
+
+	color: #e4ecef;
+
+	border-collapse: collapse;
+	transition: background 0.5s ease;
+}
+
+.triangle-background {
+	background: url("../../src/images/triangles.png");
+	background-attachment: fixed;
 }

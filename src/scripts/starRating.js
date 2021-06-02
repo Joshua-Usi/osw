@@ -22,7 +22,7 @@ define(function(require) {
 				newCS = 10;
 			}
 		}
-		return 1.5 * Math.E ** (0.05 * newCS) - 5 / 6;
+		return 1.5 * Math.E ** (0.15 * newCS) - 1;
 	}
 
 	function gaussianDistribution(x, a, b, c) {
@@ -37,9 +37,9 @@ define(function(require) {
 	*/
 	function aimDifficultyMultiplier(distance, hitObject) {
 		if (hitObject.type[1] === "1") {
-			return 1.75 * Math.E ** (Math.E * 0.0035 * distance);
+			return 1.25 * Math.E ** (Math.E * 0.0035 * distance);
 		} else {
-			return 1.5 * Math.E ** (Math.E * 0.004 * distance);
+			return 0.75 * Math.E ** (Math.E * 0.004 * distance);
 		}
 	}
 
@@ -76,7 +76,7 @@ define(function(require) {
 		let time = Math.abs(hitObject.time - previousHitObject.time);
 		let multiplier = 0.60;
 		if (hitObject.type[1] === "1") {
-			multiplier = 0.55;
+			multiplier = 0.2;
 		}
 		if (time < 1 / 60) {
 			time = 1 / 60;
@@ -84,9 +84,9 @@ define(function(require) {
 		if (mods.doubleTime || mods.nightCore) {
 			time /= 1.5;
 		} else if (mods.halfTime) {
-			time /= 0.75
+			time /= 0.75;
 		}
-		return multiplier / (time + 0.05);
+		return multiplier / (time);
 	}
 
 	return {

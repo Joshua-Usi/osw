@@ -6,15 +6,15 @@ define(function(require) {
 		group: function(maps, i) {
 			let mapsHTML = "";
 			let iconsHTML = "";
-			for (let j = 0; j < maps.length; j++) {
-				let mapStarRating = starRating.calculate(maps[j]);
+			for (let j = 0; j < maps.difficulties.length; j++) {
+				let mapStarRating = maps.difficulties[j].starRating;
 				iconsHTML += `<img class="beatmap-selection-group-pane-difficulties-icon" src="./src/images/difficulty-icons/${Formulas.beatmapDifficultyIcon(mapStarRating)}-difficulty.png">`
-				mapsHTML += this.map(maps[j], i, j, mapStarRating);
+				mapsHTML += this.map(maps.difficulties[j], i, j, mapStarRating, maps);
 			}
 			return `<div class="beatmap-selection-group">
-						<div data-audiosource="${maps[0].Creator + maps[0].Title + maps[0].AudioFilename}" class="beatmap-selection-group-pane triangle-background">
-							<div>${maps[0].Title}</div>
-							<div class="beatmap-selection-group-pane-artist-name">${maps[0].Artist}</div>
+						<div data-audio-source="${maps.creator + maps.title + maps.audioFilename}" data-index="${i}" class="beatmap-selection-group-pane triangle-background">
+							<div class="beatmap-selection-group-title">${maps.title}</div>
+							<div class="beatmap-selection-group-pane-artist">${maps.artist}</div>
 							${iconsHTML}
 						</div>
 						<div class="beatmap-selection-group-pane-maps" style="display: none;">
@@ -22,7 +22,7 @@ define(function(require) {
 						</div>
 					</div>`;
 		},
-		map: function(beatmap, groupIndex, mapIndex, mapStarRating) {
+		map: function(beatmap, groupIndex, mapIndex, mapStarRating, details, ) {
 			let stars = "";
 			if (mapStarRating < 10) {
 				for (let i = 0; i < mapStarRating; i++) {
@@ -38,11 +38,11 @@ define(function(require) {
 			} else {
 				stars = `<img src="./src/images/star.png" style="width: 3.5vh;"><p style="display: inline;">${"x" + (Math.round(mapStarRating * 100) / 100)}</p>`
 			}
-			return `<div data-group-index="${groupIndex}" data-map-index="${mapIndex}" class="beatmap-selection-map-pane triangle-background">
+			return `<div data-image-filename="${(beatmap.backgroundFilename !== "") ? (details.creator + details.title + beatmap.backgroundFilename) : ""}" data-group-index="${groupIndex}" data-map-index="${mapIndex}" class="beatmap-selection-map-pane triangle-background">
 						<img class="beatmap-selection-map-pane-difficulty-icon" src="./src/images/difficulty-icons/${Formulas.beatmapDifficultyIcon(mapStarRating)}-difficulty.png">
 							<div>
-								<b class="beatmap-selection-group-map-difficulty-name">${beatmap.Version}</b>
-								<div class="beatmap-selection-map-pane-mapper-name">mapped by ${beatmap.Creator}</div>
+								<b class="beatmap-selection-group-map-difficulty-name">${beatmap.version}</b>
+								<div class="beatmap-selection-map-pane-mapper">mapped by ${details.creator}</div>
 							</div>
 							${stars}						
 					</div>`;

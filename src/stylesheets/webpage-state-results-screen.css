@@ -16,8 +16,6 @@
 #end-results * {
 	margin: 0;
 
-	color: #e4ecef;
-
 	text-align: center;
 }
 
@@ -92,4 +90,8 @@
 	margin-right: auto;
 	padding: 3vh;
 	width: 25%;
+}
+
+#end-results-combo-type {
+	font-size: 1.5vh;
 }

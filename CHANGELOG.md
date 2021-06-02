@@ -1,6 +1,35 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v0.8.0b] - 3-06-2021
+### Added
+- Left side of beatmap selection (map details)
+- Ability to search through your beatmaps (uses exact equality search)
+- Developer mode
+- Deleting beatmaps (albeit all beatmaps)
+- Background dimming
+- Background support
+- **(NOT FULLY SUPPORTED)**If there is no background, added text saying "Deleting backgrounds makes osu! ANGGGGGGGRRRRRRRRRRYYYYYYYYYYYYYYYY! Please use the "Background Dim" setting instead." (keep a legacy going because of this [snowflake](https://github.com/ppy/osu-stable-issues/issues/688))
+### Changed
+- Star rating slightly (will probably work on in v0.9.0b)
+- Combined Gameplay and GameplayRendering options to just Gameplay
+- Some function names to make more sense (for my sake)
+- Consistent captialisation
+- Beatmap parser to include storyboards
+### Optimised
+- Beatmap loading by adding a cache after first load (when loading 329 beatmaps it went from 229ms to 45ms)
+- Tested with over 500 beatmaps now, works like a charm
+- Memory usage by only loading maps as necessary (reduced memory usage when loading 500 beatmaps from 100mb --> 20mb)
+### Removed
+- Circles.mp3 and Aureole.mp3
+- Ability to choose certain menu sequence intros
+### Fixed
+- Hardrock now flips the playfield like in osu!
+- Correctly centerised text in select boxes
+- Spun out mod not spinning automatically
+- Beatmap uploading not being deterministic and causing unreachable files to be generated (due to the nature of async)
+- Logo centering issue
+---
 ## [v0.7.10b] - 2021-05-23
 ### Added
 - Tablet support (must be enabled via settings)
@@ -10,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 ## [v0.7.9b] - 2021-05-19
 ### Added
-- Multiple beatmap uploads at the same time (tried with 300, works like a charm)
+- Multiple beatmap uploads at the same time (tried with 300 at once, works like a charm)
 ### Optimised
 - Beatmap loading (further inspection showed that beatmaps would often try to load twice)
 - Beatmap loading again by concatenating all beatmaps in a string and adding it to the DOM in one go (reduced the lag in the intro sequence)

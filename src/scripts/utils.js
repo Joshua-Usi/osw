@@ -102,7 +102,7 @@ define(function(require) {
 				direction = 1;
 			}
 			if (clockwise === 1) {
-				direction = -1;`	`
+				direction = -1;
 			}
 			while (totalLength < length) {
 				points.push({
@@ -151,10 +151,16 @@ define(function(require) {
 				r: Math.sqrt(dx * dx + dy * dy),
 			};
 		},
-		mapToOsuPixels: function(x, y, toWidth, toHeight, offsetX, offsetY) {
+		mapToOsuPixels: function(x, y, toWidth, toHeight, offsetX, offsetY, hardRock) {
+			let yMap;
+			if (hardRock) {
+				yMap = offsetY + this.map(y, 0, 384, toHeight, 0);
+			} else {
+				yMap = offsetY + this.map(y, 0, 384, 0, toHeight);
+			}
 			return {
 				x: offsetX + this.map(x, 0, 512, 0, toWidth),
-				y: offsetY + this.map(y, 0, 384, 0, toHeight),
+				y: yMap,
 			};
 		},
 		htmlCounter: function(digits, container, element, rootSrc, positionTag, positioning) {
@@ -235,27 +241,14 @@ define(function(require) {
 			};
 		},
 		formatDate: function(day, month, year, hour, minute) {
-			let monthWords = [
-				"January",
-				"February",
-				"March",
-				"April",
-				"May",
-				"June",
-				"July",
-				"August",
-				"September",
-				"October",
-				"November",
-				"December",
-			];
+			let monthWords = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", ];
 			if (hour.toString().length === 1) {
 				hour = "0" + hour;
 			}
 			if (minute.toString().length === 1) {
 				minute = "0" + minute;
 			}
-			return `${day} ${monthWords[month]} ${year} ${hour}:${minute}`; 
+			return `${day} ${monthWords[month]} ${year} ${hour}:${minute}`;
 		},
 		showWebpageStates: function(idList) {
 			for (let i = 0; i < idList.length; i++) {
@@ -280,7 +273,7 @@ define(function(require) {
 				if (this.allowMultipleRuns) {
 					while (this.accumulator >= this.milliseconds) {
 						this.accumulator = this.accumulator % this.milliseconds;
-						this.callback(...this.args);	
+						this.callback(...this.args);
 					}
 				} else {
 					if (this.accumulator >= this.milliseconds) {
@@ -292,6 +285,11 @@ define(function(require) {
 			forceRun() {
 				this.callback(...this.args);
 			}
+		},
+		secondsToMinuteSeconds(time) {
+			let minutes = Math.floor(time / 60);
+			let seconds = Math.round(time - minutes * 60);
+			return `${minutes}:${seconds}`;
 		},
 	};
 });

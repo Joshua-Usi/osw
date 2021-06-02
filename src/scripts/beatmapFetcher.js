@@ -1,66 +1,73 @@
 define(function(require) {
-	const Parser = require("./parser.js");
+	"use strict";
 	const databaseManager = require("./databaseManager.js");
-	const starRating = require("src/scripts/starRating.js");
+	const starRating = require("./starRating.js");
 	let fetchedMaps = [];
 	let mapsLoaded = 0;
 	let beatmapsSorted = [];
 	let beatMapGroups = [];
 	let previous = "";
+	let alreadyRefreshing = false;
 
 	let returns = {
 		values: [],
 		complete: false,
 	};
 	let fullyCompletedLoading = false;
-
-	let database = indexedDB.open("osw-database", 2);
+	let database = indexedDB.open("osw-database", 3);
 	database.addEventListener("upgradeneeded", function(event) {
-		console.log("A new version of the database exists and will need to be updated");
+		console.log("Your current version of the database needs to be updated. Don't worry, I will update it automatically");
 		let db = event.target.result;
 		if (db.objectStoreNames.contains("beatmaps") === false) {
 			db.createObjectStore("beatmaps", {
-				keyPath: "name"
+				keyPath: "name",
 			});
 		}
 		if (db.objectStoreNames.contains("audio") === false) {
 			db.createObjectStore("audio", {
-				keyPath: "name"
+				keyPath: "name",
 			});
 		}
 		if (db.objectStoreNames.contains("scores") === false) {
 			db.createObjectStore("scores", {
-				keyPath: "name"
+				keyPath: "name",
+			});
+		}
+		if (db.objectStoreNames.contains("images") === false) {
+			db.createObjectStore("images", {
+				keyPath: "name",
+			});
+		}
+		if (db.objectStoreNames.contains("skin-elements") === false) {
+			db.createObjectStore("skin-elements", {
+				keyPath: "name",
 			});
 		}
 	});
-	database.addEventListener("error", function(event) {
-		console.error(`Attempt to open database failed: ${event.target.error}`);
-	});
-	database.addEventListener("success", function(event) {
-		let database = event.target.result;
-		fetchMaps(database);
-	});
-	async function fetchMaps(database) {
+
+	function fetchMaps(database) {
 		databaseManager.getAllInDatabase(database, "beatmaps", returns);
 		function checkComplete() {
 			if (returns.complete && fullyCompletedLoading === false) {
+				returns.values.sort(function (a, b) {
+					return (a.name > b.name) ? 1 : -1;
+				});
 				for (let i = 0; i < returns.values.length; i++) {
-					let parsedMap = returns.values[i].data;
+					let parsedMap = returns.values[i];
 					if (i === 0) {
-						previous = parsedMap.Creator + parsedMap.Title;
+						previous = parsedMap.data.Creator + parsedMap.data.Title;
 					}
 					/* ignore other gamemodes... for now */
-					if (parsedMap.Mode !== 0) {
+					if (parsedMap.data.Mode !== 0) {
 						continue;
 					}
-					if (beatMapGroups.length !== 0 && parsedMap.Creator + parsedMap.Title !== previous) {
+					if (beatMapGroups.length !== 0 && parsedMap.data.Creator + parsedMap.data.Title !== previous) {
 						beatMapGroups.sort(function(a, b) {
-							return starRating.calculate(a) - starRating.calculate(b);
+							return starRating.calculate(a.data) - starRating.calculate(b.data);
 						});
 						beatmapsSorted.push(beatMapGroups);
 						beatMapGroups = [];
-						previous = parsedMap.Creator + parsedMap.Title;
+						previous = parsedMap.data.Creator + parsedMap.data.Title;
 					}
 					beatMapGroups.push(parsedMap);
 				}
@@ -68,6 +75,7 @@ define(function(require) {
 					beatmapsSorted.push(beatMapGroups);
 				}
 				fullyCompletedLoading = true;
+				alreadyRefreshing = false;
 			} else {
 				setTimeout(checkComplete, 250);
 			}
@@ -82,26 +90,29 @@ define(function(require) {
 			return fullyCompletedLoading;
 		},
 		refresh: function() {
-			mapsLoaded = 0;
-			beatmapsSorted = [];
-			beatMapGroups = [];
-			previous = "";
+			if (alreadyRefreshing === false) {
+				mapsLoaded = 0;
+				beatmapsSorted = [];
+				beatMapGroups = [];
+				previous = "";
+				alreadyRefreshing = true;
 
-			returns = {
-				values: [],
-				complete: false,
-			};
-			fullyCompletedLoading = false;
-			let database = indexedDB.open("osw-database");
-			database.addEventListener("error", function(event) {
-				console.error(`Attempt to open database failed: ${event.target.error}`);
-			});
-			database.addEventListener("success", function(event) {
-				let database = event.target.result;
-				fetchMaps(database);
-			});
+				returns = {
+					values: [],
+					complete: false,
+				};
+				fullyCompletedLoading = false;
+				let database = indexedDB.open("osw-database");
+				database.addEventListener("error", function(event) {
+					console.error(`Attempt to open database failed: ${event.target.error}`);
+				});
+				database.addEventListener("success", function(event) {
+					let database = event.target.result;
+					fetchMaps(database);
+				});
+			}
 		},
-		checkForNewMaps: function(beatmapQueue) {
+		addNewMaps: function(beatmapQueue) {
 			let database = indexedDB.open("osw-database");
 			database.addEventListener("error", function(event) {
 				console.error(`Attempt to open database failed: ${event.target.error}`);
@@ -109,7 +120,7 @@ define(function(require) {
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
 				while (beatmapQueue.length > 0) {
-					databaseManager.addToDatabase(database, "beatmaps", beatmapQueue[0].name, Parser.parseBeatmap(beatmapQueue[0].data));
+					databaseManager.addToDatabase(database, "beatmaps", beatmapQueue[0].name, beatmapQueue[0].data);
 					fetchedMaps.push(beatmapQueue[0].data);
 					beatmapQueue.splice(0, 1);
 				}
@@ -127,6 +138,30 @@ define(function(require) {
 					audioQueue.splice(0, 1);
 				}
 			});
+		},
+		addImage: function(imageQueue) {
+			let database = indexedDB.open("osw-database");
+			database.addEventListener("error", function(event) {
+				console.error(`Attempt to open database failed: ${event.target.error}`);
+			});
+			database.addEventListener("success", function(event) {
+				let database = event.target.result;
+				while (imageQueue.length > 0) {
+					databaseManager.addToDatabase(database, "images", imageQueue[0].name, imageQueue[0].data);
+					imageQueue.splice(0, 1);
+				}
+			});
+		},
+		clearMemory() {
+			mapsLoaded = 0;
+			beatmapsSorted = [];
+			beatMapGroups = [];
+			previous = "";
+
+			returns = {
+				values: [],
+				complete: false,
+			};
 		}
 	};
 });

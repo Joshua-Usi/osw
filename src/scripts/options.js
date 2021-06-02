@@ -2,7 +2,7 @@ define(function(require) {
 	"use strict";
 	const utils = require("./utils.js");
 	let defaultOptions = {
-		version: 5,
+		version: 6,
 		types: [
 			"slider",
 			"slider",
@@ -13,13 +13,12 @@ define(function(require) {
 			"slider",
 			"checkbox",
 
-			"selectbox",
 			"checkbox",
+			"slider",
 
 			"selectbox",
 			"slider",
 			"checkbox",
-
 			"checkbox",
 			"selectbox",
 
@@ -29,6 +28,8 @@ define(function(require) {
 			"selectbox",
 
 			"selectbox",
+
+			"checkbox",
 		],
 		Audio: {
 			masterVolume: 1,
@@ -38,19 +39,17 @@ define(function(require) {
 		Inputs: {
 			keyboardLeftButton: "z",
 			keyboardRightButton: "x",
-			mouseSensitivity: utils.map(100, 0, 1000, 0, 1),
+			mouseSensitivity: 0.1,
 			useRawPosition: false,
 		},
 		UserInterface: {
-			introSequence: "Triangles",
 			menuParallax: true,
+			backgroundBlur: 0.5,
 		},
 		Gameplay: {
 			notelockStyle: "Full (original osu! implementation)",
 			backgroundDim: 0.8,
 			draw300Hits: true,
-		},
-		GameplayRendering: {
 			snakingSlidersIn: true,
 			cursorTrails: "Interpolated",
 		},
@@ -63,16 +62,20 @@ define(function(require) {
 		Skin: {
 			currentSkin: "Ajax Transparent",
 		},
+		Maintainence: {
+			developerMode: false,
+		}
 	};
-	if (window.localStorage.options === undefined) {
+	if (window.localStorage.getItem("options") === null) {
 		window.localStorage.setItem("options", JSON.stringify(defaultOptions));
 	} else {
 		let optionsTemp = JSON.parse(window.localStorage.getItem("options"));
 		if (optionsTemp.version < defaultOptions.version) {
 			localStorage.setItem("options", JSON.stringify(defaultOptions));
 			console.log("Your options was reset due to new version");
+		} else {
+			defaultOptions = optionsTemp;
 		}
-		defaultOptions = optionsTemp;
 	}
 	return {
 		get: function() {

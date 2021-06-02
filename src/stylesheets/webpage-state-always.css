@@ -16,16 +16,18 @@
 
 	object-fit: cover;
 }
-
-.gamemode-icons {
-	border-radius: 100px;
-	padding: 1.6vh;
+#avatar {
+	float: left;
+	width: 4vh;
+	margin-top: 1.125vh;
+	border-radius: 1vh;
 }
 
-#avatar {
-	width: 6vh;
-	margin-top: 0.75vh;
-	border-radius: 1vh;
+.gamemode-icons {
+	float: left;
+	width: 4vh;
+	margin-top: 1.125vh;
+	
 }
 
 .settings-button {
@@ -44,6 +46,8 @@
 	font-size: 1.75vh;
 
 	outline: none;
+
+	transition: background 0.2s;
 }
 
 #splash-screen {
@@ -279,11 +283,6 @@
 	font-size: 1.25vh;
 
 	transition: background 1s, opacity 1s;	
-}
-
-.triangle-background {
-	background: url("../../src/images/triangles.png");
-	background-attachment: fixed;
 }
 
 #goodbye {

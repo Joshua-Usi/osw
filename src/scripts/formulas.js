@@ -2,20 +2,6 @@ define(function(require) {
 	"use strict";
 	const Mods = require("./mods.js");
 	const utils = require("./utils.js");
-	function applyModMultiplier(n, mods, multiplier) {
-		if (mods) {
-			if (mods.easy) {
-				n *= 0.5;
-			}
-			if (mods.hardRock) {
-				n *= multiplier;
-				if (n >= 10) {
-					n = 10;
-				}
-			}
-		}
-		return n;
-	}
 	const toShorthand = {
 		/* difficulty reduction */
 		easy: "EZ",
@@ -57,8 +43,22 @@ define(function(require) {
 		V2: "scoreV2",
 	};
 	return {
+		applyModMultiplier: function(n, mods, multiplier) {
+			if (mods) {
+				if (mods.easy) {
+					n *= 0.5;
+				}
+				if (mods.hardRock) {
+					n *= multiplier;
+					if (n >= 10) {
+						n = 10;
+					}
+				}
+			}
+			return n;
+		},
 		AR: function(n, mods) {
-			n = applyModMultiplier(n, mods, 1.4);
+			n = this.applyModMultiplier(n, mods, 1.4);
 			if (n < 5) {
 				return 1.2 + 0.6 * (5 - n) / 5;
 			} else if (n === 5) {
@@ -82,7 +82,7 @@ define(function(require) {
 			return ar;
 		},
 		ARFadeIn: function(n, mods) {
-			n = applyModMultiplier(n, mods, 1.4);
+			n = this.applyModMultiplier(n, mods, 1.4);
 			let ar;
 			if (n < 5) {
 				ar = 0.8 + 0.4 * (5 - n) / 5;
@@ -94,12 +94,12 @@ define(function(require) {
 			return ar;
 		},
 		CS: function(n, mods) {
-			n = applyModMultiplier(n, mods, 1.3);
+			n = this.applyModMultiplier(n, mods, 1.3);
 			return 54.4 - 4.48 * n;
 		},
 		/* values for hit windows (centered around hit object time for 50, 100, 300) */
 		ODHitWindow: function(n, mods) {
-			n = applyModMultiplier(n, mods, 1.4);
+			n = this.applyModMultiplier(n, mods, 1.4);
 			/* in order 50, 100, 300 */
 			return [
 				0.4 - 0.02 * n,
@@ -109,7 +109,7 @@ define(function(require) {
 		},
 		/* measured in spins per second required for clear */
 		ODSpinner: function(n, mods) {
-			n = applyModMultiplier(n, mods, 1.4);
+			n = this.applyModMultiplier(n, mods, 1.4);
 			let od;
 			if (n < 5) {
 				od = 5 - 2 * (5 - n) / 5;
@@ -182,6 +182,21 @@ define(function(require) {
 				return "expert";
 			} else {
 				return "expert+";
+			}
+		},
+		beatmapDifficultyColour: function(starRating) {
+			if (starRating <= 1.99) {
+				return "#a1b855";
+			} else if (starRating <= 2.69) {
+				return "#78c6d3";
+			} else if (starRating <= 3.99) {
+				return "#eaca65";
+			} else if (starRating <= 5.29) {
+				return "#e78fb8";
+			} else if (starRating <= 6.49) {
+				return "#9b86d8";
+			} else {
+				return "#515151";
 			}
 		},
 		/* https://osu.ppy.sh/wiki/en/Score#scoring */
@@ -262,53 +277,6 @@ define(function(require) {
 			}
 			return multiplier;
 		},
-		modsShorthand: function(mods) {
-			let shorthand = "";
-			if (mods.hidden) {
-				shorthand += "HD";
-			}
-			if (mods.suddenDeath) {
-				shorthand += "SD";
-			}
-			if (mods.perfect) {
-				shorthand += "PF";
-			}
-			if (mods.doubleTime) {
-				shorthand += "DT";
-			}
-			if (mods.mods.nightCore) {
-				shorthand += "NC";
-			}
-			if (mods.hardRock) {
-				shorthand += "HR";
-			}
-			if (mods.flashlight) {
-				shorthand += "FL";
-			}
-			/* decreases */
-			if (mods.easy) {
-				shorthand += "EZ";
-			}
-			if (mods.noFail) {
-				shorthand += "NF";
-			}
-			if (mods.halfTime) {
-				shorthand += "HT";
-			}
-			if (mods.spunOut) {
-				shorthand += "SO";
-			}
-			/* special mods */
-			if (mods.relax) {
-				shorthand += "RX";
-			}
-			if (mods.autopilot) {
-				shorthand += "AP";
-			}
-			if (mods.auto) {
-				shorthand += "AT";
-			}
-		},
 		parseShorthand: function(string) {
 			let splitMods = string.match(/.{1,2}/g);
 			let mods = new Mods();
@@ -321,8 +289,11 @@ define(function(require) {
 			let output = "";
 			for (let mod in mods) {
 				if (mods[mod] === true) {
-					output += modToShorthand(mod);
+					output += this.modToShorthand(mod);
 				}
+			}
+			if (output === "") {
+				output = "NM";
 			}
 			return output;
 		},
@@ -331,6 +302,23 @@ define(function(require) {
 		},
 		shorthandToMod: function(shorthand) {
 			return toLonghand[shorthand];
-		}
+		},
+		getObjectCount: function(beatmap) {
+			let counts = {
+				circles: 0,
+				sliders: 0,
+				spinners: 0,
+			};
+			for (var i = 0; i < beatmap.hitObjects.length; i++) {
+				if (beatmap.hitObjects[i].type[0] === "1") {
+					counts.circles++;
+				} else if (beatmap.hitObjects[i].type[1] === "1") {
+					counts.sliders++;
+				} else if (beatmap.hitObjects[i].type[3] === "1") {
+					counts.spinners++;
+				}
+			}
+			return counts;
+		},
 	};
 });

@@ -31,7 +31,7 @@
 	position: absolute;
 	z-index: 50;
 	top: calc(50vh - 70vh / 2);
-	left: calc(50vw - 70vh / 2);
+	left: calc(55vw - 70vh / 2);
 
 	width: 70vh;
 	background: url('../../src/images/triangles.png');

@@ -39,7 +39,7 @@
 			</div>
 			<div id="goodbye"></div>
 			<div id="background-dim">
-				<img decoding="async" id="background" src="./src/images/osw_background.png">
+				<img decoding="async" id="background" src="./src/images/osw-background.png">
 			</div>
 			<div id="intro">
 				<div id="intro-text"></div>
@@ -65,7 +65,7 @@
 					<button type="button" class="settings-button triangle-background blue" onclick="window.open('https://github.com/Joshua-Usi/unofficial-osu-web', '_blank');">Visit Github repository</button>
 					<button type="button" class="settings-button triangle-background blue" onclick="window.open('https://github.com/Joshua-Usi/osw/issues/new/choose', '_blank');">Found a bug? Submit a bug report</button>
 					<button type="button" class="settings-button triangle-background blue" onclick="window.open('http://osu.ppy.sh/', '_blank');">Visit official osu! website</button>
-					<p style="display: inline;">Client version: <span class="client-version"></span></p>
+					<p>Client version: <span class="client-version"></span></p>
 					<!-- Audio Settings -->
 					<div class="sidenav-divider"></div>
 					<p class="sidenav-title-text">Audio</p>
@@ -87,27 +87,18 @@
 					<input type="range" id="settings-mouse-sensitivity" class="slider" min="0" max="1000" value="100">
 					<p style="color: #999;">Highly recommended if you are using tablet</p>
 					<p class="inline-block">Use tablet raw position</p>
-					<input type="checkbox" id="settings-use-raw-position" class="checkbox inline-block float-right" name="settings-use-raw-position">
+					<input type="checkbox" id="settings-use-raw-position" class="checkbox inline-block float-right">
 					<!-- User Interface Settings -->
 					<div class="sidenav-divider"></div>
 					<p class="sidenav-title-text">User Interface</p>
 					<!-- Triangles or Circles -->
-					<p>Intro Sequence</p>
-					<div class="select-box" id="settings-intro-sequence">
-						<div class="select-box-selected-container">
-							<!-- Default option -->
-							<p class="select-box-selected">Triangles</p>
-							<p class="select-box-arrow">&#709;</p>
-						</div>
-						<div class="select-box-selections">
-							<p class="selected">Triangles</p>
-							<p>Circles</p>
-						</div>
-					</div>
+					<p>Intro sequence</p>
 					<div>
 						<p class="inline-block">Menu parallax</p>
-						<input type="checkbox" id="settings-menu-parallax" class="checkbox inline-block float-right" name="settings-menu-parallax" checked>
+						<input type="checkbox" id="settings-menu-parallax" class="checkbox inline-block float-right" checked>
 					</div>
+					<p id="settings-background-blur-text">Background blur: 8px</p>
+					<input type="range" id="settings-background-blur" class="slider" min="0" max="16" value="8">
 					<!-- Gameplay Settings -->
 					<div class="sidenav-divider"></div>
 					<p class="sidenav-title-text">Gameplay</p>
@@ -128,18 +119,13 @@
 					<input type="range" id="settings-background-dim" class="slider" min="0" max="100" value="80">
 					<div>
 						<p class="inline-block">Draw 300 hits</p>
-						<input type="checkbox" id="settings-draw300-hits" class="checkbox inline-block float-right" name="settings-draw300-hits" checked>
+						<input type="checkbox" id="settings-draw300-hits" class="checkbox inline-block float-right" checked>
 					</div>
-					<!-- Gameplay Rendering Settings -->
-					<div class="sidenav-divider"></div>
-					<p class="sidenav-title-text">Gameplay Rendering</p>
 					<div>
-						<p class="inline-block">Snaking In sliders</p>
-						<input type="checkbox" id="settings-snaking-sliders-in" class="checkbox inline-block float-right" name="settings-snaking-sliders" checked>
-						<!-- <p class="inline-block">Snaking Out sliders</p> -->
-						<!-- <input type="checkbox" id="settings-snaking-sliders-out" class="checkbox inline-block float-right" name="settings-snaking-sliders-out" checked> -->
+						<p class="inline-block">Snaking in sliders</p>
+						<input type="checkbox" id="settings-snaking-sliders-in" class="checkbox inline-block float-right" checked>
 					</div>
-					<p>Cursor Trails</p>
+					<p>Cursor trails</p>
 					<div class="select-box" id="settings-cursor-trails">
 						<div class="select-box-selected-container">
 							<!-- Default option -->
@@ -157,7 +143,7 @@
 					<p class="sidenav-title-text">Performance</p>
 					<!-- setTimeout has a minimum timeout time of 4ms, thus making 250fps the limit -->
 					<!-- Vsync, 2x Vsync, Browser maximum (250fps) -->
-					<p>Max Frame Rate</p>
+					<p>Max frame rate</p>
 					<div class="select-box" id="settings-max-frame-rate">
 						<div class="select-box-selected-container">
 							<!-- Default option -->
@@ -172,12 +158,12 @@
 					</div>
 					<div>
 						<p class="inline-block">Show FPS</p>
-						<input type="checkbox" id="settings-show-fps" class="checkbox inline-block float-right" name="settings-show-fps">
+						<input type="checkbox" id="settings-show-fps" class="checkbox inline-block float-right">
 					</div>
 					<!-- Full, Half, Quarter, Eighth, Sixteenth -->
-					<p id="settings-slider-resolution-text">Slider Resolution: Full</p>
+					<p id="settings-slider-resolution-text">Slider resolution: Full</p>
 					<input type="range" id="settings-slider-resolution" class="slider" min="1" max="5" value="1">
-					<p>Score Update Rate</p>
+					<p>Score update rate</p>
 					<div class="select-box" id="settings-score-update-rate">
 						<div class="select-box-selected-container">
 							<!-- Default option -->
@@ -192,7 +178,7 @@
 					<!-- Skin Settings -->
 					<div class="sidenav-divider"></div>
 					<p class="sidenav-title-text">Skin</p>
-					<p>Current Skin</p>
+					<p>Current skin</p>
 					<div class="select-box" id="settings-current-skin">
 						<div class="select-box-selected-container">
 							<!-- Default option -->
@@ -203,18 +189,25 @@
 							<p class="selected">Ajax Transparent</p>
 						</div>
 					</div>
+					<button type="button" id="settings-button-upload-skin" disabled class="settings-button triangle-background blue">Upload skin (coming soon)</button>
 					<div class="sidenav-divider"></div>
 					<p class="sidenav-title-text">Maintenance</p>
-					<button type="button" id="settings-button-clear-local-storage" class="settings-button triangle-background red">Clear Local Storage</button>
+					<div>
+						<p class="inline-block">Developer mode</p>
+						<input type="checkbox" id="settings-developer-mode" class="checkbox inline-block float-right">
+					</div>
+					<button type="button" id="settings-button-clear-local-storage" class="settings-button triangle-background red">Clear local storage</button>
+					<button type="button" id="settings-button-delete-beatmap-cache" class="settings-button triangle-background red">Delete beatmap cache</button>
+					<button type="button" id="settings-button-delete-all-beatmaps" class="settings-button triangle-background red">Delete all beatmaps</button>
 				</div>
 			</div>
 			<div id="top-bar">
 				<div class="span-top-bar-text" style="float: left;">
-					<img id="settings-icon" class="top-bar-text gamemode-icons" style="width: 4.1vh;" src="./src/images/settings.png">
+					<img id="settings-icon" class="gamemode-icons" src="./src/images/settings.png">
 					<p class="top-bar-text" id="welcome-user">Welcome Guest</p>
 					<img id="avatar" src="./src/images/default-avatar.png" onclick="window.location = 'https://osu.ppy.sh/users/13478347';">
 				</div>
-				<p class="top-bar-text" id="pause" style="float: right;">&#x275A;&#x275A;</p>
+				<p class="top-bar-text float-right" id="pause">&#x275A;&#x275A;</p>
 			</div>
 			<p id="frame-rate">0 / 60 fps</p>
 		</div>
@@ -275,9 +268,9 @@
 			</div>
 		</div>
 		<div id="bottom-bar">
-			<div style="display:inline-block; width: 15vw; float: left;">
+			<div class="inline-block" style=" width: 15vw; float: left;">
 				<div id="back-button">
-					<div class="bottom-bar-anti-skew">
+					<div style="transform: skew(10deg);">
 						<div id="back-button-image-container">
 							<img src="./src/images/back.png" id="back-button-image">
 						</div>
@@ -285,30 +278,101 @@
 					</div>
 				</div>
 			</div>
-			<div style="width: 15vw;" class="buttons-container" id="bottom-bar-upload" onclick="document.getElementById('upload-beatmap').click();">
-				<input type="file" name="upload-beatmap" id="upload-beatmap" style="display: none;" multiple />
-				<div class="bottom-bar-anti-skew">
-					<p class="buttons-container-text">Upload a beatmap</p>
-				</div>
+			<div style="width: 15vw;" class="bottom-bar-buttons" id="bottom-bar-upload" onclick="document.getElementById('upload-beatmap').click();">
+				<input type="file" id="upload-beatmap" style="display: none;" multiple />
+				<p class="bottom-bar-buttons-text">Upload a beatmap</p>
 			</div>
-			<div style="width: 7.5vw;" class="buttons-container" id="bottom-bar-mods">
-				<div class="bottom-bar-anti-skew">
-					<p class="buttons-container-text">Mods</p>
-				</div>
+			<div class="bottom-bar-buttons" id="bottom-bar-mods">
+				<p class="bottom-bar-buttons-text">Mods</p>
 			</div>
-			<div style="width: 7.5vw;" class="buttons-container" id="bottom-bar-random">
-				<div class="bottom-bar-anti-skew">
-					<p class="buttons-container-text">Random</p>
-				</div>
+			<div class="bottom-bar-buttons" id="bottom-bar-random">
+				<p class="bottom-bar-buttons-text">Random</p>
 			</div>
-			<div style="width: 7.5vw;" class="buttons-container" id="bottom-bar-options">
-				<div class="bottom-bar-anti-skew">
-					<p class="buttons-container-text">Options</p>
-				</div>
+			<div class="bottom-bar-buttons" id="bottom-bar-options">
+				<p class="bottom-bar-buttons-text">Options</p>
 			</div>
 		</div>
 		<div class="webpage-state" id="webpage-state-beatmap-selection">
-			<div id="beatmap-selection-left"></div>
+			<div id="beatmap-selection-top">
+				<div id="beatmap-image-wrapper">
+					<div id="beatmap-image"></div>
+					<div id="beatmap-statistics-row">
+						<p id="beatmap-statistics-version">Version</p>
+						<p id="beatmap-statistics-title">Title</p>
+						<p id="beatmap-statistics-artist">Artist</p>
+						<p style="font-weight: bold; font-size: 1.5vh; margin: 1vh 0;">mapped by <span id="beatmap-statistics-creator" style="color: #77b9e3;">Noone</span></p>
+					</div>
+					<div style="font-size: 1.75vh;" id="beatmap-statistics-row-2">
+						<img class="beatmap-statistics-images" src="./src/images/beatmap-selection/drain-time.png">
+						<p class="beatmap-statistics" id="beatmap-statistics-drain-time">0:00</p>
+						<img class="beatmap-statistics-images" src="./src/images/beatmap-selection/bpm.png">
+						<p class="beatmap-statistics" id="beatmap-statistics-bpm">0</p>
+						<img class="beatmap-statistics-images" src="./src/images/beatmap-selection/circle-count.png">
+						<p class="beatmap-statistics" id="beatmap-statistics-circle-count">0</p>
+						<img class="beatmap-statistics-images" src="./src/images/beatmap-selection/slider-count.png">
+						<p class="beatmap-statistics" id="beatmap-statistics-slider-count">0</p>
+						<img class="beatmap-statistics-images" src="./src/images/beatmap-selection/spinner-count.png">
+						<p class="beatmap-statistics" id="beatmap-statistics-spinner-count">0</p>
+					</div>
+					<div id="beatmap-image-difficulty-border"></div>
+					<div id="beatmap-image-difficulty-border-2"></div>
+				</div>
+				<div id="beatmap-search">
+					<input type="text" placeholder="type to search" class="inline-block" id="beatmap-search-bar">
+					<img src="./src/images/magnifying-glass.png" id="beatmap-search-magnifying-glass">
+				</div>
+			</div>
+			<div id="beatmap-selection-left">
+				<div style="position: relative; top: 45vh; font-size: 2vh">
+					<div style="padding: 1vh; width: 23vw; background-color: #0003;">
+						<div style="clear: both;">
+							<p class="inline-block beatmap-difficulty-text">Circle Size</p>
+							<div class="inline-block beatmap-difficulty-bar-background">
+								<div id="circle-size-difficulty" class="beatmap-difficulty-bar"></div>
+							</div>
+							<p id="circle-size-difficulty-value" class="inline-block beatmap-difficulty-value">0</p>
+						</div>
+						<div style="clear: both;">
+							<p class="inline-block beatmap-difficulty-text">HP Drain</p>
+							<div class="inline-block beatmap-difficulty-bar-background">
+								<div id="hp-drain-difficulty" class="beatmap-difficulty-bar"></div>
+							</div>
+							<p id="hp-drain-difficulty-value" class="inline-block beatmap-difficulty-value">0</p>
+						</div>
+						<div style="clear: both;">
+							<p class="inline-block beatmap-difficulty-text">Accuracy</p>
+							<div class="inline-block beatmap-difficulty-bar-background">
+								<div id="accuracy-difficulty" class="beatmap-difficulty-bar"></div>
+							</div>
+							<p id="accuracy-difficulty-value" class="inline-block beatmap-difficulty-value">0</p>
+						</div>
+						<div style="clear: both;">
+							<p class="inline-block beatmap-difficulty-text">Approach Rate</p>
+							<div class="inline-block beatmap-difficulty-bar-background">
+								<div id="approach-rate-difficulty" class="beatmap-difficulty-bar"></div>
+							</div>
+							<p id="approach-rate-difficulty-value" class="inline-block beatmap-difficulty-value">0</p>
+						</div>
+						<div style="clear: both;">
+							<p class="inline-block beatmap-difficulty-text">Star Difficulty</p>
+							<div class="inline-block beatmap-difficulty-bar-background">
+								<div id="star-rating-difficulty" class="beatmap-difficulty-bar"></div>
+							</div>
+							<p id="star-rating-difficulty-value" class="inline-block beatmap-difficulty-value">0</p>
+						</div>
+						<div style="clear: both;"></div>
+					</div>
+				</div>
+				<!-- <div>
+					<p>Description</p>
+				</div>
+				<div>
+					<p>Source</p>
+				</div>
+				<div>
+					<p>Tags</p>
+				</div> -->
+			</div>
 			<div id="beatmap-selection-right"></div>
 		</div>
 		<div class="webpage-state" id="webpage-state-gameplay">
@@ -319,6 +383,11 @@
 			<div id="skip-button">Press <div id="skip-button-space-bar">SPACE</div> to skip</div>
 			<canvas id="gameplay-flashlight"></canvas>
 			<canvas id="gameplay"></canvas>
+			<!-- a legacy to an older, better time -->
+			<div style="display: none; position: absolute; top: 45vh; left: 0; background: #111; width: 100vw; padding: 2vh 0; font-size: 3vh;text-align: center; transition: opacity 2s;">
+				<p style="margin: 0;">Deleting backgrounds makes osw! ANGGGGGGGRRRRRRRRRRYYYYYYYYYYYYYYYY!</p>
+				<p style="margin: 0;">Please use the "Background Dim" setting instead.</p>
+			</div>
 		</div>
 		<div class="webpage-state" id="webpage-state-mods">
 			<div id="mods-blue-one" class="mods-blue"></div>
@@ -426,7 +495,7 @@
 				</div>
 				<div id="mod-buttons-container">
 					<button type="button" style="margin-left: 10vw;" class="mods-button triangle-background blue" id="mods-deselect-all">Deselect All</button>
-					<button type="button" class="mods-button triangle-background blue">Customisation</button>
+					<button type="button" disabled class="mods-button triangle-background blue">Customisation</button>
 					<button type="button" class="mods-button triangle-background blue" id="mods-close-button">Close</button>
 					<p class="inline-block" id="mod-score-multiplier">Score Multiplier: <b>1.00x</b></p>
 				</div>
@@ -469,15 +538,15 @@
 		</div>
 		<div class="webpage-state" id="webpage-state-results-screen">
 			<div id="end-results">
-				<p id="end-results-map-name">Map Name</p>
-				<p id="end-results-artist-name">Artist</p>
+				<p id="end-results-map-name">MAP_NAME</p>
+				<p id="end-results-artist-name">ARTIST_NAME</p>
 				<img id="end-results-grade" src="//:0">
 				<p id="end-results-score">0</p>
 				<div id="end-results-accuracy">
-					<div id="end-results-accuracy-bar">0.00%</div>
+					<div id="end-results-accuracy-bar">ACCURACY_VALUE</div>
 				</div>
-				<p id="end-results-difficulty-name">Difficulty Name</p>
-				<p id="end-results-mapper-name">Mapper Name</p>
+				<p id="end-results-difficulty-name">DIFFICULTY_NAME</p>
+				<p id="end-results-mapper-name">MAPPER_NAME</p>
 				<div class="end-results-section">
 					<div class="end-results-3-part">
 						<p class="end-results-header">ACCURACY</p>
@@ -487,7 +556,7 @@
 						<p class="end-results-header">COMBO</p>
 						<div>
 							<p id="end-results-max-combo" class="inline-block">0</p>
-							<p id="end-results-combo-type" class="inline-block" style="font-size: 1.5vh;">PERFECT</p>
+							<p id="end-results-combo-type" class="inline-block">PERFECT</p>
 						</div>
 					</div>
 					<div class="end-results-3-part">

@@ -81,6 +81,19 @@ define(function(require) {
 				this.effects = effects;
 			}
 		},
+		BreakPeriod: class BreakPeriod {
+			constructor(breakName, startTime, endTime) {
+				this.startTime = startTime;
+				this.endTime = endTime;
+			}
+		},
+		Background: class Background {
+			constructor(n, m, filename, xOffset, yOffset) {
+				this.filename = filename;
+				this.xOffset = xOffset || 0;
+				this.yOffset = yOffset || 0;
+			}
+		},
 		ScoreObject: class ScoreObject {
 			constructor(score, x, y, initialTime, lifetime) {
 				this.score = score;
