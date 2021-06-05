@@ -205,7 +205,7 @@ define(function(require) {
 				r: parseInt(splitTriplets[0]),
 				g: parseInt(splitTriplets[1]),
 				b: parseInt(splitTriplets[2]),
-			}
+			};
 		},
 		parseBreakPeriod: function(data) {
 			let splited = data.split(",");

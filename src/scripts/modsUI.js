@@ -1,6 +1,7 @@
 define(function(require) {
+  "use strict";
 	const formulas = require("./formulas.js");
-	const mods = require("./mods.js")();
+	const mods = new require("./mods.js")();
 	let isOpen = false;
 	let elements = document.getElementsByClassName("mod-icons");
 	for (let i = 0; i < elements.length; i++) {
@@ -22,21 +23,21 @@ define(function(require) {
 		"mods-blue-two",
 		"mods-blue-three",
 		"mods-blue-four",
-	]
+	];
 	let elOpenTimes = [
 		"0.75s",
 		"0.35s",
 		"0.45s",
 		"0.55s",
 		"0.65s",
-	]
+	];
 	let elCloseTimes = [
 		"0.75s",
 		"1.45s",
 		"1.25s",
 		"1.05s",
 		"0.85s",
-	]
+	];
 	function closeModsUI() {
 		for (let i = 0; i < el.length; i++) {
 			let element = document.getElementById(el[i]);

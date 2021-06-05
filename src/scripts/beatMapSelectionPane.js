@@ -26,7 +26,7 @@ define(function(require) {
 			let stars = "";
 			if (mapStarRating < 10) {
 				for (let i = 0; i < mapStarRating; i++) {
-					let size = Math.round(utils.map(mapStarRating - i, 1, 0, 1, 0.5) * 100) / 100;
+					let size = utils.roundDigits(utils.map(mapStarRating - i, 1, 0, 1, 0.5), 2);
 					if (size >= 1) {
 						size = 1;
 					}

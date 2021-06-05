@@ -1,24 +1,25 @@
 define(function(require) {
-	return function(easy, noFail, halfTime, hardRock, suddenDeath, perfect, doubleTime, nightcore, hidden, flashlight, relax, autopilot, spunOut, auto, scoreV2) {
-		return {
-			/* difficulty reduction*/
-			easy: easy || false,
-			noFail: noFail || false,
-			halfTime: halfTime || false,
-			/* difficulty increases*/
-			hardRock: hardRock || false,
-			suddenDeath: suddenDeath || false,
-			perfect: perfect || false,
-			doubleTime: doubleTime || false,
-			nightcore: nightcore || false,
-			hidden: hidden || false,
-			flashlight: flashlight || false,
+  "use strict";
+	return class Mods {
+		constructor(easy, noFail, halfTime, hardRock, suddenDeath, perfect, doubleTime, nightcore, hidden, flashlight, relax, autopilot, spunOut, auto, scoreV2) {
+			/* difficulty reduction */
+			this.easy = easy || false;
+			this.noFail = noFail || false;
+			this.halfTime = halfTime || false;
+			/* difficulty increases */
+			this.hardRock = hardRock || false;
+			this.suddenDeath = suddenDeath || false;
+			this.perfect = perfect || false;
+			this.doubleTime = doubleTime || false;
+			this.nightcore = nightcore || false;
+			this.hidden = hidden || false;
+			this.flashlight = flashlight || false;
 			/* special */
-			relax: relax || false,
-			autopilot: autopilot || false,
-			spunOut: spunOut || false,
-			auto: auto || false,
-			scoreV2: scoreV2 || false,
+			this.relax = relax || false;
+			this.autopilot = autopilot || false;
+			this.spunOut = spunOut || false;
+			this.auto = auto || false;
+			this.scoreV2 = scoreV2 || false;
 		};
 	};
 });

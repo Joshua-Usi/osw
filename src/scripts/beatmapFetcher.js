@@ -62,9 +62,6 @@ define(function(require) {
 						continue;
 					}
 					if (beatMapGroups.length !== 0 && parsedMap.data.Creator + parsedMap.data.Title !== previous) {
-						beatMapGroups.sort(function(a, b) {
-							return starRating.calculate(a.data) - starRating.calculate(b.data);
-						});
 						beatmapsSorted.push(beatMapGroups);
 						beatMapGroups = [];
 						previous = parsedMap.data.Creator + parsedMap.data.Title;

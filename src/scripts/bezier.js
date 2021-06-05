@@ -26,32 +26,14 @@
  */
 define(function(require) {
 	"use strict";
-
-	function distance(a, b) {
-		return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
-	}
-	/** Computes factorial*/
-	let precomputedFactorials = [];
-	function precomputeFactorial(k) {
-		let total = 1;
-		for (let i = 2; i <= k; i++) {
-			total *= i;
-		}
-		return total;
-	}
-	for (var i = 0; i < 170; i++) {
-		precomputedFactorials.push(precomputeFactorial(i));
-	}
-	function factorial(k) {
-		return precomputedFactorials[k];
-	}
+	const utils = require("./utils.js");
 	/**	Computes Bernstain
 	 *	@param {Integer} i - the i-th index
 	 *	@param {Integer} n - the total number of points
 	 *	@param {Number} t - the value of parameter t , between 0 and 1
 	 **/
 	function B(i, n, t) {
-		return factorial(n) / (factorial(i) * factorial(n - i)) * Math.pow(t, i) * Math.pow(1 - t, n - i);
+		return utils.factorial(n) / (utils.factorial(i) * utils.factorial(n - i)) * Math.pow(t, i) * Math.pow(1 - t, n - i);
 	}
 	/** Computes a point's coordinates for a value of t
 	 *	@param {Number} t - a value between o and 1
@@ -75,7 +57,7 @@ define(function(require) {
 		/** Compute the incremental step*/
 		let tLength = 0;
 		for (let i = 0; i < points.length - 1; i++) {
-			tLength += distance(points[i], points[i + 1]);
+			tLength += utils.dist(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
 		}
 		if (res === undefined) {
 			res = 1;

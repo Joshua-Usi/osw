@@ -93,16 +93,12 @@ define(function(require) {
 			};
 		}
 		init() {
-			/* needed to access outside scope */
-			let that = this;
 			document.getElementById(this.element).addEventListener("mousemove", this.mousemove);
 			document.getElementById(this.element).addEventListener('contextmenu', this.contextmenu);
 			document.getElementById(this.element).addEventListener("mousedown", this.mousedown);
 			document.getElementById(this.element).addEventListener("mouseup", this.mouseup);
 		}
 		destroy() {
-			/* needed to access outside scope */
-			let that = this;
 			document.getElementById(this.element).removeEventListener("mousemove", this.mousemove);
 			document.getElementById(this.element).removeEventListener('contextmenu', this.contextmenu);
 			document.getElementById(this.element).removeEventListener("mousedown", this.mousedown);

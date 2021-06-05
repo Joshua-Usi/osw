@@ -1,6 +1,5 @@
 define(function(require) {
 	"use strict";
-	const utils = require("./utils.js");
 	let defaultOptions = {
 		version: 6,
 		types: [
@@ -94,5 +93,5 @@ define(function(require) {
 		read: function() {
 			return JSON.parse(window.localStorage.getItem("options"));	
 		},
-	}
+	};
 });

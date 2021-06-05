@@ -1,32 +1,26 @@
 define(function(require) {
 	"use strict";
+	let precomputedFactorials = [];
+	function precomputeFactorial(k) {
+		let total = 1;
+		for (let i = 2; i <= k; i++) {
+			total *= i;
+		}
+		return total;
+	}
+	/* precompute factorials for performance*/
+	for (let i = 0; i < 170; i++) {
+		precomputedFactorials.push(precomputeFactorial(i));
+	}
 	return {
-		/* View in fullscreen */
-		openFullscreen: function() {
-			if (document.documentElement.requestFullscreen) {
-				document.documentElement.requestFullscreen();
-			} else if (document.documentElement.webkitRequestFullscreen) {
-				/* Safari */
-				document.documentElement.webkitRequestFullscreen();
-			} else if (document.documentElement.msRequestFullscreen) {
-				/* IE11 */
-				document.documentElement.msRequestFullscreen();
-			}
-		},
-		/* Close fullscreen */
-		closeFullscreen: function() {
-			if (document.exitFullscreen) {
-				document.exitFullscreen();
-			} else if (document.webkitExitFullscreen) {
-				/* Safari */
-				document.webkitExitFullscreen();
-			} else if (document.msExitFullscreen) {
-				/* IE11 */
-				document.msExitFullscreen();
-			}
-		},
 		map: function(num, numMin, numMax, mapMin, mapMax) {
 			return mapMin + ((mapMax - mapMin) / (numMax - numMin)) * (num - numMin);
+		},
+		factorial: function(k) {
+			return precomputedFactorials[k];
+		},
+		roundDigits: function(value, digits) {
+			return Math.round(value * 10 ** digits) / 10 ** digits;
 		},
 		clamp: function(value, min, max) {
 			if (value < min) {
@@ -45,10 +39,6 @@ define(function(require) {
 		},
 		direction: function(x1, y1, x2, y2) {
 			return Math.atan2(x1 - x2, y1 - y2);
-		},
-		brighten: function(element, value) {
-			let dim = document.getElementById(element);
-			dim.style.filter = "brightness(" + value + ")";
 		},
 		removeInstances: function(str, items) {
 			let s = str;
@@ -82,7 +72,7 @@ define(function(require) {
 		// The function returns following values 
 		// 0 --> p, q and r are colinear 
 		// 1 --> Clockwise 
-		// 2 --> Counterclockwise 
+		// -1 --> Counterclockwise 
 		orientation: function(p1, p2, p3) {
 			let val = (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y);
 			// colinear
@@ -90,20 +80,13 @@ define(function(require) {
 				return 0;
 			}
 			// clock or counterclock wise 
-			return (val > 0) ? 1 : 2;
+			return (val > 0) ? 1 : - 1;
 		},
 		/* 90 sided circle */
-		circleToPoints: function(x, y, r, length, startingAngle, clockwise) {
+		circleToPoints: function(x, y, r, length, startingAngle, direction) {
 			let points = [];
 			let totalLength = 0;
-			let direction;
 			let currentAngle = 0;
-			if (clockwise === 2) {
-				direction = 1;
-			}
-			if (clockwise === 1) {
-				direction = -1;
-			}
 			while (totalLength < length) {
 				points.push({
 					x: x + Math.cos(startingAngle + direction * currentAngle) * r,
@@ -174,7 +157,7 @@ define(function(require) {
 					document.getElementById(container).insertBefore(image, document.getElementById(container).childNodes[0]);
 				}
 				let image = document.getElementById(element + i);
-				if (/^[0-9]+$/.test(digits[i])) {
+				if (/^[0-9]+$/.test(digits[i]) || /x/g.test(digits[i])) {
 					image.src = rootSrc + digits[i] + ".png";
 				} else {
 					let trueSrc = "0";
@@ -187,9 +170,6 @@ define(function(require) {
 							break;
 						case "%":
 							trueSrc = "percent";
-							break;
-						case "x":
-							trueSrc = "x";
 							break;
 					}
 					image.src = rootSrc + trueSrc + ".png";

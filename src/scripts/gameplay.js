@@ -1184,7 +1184,7 @@ define(function(require) {
 				document.getElementById("skip-button").style.opacity = "0";
 			}
 			currentLoadedMap = mapData;
-			playDetails = PlayDetails(mods);
+			playDetails = new PlayDetails(mods);
 			if (mods.flashlight === false) {
 				document.getElementById("gameplay-flashlight").style.display = "none";
 			} else {

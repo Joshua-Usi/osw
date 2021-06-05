@@ -7,7 +7,6 @@ define(function(require) {
 	canvas.height = 0.8 * window.innerWidth;
 	let ctx = canvas.getContext("2d");
 	let pointArrays = [];
-	let animationStage = 0.05;
 	/* intro sequence events */
 	let eventDone = [false, false, false, false, false, false, false, false, false];
 	let eventTimings = [0.2, 0.4, 0.6, 0.9, 1.6, 1.8, 2, 2.2, 3.1];
@@ -62,9 +61,9 @@ define(function(require) {
 	];
 	let triangleNumber = 0;
 	/* constants */
-	let numberOfTriangles = 22;
-	let timeBetweenEachTriangle = 0.022;
-	let triangleFadeOutTime = 0.24;
+	let NUMBER_OF_TRIANGLES = 22;
+	let TIME_BETWEEN_EACH_TRIANGLE = 0.022;
+	let TRIANGLE_FADE_OUT_TIME = 0.24;
 
 	(function generatePoints() {
 		for (let i = 0; i < 2; i++) {
@@ -126,23 +125,23 @@ define(function(require) {
 		document.getElementById("triangles-container").innerHTML += `<svg class="intro-triangle" id="triangle-${triangleN}" style="position: absolute; top: ${y}px; left: ${x};" height="${size}" width="${size}">
 		<polygon points="${size * 3 / 6},${size / 6} ${size * 5 / 6},${size * 5 / 6} ${size / 6},${size * 5 / 6}" style="fill:${(type === 0) ? "white" : "transparent"};stroke:white;stroke-width:2" />
 		</svg>`;
-		document.getElementById(`triangle-${triangleN}`).querySelector("polygon").style.animation = `${triangleFadeOutTime * speed}s ease ${0.9 * speed + triangleN * timeBetweenEachTriangle * speed + "s"} 1 normal none running fade-in-out`;
+		document.getElementById(`triangle-${triangleN}`).querySelector("polygon").style.animation = `${TRIANGLE_FADE_OUT_TIME * speed}s ease ${0.9 * speed + triangleN * TIME_BETWEEN_EACH_TRIANGLE * speed + "s"} 1 normal none running fade-in-out`;
 	}
 
 	function animate() {
 		let audio = document.getElementById("menu-audio");
-		while (triangleNumber <= numberOfTriangles && audio.currentTime > 0.1) {
+		while (triangleNumber <= NUMBER_OF_TRIANGLES && audio.currentTime > 0.1) {
 			createTriangle(utils.randomInt(0, 1), utils.randomInt(window.innerWidth * 0.3, window.innerWidth * 0.7), utils.randomInt(window.innerHeight * 0.4, window.innerHeight * 0.6), utils.randomInt(10, 120), triangleNumber);
 			triangleNumber++;
 		}
 		for (var i = 0; i < events.length; i++) {
 			if (eventDone[i] === false && audio.currentTime >= eventTimings[i]) {
 				events[i]();
-				eventDone[i] === true;
+				eventDone[i] = true;
 			}
 		}
 		if (audio.currentTime >= 2.2 && audio.currentTime <= 3.1) {
-			animationStage = utils.map(audio.currentTime, 2.2, 3.4, 0.025, 1);
+			let animationStage = utils.map(audio.currentTime, 2.2, 3.4, 0.025, 1);
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			ctx.lineWidth = 3;
 			for (let i = 0; i < pointArrays.length; i++) {

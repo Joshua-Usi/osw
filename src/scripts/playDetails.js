@@ -1,25 +1,26 @@
 define(function (require) {
+  "use strict"
 	const Mods = require("./mods.js");
-	return function(mods) {
-		return {
-			mapName: "",
-			mapperName: "",
-			artist: "",
-			difficultyName: "",
-			score: 0,
-			maxCombo: 0,
-			comboType: "",
-			unstableRate: 0,
-			pp: 0,
-			great: 0,
-			ok: 0,
-			meh: 0,
-			miss: 0,
-			comboBreaks: 0,
-			sliderBreaks: 0,
-			mods: mods || Mods(),
-			datePlayed: "",
-			replay: [],
-		};
-	}
+	return class PlayDetails {
+		constructor(mods) {
+			this.mapName = "";
+			this.mapperName = "";
+			this.artist = "";
+			this.difficultyName = "";
+			this.score = 0;
+			this.maxCombo = 0;
+			this.comboType = "";
+			this.unstableRate = 0;
+			this.pp = 0;
+			this.great = 0;
+			this.ok = 0;
+			this.meh = 0;
+			this.miss = 0;
+			this.comboBreaks = 0;
+			this.sliderBreaks = 0;
+			this.mods = mods || new Mods();
+			this.datePlayed = "";
+			this.replay = [];
+		}
+	};
 });
