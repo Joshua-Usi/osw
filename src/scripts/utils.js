@@ -146,7 +146,8 @@ define(function(require) {
 				y: yMap,
 			};
 		},
-		htmlCounter: function(digits, container, element, rootSrc, positionTag, positioning) {
+		htmlCounter: function(digits, container, element, imageSource, positionTag, positioning) {
+			digits = this.reverse(digits);
 			if (digits.length < document.getElementById(container).childNodes.length) {
 				document.getElementById(container).innerHTML = "";
 			}
@@ -157,22 +158,16 @@ define(function(require) {
 					document.getElementById(container).insertBefore(image, document.getElementById(container).childNodes[0]);
 				}
 				let image = document.getElementById(element + i);
-				if (/^[0-9]+$/.test(digits[i]) || /x/g.test(digits[i])) {
-					image.src = rootSrc + digits[i] + ".png";
+				if (/^[0-9]+$/.test(digits[i])) {
+					image.src = imageSource[digits[i]].src;
 				} else {
-					let trueSrc = "0";
-					switch (digits[i]) {
-						case ".":
-							trueSrc = "dot";
-							break;
-						case ",":
-							trueSrc = "comma";
-							break;
-						case "%":
-							trueSrc = "percent";
-							break;
+					const sourceMap = {
+						",": 10,
+						".": 11,
+						"%": 12,
+						"x": 13,
 					}
-					image.src = rootSrc + trueSrc + ".png";
+					image.src = imageSource[sourceMap[digits[i]]].src;
 				}
 			}
 			document.getElementById(container).style[positionTag] = positioning;

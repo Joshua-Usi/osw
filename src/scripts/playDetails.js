@@ -3,15 +3,15 @@ define(function (require) {
 	const Mods = require("./mods.js");
 	return class PlayDetails {
 		constructor(mods) {
-			this.mapName = "";
-			this.mapperName = "";
+			this.title = "";
+			this.creator = "";
 			this.artist = "";
-			this.difficultyName = "";
+			this.version = "";
 			this.score = 0;
 			this.maxCombo = 0;
 			this.comboType = "";
 			this.unstableRate = 0;
-			this.pp = 0;
+			this.performancePoints = 0;
 			this.great = 0;
 			this.ok = 0;
 			this.meh = 0;

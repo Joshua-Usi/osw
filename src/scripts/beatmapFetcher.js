@@ -9,10 +9,14 @@ define(function(require) {
 	let previous = "";
 	let alreadyRefreshing = false;
 
-	let returns = {
-		values: [],
-		complete: false,
-	};
+	class DatabaseData {
+		constructor() {
+			this.value = [];
+			this.complete = false;
+		}
+	}
+
+	let returns = new DatabaseData();
 	let fullyCompletedLoading = false;
 	let database = indexedDB.open("osw-database", 3);
 	database.addEventListener("upgradeneeded", function(event) {
@@ -88,16 +92,7 @@ define(function(require) {
 		},
 		refresh: function() {
 			if (alreadyRefreshing === false) {
-				mapsLoaded = 0;
-				beatmapsSorted = [];
-				beatMapGroups = [];
-				previous = "";
-				alreadyRefreshing = true;
-
-				returns = {
-					values: [],
-					complete: false,
-				};
+				clearMemory();
 				fullyCompletedLoading = false;
 				let database = indexedDB.open("osw-database");
 				database.addEventListener("error", function(event) {
@@ -154,11 +149,7 @@ define(function(require) {
 			beatmapsSorted = [];
 			beatMapGroups = [];
 			previous = "";
-
-			returns = {
-				values: [],
-				complete: false,
-			};
+			new DatabaseData();
 		}
 	};
 });

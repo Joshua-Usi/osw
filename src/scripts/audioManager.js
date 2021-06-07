@@ -1,4 +1,11 @@
 define(function(require) {
+	class Sound {
+		constructor(src, type, allowMultiPlay) {
+			this.audio = new Audio(src);
+			this.type = type;
+			this.allowMultiPlay = allowMultiPlay || false;
+		}
+	}
 	return class AudioManager {
 		constructor() {
 			// map for loaded sounds
@@ -15,12 +22,9 @@ define(function(require) {
 			this.effectsVolume = volume;
 		}
 		/* type is a string data that is either "music" or "effects" */
+		/* allowMultiPlay is an optional argument */
 		load(id, src, type, allowMultiPlay) {
-			this.sounds[id] = {
-				audio: new Audio(src),
-				allowMultiPlay: allowMultiPlay,
-				type: type,
-			};
+			this.sounds[id] = new Sound(src, type, allowMultiPlay);
 		}
 		changeSource(id, src) {
 			this.sounds[id].audio.src = src;

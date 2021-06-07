@@ -5,9 +5,6 @@ define(function(require) {
 			this.canvas.style.margin = 0;
 			this.context = this.canvas.getContext("2d");
 			this.customProperties = {
-				/* 
-				 *
-				 */
 				textAlign: "left",
 				imageAlign: "top-left",
 			}

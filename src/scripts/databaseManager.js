@@ -1,14 +1,17 @@
 define(function(require) {
+	class StoragePair {
+		constructor(name, key) {
+			this.name = name;
+			this.key = key;
+		}
+	}
 	return {
 		getObjectStore: function(database, store, mode) {
 			let transaction = database.transaction(store, mode);
 			return transaction.objectStore(store);
 		},
 		addToDatabase: function(database, store, key, data) {
-			let object = {
-				name: key,
-				data: data,
-			};
+			let object = new StoragePair(key, data);
 			let objectStore = this.getObjectStore(database, store, "readwrite");
 			let request = objectStore.add(object);
 			request.addEventListener("error", function(event) {
