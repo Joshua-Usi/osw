@@ -1,3 +1,4 @@
+/* used https://github.com/Francesco149/ojsama by https://github.com/Francesco149 */
 define(function(require) {
 	"use strict"
 	let Formulas = require("./formulas.js");
