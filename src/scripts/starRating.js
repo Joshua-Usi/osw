@@ -248,7 +248,7 @@ define(function(require) {
 	}
 	return {
 		version: function() {
-			return 2;
+			return 1;
 		},
 		calculate: function(beatmap, mods) {
 			let baseStats = new BeatmapStatsCache(beatmap);
