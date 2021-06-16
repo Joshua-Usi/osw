@@ -95,7 +95,7 @@ define(function(require) {
 		},
 		CS: function(n, mods) {
 			n = this.applyModMultiplier(n, mods, 1.3);
-			return 54.4 - 4.48 * n;
+			return (512 / 16) * (1 - 0.7 * (n - 5) / 5);
 		},
 		/* values for hit windows (centered around hit object time for 50, 100, 300) */
 		ODHitWindow: function(n, mods) {
@@ -285,7 +285,7 @@ define(function(require) {
 			}
 			return mods;
 		},
-		convertModsToShorthand: function(mods) {
+		toShorthand: function(mods) {
 			let output = "";
 			for (let mod in mods) {
 				if (mods[mod] === true) {
@@ -293,7 +293,31 @@ define(function(require) {
 				}
 			}
 			if (output === "") {
-				output = "NM";
+				return "NM";
+			}
+			return output;
+		},
+		toCalculatingShorthand: function(mods) {
+			let output = "";
+			let valuesThatDontMatter = [
+				"noFail",
+				"suddenDeath",
+				"perfect",
+				"hidden",
+				"flashlighht",
+				"relax",
+				"autopilot",
+				"spunOut",
+				"auto",
+				"scoreV2",
+			];
+			for (let mod in mods) {
+				if (mods[mod] === true && valuesThatDontMatter.includes(mod) == false) {
+					output += this.modToShorthand(mod);;
+				}
+			}
+			if (output === "") {
+				return "NM";
 			}
 			return output;
 		},

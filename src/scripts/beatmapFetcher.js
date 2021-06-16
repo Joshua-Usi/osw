@@ -11,7 +11,7 @@ define(function(require) {
 
 	class DatabaseData {
 		constructor() {
-			this.value = [];
+			this.values = [];
 			this.complete = false;
 		}
 	}
@@ -92,7 +92,7 @@ define(function(require) {
 		},
 		refresh: function() {
 			if (alreadyRefreshing === false) {
-				clearMemory();
+				this.clearMemory();
 				fullyCompletedLoading = false;
 				let database = indexedDB.open("osw-database");
 				database.addEventListener("error", function(event) {

@@ -1,145 +1,259 @@
 define(function(require) {
-	let utils = require("./utils.js");
+	"use strict"
+	let Formulas = require("./formulas.js");
 	let Mods = require("./mods.js");
-
-	/* Star rating constants */
-	let aimWeightMultiplier = 1.25 * 0.35;
-	let speedWeightMultiplier = 1.1;
-
-	/* Longer sliders are considered harder by the algorithm */
-	function sliderDifficulty(slider) {
-		return slider.length / 500 + 0.75;
-	}
-
-	/* Consider CS for difficulties */
-	function CSDifficulty(CS, mods) {
-		let newCS = CS;
-		if (mods.easy) {
-			newCS *= 0.5;
-		} else if (mods.hardRock) {
-			newCS *= 1.3;
-			if (newCS > 10) {
-				newCS = 10;
+	const HARD_ROCK_MULTIPLIER = 1.4;
+	const HARD_ROCK_CS_MULTIPLIER = 1.3;
+	const EASY_MULTIPLIER = 0.5;
+	const SINGLE_TAP_THRESHOLD = 125;
+	const SINGLE_SPACING = 125.0;
+	const CIRCLESIZE_BUFF_THRESHOLD = 30;
+	const STRAIN_STEP = 400;
+	const DECAY_BASE = {
+		SPEED: 0.3,
+		AIM: 0.15,
+	};
+	const WEIGHT_SCALING = {
+		SPEED: 1400,
+		AIM: 26.25,
+	};
+	const DECAY_WEIGHT = 0.9;
+	// ~200BPM 1/4 streams
+	let MIN_SPEED_BONUS = 75;
+	// ~330BPM 1/4 streams
+	const MAX_SPEED_BONUS = 45;
+	const ANGLE_BONUS_SCALE = 90;
+	const AIM_TIMING_THRESHOLD = 107;
+	const SPEED_ANGLE_BONUS_BEGIN = 5 * Math.PI / 6;
+	const AIM_ANGLE_BONUS_BEGIN = Math.PI / 3;
+	const STAR_SCALING_FACTOR = 0.0675;
+	const EXTREME_SCALING_FACTOR = 0.5;
+	class BeatmapStats {
+		constructor(ar, od, hp, cs) {
+			this.ApproachRate = ar;
+			this.OverallDifficulty = od;
+			this.HPDrainRate = hp;
+			this.CircleSize = cs;
+			this.speedMultiplier = 1;
+		}
+		multiply(key, multiplier) {
+			this[key] *= multiplier;
+			if (this[key] > 10) {
+				this[key] = 10;
 			}
 		}
-		return 1.5 * Math.E ** (0.15 * newCS) - 1;
 	}
-
-	function gaussianDistribution(x, a, b, c) {
-		return c / (a * Math.sqrt(2 * Math.PI)) * Math.E ** (-1 * (x - b) ** 2 / (2 * a ** 2));
-	}
-
-	/* 
-	 *	Jumps that are larger are considered more impreesive
-	 *	i.e one large jump is more impresssive than two half sized jumps
-	 *
-	 *	Sliders are also weighted slightly differently
-	*/
-	function aimDifficultyMultiplier(distance, hitObject) {
-		if (hitObject.type[1] === "1") {
-			return 1.25 * Math.E ** (Math.E * 0.0035 * distance);
-		} else {
-			return 0.75 * Math.E ** (Math.E * 0.004 * distance);
+	class BeatmapStatsCache {
+		constructor(beatmap) {
+			/* NM for nomod*/
+			this.NM = new BeatmapStats(beatmap.ApproachRate, beatmap.OverallDifficulty, beatmap.HPDrainRate, beatmap.CircleSize);
+		}
+		calculateForMods(mods) {
+			let key = Formulas.toCalculatingShorthand(mods);
+			if (this[key]) {
+				return this[key];
+			}
+			let newStats = new BeatmapStats(this.NM.od, this.NM.hp, this.NM.ar, this.NM.cs);
+			if (mods.hardRock) {
+				newStats.multiply("ApproachRate", HARD_ROCK_MULTIPLIER);
+				newStats.multiply("OverallDifficulty", HARD_ROCK_MULTIPLIER);
+				newStats.multiply("HPDrainRate", HARD_ROCK_MULTIPLIER);
+				newStats.multiply("CircleSize", HARD_ROCK_CS_MULTIPLIER);
+			}
+			if (mods.easy) {
+				newStats.multiply("ApproachRate", EASY_MULTIPLIER);
+				newStats.multiply("OverallDifficulty", EASY_MULTIPLIER);
+				newStats.multiply("HPDrainRate", EASY_MULTIPLIER);
+				newStats.multiply("CircleSize", EASY_MULTIPLIER);
+			}
+			if (mods.halfTime) {
+				newStats.multiply("speedMultiplier", 0.75);
+			}
+			if (mods.doubleTime || mods.nightcore) {
+				newStats.multiply("speedMultiplier", 1.5);
+			}
+			this[key] = newStats;
+			return this[key];
 		}
 	}
 
-	function aimDifficulty(previousHitObject, hitObject, nextHitObject, mods, circleSize) {
-		let time = Math.abs(hitObject.time - previousHitObject.time);
-		if (time >= 2) {
-			return 0;
+	function vectorMultiply(a, b) {
+		return [a[0] * b[0], a[1] * b[1]];
+	}
+
+	function vectorSubtract(a, b) {
+		return [a[0] - b[0], a[1] - b[1]];
+	}
+
+	function vectorLength(v) {
+		return Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+	}
+
+	function vectorDot(a, b) {
+		return a[0] * b[0] + a[1] * b[1];
+	}
+
+	function vectorDet(a, b) {
+		return a[0] * b[1] - a[1] * b[0];
+	}
+
+	function normaliseCircleSize(circleSize) {
+		let radius = (512 / 16) * (1 - 0.7 * (circleSize - 5) / 5);
+		let scalingFactor = 52 / radius;
+		// high circlesize (small circles) bonus
+		if (radius < CIRCLESIZE_BUFF_THRESHOLD) {
+			scalingFactor *= 1 + Math.min(CIRCLESIZE_BUFF_THRESHOLD - radius, 5) / 50;
 		}
-		let distanceBetweenObjects = 0;
-		let sliderLengthBonus = 1;
-		if (hitObject.type[1] === "1") {
-			sliderLengthBonus = sliderDifficulty(hitObject);
-			if (hitObject.type[1].slides % 2 === 1) {
-				distanceBetweenObjects = utils.dist(previousHitObject.curvePoints[previousHitObject.curvePoints.length - 1].x, previousHitObject.curvePoints[previousHitObject.curvePoints.length - 1].y, hitObject.x, hitObject.y);
+		return [scalingFactor, scalingFactor];
+	}
+
+	function initialiseObjects(beatmap) {
+		let objectDifficulties = [];
+		let circleSizeScalingVector = normaliseCircleSize(beatmap.CircleSize);
+		let normalisedCenterVector = vectorMultiply([256, 192], circleSizeScalingVector);
+		for (let i = 0; i < beatmap.hitObjects.length; i++) {
+			let objectDifficulty = new hitObjectDifficulty(JSON.parse(JSON.stringify(beatmap.hitObjects[i])));
+			let baseObject = objectDifficulty.baseObject;
+			/* spinner */
+			if (baseObject.type[3] === "1") {
+				objectDifficulty.normpos = normalisedCenterVector.slice();
 			} else {
-				distanceBetweenObjects = utils.dist(previousHitObject.x, previousHitObject.y, hitObject.x, hitObject.y);
+				objectDifficulty.normpos = vectorMultiply([baseObject.x, baseObject.y], circleSizeScalingVector);
 			}
-		} else {
-			distanceBetweenObjects = utils.dist(previousHitObject.x, previousHitObject.y, hitObject.x, hitObject.y);
+			if (i >= 2) {
+				let prev1 = objectDifficulties[i - 1];
+				let prev2 = objectDifficulties[i - 2];
+				let v1 = vectorSubtract(prev2.normpos, prev1.normpos);
+				let v2 = vectorSubtract(objectDifficulty.normpos, prev1.normpos);
+				let dot = vectorDot(v1, v2);
+				let det = vectorDet(v1, v2);
+				objectDifficulty.angle = Math.abs(Math.atan2(det, dot));
+			} else {
+				objectDifficulty.angle = null;
+			}
+			objectDifficulties.push(objectDifficulty);
 		}
-		let a = distanceBetweenObjects;
-		let b = utils.dist(hitObject.x, hitObject.y, nextHitObject.x, nextHitObject.y);
-		let c = utils.dist(previousHitObject.x, previousHitObject.y, nextHitObject.x, nextHitObject.y);
-		/* cosine rule, one of the only uses outside of school lol */
-		let angleBetweenHitobjects = Math.acos((a ** 2 + b ** 2 - c ** 2) / (2 * a * b));
-		if (isNaN(angleBetweenHitobjects)) {
-			angleBetweenHitobjects = 0;
+		return objectDifficulties;
+	}
+	class hitObjectDifficulty {
+		constructor(object) {
+			this.baseObject = object;
+			/* convert to milliseconds */
+			this.baseObject.time *= 1000;
+			this.strains = {
+				AIM: 0,
+				SPEED: 0,
+			};
+			this.normpos = [0, 0];
+			this.angle = 0;
+			this.isSingle = false;
+			this.deltaTime = 0;
+			this.dDistance = 0;
 		}
-		let angleDifficulty = -((angleBetweenHitobjects - Math.PI) ** 2) / (Math.PI ** (Math.E / 1.05)) + 1;
-		return aimDifficultyMultiplier(distanceBetweenObjects, hitObject) * 0.35 * angleDifficulty * sliderLengthBonus * CSDifficulty(circleSize, mods);
 	}
 
-	function speedDifficulty(hitObject, previousHitObject, mods) {
-		let time = Math.abs(hitObject.time - previousHitObject.time);
-		let multiplier = 0.60;
-		if (hitObject.type[1] === "1") {
-			multiplier = 0.2;
+	function calculateStrain(type, objectDifficulty, previousObjectDifficulty, speedMultiplier) {
+		let baseObject = objectDifficulty.baseObject;
+		let previousBaseObject = previousObjectDifficulty.baseObject;
+		let value = 0;
+		let timeElapsed = (baseObject.time - previousBaseObject.time) / speedMultiplier;
+		let decay = Math.pow(DECAY_BASE[type], timeElapsed / 1000);
+		objectDifficulty.deltaTime = timeElapsed;
+		if (baseObject.type[3] !== "1") {
+			let distance = vectorLength(vectorSubtract(objectDifficulty.normpos, previousObjectDifficulty.normpos));
+			objectDifficulty.dDistance = distance;
+			if (type === "SPEED") {
+				objectDifficulty.isSingle = distance > SINGLE_SPACING;
+			}
+			value = spacingWeight(type, distance, timeElapsed, previousObjectDifficulty.dDistance, previousObjectDifficulty.deltaTime, objectDifficulty.angle);
+			value *= WEIGHT_SCALING[type];
 		}
-		if (time < 1 / 60) {
-			time = 1 / 60;
-		}
-		if (mods.doubleTime || mods.nightCore) {
-			time /= 1.5;
-		} else if (mods.halfTime) {
-			time /= 0.75;
-		}
-		return multiplier / (time);
+		objectDifficulty.strains[type] = previousObjectDifficulty.strains[type] * decay + value;
 	}
 
-	return {
-		calculate: function(beatmap, mods) {
-			if (mods === undefined) {
-				mods = Mods();
-			}
-			if (beatmap.hitObjects.length <= 4) {
-				return 0;
-			}
-			let aimDiff = this.calculateAimDifficulty(beatmap, mods);
-			let speedDiff = this.calculateSpeedDifficulty(beatmap, mods);
-			return (aimDiff + speedDiff);
-		},
-		calculateAimDifficulty: function(beatmap, mods) {
-			if (mods === undefined) {
-				mods = Mods();
-			}
-			let sum = 0;
-			let highest = 0;
-			for (var i = 1; i < beatmap.hitObjects.length - 1; i++) {
-				let difficulty = aimDifficulty(beatmap.hitObjects[i], beatmap.hitObjects[i - 1], beatmap.hitObjects[i + 1], mods, beatmap.CircleSize);
-				sum += difficulty;
-				if (difficulty > highest) {
-					highest = difficulty;
+	function spacingWeight(type, distance, deltaTime, previousDistance, previousDeltaTime, angle) {
+		let angleBonus;
+		let strain_time = Math.max(deltaTime, 50);
+		switch (type) {
+			case "AIM": {
+				let prev_strain_time = Math.max(previousDeltaTime, 50);
+				let result = 0;
+				if (angle !== null && angle > AIM_ANGLE_BONUS_BEGIN) {
+					angleBonus = Math.sqrt(Math.max(previousDistance - ANGLE_BONUS_SCALE, 0) * Math.pow(Math.sin(angle - AIM_ANGLE_BONUS_BEGIN), 2) * Math.max(distance - ANGLE_BONUS_SCALE, 0));
+					result = 1.5 * Math.pow(Math.max(0, angleBonus), 0.99) / Math.max(AIM_TIMING_THRESHOLD, prev_strain_time);
 				}
+				let weightedDistance = Math.pow(distance, 0.99);
+				return Math.max(result + weightedDistance / Math.max(AIM_TIMING_THRESHOLD, strain_time), weightedDistance / strain_time);
 			}
-			return (sum / (beatmap.hitObjects.length - 1) + highest / 20) * aimWeightMultiplier;
-		},
-		calculateSpeedDifficulty: function(beatmap, mods) {
-			if (mods === undefined) {
-				mods = Mods();
-			}
-			let sum = 0;
-			let numberOfConsideredHitObjects = 0;
-			let highest = 0;
-			for (var i = 1; i < beatmap.hitObjects.length; i++) {
-				if (beatmap.hitObjects[i].type[3] === "1") {
-					continue;
+			case "SPEED": {
+				distance = Math.min(distance, SINGLE_SPACING);
+				deltaTime = Math.max(deltaTime, MAX_SPEED_BONUS);
+				let speedBonus = 1;
+				if (deltaTime < MIN_SPEED_BONUS) {
+					speedBonus += Math.pow((MIN_SPEED_BONUS - deltaTime) / 40, 2);
 				}
-				if (beatmap.hitObjects[i - 1].type[3] === "1") {
-					continue;
-				}
-				if (Math.abs(beatmap.hitObjects[i].time - beatmap.hitObjects[i - 1].time) < 2) {
-					let difficulty = speedDifficulty(beatmap.hitObjects[i], beatmap.hitObjects[i - 1], mods);
-					sum += difficulty;
-					if (difficulty > highest) {
-						highest = difficulty;
+				angleBonus = 1;
+				if (angle !== null && angle < SPEED_ANGLE_BONUS_BEGIN) {
+					let s = Math.sin(1.5 * (SPEED_ANGLE_BONUS_BEGIN - angle));
+					angleBonus += Math.pow(s, 2) / 3.57;
+					if (angle < Math.PI / 2) {
+						angleBonus = 1.28;
+						if (distance < ANGLE_BONUS_SCALE && angle < Math.PI / 4) {
+							angleBonus += (1 - angleBonus) * Math.min((ANGLE_BONUS_SCALE - distance) / 10, 1);
+						} else if (distance < ANGLE_BONUS_SCALE) {
+							angleBonus += (1 - angleBonus) * Math.min((ANGLE_BONUS_SCALE - distance) / 10, 1) * Math.sin((Math.PI / 2 - angle) * 4 / Math.PI);
+						}
 					}
 				}
-				numberOfConsideredHitObjects++;
+				return (1 + (speedBonus - 1) * 0.75) * angleBonus * (0.95 + speedBonus * Math.pow(distance / SINGLE_SPACING, 3.5)) / strain_time;
 			}
-			return (sum / numberOfConsideredHitObjects + highest / 20) * speedWeightMultiplier;
-		},
+		}
 	}
+
+	function calculateDifficulty(type, objectDifficulties, speedMultiplier) {
+		let strains = [];
+		let strainStep = STRAIN_STEP * speedMultiplier;
+		let intervalEnd = Math.ceil(objectDifficulties[0].baseObject.time / strainStep) * strainStep;
+		let maxStrain = 0;
+		for (let i = 0; i < objectDifficulties.length; i++) {
+			if (i > 0) {
+				calculateStrain(type, objectDifficulties[i], objectDifficulties[i - 1], speedMultiplier);
+			}
+			while (objectDifficulties[i].baseObject.time > intervalEnd) {
+				strains.push(Math.round(maxStrain));
+				if (i > 0) {
+					let decay = Math.pow(DECAY_BASE[type], (intervalEnd - objectDifficulties[i - 1].baseObject.time) / 1000);
+					maxStrain = objectDifficulties[i - 1].strains[type] * decay;
+				} else {
+					maxStrain = 0;
+				}
+				intervalEnd += strainStep;
+			}
+			maxStrain = Math.max(maxStrain, objectDifficulties[i].strains[type]);
+		}
+		strains.push(Math.round(maxStrain));
+		let weight = 1;
+		let total = 0;
+		let difficulty = 0;
+		strains.sort(function(a, b) {
+			return b - a;
+		});
+		console.log(type + ": " + strains);
+		for (let i = 0; i < strains.length; i++) {
+			total += Math.pow(strains[i], 1.2);
+			difficulty += strains[i] * weight;
+			weight *= DECAY_WEIGHT;
+		}
+		return difficulty;
+	}
+	return {
+		calculate: function(beatmap, mods) {
+			let baseStats = new BeatmapStatsCache(beatmap);
+			let stats = baseStats.calculateForMods(mods);
+			let objectDifficulties = initialiseObjects(beatmap);
+			let speed = Math.sqrt(calculateDifficulty("SPEED", objectDifficulties, stats.speedMultiplier)) * STAR_SCALING_FACTOR;
+			let aim = Math.sqrt(calculateDifficulty("AIM", objectDifficulties, stats.speedMultiplier)) * STAR_SCALING_FACTOR;
+			return (aim + speed + Math.abs(speed - aim) * EXTREME_SCALING_FACTOR);
+		},
+	};
 });

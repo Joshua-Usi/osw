@@ -48,7 +48,10 @@ define(function(require) {
 		console.warn("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
 	}
 	/* osw! version incremented manually */
-	const version = "osw! v0.8.1b";
+	const MAJOR_VERSION = 0;
+	const MINOR_VERSION = 9;
+	const PATCH_VERSION = 0;
+	const version = `osw! v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}b`;
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {

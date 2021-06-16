@@ -1,6 +1,11 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v0.9.0b] - 16-06-2021
+### Changed
+- Star rating is now correct as of 16-06-2021. it is an osw! compatible rewrite of [ojsama]https://github.com/Francesco149/ojsama
+- Circle size now uses the correct formula rather than an empirical formula
+---
 ## [v0.8.1b] - 7-06-2021
 ### Changed
 - Misses to now have their own animation
@@ -15,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Deleting beatmaps (albeit all beatmaps)
 - Background dimming
 - Background support
-- **NOT FULLY SUPPORTED**If there is no background, added text saying "Deleting backgrounds makes osu! ANGGGGGGGRRRRRRRRRRYYYYYYYYYYYYYYYY! Please use the "Background Dim" setting instead." (keep a legacy going because of this [snowflake](https://github.com/ppy/osu-stable-issues/issues/688))
+- **NOT FULLY SUPPORTED** If there is no background, added text saying "Deleting backgrounds makes osu! ANGGGGGGGRRRRRRRRRRYYYYYYYYYYYYYYYY! Please use the "Background Dim" setting instead." (keep a legacy going because of this [snowflake](https://github.com/ppy/osu-stable-issues/issues/688))
 ### Changed
 - Star rating slightly (will probably work on in v0.9.0b)
 - Combined Gameplay and GameplayRendering options to just Gameplay
