@@ -46,7 +46,7 @@ define(function(require) {
 	}
 	class BeatmapStatsCache {
 		constructor(beatmap) {
-			/* NM for nomod*/
+			/* NM for nomod */
 			this.NM = new BeatmapStats(beatmap.ApproachRate, beatmap.OverallDifficulty, beatmap.HPDrainRate, beatmap.CircleSize);
 		}
 		calculateForMods(mods) {
@@ -239,7 +239,6 @@ define(function(require) {
 		strains.sort(function(a, b) {
 			return b - a;
 		});
-		console.log(type + ": " + strains);
 		for (let i = 0; i < strains.length; i++) {
 			total += Math.pow(strains[i], 1.2);
 			difficulty += strains[i] * weight;
@@ -248,6 +247,9 @@ define(function(require) {
 		return difficulty;
 	}
 	return {
+		version: function() {
+			return 1;
+		},
 		calculate: function(beatmap, mods) {
 			let baseStats = new BeatmapStatsCache(beatmap);
 			let stats = baseStats.calculateForMods(mods);

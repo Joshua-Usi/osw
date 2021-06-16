@@ -36,7 +36,8 @@ define(function(require) {
 	require("./src/scripts/modsUI.js");
 	const Mods = require("./src/scripts/mods.js");
 	const Formulas = require("./src/scripts/formulas.js");
-	const cacheManager = require("./src/scripts/cacheManager.js");
+	const CacheManager = require("./src/scripts/CacheManager.js");
+	const StarRating = require("./src/scripts/starRating.js");
 	if (!window.localStorage) {
 		console.warn("LocalStorage is not supported on this browser. You will not be able to save your options");
 	}
@@ -86,7 +87,7 @@ define(function(require) {
 			}
 			let database = window.indexedDB.open("osw-database");
 			database.addEventListener("success", function(event) {
-				let beatmapCache = cacheManager.getCache("beatmapCache");
+				let beatmapCache = CacheManager.getCache("beatmapCache");
 				let database = event.target.result;
 				let audioObjectStore = databaseManager.getObjectStore(database, "audio", "readonly");
 				let audioRequest = audioObjectStore.get(details.getAttribute("data-audio-source"));
@@ -115,7 +116,7 @@ define(function(require) {
 		for (let i = 0; i < selectedModElements.length; i++) {
 			selectedMods[selectedModElements[i].id.replace("mod-", "")] = true;
 		}
-		let beatmapCache = cacheManager.getCache("beatmapCache");
+		let beatmapCache = CacheManager.getCache("beatmapCache");
 		if (lastElementClicked != element) {
 			setDifficultyBars(beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")], selectedMods);
 			setStatisticValues(beatmapCache[element.getAttribute("data-group-index")], beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")], selectedMods);
@@ -224,13 +225,14 @@ define(function(require) {
 		document.getElementById("beatmap-statistics-spinner-count").textContent = map.objectCounts.spinners;
 	}
 	/* if cache already exist, then use it */
-	if (localStorage.getItem("beatmapCache") && localStorage.getItem("beatmapCache") !== "[]") {
+	if ((localStorage.getItem("beatmapCache") && localStorage.getItem("beatmapCache") !== "[]") || parseInt(localStorage.getItem("beatmapCacheVersion")) !== StarRating.version()) {
 		/* Beatmap loading and adding to dom */
 		let concatenated = "";
-		let cache = cacheManager.getCache("beatmapCache");
+		let cache = CacheManager.getCache("beatmapCache");
 		for (let i = 0; i < cache.length; i++) {
 			concatenated += BeatMapSelectionPaneTemplate.group(cache[i], i);
 		}
+		localStorage.setItem("beatmapCacheVersion", StarRating.version());
 		document.getElementById("beatmap-selection-right").innerHTML = concatenated;
 	} else {
 		Beatmaps.refresh();
@@ -242,9 +244,10 @@ define(function(require) {
 			let loadedMaps = Beatmaps.get();
 			/* Beatmap loading and adding to dom */
 			let concatenated = "";
-			let cache = cacheManager.generate(loadedMaps);
+			let cache = CacheManager.generate(loadedMaps);
 			if (cache.length > 0) {
-				cacheManager.setCache("beatmapCache", cache);
+				CacheManager.setCache("beatmapCache", cache);
+				CacheManager.setCache("beatmapCacheVersion", StarRating.version());
 			}
 			for (let i = 0; i < cache.length; i++) {
 				concatenated += BeatMapSelectionPaneTemplate.group(cache[i], i);
@@ -369,7 +372,7 @@ define(function(require) {
 	/* Accumulators */
 	let time = 0;
 	let previousTime = 0;
-	let gameplayRenderAccumulator = new utils.Accumulator(gameplay.render, 1000 / 60);
+	let gameplayRenderAccumulator = new utils.Accumulator(gameplay.render, /*1000 / 60*/ 0);
 	let logoBeatAccumulator;
 	let beatmapQueue = [];
 	let audioQueue = [];
@@ -542,7 +545,7 @@ define(function(require) {
 					Beatmaps.addNewMaps(beatmapQueue);
 					loadedNewMaps = false;
 				} else if (loadedNewMaps === false) {
-					cacheManager.deleteCache("beatmapCache");
+					CacheManager.deleteCache("beatmapCache");
 					Beatmaps.refresh();
 					loadMaps();
 					loadedNewMaps = true;
@@ -819,14 +822,14 @@ define(function(require) {
 		}
 	});
 	document.getElementById("settings-button-delete-beatmap-cache").addEventListener("click", function() {
-		cacheManager.deleteCache("beatmapCache");
+		CacheManager.deleteCache("beatmapCache");
 		window.alert("beatmap cache cleared, the webpage will now refresh");
 		location.reload();
 	});
 	document.getElementById("settings-button-delete-all-beatmaps").addEventListener("click", function() {
 		if (window.confirm("Are you sure you want to delete all beatmaps? this option is not undoable")) {
 			let database = window.indexedDB.open("osw-database");
-			cacheManager.deleteCache("beatmapCache");
+			CacheManager.deleteCache("beatmapCache");
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
 				const toDelete = ["beatmaps", "audio", "images"];
