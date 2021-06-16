@@ -225,7 +225,7 @@ define(function(require) {
 		document.getElementById("beatmap-statistics-spinner-count").textContent = map.objectCounts.spinners;
 	}
 	/* if cache already exist, then use it */
-	if ((localStorage.getItem("beatmapCache") && localStorage.getItem("beatmapCache") !== "[]") || parseInt(localStorage.getItem("beatmapCacheVersion")) !== StarRating.version()) {
+	if ((localStorage.getItem("beatmapCache") && localStorage.getItem("beatmapCache") !== "[]") || parseInt(localStorage.getItem("beatmapCacheVersion")) === StarRating.version()) {
 		/* Beatmap loading and adding to dom */
 		let concatenated = "";
 		let cache = CacheManager.getCache("beatmapCache");
