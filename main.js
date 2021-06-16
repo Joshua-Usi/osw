@@ -225,16 +225,16 @@ define(function(require) {
 		document.getElementById("beatmap-statistics-spinner-count").textContent = map.objectCounts.spinners;
 	}
 	/* if cache already exist, then use it */
-	if ((localStorage.getItem("beatmapCache") && localStorage.getItem("beatmapCache") !== "[]") || parseInt(localStorage.getItem("beatmapCacheVersion")) === StarRating.version()) {
+	if (localStorage.getItem("beatmapCache") && localStorage.getItem("beatmapCache") !== "[]" && parseInt(localStorage.getItem("beatmapCacheVersion")) === StarRating.version()) {
 		/* Beatmap loading and adding to dom */
 		let concatenated = "";
 		let cache = CacheManager.getCache("beatmapCache");
 		for (let i = 0; i < cache.length; i++) {
 			concatenated += BeatMapSelectionPaneTemplate.group(cache[i], i);
 		}
-		localStorage.setItem("beatmapCacheVersion", StarRating.version());
 		document.getElementById("beatmap-selection-right").innerHTML = concatenated;
 	} else {
+		localStorage.setItem("beatmapCacheVersion", StarRating.version());
 		Beatmaps.refresh();
 		loadMaps();
 	}
