@@ -1,6 +1,6 @@
 define(function(require) {
   "use strict";
-	const Formulas = require("./Formulas.js");
+	const Formulas = require("./formulas.js");
 	const mods = new require("./mods.js");
 	let isOpen = false;
 	let elements = document.getElementsByClassName("mod-icons");
