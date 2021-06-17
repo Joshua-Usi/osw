@@ -56,7 +56,6 @@ define(function(require) {
 						this.keyMap[keyData[i]] = i;
 					}
 				}
-				console.log(this.keyMap);
 			})();
 			const that = this;
 			this.keydown = function(e) {

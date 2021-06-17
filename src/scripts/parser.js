@@ -200,7 +200,7 @@ define(function(require) {
 			return new HitObject.TimingPoint(...splited);
 		},
 		parseComboColour: function(data) {
-			let splitTriplets = data.split"")[1].split(",");
+			let splitTriplets = data.split(":")[1].split(",");
 			return {
 				r: parseInt(splitTriplets[0]),
 				g: parseInt(splitTriplets[1]),
@@ -220,12 +220,12 @@ define(function(require) {
 		},
 		defaultComboColours: function() {
 			return [
-				this.parseComboColour"255,213,128"),
-				this.parseComboColour"242,121,97"),
-				this.parseComboColour"255,140,179"),
-				this.parseComboColour"187,103,229"),
-				this.parseComboColour"140,236,255"),
-				this.parseComboColour"145,229,103"),
+				this.parseComboColour(":255,213,128"),
+				this.parseComboColour(":242,121,97"),
+				this.parseComboColour(":255,140,179"),
+				this.parseComboColour(":187,103,229"),
+				this.parseComboColour(":140,236,255"),
+				this.parseComboColour(":145,229,103"),
 			];
 		},
 	};
