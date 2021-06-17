@@ -1,7 +1,6 @@
 define(function(require) {
 	"use strict";
-	const databaseManager = require("./databaseManager.js");
-	const starRating = require("./starRating.js");
+	const DatabaseManager = require("./databaseManager.js");
 	let fetchedMaps = [];
 	let mapsLoaded = 0;
 	let beatmapsSorted = [];
@@ -50,7 +49,7 @@ define(function(require) {
 	});
 
 	function fetchMaps(database) {
-		databaseManager.getAllInDatabase(database, "beatmaps", returns);
+		DatabaseManager.getAllInDatabase(database, "beatmaps", returns);
 		function checkComplete() {
 			if (returns.complete && fullyCompletedLoading === false) {
 				returns.values.sort(function (a, b) {
@@ -112,7 +111,7 @@ define(function(require) {
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
 				while (beatmapQueue.length > 0) {
-					databaseManager.addToDatabase(database, "beatmaps", beatmapQueue[0].name, beatmapQueue[0].data);
+					DatabaseManager.addToDatabase(database, "beatmaps", beatmapQueue[0].name, beatmapQueue[0].data);
 					fetchedMaps.push(beatmapQueue[0].data);
 					beatmapQueue.splice(0, 1);
 				}
@@ -126,7 +125,7 @@ define(function(require) {
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
 				while (audioQueue.length > 0) {
-					databaseManager.addToDatabase(database, "audio", audioQueue[0].name, audioQueue[0].data);
+					DatabaseManager.addToDatabase(database, "audio", audioQueue[0].name, audioQueue[0].data);
 					audioQueue.splice(0, 1);
 				}
 			});
@@ -139,7 +138,7 @@ define(function(require) {
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
 				while (imageQueue.length > 0) {
-					databaseManager.addToDatabase(database, "images", imageQueue[0].name, imageQueue[0].data);
+					DatabaseManager.addToDatabase(database, "images", imageQueue[0].name, imageQueue[0].data);
 					imageQueue.splice(0, 1);
 				}
 			});
@@ -149,7 +148,7 @@ define(function(require) {
 			beatmapsSorted = [];
 			beatMapGroups = [];
 			previous = "";
-			new DatabaseData();
+			returns = new DatabaseData();
 		}
 	};
 });

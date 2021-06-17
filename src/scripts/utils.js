@@ -8,7 +8,7 @@ define(function(require) {
 		}
 		return total;
 	}
-	/* precompute factorials for performance*/
+	/* precompute factorials for performance */
 	for (let i = 0; i < 170; i++) {
 		precomputedFactorials.push(precomputeFactorial(i));
 	}
@@ -48,7 +48,7 @@ define(function(require) {
 			return s;
 		},
 		binary: function(number, length) {
-			let asBinary = (number >>> 0).toString(2);
+			let asBinary = (number).toString(2);
 			while (asBinary.length <= length) {
 				asBinary = "0" + asBinary;
 			}
@@ -68,18 +68,20 @@ define(function(require) {
 				return false;
 			}
 		},
-		// To find orientation of ordered triplet (p1, p2, p3). 
-		// The function returns following values 
-		// 0 --> p, q and r are colinear 
-		// 1 --> Clockwise 
-		// -1 --> Counterclockwise 
+		/*
+		 *	To find orientation of ordered triplets (p1, p2, p3). 
+		 *	The function returns following values 
+		 *	0 --> p, q and r are colinear 
+		 *	1 --> Clockwise 
+		 *	-1 --> Counterclockwise
+		 */
 		orientation: function(p1, p2, p3) {
 			let val = (p2.y - p1.y) * (p3.x - p2.x) - (p2.x - p1.x) * (p3.y - p2.y);
-			// colinear
+			/* collinear */
 			if (val == 0) {
 				return 0;
 			}
-			// clock or counterclock wise 
+			/* clock or counterclock wise */ 
 			return (val > 0) ? 1 : - 1;
 		},
 		/* 90 sided circle */
@@ -216,7 +218,7 @@ define(function(require) {
 			};
 		},
 		formatDate: function(day, month, year, hour, minute) {
-			let monthWords = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", ];
+			const monthWords = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", ];
 			if (hour.toString().length === 1) {
 				hour = "0" + hour;
 			}

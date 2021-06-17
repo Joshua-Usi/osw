@@ -1,5 +1,5 @@
 define(function(require) {
-	const starRating = require("./starRating.js");
+	const StarRating = require("./starRating.js");
 	const Formulas = require("./formulas.js");
 	const that = {
 		generate(maps) {
@@ -46,7 +46,7 @@ define(function(require) {
 				this.circleSize = beatmap.data.CircleSize;
 				this.overallDifficulty = beatmap.data.OverallDifficulty
 				this.healthDrain = beatmap.data.HPDrainRate;
-				this.starRating = starRating.calculate(beatmap.data);
+				this.starRating = StarRating.calculate(beatmap.data);
 				this.beatLength = beatmap.data.timingPoints[0].beatLength * 1000;
 				this.backgroundFilename = (beatmap.data.background) ? beatmap.data.background.filename : "";
 				this.objectCounts = Formulas.getObjectCount(beatmap.data);

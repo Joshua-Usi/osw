@@ -66,14 +66,14 @@ define(function(require) {
 				loadImage(`./src/images/skins/${skin}/hit0.png`),
 			];
 			this.grades = {
-				"xh": loadImage(`./src/images/skins/${skin}/ranking-xh-small.png`),
-				"x": loadImage(`./src/images/skins/${skin}/ranking-x-small.png`),
-				"sh": loadImage(`./src/images/skins/${skin}/ranking-sh-small.png`),
-				"s": loadImage(`./src/images/skins/${skin}/ranking-s-small.png`),
-				"a": loadImage(`./src/images/skins/${skin}/ranking-a-small.png`),
-				"b": loadImage(`./src/images/skins/${skin}/ranking-b-small.png`),
-				"c": loadImage(`./src/images/skins/${skin}/ranking-c-small.png`),
-				"d": loadImage(`./src/images/skins/${skin}/ranking-d-small.png`),
+				xh: loadImage(`./src/images/skins/${skin}/ranking-xh-small.png`),
+				x: loadImage(`./src/images/skins/${skin}/ranking-x-small.png`),
+				sh: loadImage(`./src/images/skins/${skin}/ranking-sh-small.png`),
+				s: loadImage(`./src/images/skins/${skin}/ranking-s-small.png`),
+				a: loadImage(`./src/images/skins/${skin}/ranking-a-small.png`),
+				b: loadImage(`./src/images/skins/${skin}/ranking-b-small.png`),
+				c: loadImage(`./src/images/skins/${skin}/ranking-c-small.png`),
+				d: loadImage(`./src/images/skins/${skin}/ranking-d-small.png`),
 			};
 		}
 	};

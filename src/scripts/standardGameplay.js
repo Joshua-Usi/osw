@@ -1127,7 +1127,7 @@ define(function(require) {
 				flashlightSize = utils.map(100, 0, 512, 0, window.innerWidth);
 			}
 
-			if (keyboard.getKeyDown("esc")) {
+			if (keyboard.getKeyDown("escape")) {
 				document.getElementById("webpage-state-pause-screen").style.display = "block";
 				audio.pause();
 				exitPointerLock();

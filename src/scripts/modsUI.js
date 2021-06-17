@@ -1,6 +1,6 @@
 define(function(require) {
   "use strict";
-	const formulas = require("./formulas.js");
+	const Formulas = require("./Formulas.js");
 	const mods = new require("./mods.js");
 	let isOpen = false;
 	let elements = document.getElementsByClassName("mod-icons");
@@ -14,7 +14,7 @@ define(function(require) {
 				this.classList.add("mod-selected");
 				mods[modName] = true;
 			}
-			document.getElementById("mod-score-multiplier").innerHTML = `Score Multiplier: <b>${formulas.modScoreMultiplier(mods).toFixed(2)}x</b>`;
+			document.getElementById("mod-score-multiplier").innerHTML = `Score Multiplier: <b>${Formulas.modScoreMultiplier(mods).toFixed(2)}x</b>`;
 		});
 	}
 	let el = [

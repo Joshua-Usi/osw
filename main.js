@@ -26,17 +26,17 @@ define(function(require) {
 	/* RequireJS Module Loading */
 	const Options = require("./src/scripts/options.js");
 	const AudioManager = new(require("./src/scripts/audioManager.js"))();
-	const utils = require("./src/scripts/utils.js");
+	const Utils = require("./src/scripts/utils.js");
 	const Beatmaps = require("./src/scripts/beatmapFetcher.js");
 	const BeatMapSelectionPaneTemplate = require("./src/scripts/beatMapSelectionPane.js");
-	const gameplay = require("./src/scripts/gameplay.js");
-	const introSequence = require("./src/scripts/introSequence.js");
-	const databaseManager = require("./src/scripts/databaseManager.js");
+	const GameplayHandler = require("./src/scripts/standardGameplay.js");
+	const IntroSequence = require("./src/scripts/introSequence.js");
+	const DatabaseManager = require("./src/scripts/databaseManager.js");
 	const Parser = require("./src/scripts/parser.js");
 	require("./src/scripts/modsUI.js");
 	const Mods = require("./src/scripts/mods.js");
 	const Formulas = require("./src/scripts/formulas.js");
-	const CacheManager = require("./src/scripts/CacheManager.js");
+	const CacheManager = require("./src/scripts/cacheManager.js");
 	const StarRating = require("./src/scripts/starRating.js");
 	if (!window.localStorage) {
 		console.warn("LocalStorage is not supported on this browser. You will not be able to save your options");
@@ -89,7 +89,7 @@ define(function(require) {
 			database.addEventListener("success", function(event) {
 				let beatmapCache = CacheManager.getCache("beatmapCache");
 				let database = event.target.result;
-				let audioObjectStore = databaseManager.getObjectStore(database, "audio", "readonly");
+				let audioObjectStore = DatabaseManager.getObjectStore(database, "audio", "readonly");
 				let audioRequest = audioObjectStore.get(details.getAttribute("data-audio-source"));
 				audioRequest.addEventListener("error", function(event) {
 					console.error(`Attempt to find query failed: ${event.target.error}`);
@@ -129,7 +129,7 @@ define(function(require) {
 				let database = window.indexedDB.open("osw-database");
 				database.addEventListener("success", function(event) {
 					let database = event.target.result;
-					let imageObjectStore = databaseManager.getObjectStore(database, "images", "readonly");
+					let imageObjectStore = DatabaseManager.getObjectStore(database, "images", "readonly");
 					let imageRequest = imageObjectStore.get(element.getAttribute("data-image-filename"));
 					imageRequest.addEventListener("error", function(event) {
 						console.error(`Attempt to find query failed: ${event.target.error}`);
@@ -146,7 +146,7 @@ define(function(require) {
 							}
 							document.getElementById("beatmap-image").style.backgroundImage = `url("data:image/${imageType};base64,${event.target.result.data}")`;
 							document.getElementById("background").src = `data:image/${imageType};base64,${event.target.result.data}`;
-							document.getElementById("background").style.filter = `blur(${utils.map(Options.getProperty("UserInterface", "backgroundBlur"), 0, 1, 0, 16)}px)`;
+							document.getElementById("background").style.filter = `blur(${Utils.map(Options.getProperty("UserInterface", "backgroundBlur"), 0, 1, 0, 16)}px)`;
 						} else {
 							document.getElementById("beatmap-image").style.backgroundImage = `url("./src/images/osw-background.png")`;
 							document.getElementById("background").src = "./src/images/osw-background.png";
@@ -159,20 +159,20 @@ define(function(require) {
 			let database = window.indexedDB.open("osw-database");
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
-				let beatmapObjectStore = databaseManager.getObjectStore(database, "beatmaps", "readonly");
+				let beatmapObjectStore = DatabaseManager.getObjectStore(database, "beatmaps", "readonly");
 				let beatmapRequest = beatmapObjectStore.get(beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")].databaseKey);
 				beatmapRequest.addEventListener("error", function(event) {
 					console.error(`Attempt to find query failed: ${event.target.error}`);
 				});
 				beatmapRequest.addEventListener("success", function(event) {
-					utils.showWebpageStates(["webpage-state-gameplay", ]);
-					utils.hideWebpageStates(["webpage-state-menu", "webpage-state-beatmap-selection", "webpage-state-mods", "webpage-state-pause-screen", "webpage-state-fail-screen", "webpage-state-results-screen", "top-bar", "bottom-bar", ]);
+					Utils.showWebpageStates(["webpage-state-gameplay"]);
+					Utils.hideWebpageStates(["webpage-state-menu", "webpage-state-beatmap-selection", "webpage-state-mods", "webpage-state-pause-screen", "webpage-state-fail-screen", "webpage-state-results-screen", "top-bar", "bottom-bar", ]);
 					document.getElementById("sidenav").style.width = "0";
 					document.getElementById("sidenav").style.opacity = "0.2";
 					menuAudio.pause();
-					/* reset */
+					/* reset audio time */
 					menuAudio.currentTime = 0;
-					gameplay.playMap(event.target.result.data, selectedMods);
+					GameplayHandler.playMap(event.target.result.data, selectedMods);
 				});
 			});
 		}
@@ -202,8 +202,8 @@ define(function(require) {
 				let multiplier = (key[i] === "circleSize") ? 1.3 : 1.4;
 				difficultyValue = Formulas.applyModMultiplier(map[key[i]], mods, multiplier);
 			}
-			document.getElementById(parts[i] + "-difficulty").style.width = utils.clamp(difficultyValue, 0, 10) + "vw";
-			document.getElementById(parts[i] + "-difficulty-value").textContent = utils.roundDigits(difficultyValue, 2);
+			document.getElementById(parts[i] + "-difficulty").style.width = Utils.clamp(difficultyValue, 0, 10) + "vw";
+			document.getElementById(parts[i] + "-difficulty-value").textContent = Utils.roundDigits(difficultyValue, 2);
 		}
 	}
 
@@ -218,7 +218,7 @@ define(function(require) {
 		document.getElementById("beatmap-statistics-title").textContent = group.title;
 		document.getElementById("beatmap-statistics-artist").textContent = group.artist;
 		document.getElementById("beatmap-statistics-creator").textContent = group.creator;
-		document.getElementById("beatmap-statistics-drain-time").textContent = utils.secondsToMinuteSeconds(map.drainTime);
+		document.getElementById("beatmap-statistics-drain-time").textContent = Utils.secondsToMinuteSeconds(map.drainTime);
 		document.getElementById("beatmap-statistics-bpm").textContent = Math.round(60000 / (map.beatLength / multiplier));
 		document.getElementById("beatmap-statistics-circle-count").textContent = map.objectCounts.circles;
 		document.getElementById("beatmap-statistics-slider-count").textContent = map.objectCounts.sliders;
@@ -372,7 +372,7 @@ define(function(require) {
 	/* Accumulators */
 	let time = 0;
 	let previousTime = 0;
-	let gameplayRenderAccumulator = new utils.Accumulator(gameplay.render, /*1000 / 60*/ 0);
+	let gameplayRenderAccumulator = new Utils.Accumulator(GameplayHandler.render, /*1000 / 60*/ 0);
 	let logoBeatAccumulator;
 	let beatmapQueue = [];
 	let audioQueue = [];
@@ -393,19 +393,19 @@ define(function(require) {
 			AudioManager.load("sliderbar", "./src/audio/effects/sliderbar.wav", "effects", true);
 			AudioManager.load("menu-hit", "./src/audio/effects/menu-hit.wav", "effects", true);
 			let userOptions = Options.read();
-			introSequence.animate();
+			IntroSequence.animate();
 			/* Setting settings */
 			let index = 0;
 			for (let group in userOptions) {
 				if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object" && group !== "types") {
 					for (let setting in userOptions[group]) {
 						if (userOptions[group].hasOwnProperty(setting)) {
-							let element = document.getElementById("settings-" + utils.camelCaseToDash(setting));
+							let element = document.getElementById("settings-" + Utils.camelCaseToDash(setting));
 							switch (userOptions.types[index]) {
 								case "slider":
-									let mapped = utils.map(userOptions[group][setting], 0, 1, element.min, element.max);
+									let mapped = Utils.map(userOptions[group][setting], 0, 1, element.min, element.max);
 									if (setting === "sliderResolution") {
-										mapped = utils.map(mapped, 10, 14, 1, 5);
+										mapped = Utils.map(mapped, 10, 14, 1, 5);
 									}
 									element.value = Math.round(mapped);
 									element.dispatchEvent(new CustomEvent("input"));
@@ -428,7 +428,7 @@ define(function(require) {
 			settingsSet = true;
 			chosenSong = 0;
 			menuAudio.src = `src/audio/${songs[chosenSong]}`;
-			logoBeatAccumulator = new utils.Accumulator(logoBeat, defaultSongsMs[chosenSong]);
+			logoBeatAccumulator = new Utils.Accumulator(logoBeat, defaultSongsMs[chosenSong]);
 			menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 			menuAudio.play();
 			isFirstClick = false;
@@ -448,7 +448,7 @@ define(function(require) {
 					audioAnalyserData = new Uint8Array(analyser.frequencyBinCount);
 					analyser.getByteFrequencyData(audioAnalyserData); // passing our Uint audioAnalyserData array
 					audioAnalyserData = [...audioAnalyserData];
-					loudness = utils.sum(audioAnalyserData);
+					loudness = Utils.sum(audioAnalyserData);
 					visualiserOffset += 12;
 					ctx.clearRect(0, 0, audioVisualiser.width, audioVisualiser.height);
 					if (logoSize === 70) {
@@ -470,10 +470,10 @@ define(function(require) {
 							continue;
 						}
 						let mag = (visualiserData[i] ** 1.6 / (255 ** 0.7) + 100);
-						let angle = utils.map(i, 0, visualiserData.length, Math.PI, 3 * Math.PI);
+						let angle = Utils.map(i, 0, visualiserData.length, Math.PI, 3 * Math.PI);
 						/* optimised rendering by not rendering parts of lines that are unseen */
 						ctx.moveTo(audioVisualiser.width / 2 + Math.sin(angle) * audioVisualiser.width / 4, audioVisualiser.height / 2 + Math.cos(angle) * audioVisualiser.height / 4);
-						ctx.lineTo(audioVisualiser.width / 2 + Math.sin(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2), audioVisualiser.height / 2 + Math.cos(angle) * utils.map(mag, 0, 255, 0, audioVisualiser.width / 2));
+						ctx.lineTo(audioVisualiser.width / 2 + Math.sin(angle) * Utils.map(mag, 0, 255, 0, audioVisualiser.width / 2), audioVisualiser.height / 2 + Math.cos(angle) * Utils.map(mag, 0, 255, 0, audioVisualiser.width / 2));
 					}
 					ctx.stroke();
 					/* beat detection */
@@ -526,8 +526,8 @@ define(function(require) {
 				} else if (maxFramerate === "Browser maximum (250fps)") {
 					gameplayRenderAccumulator.milliseconds = 1000 / 250;
 				}
-				if (gameplay.isRunning()) {
-					gameplay.tick();
+				if (GameplayHandler.isRunning()) {
+					GameplayHandler.tick();
 					gameplayRenderAccumulator.tick(time - previousTime);
 				}
 				if (logoBeatAccumulator && menuAudio.paused === false) {
@@ -552,7 +552,7 @@ define(function(require) {
 				}
 				previousTime = time;
 				time = Date.now();
-				if (gameplay.isRunning()) {
+				if (GameplayHandler.isRunning()) {
 					setTimeout(animate, 0);
 				} else {
 					requestAnimationFrame(animate);
@@ -594,8 +594,8 @@ define(function(require) {
 	});
 	window.addEventListener("blur", function() {
 		if (document.getElementById("webpage-state-gameplay").style.display === "block" && document.getElementById("webpage-state-fail-screen").style.display === "none") {
-			utils.showWebpageStates(["webpage-state-pause-screen"]);
-			gameplay.pause();
+			Utils.showWebpageStates(["webpage-state-pause-screen"]);
+			GameplayHandler.pause();
 		}
 	});
 	/* Top bar event listeners */
@@ -680,7 +680,7 @@ define(function(require) {
 	let sliders = document.getElementsByClassName("slider");
 	for (let i = 0; i < sliders.length; i++) {
 		sliders[i].addEventListener("input", function() {
-			this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
+			this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + Utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + Utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
 			AudioManager.play("sliderbar");
 		});
 		sliders[i].addEventListener("mouseenter", function() {
@@ -877,8 +877,8 @@ define(function(require) {
 		menuTimeout = setTimeout(resetMenu, 15000);
 	});
 	document.getElementById("menu-bar-play").addEventListener("click", function() {
-		utils.showWebpageStates(["webpage-state-beatmap-selection", "webpage-state-mods", "bottom-bar", ]);
-		utils.hideWebpageStates(["webpage-state-menu"]);
+		Utils.showWebpageStates(["webpage-state-beatmap-selection", "webpage-state-mods", "bottom-bar", ]);
+		Utils.hideWebpageStates(["webpage-state-menu"]);
 		chooseRandomMap();
 	});
 	/* Helper */
@@ -921,10 +921,10 @@ define(function(require) {
 				if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object" && group !== "types") {
 					for (let setting in userOptions[group]) {
 						if (userOptions[group].hasOwnProperty(setting)) {
-							let element = document.getElementById("settings-" + utils.camelCaseToDash(setting));
+							let element = document.getElementById("settings-" + Utils.camelCaseToDash(setting));
 							switch (userOptions.types[index]) {
 								case "slider":
-									Options.update(group, setting, utils.map(element.value, element.min, element.max, 0, 1));
+									Options.update(group, setting, Utils.map(element.value, element.min, element.max, 0, 1));
 									break;
 								case "checkbox":
 									Options.update(group, setting, element.checked);
@@ -960,11 +960,11 @@ define(function(require) {
 	document.getElementById("back-button").addEventListener("click", function() {
 		AudioManager.play("back-button-click");
 		if (document.getElementById("webpage-state-results-screen").style.display === "block") {
-			utils.showWebpageStates(["webpage-state-beatmap-selection", "webpage-state-mods", "top-bar", ]);
-			utils.hideWebpageStates(["webpage-state-results-screen", ]);
+			Utils.showWebpageStates(["webpage-state-beatmap-selection", "webpage-state-mods", "top-bar", ]);
+			Utils.hideWebpageStates(["webpage-state-results-screen", ]);
 		} else {
-			utils.showWebpageStates(["webpage-state-menu", ]);
-			utils.hideWebpageStates(["webpage-state-mods", "webpage-state-beatmap-selection", "bottom-bar", ]);
+			Utils.showWebpageStates(["webpage-state-menu", ]);
+			Utils.hideWebpageStates(["webpage-state-mods", "webpage-state-beatmap-selection", "bottom-bar", ]);
 		}
 		menuAudio.play();
 	});
@@ -972,13 +972,13 @@ define(function(require) {
 		AudioManager.play("menu-hover");
 	});
 	document.getElementById("pause-menu-continue").addEventListener("click", function() {
-		gameplay.continue();
-		utils.hideWebpageStates(["webpage-state-pause-screen", "webpage-state-fail-screen", ]);
+		GameplayHandler.continue();
+		Utils.hideWebpageStates(["webpage-state-pause-screen", "webpage-state-fail-screen", ]);
 	});
 
 	function retry() {
-		gameplay.retry();
-		utils.hideWebpageStates(["webpage-state-pause-screen", "webpage-state-fail-screen", ]);
+		GameplayHandler.retry();
+		Utils.hideWebpageStates(["webpage-state-pause-screen", "webpage-state-fail-screen", ]);
 	}
 	document.getElementById("pause-menu-retry").addEventListener("click", retry);
 	document.getElementById("fail-menu-retry").addEventListener("click", retry);
@@ -986,8 +986,8 @@ define(function(require) {
 	function quit() {
 		menuAudio.playbackRate = 1;
 		menuAudio.play();
-		utils.showWebpageStates(["webpage-state-beatmap-selection", "webpage-state-mods", "top-bar", "bottom-bar", ]);
-		utils.hideWebpageStates(["webpage-state-gameplay", "webpage-state-pause-screen", "webpage-state-fail-screen", ]);
+		Utils.showWebpageStates(["webpage-state-beatmap-selection", "webpage-state-mods", "top-bar", "bottom-bar", ]);
+		Utils.hideWebpageStates(["webpage-state-gameplay", "webpage-state-pause-screen", "webpage-state-fail-screen", ]);
 	}
 	document.getElementById("pause-menu-quit").addEventListener("click", quit);
 	document.getElementById("fail-menu-quit").addEventListener("click", quit);

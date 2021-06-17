@@ -1,14 +1,14 @@
 define(function(require) {
-	const utils = require("src/scripts/utils.js")
+	"use strict";
+	const Utils = require("src/scripts/utils.js");
 	const Formulas = require("src/scripts/formulas.js");
-	const starRating = require("src/scripts/starRating.js");
 	return {
 		group: function(maps, i) {
 			let mapsHTML = "";
 			let iconsHTML = "";
 			for (let j = 0; j < maps.difficulties.length; j++) {
 				let mapStarRating = maps.difficulties[j].starRating;
-				iconsHTML += `<img class="beatmap-selection-group-pane-difficulties-icon" src="./src/images/difficulty-icons/${Formulas.beatmapDifficultyIcon(mapStarRating)}-difficulty.png">`
+				iconsHTML += `<img class="beatmap-selection-group-pane-difficulties-icon" src="./src/images/difficulty-icons/${Formulas.beatmapDifficultyIcon(mapStarRating)}-difficulty.png">`;
 				mapsHTML += this.map(maps.difficulties[j], i, j, mapStarRating, maps);
 			}
 			return `<div class="beatmap-selection-group">
@@ -22,11 +22,11 @@ define(function(require) {
 						</div>
 					</div>`;
 		},
-		map: function(beatmap, groupIndex, mapIndex, mapStarRating, details, ) {
+		map: function(beatmap, groupIndex, mapIndex, mapStarRating, details) {
 			let stars = "";
 			if (mapStarRating < 10) {
 				for (let i = 0; i < mapStarRating; i++) {
-					let size = utils.roundDigits(utils.map(mapStarRating - i, 1, 0, 1, 0.5), 2);
+					let size = Utils.roundDigits(Utils.map(mapStarRating - i, 1, 0, 1, 0.5), 2);
 					if (size >= 1) {
 						size = 1;
 					}
@@ -36,7 +36,7 @@ define(function(require) {
 					stars += `<img style="transform: scale(${size}); opacity: ${(size > 0.5) ? 1 : 0.5}; width: 3.5vh;" src="./src/images/star.png">`;
 				}
 			} else {
-				stars = `<img src="./src/images/star.png" style="width: 3.5vh;"><p style="display: inline;">${"x" + (Math.round(mapStarRating * 100) / 100)}</p>`
+				stars = `<img src="./src/images/star.png" style="width: 3.5vh;"><p style="display: inline;">${"x" + (Math.round(mapStarRating * 100) / 100)}</p>`;
 			}
 			return `<div data-image-filename="${(beatmap.backgroundFilename !== "") ? (details.creator + details.title + beatmap.backgroundFilename) : ""}" data-group-index="${groupIndex}" data-map-index="${mapIndex}" class="beatmap-selection-map-pane triangle-background">
 						<img class="beatmap-selection-map-pane-difficulty-icon" src="./src/images/difficulty-icons/${Formulas.beatmapDifficultyIcon(mapStarRating)}-difficulty.png">

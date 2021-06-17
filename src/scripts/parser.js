@@ -1,56 +1,56 @@
 define(function(require) {
 	"use strict";
 	const HitObject = require("./hitObjects.js");
-	const utils = require("./utils.js");
+	const Utils = require("./utils.js");
 	/* refer to https://osu.ppy.sh/wiki/sk/osu!_File_Formats/Osu_(file_format) */
 	let typeMap = {
 		/* under [General] */
-		"AudioFilename": "string",
-		"AudioLeadIn": "number",
+		AudioFilename: "string",
+		AudioLeadIn: "number",
 		/* depreciated, but might as well support it */
-		"AudioHash": "string",
-		"PreviewTime": "number",
-		"Countdown": "number",
-		"SampleSet": "string",
-		"StackLeniency": "number",
-		"Mode": "number",
-		"LetterboxInBreaks": "number",
+		AudioHash: "string",
+		PreviewTime: "number",
+		Countdown: "number",
+		SampleSet: "string",
+		StackLeniency: "number",
+		Mode: "number",
+		LetterboxInBreaks: "number",
 		/* depreciated */
-		"StoryFireInFront": "number",
-		"UseSkinSprites": "number",
+		StoryFireInFront: "number",
+		UseSkinSprites: "number",
 		/* depreciated */
-		"AlwaysShowPlayfield": "number",
-		"OverlayPosition": "string",
-		"SkinPreference": "string",
-		"EpilepsyWarning": "number",
-		"CountdownOffset": "number",
-		"SpecialStyle": "number",
-		"WidescreenStoryboard": "number",
-		"SamplesMatchPlaybackRate": "number",
+		AlwaysShowPlayfield: "number",
+		OverlayPosition: "string",
+		SkinPreference: "string",
+		EpilepsyWarning: "number",
+		CountdownOffset: "number",
+		SpecialStyle: "number",
+		WidescreenStoryboard: "number",
+		SamplesMatchPlaybackRate: "number",
 		/* under [Editor] */
-		"Bookmarks": "string",
-		"DistanceSpacing": "number",
-		"BeatDivisor": "number",
-		"GridSize": "number",
-		"TimelineZoom": "number",
+		Bookmarks: "string",
+		DistanceSpacing: "number",
+		BeatDivisor: "number",
+		GridSize: "number",
+		TimelineZoom: "number",
 		/* under [Metadata] */
-		"Title": "string",
-		"TitleUnicode": "string",
-		"Artist": "string",
-		"ArtistUnicode": "string",
-		"Creator": "string",
-		"Version": "string",
-		"Source": "string",
-		"Tags": "string",
-		"BeatmapID": "number",
-		"BeatmapSetID": "number",
+		Title: "string",
+		TitleUnicode: "string",
+		Artist: "string",
+		ArtistUnicode: "string",
+		Creator: "string",
+		Version: "string",
+		Source: "string",
+		Tags: "string",
+		BeatmapID: "number",
+		BeatmapSetID: "number",
 		/* under [Difficulty] */
-		"HPDrainRate": "number",
-		"CircleSize": "number",
-		"OverallDifficulty": "number",
-		"ApproachRate": "number",
-		"SliderMultiplier": "number",
-		"SliderTickRate": "number",
+		HPDrainRate: "number",
+		CircleSize: "number",
+		OverallDifficulty: "number",
+		ApproachRate: "number",
+		SliderMultiplier: "number",
+		SliderTickRate: "number",
 	};
 	return {
 		parseBeatmap: function(data) {
@@ -177,7 +177,7 @@ define(function(require) {
 					splited[i] = parseFloat(splited[i]);
 				}
 			}
-			let asBinary = utils.reverse(utils.binary(splited[3], 8));
+			let asBinary = Utils.reverse(Utils.binary(splited[3], 8));
 			if (asBinary[0] === "1") {
 				/* hitCircle */
 				return new HitObject.HitCircle(...splited);
@@ -200,7 +200,7 @@ define(function(require) {
 			return new HitObject.TimingPoint(...splited);
 		},
 		parseComboColour: function(data) {
-			let splitTriplets = data.split(":")[1].split(",");
+			let splitTriplets = data.split"")[1].split(",");
 			return {
 				r: parseInt(splitTriplets[0]),
 				g: parseInt(splitTriplets[1]),
@@ -220,12 +220,12 @@ define(function(require) {
 		},
 		defaultComboColours: function() {
 			return [
-				this.parseComboColour(":255,213,128"),
-				this.parseComboColour(":242,121,97"),
-				this.parseComboColour(":255,140,179"),
-				this.parseComboColour(":187,103,229"),
-				this.parseComboColour(":140,236,255"),
-				this.parseComboColour(":145,229,103"),
+				this.parseComboColour"255,213,128"),
+				this.parseComboColour"242,121,97"),
+				this.parseComboColour"255,140,179"),
+				this.parseComboColour"187,103,229"),
+				this.parseComboColour"140,236,255"),
+				this.parseComboColour"145,229,103"),
 			];
 		},
 	};

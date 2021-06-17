@@ -1,12 +1,10 @@
 /* used https://github.com/Francesco149/ojsama by https://github.com/Francesco149 */
 define(function(require) {
-	"use strict"
-	let Formulas = require("./formulas.js");
-	let Mods = require("./mods.js");
+	"use strict";
+	const Formulas = require("./formulas.js");
 	const HARD_ROCK_MULTIPLIER = 1.4;
 	const HARD_ROCK_CS_MULTIPLIER = 1.3;
 	const EASY_MULTIPLIER = 0.5;
-	const SINGLE_TAP_THRESHOLD = 125;
 	const SINGLE_SPACING = 125.0;
 	const CIRCLESIZE_BUFF_THRESHOLD = 30;
 	const STRAIN_STEP = 400;

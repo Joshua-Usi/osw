@@ -1,6 +1,6 @@
 define(function(require) {
 	"use strict";
-	let utils = require("./utils.js");
+	const Utils = require("./utils.js");
 	return {
 		HitCircle: class HitCircle {
 			constructor(x, y, time, type, hitSound, objectParams, hitSample) {
@@ -8,7 +8,7 @@ define(function(require) {
 				this.y = y;
 				/* convert to seconds */
 				this.time = time / 1000;
-				this.type = utils.reverse(utils.binary(type));
+				this.type = Utils.reverse(Utils.binary(type));
 				this.hitSound = hitSound;
 				this.objectParams = objectParams;
 				this.hitSample = hitSample;
@@ -23,7 +23,7 @@ define(function(require) {
 				this.x = x;
 				this.y = y;
 				this.time = time / 1000;
-				this.type = utils.reverse(utils.binary(type));
+				this.type = Utils.reverse(Utils.binary(type));
 				this.hitSound = hitSound;
 				this.curveType = curveTypecurvePoints[0];
 				this.curvePoints = curveTypecurvePoints.substr(1).split("|");
@@ -56,7 +56,7 @@ define(function(require) {
 				this.y = y;
 				/* convert to seconds */
 				this.time = time / 1000;
-				this.type = utils.reverse(utils.binary(type));
+				this.type = Utils.reverse(Utils.binary(type));
 				this.hitSound = hitSound;
 				this.endTime = endTime / 1000;
 				this.hitSample = hitSample;

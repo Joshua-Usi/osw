@@ -1,7 +1,7 @@
 define(function(require) {
 	"use strict";
-	const bezier = require("./bezier.js");
-	const utils = require("./utils.js");
+	const Bezier = require("./bezier.js");
+	const Utils = require("./utils.js");
 	let canvas = document.getElementById("intro-logo");
 	canvas.width = 0.8 * window.innerWidth;
 	canvas.height = 0.8 * window.innerWidth;
@@ -74,10 +74,10 @@ define(function(require) {
 			for (let j = 1.5 * Math.PI; j >= -0.5 * Math.PI; j -= Math.PI / 4) {
 				let x = 0.5 + Math.cos(j) * size;
 				let y = 0.5 + Math.sin(j) * size;
-				octagonPoints.push(utils.point(x, y));
+				octagonPoints.push(Utils.point(x, y));
 			}
 			for (let j = 0; j < octagonPoints.length - 1; j++) {
-				let bezierPoints = bezier([octagonPoints[j], octagonPoints[j + 1]], 0.01);
+				let bezierPoints = Bezier([octagonPoints[j], octagonPoints[j + 1]], 0.01);
 				for (let j = 0; j < bezierPoints.length; j++) {
 					octagonInterpolatedPoints.push(bezierPoints[j]);
 				}
@@ -93,19 +93,19 @@ define(function(require) {
 				case "M":
 					pathPoints = [];
 					beginningIndex = i;
-					pathPoints.push(utils.point(path[i].x, path[i].y));
+					pathPoints.push(Utils.point(path[i].x, path[i].y));
 					break;
 				case "L":
-					pathPoints = pathPoints.concat(bezier([path[i - 1], path[i].x], 0.01));
+					pathPoints = pathPoints.concat(Bezier([path[i - 1], path[i].x], 0.01));
 					break;
 				case "C":
-					pathPoints = pathPoints.concat(bezier([path[i - 1], utils.point(path[i].x1, path[i].y1), utils.point(path[i].x2, path[i].y2), path[i]], 0.01));
+					pathPoints = pathPoints.concat(Bezier([path[i - 1], Utils.point(path[i].x1, path[i].y1), Utils.point(path[i].x2, path[i].y2), path[i]], 0.01));
 					break;
 				case "Q":
-					pathPoints = pathPoints.concat(bezier([path[i - 1], utils.point(path[i].x1, path[i].y1), path[i]], 0.01));
+					pathPoints = pathPoints.concat(Bezier([path[i - 1], Utils.point(path[i].x1, path[i].y1), path[i]], 0.01));
 					break;
 				case "Z":
-					pathPoints.push(utils.point(path[beginningIndex].x, path[beginningIndex].y));
+					pathPoints.push(Utils.point(path[beginningIndex].x, path[beginningIndex].y));
 					pointArrays.push(pathPoints);
 					break;
 			}
@@ -116,7 +116,7 @@ define(function(require) {
 		for (let i = 0; i < elements.length; i++) {
 			elements[i].style.width = newWidth + "vh";
 			elements[i].style.top = (50 - newWidth / 2) + "vh";
-			elements[i].style.left = 50 - newWidth / 4 + utils.map(i, 0, elements.length - 1, -newRange, newRange) + "vw";
+			elements[i].style.left = 50 - newWidth / 4 + Utils.map(i, 0, elements.length - 1, -newRange, newRange) + "vw";
 		}
 	}
 
@@ -131,7 +131,7 @@ define(function(require) {
 	function animate() {
 		let audio = document.getElementById("menu-audio");
 		while (triangleNumber <= NUMBER_OF_TRIANGLES && audio.currentTime > 0.1) {
-			createTriangle(utils.randomInt(0, 1), utils.randomInt(window.innerWidth * 0.3, window.innerWidth * 0.7), utils.randomInt(window.innerHeight * 0.4, window.innerHeight * 0.6), utils.randomInt(10, 120), triangleNumber);
+			createTriangle(Utils.randomInt(0, 1), Utils.randomInt(window.innerWidth * 0.3, window.innerWidth * 0.7), Utils.randomInt(window.innerHeight * 0.4, window.innerHeight * 0.6), Utils.randomInt(10, 120), triangleNumber);
 			triangleNumber++;
 		}
 		for (var i = 0; i < events.length; i++) {
@@ -141,13 +141,13 @@ define(function(require) {
 			}
 		}
 		if (audio.currentTime >= 2.2 && audio.currentTime <= 3.1) {
-			let animationStage = utils.map(audio.currentTime, 2.2, 3.4, 0.025, 1);
+			let animationStage = Utils.map(audio.currentTime, 2.2, 3.4, 0.025, 1);
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			ctx.lineWidth = 3;
 			for (let i = 0; i < pointArrays.length; i++) {
 				ctx.strokeStyle = "#fff9";
 				ctx.beginPath();
-				let maxIndex = pointArrays[i].length - (utils.map(animationStage, 0, 1, pointArrays[i].length, 0) ** 4 / pointArrays[i].length ** 3);
+				let maxIndex = pointArrays[i].length - (Utils.map(animationStage, 0, 1, pointArrays[i].length, 0) ** 4 / pointArrays[i].length ** 3);
 				if (maxIndex > pointArrays[i].length) {
 					maxIndex = pointArrays[i].length;
 				}

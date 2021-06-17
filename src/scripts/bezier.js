@@ -69,5 +69,5 @@ define(function(require) {
 			temp.push(P(t, points));
 		}
 		return temp;
-	}
+	};
 });
