@@ -283,6 +283,6 @@ img {
 }
 
 .triangle-background {
-	background: url("../../src/images/triangles.png");
+	background: url("./src/images/triangles.png");
 	background-attachment: fixed;
 }

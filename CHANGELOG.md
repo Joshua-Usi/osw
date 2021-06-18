@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - A database issue using wrong keys
 - When pressing tab, the mod menu would glitch, and the only way to fix would be a reload
+- Background path errors (difference in the way web server and github handle files)
 ---
 ## [v0.9.0b] - 16-06-2021
 ### Changed

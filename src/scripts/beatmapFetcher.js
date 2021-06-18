@@ -19,7 +19,7 @@ define(function(require) {
 	let fullyCompletedLoading = false;
 	let database = indexedDB.open("osw-database", 3);
 	database.addEventListener("upgradeneeded", function(event) {
-		console.log("Your current version of the database needs to be updated. Don't worry, I will update it automatically");
+		console.log("Your current version of the database needs to be updated. Don't worry, It will be updated it automatically");
 		let db = event.target.result;
 		if (db.objectStoreNames.contains("beatmaps") === false) {
 			db.createObjectStore("beatmaps", {
@@ -31,13 +31,13 @@ define(function(require) {
 				keyPath: "name",
 			});
 		}
-		if (db.objectStoreNames.contains("scores") === false) {
-			db.createObjectStore("scores", {
+		if (db.objectStoreNames.contains("images") === false) {
+			db.createObjectStore("images", {
 				keyPath: "name",
 			});
 		}
-		if (db.objectStoreNames.contains("images") === false) {
-			db.createObjectStore("images", {
+		if (db.objectStoreNames.contains("scores") === false) {
+			db.createObjectStore("scores", {
 				keyPath: "name",
 			});
 		}
