@@ -1,8 +1,8 @@
 define(function(require) {
 	class StoragePair {
-		constructor(name, key) {
+		constructor(name, data) {
 			this.name = name;
-			this.key = key;
+			this.data = data;
 		}
 	}
 	return {

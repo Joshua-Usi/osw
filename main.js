@@ -390,6 +390,10 @@ define(function(require) {
 	/* Event Listeners */
 	window.addEventListener("click", function() {
 		if (isFirstClick && document.readyState === "complete") {
+			document.getElementById("splash-screen").style.opacity = 0;
+			setTimeout(function() {
+				document.getElementById("splash-screen").style.display = "none";
+			}, 1000);
 			AudioManager.load("back-button-click", "./src/audio/effects/back-button-click.wav", "effects", true);
 			AudioManager.load("menu-options-click", "./src/audio/effects/menu-options-click.wav", "effects", true);
 			AudioManager.load("menu-freeplay-click", "./src/audio/effects/menu-freeplay-click.wav", "effects", true);
@@ -862,10 +866,7 @@ define(function(require) {
 	});
 	/* Splashscreen listener */
 	document.getElementById("splash-screen").addEventListener("click", function() {
-		this.style.opacity = 0;
-		setTimeout(function() {
-			document.getElementById("splash-screen").style.display = "none";
-		}, 1000);
+		
 	});
 	/* logo listener */
 	document.getElementById("logo").addEventListener("click", function() {

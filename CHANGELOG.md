@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - When searching for maps and choosing random maps, the random algorithm only considers visible maps
 - Improved the searching algorithm by ignoring punctuation
+### Fixed
+- A database issue
 ---
 ## [v0.9.0b] - 16-06-2021
 ### Changed
