@@ -88,8 +88,6 @@ define(function(require) {
 									<td>${round(map.diff_aim, 2)}</td>
 									<td>${round(map.diff_speed, 2)}</td>
 									<td>${round(map.difficultyrating, 2)}</td>
-									<td>${round(starRating.calculateAimDifficulty(parsedMap), 2)}</td>
-									<td>${round(starRating.calculateSpeedDifficulty(parsedMap), 2)}</td>
 									<td>${round(diff, 2)}</td>
 									<th style=\"background-color: ${(difference < 0) ? "#0f0" : "#f00"};\">${difference}</td>
 								</tr>`;

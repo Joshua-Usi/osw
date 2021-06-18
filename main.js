@@ -27,33 +27,45 @@ define(function(require) {
 	const Options = require("./src/scripts/options.js");
 	const AudioManager = new(require("./src/scripts/audioManager.js"))();
 	const Utils = require("./src/scripts/utils.js");
-	const Beatmaps = require("./src/scripts/beatmapFetcher.js");
+	const BeatmapFetcher = require("./src/scripts/beatmapFetcher.js");
 	const BeatMapSelectionPaneTemplate = require("./src/scripts/beatMapSelectionPane.js");
 	const GameplayHandler = require("./src/scripts/standardGameplay.js");
 	const IntroSequence = require("./src/scripts/introSequence.js");
 	const DatabaseManager = require("./src/scripts/databaseManager.js");
 	const Parser = require("./src/scripts/parser.js");
-	require("./src/scripts/modsUI.js");
 	const Mods = require("./src/scripts/mods.js");
 	const Formulas = require("./src/scripts/formulas.js");
 	const CacheManager = require("./src/scripts/cacheManager.js");
 	const StarRating = require("./src/scripts/starRating.js");
+	AudioManager.load("back-button-click", "./src/audio/effects/back-button-click.wav", "effects", true);
+	AudioManager.load("menu-options-click", "./src/audio/effects/menu-options-click.wav", "effects", true);
+	AudioManager.load("menu-freeplay-click", "./src/audio/effects/menu-freeplay-click.wav", "effects", true);
+	AudioManager.load("menu-edit-click", "./src/audio/effects/menu-edit-click.wav", "effects", true);
+	AudioManager.load("menu-direct-click", "./src/audio/effects/menu-direct-click.wav", "effects", true);
+	AudioManager.load("menu-exit-click", "./src/audio/effects/menu-exit-click.wav", "effects", true);
+	AudioManager.load("menu-hover", "./src/audio/effects/menu-hover.wav", "effects", true);
+	AudioManager.load("check-on", "./src/audio/effects/check-on.wav", "effects", true);
+	AudioManager.load("check-off", "./src/audio/effects/check-off.wav", "effects", true);
+	AudioManager.load("settings-hover", "./src/audio/effects/settings-hover.wav", "effects", true);
+	AudioManager.load("sliderbar", "./src/audio/effects/sliderbar.wav", "effects", true);
+	AudioManager.load("menu-hit", "./src/audio/effects/menu-hit.wav", "effects", true);
+	require("./src/scripts/modsUI.js");
 	if (!window.localStorage) {
-		console.warn("LocalStorage is not supported on this browser. You will not be able to save your options");
+		throw new Error("LocalStorage is not supported on this browser. You will not be able to save your options");
 	}
 	/* Offline context checks, needed to ensure for some effects to work */
 	if (window.origin === null) {
-		console.warn("The CORS origin is not set correctly or you may be running this client on the file system. You may experience audio visualiser bugs");
-		console.error("Due to CORS origin not being set correctly, beatmaps will unable to be saved");
+		console.warn("Due to CORS origin not being set correctly (you may running this via local files, use a webserver), beatmaps, audio, images, scores and skins will unable to be saved, the visualisers may also bug and file uploads will break");
 	}
 	if (!window.indexedDB) {
-		console.warn("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
+		throw new Error("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
 	}
 	/* osw! version incremented manually */
 	const MAJOR_VERSION = 0;
 	const MINOR_VERSION = 9;
 	const PATCH_VERSION = 1;
-	const version = `osw! v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}b`;
+	const BUILD_METADATA = "b"
+	const version = `osw! v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}${BUILD_METADATA}`;
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
@@ -239,13 +251,13 @@ define(function(require) {
 		}
 		document.getElementById("beatmap-selection-right").innerHTML = concatenated;
 	} else {
-		Beatmaps.refresh();
+		BeatmapFetcher.refresh();
 		loadMaps();
 	}
 
 	function loadMaps() {
-		if (Beatmaps.allMapsLoaded()) {
-			let loadedMaps = Beatmaps.get();
+		if (BeatmapFetcher.allMapsLoaded()) {
+			let loadedMaps = BeatmapFetcher.get();
 			/* Beatmap loading and adding to dom */
 			let concatenated = "";
 			let cache = CacheManager.generate(loadedMaps);
@@ -333,9 +345,6 @@ define(function(require) {
 		rightBeat.style.opacity = "0";
 	}
 	/* Initial menu song pool */
-	let songs = ["cYsmix - Triangles.mp3"];
-	let defaultSongsMs = [375];
-	let chosenSong;
 	let menuAudio = document.getElementById("menu-audio");
 	menuAudio.addEventListener("play", function() {
 		beatNumber = 0;
@@ -382,11 +391,46 @@ define(function(require) {
 	/* Accumulators */
 	let time = 0;
 	let previousTime = 0;
-	let gameplayRenderAccumulator = new Utils.Accumulator(GameplayHandler.render, /*1000 / 60*/ 0);
-	let logoBeatAccumulator;
+	let gameplayRenderAccumulator = new Utils.Accumulator(GameplayHandler.render, 1000 / 60);
+	let logoBeatAccumulator = new Utils.Accumulator(logoBeat, 375);
 	let beatmapQueue = [];
 	let audioQueue = [];
 	let imageQueue = [];
+	/* set the settings */
+	(function() {
+		let userOptions = Options.read();
+		let index = 0;
+		for (let group in userOptions) {
+			if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object" && group !== "types") {
+				for (let setting in userOptions[group]) {
+					if (userOptions[group].hasOwnProperty(setting)) {
+						let element = document.getElementById("settings-" + Utils.camelCaseToDash(setting));
+						switch (userOptions.types[index]) {
+							case "slider":
+								let mapped = Utils.map(userOptions[group][setting], 0, 1, element.min, element.max);
+								/* is weird, idk, quick patch */
+								if (setting === "sliderResolution") {
+									mapped = Utils.map(mapped, 10, 14, 1, 5);
+								}
+								element.value = Math.round(mapped);
+								element.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + Utils.map(element.value, element.min, element.max, 0, 100) + "%, #7e3c57 " + Utils.map(element.value, element.min, element.max, 0, 100) + "%, #7e3c57 100%)";
+								break;
+							case "checkbox":
+								element.checked = userOptions[group][setting];
+								break;
+							case "selectbox":
+								element.getElementsByClassName("select-box-selected")[0].textContent = userOptions[group][setting];
+								break;
+							case "text":
+								element.textContent = userOptions[group][setting];
+								break;
+						}
+						index++;
+					}
+				}
+			}
+		}
+	})();
 	/* Event Listeners */
 	window.addEventListener("click", function() {
 		if (isFirstClick && document.readyState === "complete") {
@@ -394,55 +438,8 @@ define(function(require) {
 			setTimeout(function() {
 				document.getElementById("splash-screen").style.display = "none";
 			}, 1000);
-			AudioManager.load("back-button-click", "./src/audio/effects/back-button-click.wav", "effects", true);
-			AudioManager.load("menu-options-click", "./src/audio/effects/menu-options-click.wav", "effects", true);
-			AudioManager.load("menu-freeplay-click", "./src/audio/effects/menu-freeplay-click.wav", "effects", true);
-			AudioManager.load("menu-edit-click", "./src/audio/effects/menu-edit-click.wav", "effects", true);
-			AudioManager.load("menu-direct-click", "./src/audio/effects/menu-direct-click.wav", "effects", true);
-			AudioManager.load("menu-exit-click", "./src/audio/effects/menu-exit-click.wav", "effects", true);
-			AudioManager.load("menu-hover", "./src/audio/effects/menu-hover.wav", "effects", true);
-			AudioManager.load("check-on", "./src/audio/effects/check-on.wav", "effects", true);
-			AudioManager.load("check-off", "./src/audio/effects/check-off.wav", "effects", true);
-			AudioManager.load("settings-hover", "./src/audio/effects/settings-hover.wav", "effects", true);
-			AudioManager.load("sliderbar", "./src/audio/effects/sliderbar.wav", "effects", true);
-			AudioManager.load("menu-hit", "./src/audio/effects/menu-hit.wav", "effects", true);
-			let userOptions = Options.read();
 			IntroSequence.animate();
-			/* Setting settings */
-			let index = 0;
-			for (let group in userOptions) {
-				if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object" && group !== "types") {
-					for (let setting in userOptions[group]) {
-						if (userOptions[group].hasOwnProperty(setting)) {
-							let element = document.getElementById("settings-" + Utils.camelCaseToDash(setting));
-							switch (userOptions.types[index]) {
-								case "slider":
-									let mapped = Utils.map(userOptions[group][setting], 0, 1, element.min, element.max);
-									if (setting === "sliderResolution") {
-										mapped = Utils.map(mapped, 10, 14, 1, 5);
-									}
-									element.value = Math.round(mapped);
-									element.dispatchEvent(new CustomEvent("input"));
-									break;
-								case "checkbox":
-									element.checked = userOptions[group][setting];
-									break;
-								case "selectbox":
-									element.getElementsByClassName("select-box-selected")[0].textContent = userOptions[group][setting];
-									break;
-								case "text":
-									element.textContent = userOptions[group][setting];
-									break;
-							}
-							index++;
-						}
-					}
-				}
-			}
-			settingsSet = true;
-			chosenSong = 0;
-			menuAudio.src = `src/audio/${songs[chosenSong]}`;
-			logoBeatAccumulator = new Utils.Accumulator(logoBeat, defaultSongsMs[chosenSong]);
+			menuAudio.src = "src/audio/cYsmix - Triangles.mp3";
 			menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 			menuAudio.play();
 			isFirstClick = false;
@@ -550,19 +547,31 @@ define(function(require) {
 					logoResetBeat();
 				}
 				if (audioQueue.length > 0) {
-					Beatmaps.addAudio(audioQueue);
+					BeatmapFetcher.addAudio(audioQueue);
 				}
 				if (imageQueue.length > 0) {
-					Beatmaps.addImage(imageQueue);
+					BeatmapFetcher.addImage(imageQueue);
 				}
 				if (beatmapQueue.length > 0) {
-					Beatmaps.addNewMaps(beatmapQueue);
+					BeatmapFetcher.addNewMaps(beatmapQueue);
 					loadedNewMaps = false;
 				} else if (loadedNewMaps === false) {
 					CacheManager.deleteCache("beatmapCache");
-					Beatmaps.refresh();
+					BeatmapFetcher.refresh();
 					loadMaps();
 					loadedNewMaps = true;
+				}
+				if (Options.getProperty("Maintainence", "developerMode")) {
+					/* each character is 2 bytes according to utf-16, therefore multiply string length by 2 to get amount in bytes */
+					navigator.storage.estimate().then(function(estimate) {
+						document.getElementById("developer-mode-details").innerHTML = `
+						<p>Beatmap cache size: ${(localStorage.getItem("beatmapCache")) ? ((localStorage.getItem("beatmapCache").length * 2 / 1024).toFixed(2)) : 0} / 5000KB</p>
+						<p>IndexedDB size: ${(estimate.usageDetails.indexedDB / (1024 ** 2)).toFixed(2)} / ${(estimate.quota / (1024 ** 2)).toFixed(2)}MB</p>
+						<p>Total HTML elements: ${document.querySelectorAll("*").length} nodes</p>
+					`;
+					});
+				} else {
+					document.getElementById("developer-mode-details").innerHTML = "";
 				}
 				previousTime = time;
 				time = Date.now();
@@ -627,6 +636,9 @@ define(function(require) {
 			menuAudio.pause();
 			this.innerHTML = "&#x25BA;";
 		}
+	});
+	document.getElementById("shuffle-icon").addEventListener("click", function() {
+		chooseRandomMap();
 	});
 	/* Sidenav event listener */
 	document.getElementById("close-btn").addEventListener("click", function() {
@@ -865,9 +877,7 @@ define(function(require) {
 		}
 	});
 	/* Splashscreen listener */
-	document.getElementById("splash-screen").addEventListener("click", function() {
-		
-	});
+	document.getElementById("splash-screen").addEventListener("click", function() {});
 	/* logo listener */
 	document.getElementById("logo").addEventListener("click", function() {
 		AudioManager.play("menu-hit");
@@ -925,35 +935,33 @@ define(function(require) {
 	}
 
 	function setSettings() {
-		if (settingsSet) {
-			let index = 0;
-			let userOptions = Options.get();
-			for (let group in userOptions) {
-				if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object" && group !== "types") {
-					for (let setting in userOptions[group]) {
-						if (userOptions[group].hasOwnProperty(setting)) {
-							let element = document.getElementById("settings-" + Utils.camelCaseToDash(setting));
-							switch (userOptions.types[index]) {
-								case "slider":
-									Options.update(group, setting, Utils.map(element.value, element.min, element.max, 0, 1));
-									break;
-								case "checkbox":
-									Options.update(group, setting, element.checked);
-									break;
-								case "selectbox":
-									Options.update(group, setting, element.getElementsByClassName("select-box-selected")[0].textContent);
-									break;
-								case "text":
-									Options.update(group, setting, element.textContent);
-									break;
-							}
-							index++;
+		let index = 0;
+		let userOptions = Options.get();
+		for (let group in userOptions) {
+			if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object" && group !== "types") {
+				for (let setting in userOptions[group]) {
+					if (userOptions[group].hasOwnProperty(setting)) {
+						let element = document.getElementById("settings-" + Utils.camelCaseToDash(setting));
+						switch (userOptions.types[index]) {
+							case "slider":
+								Options.update(group, setting, Utils.map(element.value, element.min, element.max, 0, 1));
+								break;
+							case "checkbox":
+								Options.update(group, setting, element.checked);
+								break;
+							case "selectbox":
+								Options.update(group, setting, element.getElementsByClassName("select-box-selected")[0].textContent);
+								break;
+							case "text":
+								Options.update(group, setting, element.textContent);
+								break;
 						}
+						index++;
 					}
 				}
 			}
-			Options.save();
 		}
+		Options.save();
 	}
 	window.addEventListener("orientationchange", function(event) {
 		/* osw! only allows horizontal screens */
@@ -968,6 +976,11 @@ define(function(require) {
 	}, {
 		passive: false
 	});
+	window.addEventListener("keydown", function(e) {
+		if (e.keyCode === 9) {
+			e.preventDefault();
+		}
+	})
 	document.getElementById("back-button").addEventListener("click", function() {
 		AudioManager.play("back-button-click");
 		if (document.getElementById("webpage-state-results-screen").style.display === "block") {
@@ -1067,7 +1080,6 @@ define(function(require) {
 			fileReader.readAsBinaryString(this.files[i]);
 		}
 	});
-
 	document.getElementById("beatmap-search-bar").addEventListener("input", function() {
 		let groups = document.getElementsByClassName("beatmap-selection-group");
 		for (let i = 0; i < groups.length; i++) {

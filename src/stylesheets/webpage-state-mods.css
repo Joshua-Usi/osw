@@ -1,5 +1,6 @@
 #mods-ui {
 	position: absolute;
+	display: inline-block;
 	bottom: -76vh;
 	z-index: 900;
 

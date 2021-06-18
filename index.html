@@ -16,6 +16,7 @@
 		<link rel="stylesheet" type="text/css" rel="stylesheet" href="./src/stylesheets/webpage-state-fail-screen.css">
 		<link rel="stylesheet" type="text/css" rel="stylesheet" href="./src/stylesheets/webpage-state-results-screen.css">
 		<link rel="stylesheet" type="text/css" rel="stylesheet" href="./src/stylesheets/webpage-state-mods.css">
+		<link rel="stylesheet" type="text/css" rel="stylesheet" href="./src/stylesheets/mouse-states.css">
 	</head>
 	<body id="body">
 		<div class="webpage-state" id="webpage-state-always">
@@ -192,10 +193,12 @@
 					<button type="button" id="settings-button-upload-skin" disabled class="settings-button triangle-background blue">Upload skin (coming soon)</button>
 					<div class="sidenav-divider"></div>
 					<p class="sidenav-title-text">Maintenance</p>
+					<p style="color: #999;">Note! developer modeis performance heavy</p>
 					<div>
 						<p class="inline-block">Developer mode</p>
 						<input type="checkbox" id="settings-developer-mode" class="checkbox inline-block float-right">
 					</div>
+					<div id="developer-mode-details"></div>
 					<button type="button" id="settings-button-clear-local-storage" class="settings-button triangle-background red">Clear local storage</button>
 					<button type="button" id="settings-button-delete-beatmap-cache" class="settings-button triangle-background red">Delete beatmap cache</button>
 					<button type="button" id="settings-button-delete-all-beatmaps" class="settings-button triangle-background red">Delete all beatmaps</button>
@@ -206,6 +209,9 @@
 					<img id="settings-icon" class="gamemode-icons" src="./src/images/settings.png">
 				</div>
 				<p class="top-bar-text float-right" id="pause">&#x275A;&#x275A;</p>
+				<div class="span-top-bar-text float-right">
+					<img id="shuffle-icon" class="gamemode-icons" src="./src/images/shuffle.png">
+				</div>
 			</div>
 			<p id="frame-rate">0 / 60 fps</p>
 		</div>

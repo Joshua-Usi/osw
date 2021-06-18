@@ -52,6 +52,66 @@ define(function(require) {
 		SliderMultiplier: "number",
 		SliderTickRate: "number",
 	};
+
+	function parseHitObject(data) {
+		let splited = data.split(",");
+		let len = splited.length;
+		for (var i = 0; i < len; i++) {
+			if (/^[0-9]+$/.test(splited[i])) {
+				splited[i] = parseFloat(splited[i]);
+			}
+		}
+		let asBinary = Utils.reverse(Utils.binary(splited[3], 8));
+		if (asBinary[0] === "1") {
+			/* hitCircle */
+			return new HitObject.HitCircle(...splited);
+		} else if (asBinary[1] === "1") {
+			/* slider */
+			return new HitObject.Slider(...splited);
+		} else if (asBinary[3] === "1") {
+			/* spinner */
+			return new HitObject.Spinner(...splited);
+		}
+	}
+	function parseTimingPoint(data) {
+		let splited = data.split(",");
+		let len = splited.length;
+		for (var i = 0; i < len; i++) {
+			if (/^[0-9]+$/.test(splited[i])) {
+				splited[i] = parseFloat(splited[i]);
+			}
+		}
+		return new HitObject.TimingPoint(...splited);
+	}
+	function parseComboColour(data) {
+		let splitTriplets = data.split(":")[1].split(",");
+		return {
+			r: parseInt(splitTriplets[0]),
+			g: parseInt(splitTriplets[1]),
+			b: parseInt(splitTriplets[2]),
+		};
+	}
+	function parseBreakPeriod(data) {
+		let splited = data.split(",");
+		return new HitObject.BreakPeriod(...splited);
+	}
+	function parseBackground(data) {
+		let splited = data.replaceAll("\"", "").split(",");
+		/* ignore video files for now */
+		if (splited[0] !== "Video") {
+			return new HitObject.Background(...splited);
+		}
+	}
+	function defaultComboColours() {
+		return [
+			parseComboColour(":255,213,128"),
+			parseComboColour(":242,121,97"),
+			parseComboColour(":255,140,179"),
+			parseComboColour(":187,103,229"),
+			parseComboColour(":140,236,255"),
+			parseComboColour(":145,229,103"),
+		];
+	}
 	return {
 		parseBeatmap: function(data) {
 			let splited = data.split(/[\n\r]/g);
@@ -79,26 +139,26 @@ define(function(require) {
 					continue;
 				}
 				if (section === "[TimingPoints]" && /[,]/g.test(splited[i])) {
-					beatmap.timingPoints.push(this.parseTimingPoint(splited[i]));
+					beatmap.timingPoints.push(parseTimingPoint(splited[i]));
 					continue;
 				}
 				if (section === "[HitObjects]" && /[,]/g.test(splited[i])) {
-					beatmap.hitObjects.push(this.parseHitObject(splited[i]));
+					beatmap.hitObjects.push(parseHitObject(splited[i]));
 					continue;
 				}
 				if (section === "[Colours]" && /(Combo)/g.test(splited[i])) {
-					beatmap.comboColours.push(this.parseComboColour(splited[i]));
+					beatmap.comboColours.push(parseComboColour(splited[i]));
 					continue;
 				}
 				if (section === "[Events]" && splited[i] !== subSection) {
 					if (subSection === "//Background and Video events") {
-						let parsedBackground = this.parseBackground(splited[i]);
+						let parsedBackground = parseBackground(splited[i]);
 						if (parsedBackground !== undefined) {
 							beatmap.background = parsedBackground;
 						}
 					}
 					if (subSection === "//Break Periods") {
-						beatmap.breakPeriods.push(this.parseBreakPeriod(splited[i]));
+						beatmap.breakPeriods.push(parseBreakPeriod(splited[i]));
 					}
 					// if (subSection === "//Storyboard Layer 0 (Background)") {
 					// }
@@ -124,7 +184,7 @@ define(function(require) {
 				}
 			}
 			if (beatmap.comboColours.length === 0) {
-				beatmap.comboColours = this.defaultComboColours();
+				beatmap.comboColours = defaultComboColours();
 			}
 			return beatmap;
 		},
@@ -168,65 +228,6 @@ define(function(require) {
 				}
 			}
 			return beatmap;
-		},
-		parseHitObject: function(data) {
-			let splited = data.split(",");
-			let len = splited.length;
-			for (var i = 0; i < len; i++) {
-				if (/^[0-9]+$/.test(splited[i])) {
-					splited[i] = parseFloat(splited[i]);
-				}
-			}
-			let asBinary = Utils.reverse(Utils.binary(splited[3], 8));
-			if (asBinary[0] === "1") {
-				/* hitCircle */
-				return new HitObject.HitCircle(...splited);
-			} else if (asBinary[1] === "1") {
-				/* slider */
-				return new HitObject.Slider(...splited);
-			} else if (asBinary[3] === "1") {
-				/* spinner */
-				return new HitObject.Spinner(...splited);
-			}
-		},
-		parseTimingPoint: function(data) {
-			let splited = data.split(",");
-			let len = splited.length;
-			for (var i = 0; i < len; i++) {
-				if (/^[0-9]+$/.test(splited[i])) {
-					splited[i] = parseFloat(splited[i]);
-				}
-			}
-			return new HitObject.TimingPoint(...splited);
-		},
-		parseComboColour: function(data) {
-			let splitTriplets = data.split(":")[1].split(",");
-			return {
-				r: parseInt(splitTriplets[0]),
-				g: parseInt(splitTriplets[1]),
-				b: parseInt(splitTriplets[2]),
-			};
-		},
-		parseBreakPeriod: function(data) {
-			let splited = data.split(",");
-			return new HitObject.BreakPeriod(...splited);
-		},
-		parseBackground: function(data) {
-			let splited = data.replaceAll("\"", "").split(",");
-			/* ignore video files for now */
-			if (splited[0] !== "Video") {
-				return new HitObject.Background(...splited);
-			}
-		},
-		defaultComboColours: function() {
-			return [
-				this.parseComboColour(":255,213,128"),
-				this.parseComboColour(":242,121,97"),
-				this.parseComboColour(":255,140,179"),
-				this.parseComboColour(":187,103,229"),
-				this.parseComboColour(":140,236,255"),
-				this.parseComboColour(":145,229,103"),
-			];
 		},
 	};
 });

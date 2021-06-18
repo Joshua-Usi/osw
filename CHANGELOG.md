@@ -4,11 +4,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v0.9.1b] - 17-06-2021
 ### Added
 - A message to users when running offline to use a web browser
+- Shuffle button in the menu so users can pick songs
+- Mouse Feedback for clickable icons
 ### Changed
 - When searching for maps and choosing random maps, the random algorithm only considers visible maps
 - Improved the searching algorithm by ignoring punctuation
 ### Fixed
-- A database issue
+- A database issue using wrong keys
+- When pressing tab, the mod menu would glitch, and the only way to fix would be a reload
 ---
 ## [v0.9.0b] - 16-06-2021
 ### Changed
