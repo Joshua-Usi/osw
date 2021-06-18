@@ -44,6 +44,7 @@ define(function(require) {
 	/* Offline context checks, needed to ensure for some effects to work */
 	if (window.origin === null) {
 		console.warn("The CORS origin is not set correctly or you may be running this client on the file system. You may experience audio visualiser bugs");
+		console.error("Due to CORS origin not being set correctly, beatmaps will unable to be saved");
 	}
 	if (!window.indexedDB) {
 		console.warn("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
@@ -51,7 +52,7 @@ define(function(require) {
 	/* osw! version incremented manually */
 	const MAJOR_VERSION = 0;
 	const MINOR_VERSION = 9;
-	const PATCH_VERSION = 0;
+	const PATCH_VERSION = 1;
 	const version = `osw! v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}b`;
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
@@ -120,6 +121,9 @@ define(function(require) {
 		if (lastElementClicked != element) {
 			setDifficultyBars(beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")], selectedMods);
 			setStatisticValues(beatmapCache[element.getAttribute("data-group-index")], beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")], selectedMods);
+			document.getElementById("description-text").textContent = beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")].version;
+			document.getElementById("source-text").textContent = beatmapCache[element.getAttribute("data-group-index")].source;
+			document.getElementById("tags-text").textContent = beatmapCache[element.getAttribute("data-group-index")].tags;
 			let colour = Formulas.beatmapDifficultyColour(beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")].starRating);
 			document.getElementById("beatmap-image-difficulty-border").style.backgroundColor = colour;
 			document.getElementById("beatmap-image-difficulty-border-2").style.backgroundColor = colour;
@@ -224,8 +228,9 @@ define(function(require) {
 		document.getElementById("beatmap-statistics-slider-count").textContent = map.objectCounts.sliders;
 		document.getElementById("beatmap-statistics-spinner-count").textContent = map.objectCounts.spinners;
 	}
+	const CACHE_VERSION = 2;
 	/* if cache already exist, then use it */
-	if (localStorage.getItem("beatmapCache") && localStorage.getItem("beatmapCache") !== "[]" && parseInt(localStorage.getItem("beatmapCacheVersion")) === StarRating.version()) {
+	if (localStorage.getItem("beatmapCache") && localStorage.getItem("beatmapCache") !== "[]" && parseInt(localStorage.getItem("beatmapCacheVersion")) === CACHE_VERSION) {
 		/* Beatmap loading and adding to dom */
 		let concatenated = "";
 		let cache = CacheManager.getCache("beatmapCache");
@@ -234,7 +239,6 @@ define(function(require) {
 		}
 		document.getElementById("beatmap-selection-right").innerHTML = concatenated;
 	} else {
-		localStorage.setItem("beatmapCacheVersion", StarRating.version());
 		Beatmaps.refresh();
 		loadMaps();
 	}
@@ -247,7 +251,7 @@ define(function(require) {
 			let cache = CacheManager.generate(loadedMaps);
 			if (cache.length > 0) {
 				CacheManager.setCache("beatmapCache", cache);
-				CacheManager.setCache("beatmapCacheVersion", StarRating.version());
+				CacheManager.setCache("beatmapCacheVersion", CACHE_VERSION);
 			}
 			for (let i = 0; i < cache.length; i++) {
 				concatenated += BeatMapSelectionPaneTemplate.group(cache[i], i);
@@ -261,8 +265,14 @@ define(function(require) {
 
 	function chooseRandomMap() {
 		let groups = document.getElementsByClassName("beatmap-selection-group");
-		if (groups.length > 0) {
-			clickGroup(groups[Math.floor(Math.random() * groups.length)]);
+		let visibleGroups = [];
+		for (let i = 0; i < groups.length; i++) {
+			if (groups[i].style.display !== "none") {
+				visibleGroups.push(groups[i]);
+			}
+		}
+		if (visibleGroups.length > 0) {
+			clickGroup(visibleGroups[Math.floor(Math.random() * visibleGroups.length)]);
 		}
 	}
 
@@ -1056,12 +1066,16 @@ define(function(require) {
 			fileReader.readAsBinaryString(this.files[i]);
 		}
 	});
+
 	document.getElementById("beatmap-search-bar").addEventListener("input", function() {
 		let groups = document.getElementsByClassName("beatmap-selection-group");
 		for (let i = 0; i < groups.length; i++) {
-			let name = groups[i].getElementsByClassName("beatmap-selection-group-title")[0].textContent;
+			/* all english punctuation marks, for future proofing */
+			let regexPunctuation = /[~`!@#$%^&*\(\)-_=+\[\{\]\}\|\\;:'",<.>/?]+/;
+			let nameSplit = groups[i].getElementsByClassName("beatmap-selection-group-title")[0].textContent.toLowerCase().replace(/['"\(\)]/g, "").replace(regexPunctuation, " ");
+			let querySplit = this.value.toLowerCase().replace(/['"\(\)]/g, "").replace(regexPunctuation, " ");
 			/* literal search, searchs for exact character sequences */
-			if (name.toLowerCase().includes(this.value.toLowerCase())) {
+			if (nameSplit.includes(querySplit)) {
 				groups[i].style.display = "block";
 			} else {
 				groups[i].style.display = "none";

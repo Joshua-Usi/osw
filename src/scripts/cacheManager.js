@@ -27,6 +27,8 @@ define(function(require) {
 				this.artist = mapSet[0].data.Artist;
 				this.creator = mapSet[0].data.Creator;
 				this.title = mapSet[0].data.Title;
+				this.tags = mapSet[0].data.Tags;
+				this.source = mapSet[0].data.Source;
 				this.previewTime = mapSet[0].data.PreviewTime / 1000;
 				this.difficulties =  [];
 				for (let i = 0; i < mapSet.length; i++) {

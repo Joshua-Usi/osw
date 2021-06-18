@@ -1,6 +1,13 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v0.9.1b] - 17-06-2021
+### Added
+- A message to users when running offline to use a web browser
+### Changed
+- When searching for maps and choosing random maps, the random algorithm only considers visible maps
+- Improved the searching algorithm by ignoring punctuation
+---
 ## [v0.9.0b] - 16-06-2021
 ### Changed
 - Star rating is now correct as of 16-06-2021. it is an osw! compatible rewrite of [ojsama]https://github.com/Francesco149/ojsama
