@@ -5,6 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Sudden death now automatically retries the map when you break combo
 - Perfect now automatically retries the map whenever accuracy drops below 100%
+- Spinner bonus spins now tell you how many bonus points were gained
 ### Changed
 - Judgement animations to be more smooth and match osu!
 - Better miss animation (random position and rotation)

@@ -261,6 +261,8 @@ define(function(require) {
 			} else if (hitObject.type[3] === "1" && hitObject.cache.cacheSetAfterHit === false) {
 				hitObject.cache.cacheSetAfterHit = true;
 				/* Cache setup for Spinner */
+				hitObject.cache.bonusSpins = 0;
+				hitObject.cache.size = 0;
 			}
 		}
 	}
@@ -503,6 +505,7 @@ define(function(require) {
 			/* velocity changes slowly due to spinner inertia*/
 			hitObject.cache.velocity += (angleChange - hitObject.cache.velocity) / 32;
 			hitObject.cache.spinAngle += hitObject.cache.velocity * (useTime - previousTime);
+			hitObject.cache.size -= hitObject.cache.size / 16;
 			if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && Math.abs(hitObject.cache.velocity / (Math.PI)) >= Formulas.ODSpinner(currentLoadedMap.OverallDifficulty, playDetails.mods)) {
 				hitObject.cache.timeSpentAboveSpinnerMinimum += useTime - previousTime;
 			}
@@ -516,6 +519,8 @@ define(function(require) {
 				if (hitObject.cache.cleared === false) {
 					hitEvents.push(new HitObject.Event("spinner-spin", 100, "no-increase", mapped.x, mapped.y));
 				} else {
+					hitObject.cache.bonusSpins++;
+					hitObject.cache.size += 0.125;
 					hitEvents.push(new HitObject.Event("spinner-bonus-spin", 1100, "no-increase", mapped.x, mapped.y));
 				}
 			}
@@ -613,9 +618,8 @@ define(function(require) {
 				canvas.drawImage(approachCircleComboBuffers[hitObject.cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
 			}
 			let individualDigits = hitObject.cache.comboNumber.toString();
-			for (let j = 0; j < individualDigits.length; j++) {
-				canvas.drawImage(Assets.comboNumbers[individualDigits[j]], hitObjectMapped.x - (individualDigits.length - 1) * circleDiameter / 6 + j * circleDiameter / 3, hitObjectMapped.y, circleDiameter / 3, circleDiameter / 3 * (Assets.comboNumbers[individualDigits[j]].height / Assets.comboNumbers[individualDigits[j]].width));
-			}
+			let aspectRatio = Assets.comboNumbers[0].width / Assets.comboNumbers[0].height;
+			canvas.drawDigits(Assets.comboNumbers, individualDigits, hitObjectMapped.x, hitObjectMapped.y, circleDiameter / 3, circleDiameter / 3 / aspectRatio);
 		} else if (hitObject.type[1] === "1") {
 			let sliderOpacity = utils.map(useTime, hitObject.time, hitObject.time + arTime, 1, 0);
 			if (playDetails.mods.hidden === false) {
@@ -738,7 +742,7 @@ define(function(require) {
 					ctx.resetTransform();
 				}
 			}
-			if (/*hitObject.cache.sliderFollowCirclePosition !== undefined && */useTime >= hitObject.time) {
+			if (useTime >= hitObject.time) {
 				let mapped = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 				let tempAlpha = canvas.getGlobalAlpha();
 				canvas.setGlobalAlpha(1);
@@ -751,6 +755,9 @@ define(function(require) {
 		} else if (hitObject.type[3] === "1") {
 			if (hitObject.cache.cleared) {
 				canvas.drawImage(Assets.spinnerClear, window.innerWidth / 2, window.innerHeight / 4);
+				let individualDigits = (hitObject.cache.bonusSpins * 1000).toString();
+				let aspectRatio = Assets.scoreNumbers[0].width / Assets.scoreNumbers[0].height;
+				canvas.drawDigits(Assets.scoreNumbers, individualDigits, window.innerWidth / 2, window.innerHeight * 3 / 4, window.innerWidth * 0.04 * (hitObject.cache.size + 1), window.innerWidth * 0.04 * (hitObject.cache.size + 1) / aspectRatio);
 			}
 			/* draw spinner */
 			let mapped = utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);

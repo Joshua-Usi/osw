@@ -85,6 +85,12 @@ define(function(require) {
 				}
 			}
 		}
+		drawDigits(images, digits, x, y, width, height) {
+			let digitsAsString = digits.toString(); 
+			for (let i = 0; i < digitsAsString.length; i++) {
+				this.context.drawImage(images[digitsAsString[i]], x - (digitsAsString.length) * width / 2 + i * width, y - height / 2, width, height);
+			}
+		}
 		/* courtesy of https://web.archive.org/web/20171014203801/http://www.playmycode.com/blog/2011/06/realtime-image-tinting-on-html5-canvas/*/
 		generateRGBKs(img) {
 			let w = img.width;
