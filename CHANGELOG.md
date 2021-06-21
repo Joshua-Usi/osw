@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Judgement animations to be more smooth and match osu!
 - Better miss animation (random position and rotation)
+### Fixed
+- Circle sliders being in the incorrect position
 ---
 ## [v0.9.1b] - 17-06-2021
 ### Added

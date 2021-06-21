@@ -97,10 +97,10 @@ define(function(require) {
 					x: x + Math.cos(startingAngle + direction * currentAngle) * r,
 					y: y + Math.sin(startingAngle + direction * currentAngle) * r,
 				});
-				if (currentAngle > 0) {
+				if (currentAngle < 0) {
 					totalLength++;
 				}
-				currentAngle += 1 / r;
+				currentAngle -= 1 / r;
 			}
 			return points;
 		},
