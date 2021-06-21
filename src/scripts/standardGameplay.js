@@ -869,7 +869,7 @@ define(function(require) {
 		hpDisplay += (currentHP - hpDisplay) / 8;
 	}
 
-	function processHitEvent(useTime) {
+	function processHitEvent(useTime, context) {
 		switch (hitEvents[0].score) {
 			/* great*/
 			case 300:
@@ -891,6 +891,10 @@ define(function(require) {
 				break;
 		}
 		if ((hitEvents[0].score > 50 || hitEvents[0].score === 0) && hitEvents[0].type === "hit-circle") {
+			if (playDetails.mods.perfect && hitEvents[0].score !== 300) {
+				context.retry();
+				return;
+			}
 			score += Formulas.hitScore(hitEvents[0].score, (combo === 0) ? combo : combo - 1, difficultyMultiplier, scoreMultiplier);
 			let lifetime = (hitEvents[0].score === 0) ? 1 : 0.4;
 			judgementObjects.push(new HitObject.ScoreObject(hitEvents[0].score, hitEvents[0].x, hitEvents[0].y, useTime, useTime + lifetime));
@@ -908,6 +912,10 @@ define(function(require) {
 				playDetails.comboBreaks++;
 			}
 			combo = 0;
+			if (playDetails.mods.suddenDeath) {
+				context.retry();
+				return;
+			}
 			document.getElementById("combo-container").innerHTML = "";
 		}
 		currentHP += Formulas.HP(currentLoadedMap.HPDrainRate, hitEvents[0].score, hitEvents[0].type, playDetails.mods);
@@ -1119,7 +1127,7 @@ define(function(require) {
 			}
 			/* Hit Events */
 			while (hitEvents.length > 0) {
-				processHitEvent(useTime);
+				processHitEvent(useTime, this);
 			}
 			playDetails.score = score;
 			playDetails.accuracy = Formulas.accuracy(playDetails.great, playDetails.ok, playDetails.meh, playDetails.miss) * 100;

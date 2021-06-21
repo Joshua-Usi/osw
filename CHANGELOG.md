@@ -2,6 +2,9 @@ Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
 ## [v0.9.2b] - 21-06-2021
+### Added
+- Sudden death now automatically retries the map when you break combo
+- Perfect now automatically retries the map whenever accuracy drops below 100%
 ### Changed
 - Judgement animations to be more smooth and match osu!
 - Better miss animation (random position and rotation)
