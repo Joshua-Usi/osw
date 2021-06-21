@@ -53,21 +53,38 @@ define(function(require) {
 	}
 	
 	/* Draws a N grade bezier curve from current point on the context */
-	return function bezier(points, res) {
-		/** Compute the incremental step*/
-		let tLength = 0;
-		for (let i = 0; i < points.length - 1; i++) {
-			tLength += utils.dist(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+	return {
+		nGrade: function(points, res) {
+			/* Compute the incremental step */
+			let tLength = 0;
+			for (let i = 0; i < points.length - 1; i++) {
+				tLength += utils.dist(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+			}
+			if (res === undefined) {
+				res = 1;
+			}
+			let step = res / tLength;
+			// compute the support points
+			let temp = [];
+			for (let t = 0; t <= 1; t += step) {
+				temp.push(P(t, points));
+			}
+			return temp;
+		},
+		cubic(x1, y1, x2, y2) {
+			return this.nGrade([{
+				x: 0,
+				y: 0,
+			}, {
+				x: x1,
+				y: y1,
+			},{
+				x: x2,
+				y: y2,
+			},{
+				x: 1,
+				y: 1,
+			}], 0.025);
 		}
-		if (res === undefined) {
-			res = 1;
-		}
-		let step = res / tLength;
-		// compute the support points
-		let temp = [];
-		for (let t = 0; t <= 1; t += step) {
-			temp.push(P(t, points));
-		}
-		return temp;
-	};
+	}
 });

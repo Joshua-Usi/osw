@@ -101,6 +101,11 @@ define(function(require) {
 				this.y = y;
 				this.initialTime = initialTime;
 				this.lifetime = lifetime;
+				if (this.score === 0) {
+					this.rotationVelocity = Utils.randomRange(-0.5, 0.5);
+					this.x += Utils.randomRange(-2, 2);
+					this.y += Utils.randomRange(-2, 2);
+				}
 			}
 		},
 		EffectObject: class EffectObject {

@@ -1,11 +1,16 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v0.9.2b] - 21-06-2021
+### Changed
+- Judgement animations to be more smooth and match osu!
+- Better miss animation (random position and rotation)
+---
 ## [v0.9.1b] - 17-06-2021
 ### Added
 - A message to users when running offline to use a web browser
 - Shuffle button in the menu so users can pick songs
-- Mouse Feedback for clickable icons
+- Mouse feedback for clickable icons
 ### Changed
 - When searching for maps and choosing random maps, the random algorithm only considers visible maps
 - Improved the searching algorithm by ignoring punctuation

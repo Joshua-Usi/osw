@@ -48,7 +48,7 @@ define(function(require) {
 	let hitEvents = [];
 	let hitObjects = [];
 	let hitErrors = [];
-	let scoreObjects = [];
+	let judgementObjects = [];
 	let effectObjects = [];
 	/* Playfield calculations and data */
 	let playfieldSize = 0.8;
@@ -100,16 +100,18 @@ define(function(require) {
 	let difficultyMultiplier;
 	let odTime;
 	/* osu constants */
-	let FOLLLOW_CIRCLE_SIZE = 2;
-	let APPROACH_CIRCLE_MAX_SIZE = 5;
-	let APPROACH_CIRCLE_MIN_SIZE = 1.4;
-	let HIDDEN_FADE_IN_PERCENT = 0.4;
-	let HIDDEN_FADE_OUT_PERCENT = 0.7;
-	let SLIDER_STROKE_SIZE_PERCENT = 0.9;
+	const FOLLLOW_CIRCLE_SIZE = 2;
+	const APPROACH_CIRCLE_MAX_SIZE = 5;
+	const APPROACH_CIRCLE_MIN_SIZE = 1.4;
+	const HIDDEN_FADE_IN_PERCENT = 0.4;
+	const HIDDEN_FADE_OUT_PERCENT = 0.7;
+	const SLIDER_STROKE_SIZE_PERCENT = 0.9;
 	let HIT_OBJECT_OFFSET_X = playfieldXOffset + window.innerWidth / 2 - window.innerHeight * playfieldSize * (4 / 3) / 2;
 	let HIT_OBJECT_OFFSET_Y = playfieldYOffset + window.innerHeight / 2 - window.innerHeight * playfieldSize / 2;
-	let PLAYFIELD_CENTER_X = 256;
-	let PLAYFIELD_CENTER_Y = 192;
+	const PLAYFIELD_CENTER_X = 256;
+	const PLAYFIELD_CENTER_Y = 192;
+	const JUDGEMENT_BEZIER_ANIMATION = Bezier.cubic(0, 1.4, 0, 1);
+	const MISS_JUDGEMENT_BEZIER_ANIMATION = Bezier.cubic(1, 0, 0.9, 0.7);
 
 	window.addEventListener("resize", function() {
 		canvas.canvas.width = window.innerWidth;
@@ -180,7 +182,7 @@ define(function(require) {
 					for (let j = 0; j < hitObject.curvePoints.length; j++) {
 						if (hitObject.curvePoints[j + 1] && hitObject.curvePoints[j].x === hitObject.curvePoints[j + 1].x && hitObject.curvePoints[j].y === hitObject.curvePoints[j + 1].y) {
 							bezierTemp.push(hitObject.curvePoints[j]);
-							let point = Bezier(bezierTemp);
+							let point = Bezier.nGrade(bezierTemp);
 							for (let k = 0; k < point.length; k++) {
 								hitObject.cache.points.push(point[k]);
 							}
@@ -189,7 +191,7 @@ define(function(require) {
 							bezierTemp.push(hitObject.curvePoints[j]);
 						}
 					}
-					let point = Bezier(bezierTemp);
+					let point = Bezier.nGrade(bezierTemp);
 					for (let k = 0; k < point.length; k++) {
 						hitObject.cache.points.push(point[k]);
 					}
@@ -890,7 +892,8 @@ define(function(require) {
 		}
 		if ((hitEvents[0].score > 50 || hitEvents[0].score === 0) && hitEvents[0].type === "hit-circle") {
 			score += Formulas.hitScore(hitEvents[0].score, (combo === 0) ? combo : combo - 1, difficultyMultiplier, scoreMultiplier);
-			scoreObjects.push(new HitObject.ScoreObject(hitEvents[0].score, hitEvents[0].x, hitEvents[0].y, useTime, useTime + 0.5));
+			let lifetime = (hitEvents[0].score === 0) ? 1 : 0.4;
+			judgementObjects.push(new HitObject.ScoreObject(hitEvents[0].score, hitEvents[0].x, hitEvents[0].y, useTime, useTime + lifetime));
 		} else {
 			score += hitEvents[0].score;
 		}
@@ -933,14 +936,14 @@ define(function(require) {
 	}
 
 	function renderEffects(useTime) {
-		for (let i = 0; i < scoreObjects.length; i++) {
-			if (scoreObjects[i].lifetime - useTime >= 0) {
+		for (let i = 0; i < judgementObjects.length; i++) {
+			if (judgementObjects[i].lifetime - useTime >= 0) {
 				/* ignore 300 hits */
-				if (currentOptions.Gameplay.draw300Hits === false && scoreObjects[i].score === 300) {
+				if (currentOptions.Gameplay.draw300Hits === false && judgementObjects[i].score === 300) {
 					continue;
 				}
 				let useImage = -1;
-				switch (scoreObjects[i].score) {
+				switch (judgementObjects[i].score) {
 					case 300:
 						useImage = 0;
 						break;
@@ -954,17 +957,21 @@ define(function(require) {
 						useImage = 3;
 						break;
 				}
-				canvas.setGlobalAlpha(utils.map(useTime, scoreObjects[i].initialTime, scoreObjects[i].lifetime, 1, 0));
-				let size = circleDiameter * 0.75 * utils.map(useTime, scoreObjects[i].initialTime, scoreObjects[i].lifetime, 1, 1.1);
-				if (scoreObjects[i].score === 0) {
-					let x = Math.sin(utils.map(useTime, scoreObjects[i].initialTime, scoreObjects[i].lifetime, 0, 2 * Math.PI)) * size / 64;
-					let y = utils.map(useTime, scoreObjects[i].initialTime, scoreObjects[i].lifetime, 0, 30);
-					canvas.drawImage(Assets.hitNumbers[useImage], scoreObjects[i].x + x, scoreObjects[i].y + y, size, size);
+				canvas.setGlobalAlpha(Math.min(utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 2, 0), 1));
+				let size = circleDiameter * 0.75;
+				if (judgementObjects[i].score === 0) {
+					let x = Math.sin(utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, 4 * Math.PI) * judgementObjects[i].rotationVelocity) * size / 64;
+					let y = utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, 75) ** 2 / 75 ** 1;
+					ctx.translate(judgementObjects[i].x + x, judgementObjects[i].y + y);
+					ctx.rotate(utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, 1) * judgementObjects[i].rotationVelocity);
+					canvas.drawImage(Assets.hitNumbers[useImage], 0, 0, size, size);
+					ctx.resetTransform();
 				} else {
-					canvas.drawImage(Assets.hitNumbers[useImage], scoreObjects[i].x, scoreObjects[i].y, size, size);
+					size *= JUDGEMENT_BEZIER_ANIMATION[Math.floor(utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, JUDGEMENT_BEZIER_ANIMATION.length))].y
+					canvas.drawImage(Assets.hitNumbers[useImage], judgementObjects[i].x, judgementObjects[i].y, size, size);
 				}
 			} else {
-				scoreObjects.splice(i, 1);
+				judgementObjects.splice(i, 1);
 				i--;
 			}
 		}
@@ -1207,7 +1214,7 @@ define(function(require) {
 			hitEvents = [];
 			hitObjects = [];
 			hitErrors = [];
-			scoreObjects = [];
+			judgementObjects = [];
 			effectObjects = [];
 			/* HP values */
 			currentHP = 1;

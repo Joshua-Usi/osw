@@ -77,7 +77,7 @@ define(function(require) {
 				octagonPoints.push(Utils.point(x, y));
 			}
 			for (let j = 0; j < octagonPoints.length - 1; j++) {
-				let bezierPoints = Bezier([octagonPoints[j], octagonPoints[j + 1]], 0.01);
+				let bezierPoints = Bezier.nGrade([octagonPoints[j], octagonPoints[j + 1]], 0.01);
 				for (let j = 0; j < bezierPoints.length; j++) {
 					octagonInterpolatedPoints.push(bezierPoints[j]);
 				}
@@ -96,13 +96,13 @@ define(function(require) {
 					pathPoints.push(Utils.point(path[i].x, path[i].y));
 					break;
 				case "L":
-					pathPoints = pathPoints.concat(Bezier([path[i - 1], path[i].x], 0.01));
+					pathPoints = pathPoints.concat(Bezier.nGrade([path[i - 1], path[i].x], 0.01));
 					break;
 				case "C":
-					pathPoints = pathPoints.concat(Bezier([path[i - 1], Utils.point(path[i].x1, path[i].y1), Utils.point(path[i].x2, path[i].y2), path[i]], 0.01));
+					pathPoints = pathPoints.concat(Bezier.nGrade([path[i - 1], Utils.point(path[i].x1, path[i].y1), Utils.point(path[i].x2, path[i].y2), path[i]], 0.01));
 					break;
 				case "Q":
-					pathPoints = pathPoints.concat(Bezier([path[i - 1], Utils.point(path[i].x1, path[i].y1), path[i]], 0.01));
+					pathPoints = pathPoints.concat(Bezier.nGrade([path[i - 1], Utils.point(path[i].x1, path[i].y1), path[i]], 0.01));
 					break;
 				case "Z":
 					pathPoints.push(Utils.point(path[beginningIndex].x, path[beginningIndex].y));
