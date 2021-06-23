@@ -9,8 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Judgement animations to be more smooth and match osu!
 - Better miss animation (random position and rotation)
+- Average hit error is now based on a weighted recent average (more recent hits will influence it more)
+- Average hit error is also animated
 ### Fixed
 - Circle sliders being in the incorrect position
+- Spinners not working in both directions
+### Code Quality
+- Used Math.min and Math.max instead of if statements
+- Created an emperical formula to map slider resolution to pixel resolution
 ---
 ## [v0.9.1b] - 17-06-2021
 ### Added

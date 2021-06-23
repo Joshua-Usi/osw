@@ -205,11 +205,35 @@ define(function(require) {
 			if (endingIndex === undefined) {
 				endingIndex = array.length;
 			}
+			/* default case for empty array */
+			if (endingIndex === startingIndex) {
+				return 0;
+			}
 			let sum = 0;
 			for (let i = startingIndex; i < endingIndex; i++) {
 				sum += array[i];
 			}
 			return sum / (endingIndex - startingIndex);
+		},
+		weightedMean: function(array, weightFunction, startingIndex, endingIndex) {
+			if (startingIndex === undefined) {
+				startingIndex = 0;
+			}
+			if (endingIndex === undefined) {
+				endingIndex = array.length;
+			}
+			/* default case for empty array */
+			if (endingIndex === startingIndex) {
+				return 0;
+			}
+			let sum = 0;
+			let weightSum = 0;
+			for (let i = startingIndex; i < endingIndex; i++) {
+				let weight = weightFunction(i - startingIndex);
+				sum += array[i] * weight; 
+				weightSum += weight;
+			}
+			return sum / weightSum;
 		},
 		camelCaseToDash: function(string) {
 			return string.replace(/[A-Z]/g, m => "-" + m.toLowerCase());

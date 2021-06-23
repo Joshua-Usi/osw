@@ -64,6 +64,7 @@ define(function(require) {
 	let scoreMultiplier = 1;
 	let score = 0;
 	let displayedScore = 0;
+	let meanHitErrorPosition = 0;
 	/* Combo letiables */
 	let combo = 0;
 	let currentComboNumber = 1;
@@ -114,6 +115,9 @@ define(function(require) {
 	const PLAYFIELD_CENTER_Y = 192;
 	const JUDGEMENT_BEZIER_ANIMATION = Bezier.cubic(0, 1.4, 0, 1);
 	const MISS_JUDGEMENT_BEZIER_ANIMATION = Bezier.cubic(1, 0, 0.9, 0.7);
+	/* in radians */
+	const AUTO_SPIN_SPEED = 50;
+	const AUTOPILOT_SPIN_SPEED = 30;
 
 	window.addEventListener("resize", function() {
 		canvas.canvas.width = window.innerWidth;
@@ -270,7 +274,6 @@ define(function(require) {
 	function processHitObject(hitObject, useTime, previousTime, index, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y) {
 		let hasSpliced = false;
 		let hitObjectMapped = utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
-		let autoSpinSpeed = 50;
 		if (playDetails.mods.auto) {
 			keyboard.emulateKeyUp("z");
 			if (index === 0) {
@@ -287,11 +290,13 @@ define(function(require) {
 				mouse.setPosition(sliderFollowCirclePos.x, sliderFollowCirclePos.y);
 				keyboard.emulateKeyDown("z");
 			}
-		} else if (playDetails.mods.spunOut) {
-			autoSpinSpeed = 30;
 		}
 		if ((playDetails.mods.auto || playDetails.mods.spunOut) && hitObject.type[3] === "1" && useTime > hitObject.time) {
-				angleChange = autoSpinSpeed;
+				if (playDetails.mods.auto) {
+					angleChange = AUTO_SPIN_SPEED;
+				} else if (playDetails.mods.spunOut) {
+					angleChange = AUTOPILOT_SPIN_SPEED;
+				}
 				mouse.setPosition(hitObjectMapped.x + 100 * Math.cos(hitObject.cache.spinAngle), hitObjectMapped.y + 100 * Math.sin(hitObject.cache.spinAngle));
 				keyboard.emulateKeyDown("z");
 			}
@@ -337,9 +342,7 @@ define(function(require) {
 				if (hitObject.cache.currentSlide % 2 === 0) {
 					hitObject.cache.sliderFollowCirclePosition = Math.floor(utils.map(useTime, hitObject.time + time * hitObject.cache.currentSlide, hitObject.time + time * (hitObject.cache.currentSlide + 1), 0, hitObject.cache.points.length - 1));
 					/* Prevent Index Errors */
-					if (hitObject.cache.sliderFollowCirclePosition < 0) {
-						hitObject.cache.sliderFollowCirclePosition = 0;
-					}
+					hitObject.cache.sliderFollowCirclePosition = Math.max(hitObject.cache.sliderFollowCirclePosition, 0);
 					/* Check if slider repeats, then switch direction */
 					if (hitObject.cache.sliderFollowCirclePosition > hitObject.cache.points.length - 1) {
 						hitObject.cache.sliderFollowCirclePosition = hitObject.cache.points.length - 1;
@@ -348,9 +351,7 @@ define(function(require) {
 				} else if (hitObject.cache.currentSlide % 2 === 1) {
 					hitObject.cache.sliderFollowCirclePosition = Math.floor(utils.map(useTime, hitObject.time + time * hitObject.cache.currentSlide, hitObject.time + time * (hitObject.cache.currentSlide + 1), hitObject.cache.points.length - 1, 0));
 					/* Prevent Index Errors */
-					if (hitObject.cache.sliderFollowCirclePosition > hitObject.cache.points.length - 1) {
-						hitObject.cache.sliderFollowCirclePosition = hitObject.cache.points.length - 1;
-					}
+					hitObject.cache.sliderFollowCirclePosition = Math.min(hitObject.cache.sliderFollowCirclePosition, hitObject.cache.points.length - 1);
 					/* Check if slider repeats, then switch direction */
 					if (hitObject.cache.sliderFollowCirclePosition < 0) {
 						hitObject.cache.sliderFollowCirclePosition = 0;
@@ -506,6 +507,7 @@ define(function(require) {
 			hitObject.cache.velocity += (angleChange - hitObject.cache.velocity) / 32;
 			hitObject.cache.spinAngle += hitObject.cache.velocity * (useTime - previousTime);
 			hitObject.cache.size -= hitObject.cache.size / 16;
+			hitObject.cache.size = Math.min(hitObject.cache.size, 2);
 			if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && Math.abs(hitObject.cache.velocity / (Math.PI)) >= Formulas.ODSpinner(currentLoadedMap.OverallDifficulty, playDetails.mods)) {
 				hitObject.cache.timeSpentAboveSpinnerMinimum += useTime - previousTime;
 			}
@@ -530,6 +532,8 @@ define(function(require) {
 				if (hitObject.cache.cleared === false) {
 					hitEvents.push(new HitObject.Event("spinner-spin", 100, "no-increase", mapped.x, mapped.y));
 				} else {
+					hitObject.cache.bonusSpins++;
+					hitObject.cache.size += 0.125;
 					hitEvents.push(new HitObject.Event("spinner-bonus-spin", 1100, "no-increase", mapped.x, mapped.y));
 				}
 			}
@@ -537,7 +541,7 @@ define(function(require) {
 		/* Spinner end handling */
 		if (hitObject.type[3] === "1" && useTime >= hitObject.endTime) {
 			let mapped = utils.mapToOsuPixels(PLAYFIELD_CENTER_X, PLAYFIELD_CENTER_Y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
-			/* spinner is cleared is if the time spent spinning is over 18.75% of the spinner length */
+			/* spinner is cleared is if the time spent spinning is over 25% of the spinner length */
 			if (hitObject.cache.cleared) {
 				hitEvents.push(new HitObject.Event("hit-circle", 300, "increasing", mapped.x, mapped.y));
 				/* award 100 if time spent spinning is between 25% and 18.75% */
@@ -571,13 +575,9 @@ define(function(require) {
 		let approachCircleSize = utils.map(useTime - (hitObject.time - arTime), 0, arTime, APPROACH_CIRCLE_MAX_SIZE, APPROACH_CIRCLE_MIN_SIZE);
 		let hitObjectMapped = utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 		/* approach circle max size */
-		if (approachCircleSize > APPROACH_CIRCLE_MAX_SIZE) {
-			approachCircleSize = APPROACH_CIRCLE_MAX_SIZE;
-		}
+		approachCircleSize = Math.min(approachCircleSize, APPROACH_CIRCLE_MAX_SIZE)
 		/* approach circle min size */
-		if (approachCircleSize < APPROACH_CIRCLE_MIN_SIZE) {
-			approachCircleSize = APPROACH_CIRCLE_MIN_SIZE;
-		}
+		approachCircleSize = Math.max(approachCircleSize, 0);
 		/* Alpha Calculations */
 		if (hitObject.type[0] === "1") {
 			if (playDetails.mods.hidden) {
@@ -596,9 +596,7 @@ define(function(require) {
 					canvas.setGlobalAlpha(utils.map(useTime - (hitObject.time - arTime), 0, arFadeIn, 0, 1));
 				} else {
 					let alpha = utils.map(useTime - (hitObject.time - arTime), arTime, arTime + odTime[0] / 2, 1, 0);
-					if (alpha <= 0) {
-						alpha = 0;
-					}
+					alpha = Math.max(alpha, 0);
 					canvas.setGlobalAlpha(alpha);
 				}
 			}
@@ -638,25 +636,9 @@ define(function(require) {
 				if (sliderDrawPercent > hitObject.cache.points.length - 1 || currentOptions.Gameplay.snakingSlidersIn === false) {
 					sliderDrawPercent = hitObject.cache.points.length - 1;
 				}
-				let inc;
-				switch (currentOptions.Performance.sliderResolution) {
-					case 0:
-						inc = 1;
-						break;
-					case 0.25:
-						inc = 2;
-						break;
-					case 0.5:
-						inc = 4;
-						break;
-					case 0.75:
-						inc = 8;
-						break;
-					case 1:
-						inc = 16;
-						break;
-				}
-				if (sliderDrawPercent <= 16) {
+				/* 2 ** 4x */
+				let inc = Math.pow(2, 4 * currentOptions.Performance.sliderResolution);
+				if (sliderDrawPercent <= inc) {
 					inc = 1;
 				}
 				/* Slider Curve calculated the at the hitobject time - ar time */
@@ -664,7 +646,7 @@ define(function(require) {
 				ctx.lineJoin = "round";
 				/* Draw Outer Slider Body */
 				ctx.lineWidth = circleDiameter;
-				canvas.setStrokeStyle("rgba(255, 255, 255, " + canvas.getGlobalAlpha() + ")");
+				canvas.setStrokeStyle("#fff");
 				let mapped = utils.mapToOsuPixels(hitObject.cache.points[sliderDrawPercent].x, hitObject.cache.points[sliderDrawPercent].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 				ctx.beginPath();
 				for (let j = 0; j < sliderDrawPercent; j += inc) {
@@ -757,7 +739,7 @@ define(function(require) {
 				canvas.drawImage(Assets.spinnerClear, window.innerWidth / 2, window.innerHeight / 4);
 				let individualDigits = (hitObject.cache.bonusSpins * 1000).toString();
 				let aspectRatio = Assets.scoreNumbers[0].width / Assets.scoreNumbers[0].height;
-				canvas.drawDigits(Assets.scoreNumbers, individualDigits, window.innerWidth / 2, window.innerHeight * 3 / 4, window.innerWidth * 0.04 * (hitObject.cache.size + 1), window.innerWidth * 0.04 * (hitObject.cache.size + 1) / aspectRatio);
+				canvas.drawDigits(Assets.scoreNumbers, individualDigits, window.innerWidth / 2, window.innerHeight * 3 / 4, window.innerWidth * 0.03 * (hitObject.cache.size + 1), window.innerWidth * 0.03 * (hitObject.cache.size + 1) / aspectRatio);
 			}
 			/* draw spinner */
 			let mapped = utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
@@ -820,9 +802,9 @@ define(function(require) {
 		}
 		canvas.setGlobalAlpha(1);
 		if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
-			mouseSize += 1 / 16;
+			mouseSize += 0.125;
 		}
-		mouseSize += (1 - mouseSize) / 8;
+		mouseSize += (1 - mouseSize) / 4;
 		canvas.drawImage(Assets.cursor, mouse.position.x, mouse.position.y, Assets.cursor.width * mouseSize, Assets.cursor.height * mouseSize);
 	}
 
@@ -838,12 +820,8 @@ define(function(require) {
 			angleChange = 0;
 		}
 		/* hard limit spinner speed at 50rad/s or ~477 rpm */
-		if (angleChange >= 50) {
-			angleChange = 50;
-		}
-		if (angleChange <= -50) {
-			angleChange = -50;
-		}
+		angleChange = Math.min(angleChange, 50);
+		angleChange = Math.max(angleChange, -50);
 		/* Detect sudden sign changes due to rollover every spin */
 		if (previousSigns.length > 10) {
 			previousSigns.shift();
@@ -859,19 +837,15 @@ define(function(require) {
 	}
 
 	function updateHp(useTime, previousTime) {
-		if (currentHP > 1) {
-			currentHP = 1;
+		currentHP = Math.min(currentHP, 1);
+		currentHP = Math.max(currentHP, 0);
+		if (currentHP <= 0 && (playDetails.mods.auto || playDetails.mods.relax || playDetails.mods.autopilot || playDetails.mods.noFail) === false) {
+			document.getElementById("webpage-state-fail-screen").style.display = "block";
+			audio.pause();
+			isRunning = false;
+			exitPointerLock();
 		}
-		if (currentHP < 0) {
-			currentHP = 0;
-			if ((playDetails.mods.auto || playDetails.mods.relax || playDetails.mods.autopilot || playDetails.mods.noFail) === false) {
-				document.getElementById("webpage-state-fail-screen").style.display = "block";
-				audio.pause();
-				isRunning = false;
-				exitPointerLock();
-			}
-		}
-		/* only start draining health 2 seconds before the first hit object*/
+		/* only start draining health 2 seconds before the first hit object */
 		if (useTime > currentLoadedMap.hitObjects[0].time - 2) {
 			currentHP -= Formulas.HPDrain(currentLoadedMap.HPDrainRate, useTime - previousTime);
 		}
@@ -912,9 +886,7 @@ define(function(require) {
 		}
 		if (hitEvents[0].combo === "increasing") {
 			combo++;
-			if (combo > playDetails.maxCombo) {
-				playDetails.maxCombo = combo;
-			}
+			playDetails.maxCombo = Math.max(playDetails.maxCombo, combo);
 			comboPulseSize = 1;
 		} else if (hitEvents[0].combo === "reset") {
 			if (combo >= 1) {
@@ -994,10 +966,7 @@ define(function(require) {
 		}
 		for (let i = 0; i < effectObjects.length; i++) {
 			if (effectObjects[i].lifetime - useTime >= 0) {
-				let alpha = utils.map(useTime, effectObjects[i].initialTime, effectObjects[i].lifetime, 1, 0);
-				if (alpha > 1) {
-					alpha = 1;
-				}
+				let alpha = Math.min(utils.map(useTime, effectObjects[i].initialTime, effectObjects[i].lifetime, 1, 0), 1);
 				canvas.setGlobalAlpha(alpha);
 				let size = circleDiameter * utils.map(useTime, effectObjects[i].initialTime, effectObjects[i].lifetime, 1, 1.5);
 				canvas.drawImage(effectObjects[i].src, effectObjects[i].x, effectObjects[i].y, size, size);
@@ -1021,10 +990,7 @@ define(function(require) {
 				break;
 			}
 			let useError = hitErrors[hitErrors.length - 1 - i];
-			let alpha = utils.map(i, 40, 0, 0, 0.5);
-			if (alpha <= 0) {
-				alpha = 0;
-			}
+			let alpha = Math.max(utils.map(i, 40, 0, 0, 0.5), 0);
 			canvas.setGlobalAlpha(alpha);
 			if (utils.withinRange(useError, 0, odTime[2])) {
 				canvas.setFillStyle("#66ccff");
@@ -1035,10 +1001,11 @@ define(function(require) {
 			}
 			ctx.fillRect(window.innerWidth / 2 + useError * 1000, window.innerHeight * 0.975 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.025);
 		}
-		let mean = utils.mean(hitErrors, (hitErrors.length > 40) ? hitErrors.length - 40 : 0, hitErrors.length);
+		let mean = utils.weightedMean(hitErrors, function(n) {return Math.E ** (- n / 2)}, (hitErrors.length > 40) ? hitErrors.length - 40 : 0, hitErrors.length);
+		meanHitErrorPosition += (mean - meanHitErrorPosition) / 16;
 		canvas.setGlobalAlpha(1);
 		canvas.setFillStyle("#fff");
-		ctx.fillRect(window.innerWidth / 2 + mean * 1000, window.innerHeight * 0.965 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.005);
+		ctx.fillRect(window.innerWidth / 2 + meanHitErrorPosition * 1000, window.innerHeight * 0.965 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.005);
 
 	}
 	function renderFlashlight() {
@@ -1128,10 +1095,7 @@ define(function(require) {
 			for (let i = 0; i < hitObjects.length; i++) {
 				let spliced = processHitObject(hitObjects[i], useTime, previousTime, i, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y);
 				if (spliced) {
-					i--;
-					if (i < 0) {
-						i = 0;
-					}
+					i = Math.max(i - 1, 0);
 				}
 			}
 			/* Hit Events */
