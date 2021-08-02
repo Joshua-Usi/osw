@@ -1,6 +1,28 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [vmajor.minor.patch|a,b,rc|] - 27-06-2021
+### Added
+- Replays
+- Score Saving
+- Ability to view replays
+- Notelock (unfortunately)
+### Changed
+- README.MD FAQs
+### Optimised
+-
+### Deprecated
+-
+### Removed
+-
+### Fixed
+- An issue where the approach circle size would continue to lower in size
+- Typos in README.MD
+### Security
+-
+### Code Quality
+- options.js to have a more consistent API
+---
 ## [v0.9.2b] - 21-06-2021
 ### Added
 - Sudden death now automatically retries the map when you break combo

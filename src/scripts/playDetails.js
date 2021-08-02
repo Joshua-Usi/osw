@@ -1,8 +1,10 @@
 define(function (require) {
   "use strict"
 	const Mods = require("./mods.js");
+	const ReplayManager = require("./replay.js");
 	return class PlayDetails {
-		constructor(mods) {
+		constructor(mapIdentifier, mods = new Mods()) {
+			this.mapIdentifier = mapIdentifier;
 			this.title = "";
 			this.creator = "";
 			this.artist = "";
@@ -18,9 +20,9 @@ define(function (require) {
 			this.miss = 0;
 			this.comboBreaks = 0;
 			this.sliderBreaks = 0;
-			this.mods = mods || new Mods();
+			this.mods = mods;
 			this.datePlayed = "";
-			this.replay = [];
+			this.replay = new ReplayManager.Replay();
 		}
 	};
 });

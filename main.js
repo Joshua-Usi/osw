@@ -62,8 +62,8 @@ define(function(require) {
 	}
 	/* osw! version incremented manually */
 	const MAJOR_VERSION = 0;
-	const MINOR_VERSION = 9;
-	const PATCH_VERSION = 2;
+	const MINOR_VERSION = 10;
+	const PATCH_VERSION = 0;
 	const BUILD_METADATA = "b";
 	const version = `osw! v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}${BUILD_METADATA}`;
 	/* Set element version numbers */
@@ -188,7 +188,7 @@ define(function(require) {
 					menuAudio.pause();
 					/* reset audio time */
 					menuAudio.currentTime = 0;
-					GameplayHandler.playMap(event.target.result.data, selectedMods);
+					GameplayHandler.play(event.target.result.data, event.target.result.name, selectedMods);
 				});
 			});
 		}
@@ -398,7 +398,7 @@ define(function(require) {
 	let imageQueue = [];
 	/* set the settings */
 	(function() {
-		let userOptions = Options.read();
+		let userOptions = Options.get();
 		let index = 0;
 		for (let group in userOptions) {
 			if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object" && group !== "types") {
@@ -1097,5 +1097,26 @@ define(function(require) {
 	});
 	document.getElementById("bottom-bar-random").addEventListener("click", function() {
 		chooseRandomMap();
+	});
+	document.getElementById("bottom-bar-watch-replay").addEventListener("click", function() {
+		let map = JSON.parse(localStorage.getItem("replayTest"));
+		let database = window.indexedDB.open("osw-database");
+		database.addEventListener("success", function(event) {
+			let database = event.target.result;
+			let beatmapObjectStore = DatabaseManager.getObjectStore(database, "beatmaps", "readonly");
+			let beatmapRequest = beatmapObjectStore.get(map.mapIdentifier);
+			beatmapRequest.addEventListener("error", function(event) {
+				console.error(`Attempt to find query failed: ${event.target.error}`);
+			});
+			beatmapRequest.addEventListener("success", function(event) {
+				Utils.showWebpageStates(["webpage-state-gameplay"]);
+				Utils.hideWebpageStates(["webpage-state-menu", "webpage-state-beatmap-selection", "webpage-state-mods", "webpage-state-pause-screen", "webpage-state-fail-screen", "webpage-state-results-screen", "top-bar", "bottom-bar", ]);
+				document.getElementById("sidenav").style.width = "0";
+				document.getElementById("sidenav").style.opacity = "0.2";
+				/* reset audio time */
+				menuAudio.currentTime = 0;
+				GameplayHandler.watchReplay(event.target.result.data, map);
+			});
+		});
 	});
 });

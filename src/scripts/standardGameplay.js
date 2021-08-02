@@ -15,6 +15,7 @@ define(function(require) {
 	const PlayDetails = require("./playDetails.js");
 	const endScreen = require("./endScreen.js");
 	const databaseManager = require("./databaseManager.js");
+	const ReplayManager = require("./replay.js");
 	let currentLoadedMap;
 	/* canvas setup */
 	let canvas = new Canvas("gameplay");
@@ -37,11 +38,13 @@ define(function(require) {
 	mouse.positionBound(0, 0, window.innerWidth, window.innerHeight);
 	let mouseSize = 1;
 	keyboard.init();
-	let keyboardLeftReleased = false;
-	let keyboardRightReleased = false;
+	let keyboardLeftReleased = true;
+	let keyboardRightReleased = true;
 	/* Details about the play, including replays */
 	let playDetails;
-	let currentOptions;
+	let isReplay = false;
+	let currentMouseEvent = 0;
+	let currentKeyEvent = 0;
 	/* object arrays */
 	let endingTime;
 	let currentHitObject = 0;
@@ -114,7 +117,6 @@ define(function(require) {
 	const PLAYFIELD_CENTER_X = 256;
 	const PLAYFIELD_CENTER_Y = 192;
 	const JUDGEMENT_BEZIER_ANIMATION = Bezier.cubic(0, 1.4, 0, 1);
-	const MISS_JUDGEMENT_BEZIER_ANIMATION = Bezier.cubic(1, 0, 0.9, 0.7);
 	/* in radians */
 	const AUTO_SPIN_SPEED = 50;
 	const AUTOPILOT_SPIN_SPEED = 30;
@@ -132,7 +134,7 @@ define(function(require) {
 	});
 
 	function enterPointerLock() {
-		if (currentOptions.Inputs.useRawPosition === false) {
+		if (Options.getProperty("Inputs", "useRawPosition") === false) {
 			mouse.lockPointer();
 		} else {
 			mouse.hide();
@@ -140,7 +142,7 @@ define(function(require) {
 	}
 
 	function exitPointerLock() {
-		if (currentOptions.Inputs.useRawPosition === false) {
+		if (Options.getProperty("Inputs", "useRawPosition") === false) {
 			mouse.unlockPointer();
 		} else {
 			mouse.show();
@@ -272,10 +274,14 @@ define(function(require) {
 	}
 
 	function processHitObject(hitObject, useTime, previousTime, index, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y) {
+		/* notelocked for circles */
+		if (index !== 0 && hitObject.type[0] === "1") {
+			return;
+		}
 		let hasSpliced = false;
 		let hitObjectMapped = utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 		if (playDetails.mods.auto) {
-			keyboard.emulateKeyUp("z");
+			keyboard.emulateKeyUp(Options.getProperty("Inputs", "keyboardLeftButton"));
 			if (index === 0) {
 				if ((hitObject.cache.hasHitAtAll === false || hitObject.cache.hasHitAtAll === undefined) && hitObject.type[3] !== "1") {
 					mouse.changePosition((hitObjectMapped.x - mouse.position.x) / 4, (hitObjectMapped.y - mouse.position.y) / 4);
@@ -283,12 +289,12 @@ define(function(require) {
 			}
 			if (hitObject.type[0] === "1" && useTime > hitObject.time - odTime[2] / 2) {
 				mouse.setPosition(hitObjectMapped.x, hitObjectMapped.y);
-				keyboard.emulateKeyDown("z");
+				keyboard.emulateKeyDown(Options.getProperty("Inputs", "keyboardLeftButton"));
 			}
 			if (hitObject.type[1] === "1" && useTime > hitObject.time - odTime[2] / 2) {
 				let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 				mouse.setPosition(sliderFollowCirclePos.x, sliderFollowCirclePos.y);
-				keyboard.emulateKeyDown("z");
+				keyboard.emulateKeyDown(Options.getProperty("Inputs", "keyboardLeftButton"));
 			}
 		}
 		if ((playDetails.mods.auto || playDetails.mods.spunOut) && hitObject.type[3] === "1" && useTime > hitObject.time) {
@@ -298,16 +304,10 @@ define(function(require) {
 					angleChange = AUTOPILOT_SPIN_SPEED;
 				}
 				mouse.setPosition(hitObjectMapped.x + 100 * Math.cos(hitObject.cache.spinAngle), hitObjectMapped.y + 100 * Math.sin(hitObject.cache.spinAngle));
-				keyboard.emulateKeyDown("z");
+				keyboard.emulateKeyDown(Options.getProperty("Inputs", "keyboardLeftButton"));
 			}
 		/* Hit Circle Hit Handling */
-		if (hitObject.type[0] === "1" && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased))) {
-			if (keyboard.getKeyDown("z") && keyboardLeftReleased) {
-				keyboardLeftReleased = false;
-			}
-			if (keyboard.getKeyDown("x") && keyboardRightReleased) {
-				keyboardRightReleased = false;
-			}
+		if (hitObject.type[0] === "1" && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) && keyboardLeftReleased) || (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")) && keyboardRightReleased))) {
 			let hitWindowScore = 0;
 			if (utils.withinRange(useTime, hitObject.time, odTime[0])) {
 				if (utils.withinRange(useTime, hitObject.time, odTime[2])) {
@@ -360,7 +360,7 @@ define(function(require) {
 				}
 				/* Check if slider follow circle went over slider ticks */
 				for (let j = 0; j < hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide].length; j++) {
-					if (hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] === false && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+					if (hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] === false && (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
 						let mapped = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].x, hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 						if (hitObject.cache.sliderFollowCirclePreviousPosition < hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j] && hitObject.cache.sliderFollowCirclePosition > hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]) {
 							hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] = true;
@@ -371,9 +371,9 @@ define(function(require) {
 					}
 				}
 				let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
-				if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * FOLLLOW_CIRCLE_SIZE / 2 && hitObject.cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+				if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * FOLLLOW_CIRCLE_SIZE / 2 && hitObject.cache.onFollowCircle && (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
 					hitObject.cache.onFollowCircle = true;
-				} else if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter / 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+				} else if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter / 2 && (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
 					hitObject.cache.onFollowCircle = true;
 				} else {
 					hitObject.cache.onFollowCircle = false;
@@ -382,7 +382,7 @@ define(function(require) {
 					hitObject.cache.currentSlide++;
 					if (hitObject.cache.currentSlide < hitObject.slides) {
 						let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
-						if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * FOLLLOW_CIRCLE_SIZE / 2 && hitObject.cache.onFollowCircle && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+						if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * FOLLLOW_CIRCLE_SIZE / 2 && hitObject.cache.onFollowCircle && (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
 							hitObject.cache.repeatsHit++;
 							hitEvents.push(new HitObject.Event("slider-element", 30, "increasing", sliderFollowCirclePos.x));
 							if (playDetails.mods.hidden === false) {
@@ -410,13 +410,7 @@ define(function(require) {
 			}
 		}
 		/* Slider Head Hit Handling */
-		if (hitObject.type[1] === "1" && hitObject.cache.hitHead === false && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown("z") && keyboardLeftReleased) || (keyboard.getKeyDown("x") && keyboardRightReleased)) && utils.withinRange(useTime, hitObject.time, odTime[0])) {
-			if (keyboard.getKeyDown("z") && keyboardLeftReleased) {
-				keyboardLeftReleased = false;
-			}
-			if (keyboard.getKeyDown("x") && keyboardRightReleased) {
-				keyboardRightReleased = false;
-			}
+		if (hitObject.type[1] === "1" && hitObject.cache.hitHead === false && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) && keyboardLeftReleased) || (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")) && keyboardRightReleased)) && utils.withinRange(useTime, hitObject.time, odTime[0])) {
 			hitErrors.push(useTime - hitObject.time);
 			hitEvents.push(new HitObject.Event("slider-element", 30, "increasing", hitObjectMapped.x, hitObjectMapped.y));
 			if (playDetails.mods.hidden === false) {
@@ -508,14 +502,14 @@ define(function(require) {
 			hitObject.cache.spinAngle += hitObject.cache.velocity * (useTime - previousTime);
 			hitObject.cache.size -= hitObject.cache.size / 16;
 			hitObject.cache.size = Math.min(hitObject.cache.size, 2);
-			if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x")) && Math.abs(hitObject.cache.velocity / (Math.PI)) >= Formulas.ODSpinner(currentLoadedMap.OverallDifficulty, playDetails.mods)) {
+			if ((keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton"))) && Math.abs(hitObject.cache.velocity / (Math.PI)) >= Formulas.ODSpinner(currentLoadedMap.OverallDifficulty, playDetails.mods)) {
 				hitObject.cache.timeSpentAboveSpinnerMinimum += useTime - previousTime;
 			}
 			/* spinner is officialy cleared if time spent spinning is above 25% */
 			if (hitObject.cache.timeSpentAboveSpinnerMinimum >= (hitObject.endTime - hitObject.time) * 0.25) {
 				hitObject.cache.cleared = true;
 			}
-			while (hitObject.cache.spinAngle >= Math.PI * 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+			while (hitObject.cache.spinAngle >= Math.PI * 2 && (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
 				hitObject.cache.spins++;
 				hitObject.cache.spinAngle -= Math.PI * 2;
 				if (hitObject.cache.cleared === false) {
@@ -526,7 +520,7 @@ define(function(require) {
 					hitEvents.push(new HitObject.Event("spinner-bonus-spin", 1100, "no-increase", mapped.x, mapped.y));
 				}
 			}
-			while (hitObject.cache.spinAngle <= -Math.PI * 2 && (keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+			while (hitObject.cache.spinAngle <= -Math.PI * 2 && (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
 				hitObject.cache.spins++;
 				hitObject.cache.spinAngle += Math.PI * 2;
 				if (hitObject.cache.cleared === false) {
@@ -559,13 +553,7 @@ define(function(require) {
 			return hasSpliced;
 		}
 		if (playDetails.mods.auto) {
-			keyboard.emulateKeyUp("z");
-		}
-		if (keyboard.getKeyDown("z") === false) {
-			keyboardLeftReleased = true;
-		}
-		if (keyboard.getKeyDown("x") === false) {
-			keyboardRightReleased = true;
+			keyboard.emulateKeyUp(Options.getProperty("Inputs", "keyboardLeftButton"));
 		}
 		return hasSpliced;
 	}
@@ -577,7 +565,7 @@ define(function(require) {
 		/* approach circle max size */
 		approachCircleSize = Math.min(approachCircleSize, APPROACH_CIRCLE_MAX_SIZE)
 		/* approach circle min size */
-		approachCircleSize = Math.max(approachCircleSize, 0);
+		approachCircleSize = Math.max(approachCircleSize, APPROACH_CIRCLE_MIN_SIZE);
 		/* Alpha Calculations */
 		if (hitObject.type[0] === "1") {
 			if (playDetails.mods.hidden) {
@@ -633,11 +621,11 @@ define(function(require) {
 				if (sliderDrawPercent < Math.floor(hitObject.cache.points.length / 4)) {
 					sliderDrawPercent = Math.floor(hitObject.cache.points.length / 4);
 				}
-				if (sliderDrawPercent > hitObject.cache.points.length - 1 || currentOptions.Gameplay.snakingSlidersIn === false) {
+				if (sliderDrawPercent > hitObject.cache.points.length - 1 || Options.getProperty("Gameplay", "snakingSlidersIn") === false) {
 					sliderDrawPercent = hitObject.cache.points.length - 1;
 				}
 				/* 2 ** 4x */
-				let inc = Math.pow(2, 4 * currentOptions.Performance.sliderResolution);
+				let inc = Math.pow(2, 4 * Options.getProperty("Performance", "sliderResolution"));
 				if (sliderDrawPercent <= inc) {
 					inc = 1;
 				}
@@ -758,7 +746,7 @@ define(function(require) {
 
 	function updateScore() {
 		comboPulseSize -= comboPulseSize / 8;
-		if (currentOptions.Performance.scoreUpdateRate === "Equal to frame rate") {
+		if (Options.getProperty("Performance", "scoreUpdateRate") === "Equal to frame rate") {
 			displayedScore += (score - displayedScore) / 8;
 		} else {
 			displayedScore = score;
@@ -766,7 +754,7 @@ define(function(require) {
 		/* update score html element */
 		utils.htmlCounter(Math.round(displayedScore).toString(), "score-container", "score-digit-", Assets.scoreNumbers, "left", "calc(100vw - " + (document.getElementById("score-container").childNodes.length * 2) + "vw)");
 		/* update combo html element */
-		utils.htmlCounter(combo + "x", "combo-container", "combo-digit-", Assets.scoreNumbers, "top", "calc(100vh - 52 / 32 * " + 2 * (comboPulseSize + 1) + "vw)");
+		utils.htmlCounter(combo + Options.getProperty("Inputs", "keyboardRightButton"), "combo-container", "combo-digit-", Assets.scoreNumbers, "top", "calc(100vh - 52 / 32 * " + 2 * (comboPulseSize + 1) + "vw)");
 		/* update accuracy html element */
 		utils.htmlCounter(playDetails.accuracy.toFixed(2) + "%", "accuracy-container", "accuracy-digit-", Assets.scoreNumbers, "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
 		/* rank grade */
@@ -783,7 +771,7 @@ define(function(require) {
 		/* mouse trails */
 		let numberOfMouseTrailsRendered = 0;
 		let maxMouseTrails = 128;
-		if (currentOptions.Gameplay.cursorTrails === "Interpolated") {
+		if (Options.getProperty("Gameplay", "cursorTrails") === "Interpolated") {
 			for (let i = mouse.previousPositions.x.length - 1; i >= 0; i--) {
 				let distance = utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]);
 				for (let j = distance; j >= 0; j -= 2) {
@@ -801,7 +789,7 @@ define(function(require) {
 			}
 		}
 		canvas.setGlobalAlpha(1);
-		if ((keyboard.getKeyDown("z") || keyboard.getKeyDown("x"))) {
+		if ((keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
 			mouseSize += 0.125;
 		}
 		mouseSize += (1 - mouseSize) / 4;
@@ -928,7 +916,7 @@ define(function(require) {
 		for (let i = 0; i < judgementObjects.length; i++) {
 			if (judgementObjects[i].lifetime - useTime >= 0) {
 				/* ignore 300 hits */
-				if (currentOptions.Gameplay.draw300Hits === false && judgementObjects[i].score === 300) {
+				if (Options.getProperty("Gameplay", "draw300Hits") === false && judgementObjects[i].score === 300) {
 					continue;
 				}
 				let useImage = -1;
@@ -956,7 +944,7 @@ define(function(require) {
 					canvas.drawImage(Assets.hitNumbers[useImage], 0, 0, size, size);
 					ctx.resetTransform();
 				} else {
-					size *= JUDGEMENT_BEZIER_ANIMATION[Math.floor(utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, JUDGEMENT_BEZIER_ANIMATION.length))].y
+					size *= JUDGEMENT_BEZIER_ANIMATION[Math.floor(utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, JUDGEMENT_BEZIER_ANIMATION.length - 1))].y;
 					canvas.drawImage(Assets.hitNumbers[useImage], judgementObjects[i].x, judgementObjects[i].y, size, size);
 				}
 			} else {
@@ -1038,6 +1026,10 @@ define(function(require) {
 			}
 			if (keyboard.getKeyDown("space") && document.getElementById("skip-button").style.opacity === "1") {
 				audio.currentTime = currentLoadedMap.hitObjects[0].time - 2.5;
+				if (isReplay === false) {
+					playDetails.replay.addKeyEvent(new ReplayManager.KeyboardReplayEvent(useTime, 2, "down"));
+					playDetails.replay.addKeyEvent(new ReplayManager.KeyboardReplayEvent(useTime + 1, 2, "up"));
+				}
 			}
 			if (useTime > currentLoadedMap.hitObjects[0].time - 2 && currentHitObject === 0) {
 				document.getElementById("skip-button").style.opacity = "0";
@@ -1076,9 +1068,41 @@ define(function(require) {
 					endScreen.displayResults(playDetails);
 					isRunning = false;
 					audio.playbackRate = 1;
+					if (isReplay === false) {
+						window.localStorage.setItem("replayTest", JSON.stringify(playDetails));
+					}
 				}
 			}
+			if (isReplay) {
+				while (currentMouseEvent < playDetails.replay.mouseEvents.length - 1 && useTime >= playDetails.replay.mouseEvents[currentMouseEvent].time) {
+					mouse.setPosition(playDetails.replay.mouseEvents[currentMouseEvent].x, playDetails.replay.mouseEvents[currentMouseEvent].y);
+					currentMouseEvent++;
+				}
+				while (currentKeyEvent < playDetails.replay.keyEvents.length - 1 && useTime >= playDetails.replay.keyEvents[currentKeyEvent].time) {
+					if (playDetails.replay.keyEvents[currentKeyEvent].key === 2 && playDetails.replay.keyEvents[currentKeyEvent].state === "down") {
+						keyboard.emulateKeyDown("space");
+					}
+					if (playDetails.replay.keyEvents[currentKeyEvent].key === 2 && playDetails.replay.keyEvents[currentKeyEvent].state === "up") {
+						keyboard.emulateKeyUp("space");
+					}
+					if (playDetails.replay.keyEvents[currentKeyEvent].key === 1 && playDetails.replay.keyEvents[currentKeyEvent].state === "down") {
+						keyboard.emulateKeyDown(Options.getProperty("Inputs", "keyboardRightButton"));
+					}
+					if (playDetails.replay.keyEvents[currentKeyEvent].key === 1 && playDetails.replay.keyEvents[currentKeyEvent].state === "up") {
+						keyboard.emulateKeyUp(Options.getProperty("Inputs", "keyboardRightButton"));
+					}
+					if (playDetails.replay.keyEvents[currentKeyEvent].key === 0 && playDetails.replay.keyEvents[currentKeyEvent].state === "down") {
+						keyboard.emulateKeyDown(Options.getProperty("Inputs", "keyboardLeftButton"));
+					}
+					if (playDetails.replay.keyEvents[currentKeyEvent].key === 0 && playDetails.replay.keyEvents[currentKeyEvent].state === "up") {
+						keyboard.emulateKeyUp(Options.getProperty("Inputs", "keyboardLeftButton"));
+					}
+					currentKeyEvent++;
+				}
+			}
+			/* spinners */
 			detectSpinSpeed(useTime, previousTime, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y);
+			/* hp */
 			updateHp(useTime, previousTime);
 			/* +1 because the given time is beginning time, not end time */
 			while (currentTimingPoint < currentLoadedMap.timingPoints.length - 1 && useTime >= currentLoadedMap.timingPoints[currentTimingPoint + 1].time) {
@@ -1097,6 +1121,30 @@ define(function(require) {
 				if (spliced) {
 					i = Math.max(i - 1, 0);
 				}
+			}
+			if (isReplay === false) {
+				/* keyboard events and replay recording */
+				if (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) === false && keyboardLeftReleased === false) {
+					keyboardLeftReleased = true;
+					playDetails.replay.addKeyEvent(new ReplayManager.KeyboardReplayEvent(useTime, 0, "up"));
+				}
+				if (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")) === false && keyboardRightReleased === false) {
+					keyboardRightReleased = true;
+					playDetails.replay.addKeyEvent(new ReplayManager.KeyboardReplayEvent(useTime, 1, "up"));
+				}
+				if (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) && keyboardLeftReleased) {
+						keyboardLeftReleased = false;
+						playDetails.replay.addKeyEvent(new ReplayManager.KeyboardReplayEvent(useTime, 0, "down"));
+					}
+				if (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")) && keyboardRightReleased) {
+					keyboardRightReleased = false;
+					playDetails.replay.addKeyEvent(new ReplayManager.KeyboardReplayEvent(useTime, 1, "down"));
+				}
+				/* if the mouse positions are the same, then don't bother recording */
+				// let lastMouseEvent = playDetails.replay.mouseEvents.length - 1;
+				// if (lastMouseEvent < 0 || (playDetails.replay.mouseEvents[lastMouseEvent].x !== mouse.position.x && playDetails.replay.mouseEvents[lastMouseEvent].y !== mouse.position.y)) {
+					playDetails.replay.addMouseEvent(new ReplayManager.MouseReplayEvent(useTime, mouse.position.x, mouse.position.y));
+				// }
 			}
 			/* Hit Events */
 			while (hitEvents.length > 0) {
@@ -1171,13 +1219,26 @@ define(function(require) {
 		},
 		retry: function() {
 			isRunning = false;
-			this.playMap(currentLoadedMap, playDetails.mods);
+			this.play(currentLoadedMap, playDetails.mapIdentifier, playDetails.mods);
+		},
+		watchReplay: function(mapData, playDetails2) {
+			isReplay = true;
+			currentMouseEvent = 0;
+			currentKeyEvent = 0;
+			playDetails = new PlayDetails(playDetails2.mapIdentifier, playDetails2.mods);
+			playDetails.replay = playDetails2.replay;
+			this.playMap(mapData, playDetails.mapIdentifier, playDetails.mods);
+		},
+		play(mapData, mapIdentifier, mods) {
+			isReplay = false;
+			playDetails = new PlayDetails(mapIdentifier, mods);
+			this.playMap(mapData, mods);
 		},
 		playMap: function(mapData, mods) {
-			currentOptions = Options.read();
-			let hex = Math.round(utils.map(currentOptions.Gameplay.backgroundDim, 0, 1, 0, 255)).toString(16);
+			Options.read();
+			let hex = Math.round(utils.map(Options.getProperty("Gameplay", "backgroundDim"), 0, 1, 0, 255)).toString(16);
 			document.getElementById("webpage-state-gameplay").style.background = "#000000" + hex;
-			mouse.sensitivity = currentOptions.Inputs.mouseSensitivity * 10;
+			mouse.sensitivity = Options.getProperty("Inputs", "mouseSensitivity") * 10;
 			enterPointerLock();
 			if (mapData.hitObjects[0].time > 10) {
 				document.getElementById("skip-button").style.opacity = "1";
@@ -1185,8 +1246,7 @@ define(function(require) {
 				document.getElementById("skip-button").style.opacity = "0";
 			}
 			currentLoadedMap = mapData;
-			playDetails = new PlayDetails(mods);
-			if (mods.flashlight === false) {
+			if (playDetails.mods.flashlight === false) {
 				document.getElementById("gameplay-flashlight").style.display = "none";
 			} else {
 				document.getElementById("gameplay-flashlight").style.display = "block";

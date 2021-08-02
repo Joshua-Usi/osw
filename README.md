@@ -11,19 +11,19 @@ You can play it by clicking on the link [here](https://joshua-usi.github.io/osw)
 Have a feature request or found a bug? submit an issue report [here](https://github.com/Joshua-Usi/osw/issues/new/choose)
 
 ### Will you support _____ browser or device?
-osw! will gaurantee support for Chrome, Firefox and Edge. All other browsers are subject to their own risks. Internet explorer is not supported at any version. Safari is planned to be supported due to demand
+osw! will gaurantee support for Chrome, Firefox and Edge. All other browsers are subject to their own risks. Internet explorer is not supported at any version. Safari is planned to be supported
 
 ### Im experiencing poor performance on my device! pls fix game!
 Sorry to hear that. Unfortunately theres not much I can do about it in the short term. While processing takes minimal cpu power. Rendering is horrendously slow on low powered devices. Though chromebooks have been tested with 45fps.
 
 ### Will you support tablets?
-As of current browser specficiations and to my knowledge. It is currently impossible to provide hardware tablet support for customisable area. However, tablets are currently supported as of osw! 0.7.10b
+As of current browser specfications and to my knowledge. It is currently impossible to provide hardware tablet support for customisable area. However, tablets are currently supported as of osw! 0.7.10b
 
 ### Will the PP and star rating systems be accurate?
-osw! will use custom PP and star rating systems that will try to be as close as possible to the original osu! system. Though I am not a data analyst, I will try to work hard to keep the PP and star rating system as close as possible
+osw! will use an adapted version of the pp and star rating system from [ojsama](https://github.com/Francesco149/ojsama) by [Francesco149](https://github.com/Francesco149), it is the most accurate implementation, however it may deviate by ±0.03 stars 
  
 ### So and so feature does not work exactly the same as osu!, will you fix it?
-Some osu features are near impossible to emulate unless of course I were to deep dive into the lazer codebase. Things such as HP and spinners work on custom algorithms that try to be as fair as possible
+Some osu features are near impossible to emulate unless of course I were to deep dive into the lazer codebase, which I don't want to. Things such as HP and spinners work on custom algorithms that try to be as fair as possible
   
 ### Will the beatmap editor be supported?
 Though there is a button there for the beatmap editor. It is highly unlikely to be supported unless there is a feature request with high enough demand

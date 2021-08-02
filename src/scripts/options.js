@@ -91,7 +91,7 @@ define(function(require) {
 			defaultOptions[group][option] = value;
 		},
 		read: function() {
-			return JSON.parse(window.localStorage.getItem("options"));	
+			defaultOptions = JSON.parse(window.localStorage.getItem("options"));	
 		},
 	};
 });

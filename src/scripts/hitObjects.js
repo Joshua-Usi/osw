@@ -126,21 +126,5 @@ define(function(require) {
 				this.y = y;
 			}
 		},
-		MouseReplayEvent: class MouseReplayEvent {
-			constructor(x, y, time) {
-				this.type = "mouse";
-				this.time = time;
-				this.x = x;
-				this.y = y;
-			}
-		},
-		KeyboardReplayEvent: class KeyboardReplayEvent {
-			constructor(key, state, time) {
-				this.type = "keyboard";
-				this.time = time;
-				this.key = key;
-				this.state = state;
-			}
-		}
 	};
 });
