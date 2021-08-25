@@ -3,6 +3,28 @@
 An in-development osu! clone designed to run on web browers
 It is planned to emulate the osu! experience as closely as possible in the browser
 
+Heavy development phase as the project heads closer to a release candidate
+
+### Expected features
+- [x] Local Beatmaps
+- [x] Star rating (no online API)
+- [x] Mods
+- [ ] Custom skins (not animated)
+- [ ] PP system (no online API)
+- [ ] Keybinds
+- [ ] Extensible rulsets
+- [ ] Local scores
+- [ ] Replays
+
+### Optimisations
+- [ ] Loading times
+- [ ] Main menu
+- [ ] Increase speed of beatmap cache generation
+- [ ] Star rating
+- [ ] Rendering (caches and overlays)
+- [ ] Size of replays
+
+
 ### Where can I play?
 You can play it by clicking on the link [here](https://joshua-usi.github.io/osw)
   
