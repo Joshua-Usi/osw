@@ -1,12 +1,13 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
-## [vmajor.minor.patch|a,b,rc|] - 27-06-2021
+## [v1.0.0rc] - 27-06-2021
 ### Added
 - Replays
 - Score Saving
 - Ability to view replays
 - Notelock (unfortunately)
+- Mod Incompatibilities (such as being able to choose both easy and hard rock at the same time)
 ### Changed
 - README.MD FAQs
 ### Optimised
@@ -18,10 +19,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - An issue where the approach circle size would continue to lower in size
 - Typos in README.MD
+- Pressing deselect all mods wouldn't update the score multiplier text
+- Auto experiencing notelock
+- Sliders having different velocities for diffferent segments depending on the segments of the slider
 ### Security
 -
 ### Code Quality
 - options.js to have a more consistent API
+- introsequence.js to be more modular
+- Added animatedEventsManager.js
+- Removed quickParseMap from parser.js
+- Optimised ModsUI.js API
 ---
 ## [v0.9.2b] - 21-06-2021
 ### Added

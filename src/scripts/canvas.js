@@ -102,8 +102,10 @@ define(function(require) {
 			let ctx = canvas.getContext("2d");
 			ctx.drawImage(img, 0, 0);
 			let pixels = ctx.getImageData(0, 0, w, h).data;
-			// 4 is used to ask for 3 images: red, green, blue and
-			// black in that order.
+			/*
+			 * 4 is used to ask for 3 images: red, green, blue and
+			 *	black in that order
+			 */
 			let length = pixels.length;
 			let l = 0;
 			for (let rgbI = 0; rgbI < 4; rgbI++) {

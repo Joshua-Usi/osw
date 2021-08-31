@@ -26,13 +26,7 @@ define(function(require) {
 			let stars = "";
 			if (mapStarRating < 10) {
 				for (let i = 0; i < mapStarRating; i++) {
-					let size = Utils.roundDigits(Utils.map(mapStarRating - i, 1, 0, 1, 0.5), 2);
-					if (size >= 1) {
-						size = 1;
-					}
-					if (size <= 0.5) {
-						size = 0.5;
-					}
+					let size = Utils.clamp(Utils.roundDigits(Utils.map(mapStarRating - i, 1, 0, 1, 0.5), 2), 0.5, 1);
 					stars += `<img style="transform: scale(${size}); opacity: ${(size > 0.5) ? 1 : 0.5}; width: 3.5vh;" src="./src/images/star.png">`;
 				}
 			} else {

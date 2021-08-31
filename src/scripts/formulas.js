@@ -42,6 +42,40 @@ define(function(require) {
 		AT: "auto",
 		V2: "scoreV2",
 	};
+	class ModMultiplier {
+		constructor(name, multiplier) {
+			this.multipliers = {};
+		}
+		addMultiplier(name, value) {
+			this.multipliers[name] = value;
+		}
+		getMultiplier(name) {
+			return this.multipliers[name];
+		}
+	}
+	let modMultipliers = new ModMultiplier();
+	modMultipliers.addMultiplier("easy", 0.5);
+	modMultipliers.addMultiplier("noFail", 0.5);
+	modMultipliers.addMultiplier("halfTime", 0.3);
+	modMultipliers.addMultiplier("hardRock", 1.06);
+	modMultipliers.addMultiplier("suddenDeath", 1);
+	modMultipliers.addMultiplier("perfect", 1);
+	modMultipliers.addMultiplier("doubleTime", 1.12);
+	modMultipliers.addMultiplier("nightcore", 1.12);
+	modMultipliers.addMultiplier("hidden", 1.06);
+	modMultipliers.addMultiplier("flashlight", 1.12);
+	modMultipliers.addMultiplier("relax", 0);
+	modMultipliers.addMultiplier("autopilot", 0);
+	modMultipliers.addMultiplier("spunOut", 0.9);
+	modMultipliers.addMultiplier("auto", 1);
+	modMultipliers.addMultiplier("scoreV2", 0);
+	class ObjectCounts {
+		constructor() {
+			this.circles = 0;
+			this.sliders = 0;
+			this.spinners = 0;
+		}
+	}
 	return {
 		applyModMultiplier: function(n, mods, multiplier) {
 			if (mods) {
@@ -203,8 +237,8 @@ define(function(require) {
 		difficultyPoints: function(cs, hp, od, objectCount, drainTime) {
 			return Math.round((cs + hp + od + utils.clamp(objectCount / drainTime * 8, 0, 16)) / 38 * 5);
 		},
-		hitScore: function(hitValue, comboMultiplier, difficultyMultiplier, modMultiplier) {
-			return hitValue + (hitValue * ((comboMultiplier * difficultyMultiplier * modMultiplier) / 25));
+		hitScore: function(hitValue, comboMultiplier, difficultyMultiplier, modMultipliers) {
+			return hitValue + (hitValue * ((comboMultiplier * difficultyMultiplier * modMultipliers) / 25));
 		},
 		grade: function(great, ok, meh, miss, mods) {
 			let total = great + ok + meh + miss;
@@ -242,45 +276,17 @@ define(function(require) {
 		},
 		modScoreMultiplier: function(mods) {
 			let multiplier = 1;
-			/* increases */
-			if (mods.hardRock) {
-				multiplier *= 1.06;
-			}
-			if (mods.hidden) {
-				multiplier *= 1.06;
-			}
-			if (mods.doubleTime || mods.nightcore) {
-				multiplier *= 1.12;
-			}
-			if (mods.flashlight) {
-				multiplier *= 1.12;
-			}
-			/* decreases */
-			if (mods.easy) {
-				multiplier *= 0.5;
-			}
-			if (mods.noFail) {
-				multiplier *= 0.5;
-			}
-			if (mods.halfTime) {
-				multiplier *= 0.3;
-			}
-			if (mods.spunOut) {
-				multiplier *= 0.9;	
-			}
-			/* special mods */
-			if (mods.relax) {
-				multiplier *= 0;
-			}
-			if (mods.autopilot) {
-				multiplier *= 0;
+			for (let mod in mods) {
+				if (mods.hasOwnProperty(mod) && mods[mod]) {
+					multiplier *= modMultipliers.getMultiplier(mod);
+				}
 			}
 			return multiplier;
 		},
 		parseShorthand: function(string) {
 			let splitMods = string.match(/.{1,2}/g);
 			let mods = new Mods();
-			for (var i = 0; i < splitMods.length; i++) {
+			for (let i = 0; i < splitMods.length; i++) {
 				mods[this.shorthandToMod(splitMods[i])] = true;
 			}
 			return mods;
@@ -328,12 +334,8 @@ define(function(require) {
 			return toLonghand[shorthand];
 		},
 		getObjectCount: function(beatmap) {
-			let counts = {
-				circles: 0,
-				sliders: 0,
-				spinners: 0,
-			};
-			for (var i = 0; i < beatmap.hitObjects.length; i++) {
+			let counts = new ObjectCounts();
+			for (let i = 0; i < beatmap.hitObjects.length; i++) {
 				if (beatmap.hitObjects[i].type[0] === "1") {
 					counts.circles++;
 				} else if (beatmap.hitObjects[i].type[1] === "1") {

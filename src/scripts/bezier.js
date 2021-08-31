@@ -56,17 +56,17 @@ define(function(require) {
 	return {
 		nGrade: function(points, res) {
 			/* Compute the incremental step */
-			let tLength = 0;
-			for (let i = 0; i < points.length - 1; i++) {
-				tLength += utils.dist(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
-			}
+			// let tLength = 0;
+			// for (let i = 0; i < points.length - 1; i++) {
+			// 	tLength += utils.dist(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+			// }
 			if (res === undefined) {
 				res = 1;
-			}
-			let step = res / tLength;
-			// compute the support points
+			} 
+			// let step = res / tLength;
+			/* compute the support points */
 			let temp = [];
-			for (let t = 0; t <= 1; t += step) {
+			for (let t = 0; t <= 1; t += res) {
 				temp.push(P(t, points));
 			}
 			return temp;

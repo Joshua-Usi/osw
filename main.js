@@ -33,10 +33,9 @@ define(function(require) {
 	const IntroSequence = require("./src/scripts/introSequence.js");
 	const DatabaseManager = require("./src/scripts/databaseManager.js");
 	const Parser = require("./src/scripts/parser.js");
-	const Mods = require("./src/scripts/mods.js");
 	const Formulas = require("./src/scripts/formulas.js");
 	const CacheManager = require("./src/scripts/cacheManager.js");
-	const StarRating = require("./src/scripts/starRating.js");
+	const ModsUI = require("./src/scripts/modsUI.js");
 	AudioManager.load("back-button-click", "./src/audio/effects/back-button-click.wav", "effects", true);
 	AudioManager.load("menu-options-click", "./src/audio/effects/menu-options-click.wav", "effects", true);
 	AudioManager.load("menu-freeplay-click", "./src/audio/effects/menu-freeplay-click.wav", "effects", true);
@@ -49,7 +48,6 @@ define(function(require) {
 	AudioManager.load("settings-hover", "./src/audio/effects/settings-hover.wav", "effects", true);
 	AudioManager.load("sliderbar", "./src/audio/effects/sliderbar.wav", "effects", true);
 	AudioManager.load("menu-hit", "./src/audio/effects/menu-hit.wav", "effects", true);
-	require("./src/scripts/modsUI.js");
 	if (!window.localStorage) {
 		throw new Error("LocalStorage is not supported on this browser. You will not be able to save your options");
 	}
@@ -124,15 +122,10 @@ define(function(require) {
 	}
 
 	function clickMap(element) {
-		let selectedMods = new Mods();
-		let selectedModElements = document.getElementsByClassName("mod-selected");
-		for (let i = 0; i < selectedModElements.length; i++) {
-			selectedMods[selectedModElements[i].id.replace("mod-", "")] = true;
-		}
 		let beatmapCache = CacheManager.getCache("beatmapCache");
 		if (lastElementClicked != element) {
-			setDifficultyBars(beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")], selectedMods);
-			setStatisticValues(beatmapCache[element.getAttribute("data-group-index")], beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")], selectedMods);
+			setDifficultyBars(beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")], ModsUI.getMods());
+			setStatisticValues(beatmapCache[element.getAttribute("data-group-index")], beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")], ModsUI.getMods());
 			document.getElementById("description-text").textContent = beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")].version;
 			document.getElementById("source-text").textContent = beatmapCache[element.getAttribute("data-group-index")].source;
 			document.getElementById("tags-text").textContent = beatmapCache[element.getAttribute("data-group-index")].tags;
@@ -188,7 +181,7 @@ define(function(require) {
 					menuAudio.pause();
 					/* reset audio time */
 					menuAudio.currentTime = 0;
-					GameplayHandler.play(event.target.result.data, event.target.result.name, selectedMods);
+					GameplayHandler.play(event.target.result.data, event.target.result.name, ModsUI.getMods());
 				});
 			});
 		}
@@ -379,7 +372,6 @@ define(function(require) {
 	let audioVisualiser = document.getElementById("audio-visualiser");
 	let logo = document.getElementById("logo");
 	let ctx = audioVisualiser.getContext("2d");
-	let settingsSet = false;
 	let isFirstClick = true;
 	let offset = 0;
 	let logoX = 55;
@@ -401,11 +393,11 @@ define(function(require) {
 		let userOptions = Options.get();
 		let index = 0;
 		for (let group in userOptions) {
-			if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object" && group !== "types") {
+			if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object") {
 				for (let setting in userOptions[group]) {
 					if (userOptions[group].hasOwnProperty(setting)) {
 						let element = document.getElementById("settings-" + Utils.camelCaseToDash(setting));
-						switch (userOptions.types[index]) {
+						switch (Options.getTypes()[index]) {
 							case "slider":
 								let mapped = Utils.map(userOptions[group][setting], 0, 1, element.min, element.max);
 								/* is weird, idk, quick patch */
@@ -435,10 +427,7 @@ define(function(require) {
 	window.addEventListener("click", function() {
 		if (isFirstClick && document.readyState === "complete") {
 			document.getElementById("splash-screen").style.opacity = 0;
-			setTimeout(function() {
-				document.getElementById("splash-screen").style.display = "none";
-			}, 1000);
-			IntroSequence.animate();
+			IntroSequence.start();
 			menuAudio.src = "src/audio/cYsmix - Triangles.mp3";
 			menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
 			menuAudio.play();
@@ -615,12 +604,12 @@ define(function(require) {
 		document.getElementById("splash-screen").style.animationDelay = "1s";
 		document.getElementById("heart-loader").style.display = "none";
 	});
-	window.addEventListener("blur", function() {
-		if (document.getElementById("webpage-state-gameplay").style.display === "block" && document.getElementById("webpage-state-fail-screen").style.display === "none") {
-			Utils.showWebpageStates(["webpage-state-pause-screen"]);
-			GameplayHandler.pause();
-		}
-	});
+	// window.addEventListener("blur", function() {
+	// 	if (document.getElementById("webpage-state-gameplay").style.display === "block" && document.getElementById("webpage-state-fail-screen").style.display === "none") {
+	// 		Utils.showWebpageStates(["webpage-state-pause-screen"]);
+	// 		GameplayHandler.pause();
+	// 	}
+	// });
 	/* Top bar event listeners */
 	document.getElementById("top-bar").addEventListener("mouseenter", function() {
 		document.getElementById("background-dim").style.filter = "brightness(0.5)";
@@ -938,11 +927,11 @@ define(function(require) {
 		let index = 0;
 		let userOptions = Options.get();
 		for (let group in userOptions) {
-			if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object" && group !== "types") {
+			if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object") {
 				for (let setting in userOptions[group]) {
 					if (userOptions[group].hasOwnProperty(setting)) {
 						let element = document.getElementById("settings-" + Utils.camelCaseToDash(setting));
-						switch (userOptions.types[index]) {
+						switch (Options.getTypes()[index]) {
 							case "slider":
 								Options.update(group, setting, Utils.map(element.value, element.min, element.max, 0, 1));
 								break;
@@ -1095,9 +1084,7 @@ define(function(require) {
 			}
 		}
 	});
-	document.getElementById("bottom-bar-random").addEventListener("click", function() {
-		chooseRandomMap();
-	});
+	document.getElementById("bottom-bar-random").addEventListener("click", chooseRandomMap);
 	document.getElementById("bottom-bar-watch-replay").addEventListener("click", function() {
 		let map = JSON.parse(localStorage.getItem("replayTest"));
 		let database = window.indexedDB.open("osw-database");
@@ -1118,5 +1105,36 @@ define(function(require) {
 				GameplayHandler.watchReplay(event.target.result.data, map);
 			});
 		});
+	});
+	document.getElementById("mods-close-button").addEventListener("click", ModsUI.closeModsUI);
+	document.getElementById("bottom-bar-mods").addEventListener("click", ModsUI.toggleModsUI.bind(ModsUI));
+	document.getElementById("mods-deselect-all").addEventListener("click", function() {
+		ModsUI.disableAllMods();
+		document.getElementById("mod-score-multiplier").style.color = "#fff";
+		document.getElementById("mod-score-multiplier").innerHTML = `Score Multiplier: <b>${Formulas.modScoreMultiplier(ModsUI.getMods()).toFixed(2)}x</b>`;
+	});
+	document.getElementById("mods").addEventListener("click", function(event) {
+		let elementClicked = event.target;
+		let previousModMultiplier = Formulas.modScoreMultiplier(ModsUI.getMods()).toFixed(2);
+		if (elementClicked.classList.contains("mod-icons")) {
+			let modName = elementClicked.id.replace("mod-", "");
+			if (elementClicked.classList.contains("mod-selected")) {
+				ModsUI.getMods().disableMod(modName);
+			} else {
+				ModsUI.getMods().enableMod(modName);
+			}
+			ModsUI.showEnabledMods();
+			let newModMultiplier = Formulas.modScoreMultiplier(ModsUI.getMods()).toFixed(2);
+			let scoreMultiplierElement = document.getElementById("mod-score-multiplier");
+			scoreMultiplierElement.classList.remove("mod-score-transition");
+			if (newModMultiplier > 1) {
+				scoreMultiplierElement.style.color = "#0f0";
+			} else if (newModMultiplier < 1) {
+				scoreMultiplierElement.style.color = "#f00";
+			} else {
+				scoreMultiplierElement.style.color = "#fff";
+			}
+			scoreMultiplierElement.innerHTML = `Score Multiplier: <b>${newModMultiplier}x</b>`;
+		}
 	});
 });

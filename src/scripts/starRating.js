@@ -17,9 +17,9 @@ define(function(require) {
 		AIM: 26.25,
 	};
 	const DECAY_WEIGHT = 0.9;
-	// ~200BPM 1/4 streams
+	/* ~200BPM 1/4 streams */
 	let MIN_SPEED_BONUS = 75;
-	// ~330BPM 1/4 streams
+	/* ~330BPM 1/4 streams */
 	const MAX_SPEED_BONUS = 45;
 	const ANGLE_BONUS_SCALE = 90;
 	const AIM_TIMING_THRESHOLD = 107;

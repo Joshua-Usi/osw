@@ -186,26 +186,35 @@ define(function(require) {
 					/* Slider Type Bezier, Catmull and Linear */
 					/* I will likely not support catmull sliders */
 					/* determine slider red / white anchor */
+					let bezier = [];
+					let bezierTimeMap
 					let bezierTemp = [];
 					for (let j = 0; j < hitObject.curvePoints.length; j++) {
 						if (hitObject.curvePoints[j + 1] && hitObject.curvePoints[j].x === hitObject.curvePoints[j + 1].x && hitObject.curvePoints[j].y === hitObject.curvePoints[j + 1].y) {
 							bezierTemp.push(hitObject.curvePoints[j]);
-							let point = Bezier.nGrade(bezierTemp);
+							let point = Bezier.nGrade(bezierTemp, 1 / hitObject.length);
+							/* second pass */
+							let length = utils.totalDistance(point);
+							point = Bezier.nGrade(bezierTemp, 1 / length);
 							for (let k = 0; k < point.length; k++) {
-								hitObject.cache.points.push(point[k]);
+								bezier.push(point[k]);
 							}
 							bezierTemp = [];
 						} else {
 							bezierTemp.push(hitObject.curvePoints[j]);
 						}
 					}
-					let point = Bezier.nGrade(bezierTemp);
+					let point = Bezier.nGrade(bezierTemp, 1 / hitObject.length);
+					/* second pass */
+					let length = utils.totalDistance(point);
+					point = Bezier.nGrade(bezierTemp, 1 / length);
 					for (let k = 0; k < point.length; k++) {
-						hitObject.cache.points.push(point[k]);
+						bezier.push(point[k]);
 					}
+					hitObject.cache.points = bezier;
 				} else if (hitObject.curveType === "P" && hitObject.curvePoints.length === 3) {
 					/* Slider Type Perfect Circle */
-					/* There are a select few maps that have infinity circle radius. I'm look at your sotarks */
+					/* There are a select few maps that have infinity circle radius. I'm look at you sotarks */
 					hitObject.cache.points = utils.circleToPoints(circle.x, circle.y, circle.r, Math.abs(hitObject.length), -utils.direction(circle.x, circle.y, hitObject.curvePoints[0].x, hitObject.curvePoints[0].y) - Math.PI / 2, utils.orientation(hitObject.curvePoints[0], hitObject.curvePoints[1], hitObject.curvePoints[2]));
 				}
 			} else if (hitObject.type[3] === "1") {
@@ -275,7 +284,7 @@ define(function(require) {
 
 	function processHitObject(hitObject, useTime, previousTime, index, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y) {
 		/* notelocked for circles */
-		if (index !== 0 && hitObject.type[0] === "1") {
+		if (index !== 0 && hitObject.type[0] === "1" && playDetails.mods.auto === false) {
 			return;
 		}
 		let hasSpliced = false;
@@ -635,13 +644,13 @@ define(function(require) {
 				/* Draw Outer Slider Body */
 				ctx.lineWidth = circleDiameter;
 				canvas.setStrokeStyle("#fff");
-				let mapped = utils.mapToOsuPixels(hitObject.cache.points[sliderDrawPercent].x, hitObject.cache.points[sliderDrawPercent].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 				ctx.beginPath();
 				for (let j = 0; j < sliderDrawPercent; j += inc) {
 					let mapped = utils.mapToOsuPixels(hitObject.cache.points[j].x, hitObject.cache.points[j].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 					ctx.lineTo(mapped.x, mapped.y);
 				}
 				/* draw last point to make sure slider ends properly */
+				let mapped = utils.mapToOsuPixels(hitObject.cache.points[sliderDrawPercent].x, hitObject.cache.points[sliderDrawPercent].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 				ctx.lineTo(mapped.x, mapped.y);
 				ctx.stroke();
 				/* Draw Inner Slider Body */
@@ -1340,7 +1349,7 @@ define(function(require) {
 				}
 				let pixelsPerBeat = sliderSpeedMultiplier * currentLoadedMap.timingPoints[lastUninheritedTimingPoint].beatLength;
 				let sliderLengthInBeats = (Math.abs(lastHitObject.length) * lastHitObject.slides) / pixelsPerBeat;
-				let sliderTime = pixelsPerBeat * sliderLengthInBeats / 250;
+				let sliderTime = pixelsPerBeat * sliderLengthInBeats / 100;
 				endingTime = lastHitObject.time + sliderTime + 2;
 			}
 			if (lastHitObject.type[3] === "1") {

@@ -2,75 +2,23 @@ define(function(require) {
 	"use strict";
 	const Bezier = require("./bezier.js");
 	const Utils = require("./utils.js");
+	const AnimatedEventsManager = require("./animatedEventsManager.js");
+	let animationManager = new AnimatedEventsManager();
 	let canvas = document.getElementById("intro-logo");
 	canvas.width = 0.8 * window.innerWidth;
 	canvas.height = 0.8 * window.innerWidth;
 	let ctx = canvas.getContext("2d");
 	let pointArrays = [];
-	/* intro sequence events */
-	let eventDone = [false, false, false, false, false, false, false, false, false];
-	let eventTimings = [0.2, 0.4, 0.6, 0.9, 1.6, 1.8, 2, 2.2, 3.1];
-	let events = [
-		function() {
-			document.getElementById("intro-text").textContent = "wel";
-		},
-		function() {
-			document.getElementById("intro-text").textContent = "welcome";
-		},
-		function() {
-			document.getElementById("intro-text").textContent = "welcome to";
-		},
-		function() {
-			document.getElementById("intro-text").textContent = "welcome to osw!";
-			document.getElementById("intro-text").style.letterSpacing = "0.75vh";
-		},
-		function() {
-			document.getElementById("intro-text").style.display = "none";
-			setPositions(document.getElementsByClassName("intro-gamemodes"), 4, 3.5, 25, 24);
-		},
-		function() {
-			setPositions(document.getElementsByClassName("intro-gamemodes"), 8, 7, 12.5, 11);
-		},
-		function() {
-			setPositions(document.getElementsByClassName("intro-gamemodes"), 16, 18, 17.5, 20);
-		},
-		function() {
-			let introGamemodes = document.getElementsByClassName("intro-gamemodes");
-			for (let i = 0; i < introGamemodes.length; i++) {
-				introGamemodes[i].style.display = "none";
-			}
-			let introLogo = document.getElementById("intro-logo");
-			introLogo.style.display = "block";
-			introLogo.style.top = "calc(50vh - 70vh / 2)";
-			introLogo.style.left = "calc(50vw - 70vh / 2)";
-			introLogo.style.width = "70vh";
-			introLogo.style.height = "70vh";
-		},
-		function() {
-			let introGamemodes = document.getElementsByClassName("intro-gamemodes");
-			document.getElementById("intro").style.background = "#fff";
-			document.getElementById("intro").style.opacity = 0;
-			for (let i = 0; i < introGamemodes.length; i++) {
-				introGamemodes[i].style.display = "none";
-			}
-			document.getElementById("intro-logo").style.display = "none";
-			setTimeout(function() {
-				document.getElementById("intro").style.display = "none";
-			}, 750);
-		},
-	];
-	let triangleNumber = 0;
 	/* constants */
 	let NUMBER_OF_TRIANGLES = 22;
 	let TIME_BETWEEN_EACH_TRIANGLE = 0.022;
 	let TRIANGLE_FADE_OUT_TIME = 0.24;
-
 	(function generatePoints() {
 		for (let i = 0; i < 2; i++) {
 			let size = (i === 0) ? 0.5 : 0.45;
 			let octagonPoints = [];
 			let octagonInterpolatedPoints = [];
-			/* generate circles of logo */
+			/* generate octagons of logo */
 			for (let j = 1.5 * Math.PI; j >= -0.5 * Math.PI; j -= Math.PI / 4) {
 				let x = 0.5 + Math.cos(j) * size;
 				let y = 0.5 + Math.sin(j) * size;
@@ -111,7 +59,7 @@ define(function(require) {
 			}
 		}
 	})();
-
+	
 	function setPositions(elements, width, newWidth, range, newRange) {
 		for (let i = 0; i < elements.length; i++) {
 			elements[i].style.width = newWidth + "vh";
@@ -121,27 +69,63 @@ define(function(require) {
 	}
 
 	function createTriangle(type, x, y, size, triangleN) {
-		let speed = 1 / document.getElementById("menu-audio").playbackRate;
 		document.getElementById("triangles-container").innerHTML += `<svg class="intro-triangle" id="triangle-${triangleN}" style="position: absolute; top: ${y}px; left: ${x};" height="${size}" width="${size}">
-		<polygon points="${size * 3 / 6},${size / 6} ${size * 5 / 6},${size * 5 / 6} ${size / 6},${size * 5 / 6}" style="fill:${(type === 0) ? "white" : "transparent"};stroke:white;stroke-width:2" />
+		<polygon points="${size * 0.5},${size / 6} ${size * 5 / 6},${size * 5 / 6} ${size / 6},${size * 5 / 6}" style="fill:${(type === 0) ? "white" : "transparent"};stroke:white;stroke-width:2" />
 		</svg>`;
-		document.getElementById(`triangle-${triangleN}`).querySelector("polygon").style.animation = `${TRIANGLE_FADE_OUT_TIME * speed}s ease ${0.9 * speed + triangleN * TIME_BETWEEN_EACH_TRIANGLE * speed + "s"} 1 normal none running fade-in-out`;
+		document.getElementById(`triangle-${triangleN}`).querySelector("polygon").style.animation = `${TRIANGLE_FADE_OUT_TIME}s ease ${0.9 + triangleN * TIME_BETWEEN_EACH_TRIANGLE}s 1 normal none running fade-in-out`;
 	}
-
-	function animate() {
-		let audio = document.getElementById("menu-audio");
-		while (triangleNumber <= NUMBER_OF_TRIANGLES && audio.currentTime > 0.1) {
+	/* intro sequence events */
+	animationManager.addEvent(new AnimatedEventsManager.TimedEvent(0.2, function() {
+		document.getElementById("intro-text").textContent = "wel";
+		let triangleNumber = 0;
+		while (triangleNumber <= NUMBER_OF_TRIANGLES) {
 			createTriangle(Utils.randomInt(0, 1), Utils.randomInt(window.innerWidth * 0.3, window.innerWidth * 0.7), Utils.randomInt(window.innerHeight * 0.4, window.innerHeight * 0.6), Utils.randomInt(10, 120), triangleNumber);
 			triangleNumber++;
 		}
-		for (var i = 0; i < events.length; i++) {
-			if (eventDone[i] === false && audio.currentTime >= eventTimings[i]) {
-				events[i]();
-				eventDone[i] = true;
-			}
+	}));
+	animationManager.addEvent(new AnimatedEventsManager.TimedEvent(0.4, function() {
+		document.getElementById("intro-text").textContent = "welcome";
+	}));
+	animationManager.addEvent(new AnimatedEventsManager.TimedEvent(0.6, function() {
+		document.getElementById("intro-text").textContent = "welcome to";
+	}));
+	animationManager.addEvent(new AnimatedEventsManager.TimedEvent(0.9, function() {
+		document.getElementById("intro-text").textContent = "welcome to osw!";
+		document.getElementById("intro-text").style.letterSpacing = "0.75vh";
+	}));
+	animationManager.addEvent(new AnimatedEventsManager.TimedEvent(1.6, function() {
+		document.getElementById("intro-text").style.display = "none";
+		setPositions(document.getElementsByClassName("intro-gamemodes"), 4, 3.5, 25, 24);
+	}));
+	animationManager.addEvent(new AnimatedEventsManager.TimedEvent(1.8, function() {
+		setPositions(document.getElementsByClassName("intro-gamemodes"), 8, 7, 12.5, 11);
+	}));
+	animationManager.addEvent(new AnimatedEventsManager.TimedEvent(2.0, function() {
+		setPositions(document.getElementsByClassName("intro-gamemodes"), 16, 18, 17.5, 20);
+	}));
+	animationManager.addEvent(new AnimatedEventsManager.TimedEvent(2.2, function() {
+		let introGamemodes = document.getElementsByClassName("intro-gamemodes");
+		for (let i = 0; i < introGamemodes.length; i++) {
+			introGamemodes[i].style.display = "none";
 		}
-		if (audio.currentTime >= 2.2 && audio.currentTime <= 3.1) {
-			let animationStage = Utils.map(audio.currentTime, 2.2, 3.4, 0.025, 1);
+		let introLogo = document.getElementById("intro-logo");
+		introLogo.style.display = "block";
+		introLogo.style.top = "calc(50vh - 70vh / 2)";
+		introLogo.style.left = "calc(50vw - 70vh / 2)";
+		introLogo.style.width = "70vh";
+		introLogo.style.height = "70vh";
+	}));
+	animationManager.addEvent(new AnimatedEventsManager.TimedEvent(3.1, function() {
+		/* cleanup, remove DOM nodes for extra performance */
+		let introGamemodes = document.getElementsByClassName("intro-gamemodes");
+		document.getElementById("intro").style.background = "#fff";
+		document.getElementById("intro").style.opacity = 0;
+		document.getElementById("intro").style.pointerEvents = "none";
+		document.getElementById("triangles-container").innerHTML = "";
+	}));
+	animationManager.addEventEveryFrame(new AnimatedEventsManager.UntimedEvent(function(time) {
+		if (time >= 2.2 && time <= 3.1) {
+			let animationStage = Utils.map(time, 2.2, 3.4, 0.025, 1);
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			ctx.lineWidth = 3;
 			for (let i = 0; i < pointArrays.length; i++) {
@@ -170,19 +154,15 @@ define(function(require) {
 				ctx.stroke();
 			}
 		}
-		/* last event */
-		if (eventDone[eventDone.length - 1] === false) {
+	}));
+
+	function animate() {
+		animationManager.update(document.getElementById("menu-audio").currentTime);
+		if (animationManager.isDone === false) {
 			requestAnimationFrame(animate);
 		}
 	}
 	return {
-		animate: animate,
-		hide: function() {
-			document.getElementById("intro").style.opacity = 0;
-			setTimeout(function() {
-				document.getElementById("intro").style.display = "none";
-			}, 750);
-		},
-		events: eventDone,
+		start: animate,
 	};
 });

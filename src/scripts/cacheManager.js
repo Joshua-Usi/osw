@@ -19,7 +19,7 @@ define(function(require) {
 			window.localStorage.removeItem(cacheName);
 		},
 		/* 	the beatmap cache is designed to hold data to prevent useless calculations
-		 *	with only the bare neccesities to allow for minimal memory usage in local storage
+		 *	with only the bare neccessities to allow for minimal memory usage in local storage
 		 */
 		MapSet: class MapSet {
 			constructor(mapSet) {

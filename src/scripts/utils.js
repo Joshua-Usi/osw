@@ -17,6 +17,9 @@ define(function(require) {
 			return mapMin + ((mapMax - mapMin) / (numMax - numMin)) * (num - numMin);
 		},
 		factorial: function(k) {
+			if (k > 170) {
+				return Infinity;
+			}
 			return precomputedFactorials[k];
 		},
 		roundDigits: function(value, digits) {
@@ -27,9 +30,8 @@ define(function(require) {
 				return min;
 			} else if (value > max) {
 				return max;
-			} else {
-				return value;
 			}
+			return value;
 		},
 		randomInt: function(min, max) {
 			return Math.round(this.randomRange(min, max));
@@ -290,10 +292,32 @@ define(function(require) {
 				this.callback(...this.args);
 			}
 		},
+		pad: function(string, length, paddingCharacter, prepend) {
+			/* convert to string first as the length property is needed */
+			string = string.toString();
+			paddingCharacter = paddingCharacter.toString();
+			let paddingString = "";
+			let paddingLength = length - string.length;
+			for (let i = 0; i < paddingLength; i++) {
+				paddingString += paddingCharacter;
+			}
+			if (prepend) {
+				return paddingString + string;
+			} else {
+				return string + paddingString;
+			}
+		},
 		secondsToMinuteSeconds(time) {
 			let minutes = Math.floor(time / 60);
 			let seconds = Math.round(time - minutes * 60);
-			return `${minutes}:${seconds}`;
+			return `${minutes}:${this.pad(seconds, 2, "0", true)}`;
 		},
+		totalDistance(points) {
+			let totalDistance = 0;
+			for (let i = 0; i < points.length - 1; i++) {
+				totalDistance += this.dist(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y)
+			}
+			return totalDistance;
+		}
 	};
 });
