@@ -291,17 +291,15 @@ define(function(require) {
 		logo.style.left = "calc(" + logoX + "vw - " + logoSize / 2 + "vh)";
 		logo.style.backgroundSize = logoSize + "vh";
 		logo.style.filter = "brightness(1.25)";
-		if (loudness > 5000 * (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100)) {
-			if (beatNumber % 2 === 0 || beatNumber % 4 === 0) {
-				let leftBeat = document.getElementById("left-beat");
-				leftBeat.style.transition = "opacity 0.05s";
-				leftBeat.style.opacity = "1";
-			}
-			if (beatNumber % 2 === 1 || beatNumber % 4 === 0) {
-				let rightBeat = document.getElementById("right-beat");
-				rightBeat.style.transition = "opacity 0.05s";
-				rightBeat.style.opacity = "1";
-			}
+		if (beatNumber % 2 === 0 || beatNumber % 4 === 0) {
+			let leftBeat = document.getElementById("left-beat");
+			leftBeat.style.transition = "opacity 0.05s";
+			leftBeat.style.opacity = "1";
+		}
+		if (beatNumber % 2 === 1 || beatNumber % 4 === 0) {
+			let rightBeat = document.getElementById("right-beat");
+			rightBeat.style.transition = "opacity 0.05s";
+			rightBeat.style.opacity = "1";
 		}
 		beatNumber++;
 		/* snow only in december, maximum 50 to prevent lag */
@@ -368,7 +366,6 @@ define(function(require) {
 	}
 	let visualiserOffset = 0;
 	let beatNumber = 0;
-	let loudness = 0;
 	let logoSizeIncrease = 1.05;
 	/* Create audioVisualiser for audio visualiser */
 	let audioVisualiser = document.getElementById("audio-visualiser");
@@ -450,7 +447,6 @@ define(function(require) {
 					audioAnalyserData = new Uint8Array(analyser.frequencyBinCount);
 					analyser.getByteFrequencyData(audioAnalyserData); // passing our Uint audioAnalyserData array
 					audioAnalyserData = [...audioAnalyserData];
-					loudness = Utils.sum(audioAnalyserData);
 					visualiserOffset += 12;
 					ctx.clearRect(0, 0, audioVisualiser.width, audioVisualiser.height);
 					if (logoSize === 70) {
