@@ -190,13 +190,15 @@ define(function(require) {
 	document.getElementById("beatmap-selection-right").addEventListener("click", function(event) {
 		let parent = event.target;
 		/* find the highest beatmap group or beatmap pane from the click target */
-		while (parent.classList.contains("beatmap-selection-group") === false && parent.classList.contains("beatmap-selection-map-pane") === false) {
+		while (parent.classList && parent.classList.contains("beatmap-selection-group") === false && parent.classList.contains("beatmap-selection-map-pane") === false) {
 			parent = parent.parentNode;
 		}
-		if (parent.classList.contains("beatmap-selection-group")) {
-			clickGroup(parent);
-		} else if (parent.classList.contains("beatmap-selection-map-pane")) {
-			clickMap(parent);
+		if (parent.classList) {
+			if (parent.classList.contains("beatmap-selection-group")) {
+				clickGroup(parent);
+			} else if (parent.classList.contains("beatmap-selection-map-pane")) {
+				clickMap(parent);
+			}
 		}
 	});
 
