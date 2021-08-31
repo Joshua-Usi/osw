@@ -1350,7 +1350,7 @@ define(function(require) {
 				let pixelsPerBeat = sliderSpeedMultiplier * currentLoadedMap.timingPoints[lastUninheritedTimingPoint].beatLength;
 				let sliderLengthInBeats = (Math.abs(lastHitObject.length) * lastHitObject.slides) / pixelsPerBeat;
 				let sliderTime = pixelsPerBeat * sliderLengthInBeats / 100;
-				endingTime = lastHitObject.time + sliderTime + 2;
+				endingTime = lastHitObject.time + sliderTime + 5;
 			}
 			if (lastHitObject.type[3] === "1") {
 				endingTime = lastHitObject.endTime + 2;
