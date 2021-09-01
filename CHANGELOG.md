@@ -8,14 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ability to view replays
 - Notelock (unfortunately)
 - Mod Incompatibilities (such as being able to choose both easy and hard rock at the same time)
+- Screen so user can tell if a beatmap is currently loading
 ### Changed
 - README.MD FAQs
 ### Optimised
--
+- Beatmap uploading speed
 ### Deprecated
 -
 ### Removed
--
+- Star rating tests (no longer relevant thanks to ojsama)
 ### Fixed
 - An issue where the approach circle size would continue to lower in size
 - Typos in README.MD
@@ -30,6 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added animatedEventsManager.js
 - Removed quickParseMap from parser.js
 - Optimised ModsUI.js API
+- Moved, setDifficultyBars and setStatisticValues to utils.js
+- Slightly cleaned program main line
+- Removed reliance of utils.js by formulas.js
 ---
 ## [v0.9.2b] - 21-06-2021
 ### Added

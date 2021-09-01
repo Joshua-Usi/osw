@@ -1,7 +1,6 @@
 define(function(require) {
 	"use strict";
 	const Mods = require("./mods.js");
-	const utils = require("./utils.js");
 	const toShorthand = {
 		/* difficulty reduction */
 		easy: "EZ",
@@ -75,6 +74,14 @@ define(function(require) {
 			this.sliders = 0;
 			this.spinners = 0;
 		}
+	}
+	function clamp(value, min, max) {
+		if (value < min) {
+			return min;
+		} else if (value > max) {
+			return max;
+		}
+		return value;
 	}
 	return {
 		applyModMultiplier: function(n, mods, multiplier) {
@@ -235,7 +242,7 @@ define(function(require) {
 		},
 		/* https://osu.ppy.sh/wiki/en/Score#scoring */
 		difficultyPoints: function(cs, hp, od, objectCount, drainTime) {
-			return Math.round((cs + hp + od + utils.clamp(objectCount / drainTime * 8, 0, 16)) / 38 * 5);
+			return Math.round((cs + hp + od + clamp(objectCount / drainTime * 8, 0, 16)) / 38 * 5);
 		},
 		hitScore: function(hitValue, comboMultiplier, difficultyMultiplier, modMultipliers) {
 			return hitValue + (hitValue * ((comboMultiplier * difficultyMultiplier * modMultipliers) / 25));

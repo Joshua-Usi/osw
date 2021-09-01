@@ -13,7 +13,7 @@ define(function(require) {
 		addToDatabase: function(database, store, key, data) {
 			let object = new StoragePair(key, data);
 			let objectStore = this.getObjectStore(database, store, "readwrite");
-			let request = objectStore.add(object);
+			let request = objectStore.put(object);
 			request.addEventListener("error", function(event) {
 				console.error(`Attempt to insert into object store ${store} failed: ${event.target.error}`);
 			});
@@ -34,6 +34,17 @@ define(function(require) {
 					asyncReturns.complete = true;
 				}
 			});
-		}
+		},
+		add: function(databaseName, data, objectStore) {
+			let self = this;
+			let database = indexedDB.open(databaseName);
+			database.addEventListener("error", function(event) {
+				console.error(`Attempt to open database failed: ${event.target.error}`);
+			});
+			database.addEventListener("success", function(event) {
+				let database = event.target.result;
+				self.addToDatabase(database, objectStore, data.name, data.data);
+			});
+		},
 	}
 });

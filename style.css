@@ -37,6 +37,10 @@
 	display: block;
 }
 
+#webpage-state-loading-maps {
+	display: none;
+}
+
 #webpage-state-menu {
 	display: block;
 }

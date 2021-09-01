@@ -1,5 +1,6 @@
 define(function(require) {
 	"use strict";
+	const Formulas = require("./formulas.js");
 	let precomputedFactorials = [];
 	function precomputeFactorial(k) {
 		let total = 1;
@@ -12,7 +13,7 @@ define(function(require) {
 	for (let i = 0; i < 170; i++) {
 		precomputedFactorials.push(precomputeFactorial(i));
 	}
-	return {
+	const Utils =  {
 		map: function(num, numMin, numMax, mapMin, mapMax) {
 			return mapMin + ((mapMax - mapMin) / (numMax - numMin)) * (num - numMin);
 		},
@@ -318,6 +319,43 @@ define(function(require) {
 				totalDistance += this.dist(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y)
 			}
 			return totalDistance;
-		}
+		},
+		setDifficultyBars(map, mods) {
+			let parts = ["circle-size", "hp-drain", "accuracy", "approach-rate", "star-rating"];
+			let key = ["circleSize", "healthDrain", "overallDifficulty", "approachRate", "starRating"];
+			for (let i = 0; i < parts.length; i++) {
+				let difficultyValue;
+				if (key[i] === "starRating") {
+					difficultyValue = map[key[i]];
+				} else {
+					let multiplier = (key[i] === "circleSize") ? 1.3 : 1.4;
+					difficultyValue = Formulas.applyModMultiplier(map[key[i]], mods, multiplier);
+				}
+				document.getElementById(parts[i] + "-difficulty").style.width = Utils.clamp(difficultyValue, 0, 10) + "vw";
+				document.getElementById(parts[i] + "-difficulty-value").textContent = Utils.roundDigits(difficultyValue, 2);
+			}
+		},
+		setStatisticValues(group, map, mods) {
+			let multiplier = 1;
+			if (mods.doubleTime || mods.nightCore) {
+				multiplier = 1.5;
+			} else if (mods.halfTime) {
+				multiplier = 0.75;
+			}
+			document.getElementById("beatmap-statistics-version").textContent = map.version;
+			document.getElementById("beatmap-statistics-title").textContent = group.title;
+			document.getElementById("beatmap-statistics-artist").textContent = group.artist;
+			document.getElementById("beatmap-statistics-creator").textContent = group.creator;
+			document.getElementById("beatmap-statistics-drain-time").textContent = Utils.secondsToMinuteSeconds(map.drainTime);
+			document.getElementById("beatmap-statistics-bpm").textContent = Math.round(60000 / (map.beatLength / multiplier));
+			document.getElementById("beatmap-statistics-circle-count").textContent = map.objectCounts.circles;
+			document.getElementById("beatmap-statistics-slider-count").textContent = map.objectCounts.sliders;
+			document.getElementById("beatmap-statistics-spinner-count").textContent = map.objectCounts.spinners;
+		},
+		extractFileExtension(name) {
+			let split = name.toLowerCase().split(".");
+			return split[split.length - 1];
+		},
 	};
+	return Utils;
 });

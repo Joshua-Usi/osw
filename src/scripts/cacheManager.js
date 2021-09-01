@@ -9,6 +9,14 @@ define(function(require) {
 			}
 			return cache;
 		},
+		addMapSet(mapset) {
+			let cache = that.getCache("beatmapCache");
+			if (cache === null) {
+				cache = [];
+			}
+			cache.push(new that.MapSet(mapset));
+			this.setCache("beatmapCache", cache);
+		},
 		getCache(cacheName) {
 			return JSON.parse(window.localStorage.getItem(cacheName));
 		},

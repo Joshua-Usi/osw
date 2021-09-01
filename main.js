@@ -48,19 +48,19 @@ define(function(require) {
 	AudioManager.load("settings-hover", "./src/audio/effects/settings-hover.wav", "effects", true);
 	AudioManager.load("sliderbar", "./src/audio/effects/sliderbar.wav", "effects", true);
 	AudioManager.load("menu-hit", "./src/audio/effects/menu-hit.wav", "effects", true);
-	if (!window.localStorage) {
-		throw new Error("LocalStorage is not supported on this browser. You will not be able to save your options");
-	}
 	/* Offline context checks, needed to ensure for some effects to work */
 	if (window.origin === null) {
 		console.warn("Due to CORS origin not being set correctly (you may running this via local files, use a webserver), beatmaps, audio, images, scores and skins will unable to be saved, the visualisers may also bug and file uploads will break");
+	}
+	if (!window.localStorage) {
+		throw new Error("LocalStorage is not supported on this browser. You will not be able to save your options");
 	}
 	if (!window.indexedDB) {
 		throw new Error("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
 	}
 	/* osw! version incremented manually */
 	const MAJOR_VERSION = 0;
-	const MINOR_VERSION = 10;
+	const MINOR_VERSION = 11;
 	const PATCH_VERSION = 0;
 	const BUILD_METADATA = "b";
 	const version = `osw! v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}${BUILD_METADATA}`;
@@ -69,10 +69,8 @@ define(function(require) {
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].textContent = version;
 	}
-	let loadedNewMaps = true;
-	let lastElementClicked;
-
 	function clickGroup(element) {
+		let beatmapCache = JSON.parse(window.localStorage.getItem("beatmapCache"));
 		let details = element.getElementsByClassName("beatmap-selection-group-pane")[0];
 		let maps = element.getElementsByClassName("beatmap-selection-group-pane-maps")[0];
 		let mapsChildren = maps.getElementsByClassName("beatmap-selection-map-pane");
@@ -84,7 +82,7 @@ define(function(require) {
 				mapsChildren[i].classList.remove("beatmap-selection-selected");
 			}
 		} else {
-			clickMap(maps.getElementsByClassName("beatmap-selection-map-pane")[0]);
+			clickMap(maps.getElementsByClassName("beatmap-selection-map-pane")[0], ModsUI.getMods());
 			let groups = document.getElementsByClassName("beatmap-selection-group");
 			for (let i = 0; i < groups.length; i++) {
 				groups[i].getElementsByClassName("beatmap-selection-group-pane-maps")[0].style.display = "none";
@@ -98,7 +96,6 @@ define(function(require) {
 			}
 			let database = window.indexedDB.open("osw-database");
 			database.addEventListener("success", function(event) {
-				let beatmapCache = CacheManager.getCache("beatmapCache");
 				let database = event.target.result;
 				let audioObjectStore = DatabaseManager.getObjectStore(database, "audio", "readonly");
 				let audioRequest = audioObjectStore.get(details.getAttribute("data-audio-source"));
@@ -106,26 +103,21 @@ define(function(require) {
 					console.error(`Attempt to find query failed: ${event.target.error}`);
 				});
 				audioRequest.addEventListener("success", function(event) {
-					let audioType;
-					if (event.target.result.name.toLowerCase().includes(".mp3")) {
-						audioType = "mp3";
-					} else if (event.target.result.name.toLowerCase().includes(".ogg")) {
-						audioType = "ogg";
-					}
-					logoBeatAccumulator.milliseconds = beatmapCache[parseInt(details.getAttribute("data-index"))].difficulties[0].beatLength;
-					menuAudio.src = `data:audio/${audioType};base64,${event.target.result.data}`;
+					let fileExtension = Utils.extractFileExtension(event.target.result.name);
+					let menuAudio = document.getElementById("menu-audio");
+					menuAudio.src = `data:audio/${fileExtension};base64,${event.target.result.data}`;
 					menuAudio.currentTime = beatmapCache[parseInt(details.getAttribute("data-index"))].previewTime;
 					menuAudio.play();
 				});
 			});
 		}
+		logoBeatAccumulator.milliseconds = beatmapCache[parseInt(details.getAttribute("data-index"))].difficulties[0].beatLength;
 	}
-
 	function clickMap(element) {
-		let beatmapCache = CacheManager.getCache("beatmapCache");
+		let beatmapCache = JSON.parse(window.localStorage.getItem("beatmapCache"));
 		if (lastElementClicked != element) {
-			setDifficultyBars(beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")], ModsUI.getMods());
-			setStatisticValues(beatmapCache[element.getAttribute("data-group-index")], beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")], ModsUI.getMods());
+			Utils.setDifficultyBars(beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")], ModsUI.getMods());
+			Utils.setStatisticValues(beatmapCache[element.getAttribute("data-group-index")], beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")], ModsUI.getMods());
 			document.getElementById("description-text").textContent = beatmapCache[element.getAttribute("data-group-index")].difficulties[element.getAttribute("data-map-index")].version;
 			document.getElementById("source-text").textContent = beatmapCache[element.getAttribute("data-group-index")].source;
 			document.getElementById("tags-text").textContent = beatmapCache[element.getAttribute("data-group-index")].tags;
@@ -145,16 +137,9 @@ define(function(require) {
 					});
 					imageRequest.addEventListener("success", function(event) {
 						if (event.target.result) {
-							let imageType;
-							if (event.target.result.name.toLowerCase().includes(".jpg")) {
-								imageType = "jpg";
-							} else if (event.target.result.name.toLowerCase().includes(".jpeg")) {
-								imageType = "jpeg";
-							} else if (event.target.result.name.toLowerCase().includes(".png")) {
-								imageType = "png";
-							}
-							document.getElementById("beatmap-image").style.backgroundImage = `url("data:image/${imageType};base64,${event.target.result.data}")`;
-							document.getElementById("background").src = `data:image/${imageType};base64,${event.target.result.data}`;
+							let fileExtension = Utils.extractFileExtension(event.target.result.name);
+							document.getElementById("beatmap-image").style.backgroundImage = `url("data:image/${fileExtension};base64,${event.target.result.data}")`;
+							document.getElementById("background").src = `data:image/${fileExtension};base64,${event.target.result.data}`;
 							document.getElementById("background").style.filter = `blur(${Utils.map(Options.getProperty("UserInterface", "backgroundBlur"), 0, 1, 0, 16)}px)`;
 						} else {
 							document.getElementById("beatmap-image").style.backgroundImage = `url("./src/images/osw-background.png")`;
@@ -176,6 +161,7 @@ define(function(require) {
 				beatmapRequest.addEventListener("success", function(event) {
 					Utils.showWebpageStates(["webpage-state-gameplay"]);
 					Utils.hideWebpageStates(["webpage-state-menu", "webpage-state-beatmap-selection", "webpage-state-mods", "webpage-state-pause-screen", "webpage-state-fail-screen", "webpage-state-results-screen", "top-bar", "bottom-bar", ]);
+					// hide sidenav
 					document.getElementById("sidenav").style.width = "0";
 					document.getElementById("sidenav").style.opacity = "0.2";
 					menuAudio.pause();
@@ -186,6 +172,19 @@ define(function(require) {
 			});
 		}
 	}
+	function chooseRandomMap() {
+		let groups = document.getElementsByClassName("beatmap-selection-group");
+		let visibleGroups = [];
+		for (let i = 0; i < groups.length; i++) {
+			if (groups[i].style.display !== "none") {
+				visibleGroups.push(groups[i]);
+			}
+		}
+		if (visibleGroups.length > 0) {
+			clickGroup(visibleGroups[Math.floor(Math.random() * visibleGroups.length)]);
+		}
+	}
+	let lastElementClicked;
 	/* event delegation - reduces event listeners */
 	document.getElementById("beatmap-selection-right").addEventListener("click", function(event) {
 		let parent = event.target;
@@ -201,50 +200,12 @@ define(function(require) {
 			}
 		}
 	});
-
-	function setDifficultyBars(map, mods) {
-		let parts = ["circle-size", "hp-drain", "accuracy", "approach-rate", "star-rating"];
-		let key = ["circleSize", "healthDrain", "overallDifficulty", "approachRate", "starRating"];
-		for (let i = 0; i < parts.length; i++) {
-			let difficultyValue;
-			if (key[i] === "starRating") {
-				difficultyValue = map[key[i]];
-			} else {
-				let multiplier = (key[i] === "circleSize") ? 1.3 : 1.4;
-				difficultyValue = Formulas.applyModMultiplier(map[key[i]], mods, multiplier);
-			}
-			document.getElementById(parts[i] + "-difficulty").style.width = Utils.clamp(difficultyValue, 0, 10) + "vw";
-			document.getElementById(parts[i] + "-difficulty-value").textContent = Utils.roundDigits(difficultyValue, 2);
-		}
-	}
-
-	function setStatisticValues(group, map, mods) {
-		let multiplier = 1;
-		if (mods.doubleTime || mods.nightCore) {
-			multiplier = 1.5;
-		} else if (mods.halfTime) {
-			multiplier = 0.75;
-		}
-		document.getElementById("beatmap-statistics-version").textContent = map.version;
-		document.getElementById("beatmap-statistics-title").textContent = group.title;
-		document.getElementById("beatmap-statistics-artist").textContent = group.artist;
-		document.getElementById("beatmap-statistics-creator").textContent = group.creator;
-		document.getElementById("beatmap-statistics-drain-time").textContent = Utils.secondsToMinuteSeconds(map.drainTime);
-		document.getElementById("beatmap-statistics-bpm").textContent = Math.round(60000 / (map.beatLength / multiplier));
-		document.getElementById("beatmap-statistics-circle-count").textContent = map.objectCounts.circles;
-		document.getElementById("beatmap-statistics-slider-count").textContent = map.objectCounts.sliders;
-		document.getElementById("beatmap-statistics-spinner-count").textContent = map.objectCounts.spinners;
-	}
 	const CACHE_VERSION = 2;
 	/* if cache already exist, then use it */
 	if (localStorage.getItem("beatmapCache") && localStorage.getItem("beatmapCache") !== "[]" && parseInt(localStorage.getItem("beatmapCacheVersion")) === CACHE_VERSION) {
 		/* Beatmap loading and adding to dom */
-		let concatenated = "";
 		let cache = CacheManager.getCache("beatmapCache");
-		for (let i = 0; i < cache.length; i++) {
-			concatenated += BeatMapSelectionPaneTemplate.group(cache[i], i);
-		}
-		document.getElementById("beatmap-selection-right").innerHTML = concatenated;
+		document.getElementById("beatmap-selection-right").innerHTML = BeatMapSelectionPaneTemplate.generate(cache);
 	} else {
 		BeatmapFetcher.refresh();
 		loadMaps();
@@ -254,72 +215,16 @@ define(function(require) {
 		if (BeatmapFetcher.allMapsLoaded()) {
 			let loadedMaps = BeatmapFetcher.get();
 			/* Beatmap loading and adding to dom */
-			let concatenated = "";
 			let cache = CacheManager.generate(loadedMaps);
 			if (cache.length > 0) {
 				CacheManager.setCache("beatmapCache", cache);
 				CacheManager.setCache("beatmapCacheVersion", CACHE_VERSION);
 			}
-			for (let i = 0; i < cache.length; i++) {
-				concatenated += BeatMapSelectionPaneTemplate.group(cache[i], i);
-			}
-			document.getElementById("beatmap-selection-right").innerHTML = concatenated;
+			document.getElementById("beatmap-selection-right").innerHTML = BeatMapSelectionPaneTemplate.generate(cache);
 		} else {
 			/* every 250ms try and load maps from the window.indexedDB */
 			setTimeout(loadMaps, 250);
 		}
-	}
-
-	function chooseRandomMap() {
-		let groups = document.getElementsByClassName("beatmap-selection-group");
-		let visibleGroups = [];
-		for (let i = 0; i < groups.length; i++) {
-			if (groups[i].style.display !== "none") {
-				visibleGroups.push(groups[i]);
-			}
-		}
-		if (visibleGroups.length > 0) {
-			clickGroup(visibleGroups[Math.floor(Math.random() * visibleGroups.length)]);
-		}
-	}
-
-	function logoBeat() {
-		/* logo pulse */
-		logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.05s";
-		logo.style.width = logoSize + "vh";
-		logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
-		logo.style.left = "calc(" + logoX + "vw - " + logoSize / 2 + "vh)";
-		logo.style.backgroundSize = logoSize + "vh";
-		logo.style.filter = "brightness(1.25)";
-		if (beatNumber % 2 === 0 || beatNumber % 4 === 0) {
-			let leftBeat = document.getElementById("left-beat");
-			leftBeat.style.transition = "opacity 0.05s";
-			leftBeat.style.opacity = "1";
-		}
-		if (beatNumber % 2 === 1 || beatNumber % 4 === 0) {
-			let rightBeat = document.getElementById("right-beat");
-			rightBeat.style.transition = "opacity 0.05s";
-			rightBeat.style.opacity = "1";
-		}
-		beatNumber++;
-		/* snow only in december, maximum 50 to prevent lag */
-		/* last tested:
-		 *	
-		 *	27/12/2020, works
-		 *	9/01/2021, works
-		 */
-		if (new Date().getMonth() === 11 && document.getElementById("snow").getElementsByTagName("img").length <= 50) {
-			let snowflake = document.createElement("img");
-			snowflake.src = "./src/images/snowflake.png";
-			snowflake.style.position = "fixed";
-			snowflake.style.width = Math.random() * 2 + 1 + "vh";
-			snowflake.style.top = "-10vh";
-			snowflake.style.left = Math.random() * 100 + "vw";
-			snowflake.style.opacity = 0.4;
-			snowflake.style.zIndex = -5;
-			document.getElementById("snow").appendChild(snowflake);
-		}
-		setTimeout(logoResetBeat, 4000 / 60);
 	}
 
 	function logoResetBeat() {
@@ -372,21 +277,57 @@ define(function(require) {
 	let logo = document.getElementById("logo");
 	let ctx = audioVisualiser.getContext("2d");
 	let isFirstClick = true;
-	let offset = 0;
 	let logoX = 55;
 	let logoY = 50;
 	let logoSize = 70;
 	let audioVisualiserSize = 1.6;
+	/* Beatmap Loading */
+	let pendingFileCount = 0;
+	let screenShowing = false;
 	/* Profiling letiables */
 	let recordedFramesPerSecond = [];
 	/* Accumulators */
 	let time = 0;
 	let previousTime = 0;
 	let gameplayRenderAccumulator = new Utils.Accumulator(GameplayHandler.render, 1000 / 60);
-	let logoBeatAccumulator = new Utils.Accumulator(logoBeat, 375);
-	let beatmapQueue = [];
-	let audioQueue = [];
-	let imageQueue = [];
+	let logoBeatAccumulator = new Utils.Accumulator(function() {
+		/* logo pulse */
+		logo.style.transition = "width 0.05s, top 0.05s, left 0.05s, background-size 0.05s, filter 0.05s";
+		logo.style.width = logoSize + "vh";
+		logo.style.top = "calc(" + logoY + "vh - " + logoSize / 2 + "vh)";
+		logo.style.left = "calc(" + logoX + "vw - " + logoSize / 2 + "vh)";
+		logo.style.backgroundSize = logoSize + "vh";
+		logo.style.filter = "brightness(1.25)";
+		if (beatNumber % 2 === 0 || beatNumber % 4 === 0) {
+			let leftBeat = document.getElementById("left-beat");
+			leftBeat.style.transition = "opacity 0.05s";
+			leftBeat.style.opacity = "1";
+		}
+		if (beatNumber % 2 === 1 || beatNumber % 4 === 0) {
+			let rightBeat = document.getElementById("right-beat");
+			rightBeat.style.transition = "opacity 0.05s";
+			rightBeat.style.opacity = "1";
+		}
+		beatNumber++;
+		/* snow only in december, maximum 50 to prevent lag */
+		/* last tested:
+		 *	
+		 *	27/12/2020, works
+		 *	9/01/2021, works
+		 */
+		if (new Date().getMonth() === 11 && document.getElementById("snow").getElementsByTagName("img").length <= 50) {
+			let snowflake = document.createElement("img");
+			snowflake.src = "./src/images/snowflake.png";
+			snowflake.style.position = "fixed";
+			snowflake.style.width = Math.random() * 2 + 1 + "vh";
+			snowflake.style.top = "-10vh";
+			snowflake.style.left = Math.random() * 100 + "vw";
+			snowflake.style.opacity = 0.4;
+			snowflake.style.zIndex = -5;
+			document.getElementById("snow").appendChild(snowflake);
+		}
+		setTimeout(logoResetBeat, 4000 / 60);
+	}, 375);
 	/* set the settings */
 	(function() {
 		let userOptions = Options.get();
@@ -434,13 +375,19 @@ define(function(require) {
 			time = Date.now();
 			previousTime = time;
 			(function animate() {
+				if (pendingFileCount === 0 && screenShowing) {
+					Utils.hideWebpageStates(["webpage-state-loading-maps"]);
+					screenShowing = false;
+				} else if (pendingFileCount > 0 && screenShowing === false) {
+					Utils.showWebpageStates(["webpage-state-loading-maps"]);
+					screenShowing = true;
+				}
 				if ((document.getElementById("webpage-state-gameplay").style.display === "none" || document.getElementById("webpage-state-gameplay").style.display === "")) {
 					/* triangle background moves */
 					let triangleBackgroundMoves = document.getElementsByClassName("triangle-background");
-					offset -= 0.5;
 					for (let i = 0; i < triangleBackgroundMoves.length; i++) {
 						if (triangleBackgroundMoves[i].style.display !== "none") {
-							triangleBackgroundMoves[i].style.backgroundPositionY = offset + "px";
+							triangleBackgroundMoves[i].style.backgroundPositionY = -window.performance.now() / 50 + "px";
 						}
 					}
 					/* beat detection */
@@ -532,21 +479,6 @@ define(function(require) {
 					logoBeatAccumulator.tick(time - previousTime);
 				} else {
 					logoResetBeat();
-				}
-				if (audioQueue.length > 0) {
-					BeatmapFetcher.addAudio(audioQueue);
-				}
-				if (imageQueue.length > 0) {
-					BeatmapFetcher.addImage(imageQueue);
-				}
-				if (beatmapQueue.length > 0) {
-					BeatmapFetcher.addNewMaps(beatmapQueue);
-					loadedNewMaps = false;
-				} else if (loadedNewMaps === false) {
-					CacheManager.deleteCache("beatmapCache");
-					BeatmapFetcher.refresh();
-					loadMaps();
-					loadedNewMaps = true;
 				}
 				if (Options.getProperty("Maintainence", "developerMode")) {
 					/* each character is 2 bytes according to utf-16, therefore multiply string length by 2 to get amount in bytes */
@@ -843,6 +775,7 @@ define(function(require) {
 		if (window.confirm("Are you sure you want to delete all beatmaps? this option is not undoable")) {
 			let database = window.indexedDB.open("osw-database");
 			CacheManager.deleteCache("beatmapCache");
+			CacheManager.deleteCache("loadedOSZ");
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
 				const toDelete = ["beatmaps", "audio", "images"];
@@ -967,7 +900,7 @@ define(function(require) {
 		if (e.keyCode === 9) {
 			e.preventDefault();
 		}
-	})
+	});
 	document.getElementById("back-button").addEventListener("click", function() {
 		AudioManager.play("back-button-click");
 		if (document.getElementById("webpage-state-results-screen").style.display === "block") {
@@ -1004,26 +937,42 @@ define(function(require) {
 	document.getElementById("fail-menu-quit").addEventListener("click", quit);
 	document.getElementById("upload-beatmap").addEventListener("change", function() {
 		for (let i = 0; i < this.files.length; i++) {
+			let cache = CacheManager.getCache("loadedOSZ");
+			if (cache === null) {
+				cache = [];
+			}
+			if (cache.includes(this.files[i].name)) {
+				continue;
+			} else {
+				cache.push(this.files[i].name);
+				CacheManager.setCache("loadedOSZ", cache);
+			}
 			let fileReader = new FileReader();
-			fileReader.addEventListener("load", function() {
+			fileReader.addEventListener("load", function(event) {
 				let new_zip = new JSZip();
 				new_zip.loadAsync(event.target.result).then(function(zip) {
 					let uniqueIdentifier;
 					let backgroundNames = [];
+					let audioNames = [];
 					let beatmapFiles = [];
 					let audioFiles = [];
 					let imageFiles = [];
 					/* split the files into beatmaps, audio files and images */
 					for (let key in zip.files) {
-						if (key.toLowerCase().includes(".mp3") || key.toLowerCase().includes(".ogg")) {
+						let fileExtension = Utils.extractFileExtension(key);
+						if (["ogg", "mp3", "wav"].includes(fileExtension)) {
 							audioFiles.push(key);
-						} else if (key.toLowerCase().includes(".osu")) {
+							pendingFileCount++;
+						} else if (["osu"].includes(fileExtension)) {
 							beatmapFiles.push(key);
-						} else if (key.toLowerCase().includes(".jpg") || key.toLowerCase().includes(".jpeg") || key.toLowerCase().includes(".png")) {
+							pendingFileCount++;
+						} else if (["jpg", "jpeg", "png"].includes(fileExtension)) {
 							imageFiles.push(key);
+							pendingFileCount++;
 						}
 					}
 					/* first process beatmaps*/
+					let mapSet = [];
 					for (let j = 0; j < beatmapFiles.length; j++) {
 						zip.files[beatmapFiles[j]].async("string").then(function(content) {
 							let parsedMap = Parser.parseBeatmap(content);
@@ -1033,30 +982,47 @@ define(function(require) {
 							if (parsedMap.background) {
 								backgroundNames.push(parsedMap.background.filename);
 							}
-							beatmapQueue.push({
+							if (parsedMap.AudioFilename) {
+								audioNames.push(parsedMap.AudioFilename);	
+							}
+							let map = {
 								name: beatmapFiles[j],
 								data: parsedMap,
-							});
+							};
+							DatabaseManager.add("osw-database", map, "beatmaps");
+							mapSet.push(map);
+							pendingFileCount--;
 							/* start processing audio and images once all beatmaps are processed */
 							if (j >= beatmapFiles.length - 1) {
+								CacheManager.addMapSet(mapSet);
+								let cache = CacheManager.getCache("beatmapCache");
+								document.getElementById("beatmap-selection-right").innerHTML = BeatMapSelectionPaneTemplate.generate(cache);
 								/* process audio */
 								for (let k = 0; k < audioFiles.length; k++) {
-									zip.files[audioFiles[k]].async("binarystring").then(function(content) {
-										audioQueue.push({
-											name: uniqueIdentifier + audioFiles[k],
-											data: btoa(content)
+									if (audioNames.includes(audioFiles[k])) {
+										zip.files[audioFiles[k]].async("binarystring").then(function(content) {
+											DatabaseManager.add("osw-database", {
+												name: uniqueIdentifier + audioFiles[k],
+												data: btoa(content)
+											}, "audio");
+											pendingFileCount--;
 										});
-									});
+									} else {
+										pendingFileCount--;
+									}
 								}
 								/* process images */
 								for (let k = 0; k < imageFiles.length; k++) {
 									if (backgroundNames.includes(imageFiles[k])) {
 										zip.files[imageFiles[k]].async("binarystring").then(function(content) {
-											imageQueue.push({
+											DatabaseManager.add("osw-database", {
 												name: uniqueIdentifier + imageFiles[k],
 												data: btoa(content)
-											});
+											}, "images");
+											pendingFileCount--;
 										});
+									} else {
+										pendingFileCount--;
 									}
 								}
 							}
@@ -1113,7 +1079,6 @@ define(function(require) {
 	});
 	document.getElementById("mods").addEventListener("click", function(event) {
 		let elementClicked = event.target;
-		let previousModMultiplier = Formulas.modScoreMultiplier(ModsUI.getMods()).toFixed(2);
 		if (elementClicked.classList.contains("mod-icons")) {
 			let modName = elementClicked.id.replace("mod-", "");
 			if (elementClicked.classList.contains("mod-selected")) {

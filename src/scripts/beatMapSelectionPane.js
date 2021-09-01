@@ -3,6 +3,13 @@ define(function(require) {
 	const Utils = require("src/scripts/utils.js");
 	const Formulas = require("src/scripts/formulas.js");
 	return {
+		generate: function(cache) {
+			let concatenated = "";
+			for (let i = 0; i < cache.length; i++) {
+				concatenated += this.group(cache[i], i);
+			}
+			return concatenated;
+		},
 		group: function(maps, i) {
 			let mapsHTML = "";
 			let iconsHTML = "";
