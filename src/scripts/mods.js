@@ -15,7 +15,7 @@ define(function(require) {
 		"flashlight": [],
 
 		"relax": ["noFail", "suddenDeath", "perfect", "autopilot", "auto"],
-		"autopilot": ["noFail", "suddenDeath", "perfect", "relax", "auto"],
+		"autopilot": ["noFail", "suddenDeath", "perfect", "relax", "auto", "spunOut"],
 		"spunOut": ["autoPilot"],
 		"auto": ["suddenDeath", "perfect", "relax", "autopilot", "spunOut"],
 		"scoreV2": [],

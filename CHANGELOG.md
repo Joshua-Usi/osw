@@ -1,11 +1,15 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
-## [v1.0.0rc] - 27-06-2021
+## [v0.11.1b-dev] - 3-09-2021
+### Optimised
+- Beatmap uploading even more
+### Removed
+- Volume warning on splash screen
+---
+## [v0.11.0b-dev] - 1-09-2021
 ### Added
-- Replays
-- Score Saving
-- Ability to view replays
+- Capability to view replays
 - Notelock (unfortunately)
 - Mod Incompatibilities (such as being able to choose both easy and hard rock at the same time)
 - Screen so user can tell if a beatmap is currently loading
@@ -13,8 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README.MD FAQs
 ### Optimised
 - Beatmap uploading speed
-### Deprecated
--
 ### Removed
 - Star rating tests (no longer relevant thanks to ojsama)
 ### Fixed
@@ -23,8 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pressing deselect all mods wouldn't update the score multiplier text
 - Auto experiencing notelock
 - Sliders having different velocities for diffferent segments depending on the segments of the slider
-### Security
--
 ### Code Quality
 - options.js to have a more consistent API
 - introsequence.js to be more modular

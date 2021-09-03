@@ -111,7 +111,15 @@ define(function(require) {
 		let circleSizeScalingVector = normaliseCircleSize(beatmap.CircleSize);
 		let normalisedCenterVector = vectorMultiply([256, 192], circleSizeScalingVector);
 		for (let i = 0; i < beatmap.hitObjects.length; i++) {
-			let objectDifficulty = new hitObjectDifficulty(JSON.parse(JSON.stringify(beatmap.hitObjects[i])));
+			let objectDifficulty;
+			try {
+				objectDifficulty = new hitObjectDifficulty(JSON.parse(JSON.stringify(beatmap.hitObjects[i])));
+			} catch (e) {
+				console.log(i);
+				console.log(beatmap);
+				console.log(beatmap.hitObjects[i]);
+				throw new Error(e);
+			}
 			let baseObject = objectDifficulty.baseObject;
 			/* spinner */
 			if (baseObject.type[3] === "1") {
