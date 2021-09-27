@@ -10,8 +10,12 @@ define(function(require) {
 		constructor() {
 			/* map for loaded sounds */
 			this.sounds = {};
+			this.masterVolume = 1;
 			this.musicVolume = 1;
 			this.effectsVolume = 1;
+		}
+		setMasterVolume(volume) {
+			this.masterVolume = volume;
 		}
 		/* value between 0 and 1, where 0 = muted */
 		setMusicVolume(volume) {
@@ -32,13 +36,13 @@ define(function(require) {
 		play(id, volumeOverride) {
 			if (this.sounds[id].allowMultiPlay) {
 				let cloned = this.sounds[id].audio.cloneNode();
-					if (volumeOverride) {
+				if (volumeOverride) {
 					cloned.volume = volumeOverride;
 				} else {
 					if (this.sounds[id].type === "music") {
-						cloned.volume = this.musicVolume;
+						cloned.volume = this.masterVolume * this.musicVolume;
 					} else {
-						cloned.volume = this.effectsVolume;
+						cloned.volume = this.masterVolume * this.effectsVolume;
 					}
 				}
 				cloned.play();
@@ -47,9 +51,9 @@ define(function(require) {
 					this.sounds[id].audio.volume = volumeOverride;
 				} else {
 					if (this.sounds[id].type === "music") {
-						this.sounds[id].audio.volume = this.musicVolume;
+						this.sounds[id].audio.volume = this.masterVolume * this.musicVolume;
 					} else {
-						this.sounds[id].audio.volume = this.effectsVolume;
+						this.sounds[id].audio.volume = this.masterVolume * this.effectsVolume;
 					}
 				}
 				this.sounds[id].audio.play();

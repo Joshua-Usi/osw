@@ -42,6 +42,7 @@ define(function(require) {
 	let keyboardRightReleased = true;
 	/* Details about the play, including replays */
 	let playDetails;
+	/* replay variables */
 	let isReplay = false;
 	let currentMouseEvent = 0;
 	let currentKeyEvent = 0;
@@ -114,8 +115,8 @@ define(function(require) {
 	let HIT_OBJECT_OFFSET_Y = playfieldYOffset + window.innerHeight / 2 - window.innerHeight * PLAYFIELD_ACTUAL_SIZE / 2;
 	const PLAYFIELD_SIZE_X = 512;
 	const PLAYFIELD_SIZE_Y = 384;
-	const PLAYFIELD_CENTER_X = 256;
-	const PLAYFIELD_CENTER_Y = 192;
+	const PLAYFIELD_CENTER_X = PLAYFIELD_SIZE_X / 2;
+	const PLAYFIELD_CENTER_Y = PLAYFIELD_SIZE_Y / 2;
 	const JUDGEMENT_BEZIER_ANIMATION = Bezier.cubic(0, 1.4, 0, 1);
 	/* in radians */
 	const AUTO_SPIN_SPEED = 50;
@@ -816,9 +817,9 @@ define(function(require) {
 		if (isNaN(angleChange)) {
 			angleChange = 0;
 		}
-		/* hard limit spinner speed at 50rad/s or ~477 rpm */
-		angleChange = Math.min(angleChange, 50);
-		angleChange = Math.max(angleChange, -50);
+		/* hard limit spinner speed at auto max spin speed */
+		angleChange = Math.min(angleChange, AUTO_SPIN_SPEED);
+		angleChange = Math.max(angleChange, -AUTO_SPIN_SPEED);
 		/* Detect sudden sign changes due to rollover every spin */
 		if (previousSigns.length > 10) {
 			previousSigns.shift();

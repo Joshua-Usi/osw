@@ -36,6 +36,7 @@ define(function(require) {
 	const Formulas = require("./src/scripts/formulas.js");
 	const CacheManager = require("./src/scripts/cacheManager.js");
 	const ModsUI = require("./src/scripts/modsUI.js");
+	const Version = require("./src/scripts/version.js");
 	AudioManager.load("back-button-click", "./src/audio/effects/back-button-click.wav", "effects", true);
 	AudioManager.load("menu-options-click", "./src/audio/effects/menu-options-click.wav", "effects", true);
 	AudioManager.load("menu-freeplay-click", "./src/audio/effects/menu-freeplay-click.wav", "effects", true);
@@ -58,16 +59,10 @@ define(function(require) {
 	if (!window.indexedDB) {
 		throw new Error("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
 	}
-	/* osw! version incremented manually */
-	const MAJOR_VERSION = 0;
-	const MINOR_VERSION = 11;
-	const PATCH_VERSION = 0;
-	const BUILD_METADATA = "b-dev";
-	const version = `osw! v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}${BUILD_METADATA}`;
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
-		classes[i].textContent = version;
+		classes[i].textContent = Version;
 	}
 	function clickGroup(element) {
 		let beatmapCache = JSON.parse(window.localStorage.getItem("beatmapCache"));
@@ -335,41 +330,6 @@ define(function(require) {
 		}
 		setTimeout(logoResetBeat, 4000 / 60);
 	}, 375);
-	/* set the settings */
-	(function() {
-		let userOptions = Options.get();
-		let index = 0;
-		for (let group in userOptions) {
-			if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object") {
-				for (let setting in userOptions[group]) {
-					if (userOptions[group].hasOwnProperty(setting)) {
-						let element = document.getElementById("settings-" + Utils.camelCaseToDash(setting));
-						switch (Options.getTypes()[index]) {
-							case "slider":
-								let mapped = Utils.map(userOptions[group][setting], 0, 1, element.min, element.max);
-								/* is weird, idk, quick patch */
-								if (setting === "sliderResolution") {
-									mapped = Utils.map(mapped, 10, 14, 1, 5);
-								}
-								element.value = Math.round(mapped);
-								element.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + Utils.map(element.value, element.min, element.max, 0, 100) + "%, #7e3c57 " + Utils.map(element.value, element.min, element.max, 0, 100) + "%, #7e3c57 100%)";
-								break;
-							case "checkbox":
-								element.checked = userOptions[group][setting];
-								break;
-							case "selectbox":
-								element.getElementsByClassName("select-box-selected")[0].textContent = userOptions[group][setting];
-								break;
-							case "text":
-								element.textContent = userOptions[group][setting];
-								break;
-						}
-						index++;
-					}
-				}
-			}
-		}
-	})();
 	/* Event Listeners */
 	window.addEventListener("click", function() {
 		if (isFirstClick && document.readyState === "complete") {
@@ -462,15 +422,16 @@ define(function(require) {
 				recordedFramesPerSecond.push(now);
 				/* Update frame counter */
 				let frameCounter = document.getElementById("frame-rate");
+				frameCounter.textContent = recordedFramesPerSecond.length
 				switch (Options.getProperty("Performance", "maxFrameRate")) {
 					case "VSync":
-						frameCounter.textContent = recordedFramesPerSecond.length + " / 60fps";
+						frameCounter.textContent += " / 60fps";
 						break;
 					case "2x VSync":
-						frameCounter.textContent = recordedFramesPerSecond.length + " / 120fps";
+						frameCounter.textContent += " / 120fps";
 						break;
 					case "Browser maximum (250fps)":
-						frameCounter.textContent = recordedFramesPerSecond.length + " / 250fps";
+						frameCounter.textContent += " / 250fps";
 						break;
 				}
 				if (recordedFramesPerSecond.length > 60) {
@@ -552,6 +513,39 @@ define(function(require) {
 		document.getElementById("splash-screen").style.animationDuration = "1s";
 		document.getElementById("splash-screen").style.animationDelay = "1s";
 		document.getElementById("heart-loader").style.display = "none";
+		/* set the settings */
+		let userOptions = Options.get();
+		let index = 0;
+		for (let group in userOptions) {
+			if (userOptions.hasOwnProperty(group) && typeof(userOptions[group]) === "object") {
+				for (let setting in userOptions[group]) {
+					if (userOptions[group].hasOwnProperty(setting)) {
+						let element = document.getElementById("settings-" + Utils.camelCaseToDash(setting));
+						switch (Options.getTypes()[index]) {
+							case "slider":
+								let mapped = Utils.map(userOptions[group][setting], 0, 1, element.min, element.max);
+								/* is weird, idk, quick patch */
+								if (setting === "sliderResolution") {
+									mapped = Utils.map(mapped, 10, 14, 1, 5);
+								}
+								element.value = Math.round(mapped);
+								element.dispatchEvent(new CustomEvent("input", {detail: true,}));
+								break;
+							case "checkbox":
+								element.checked = userOptions[group][setting];
+								break;
+							case "selectbox":
+								element.getElementsByClassName("select-box-selected")[0].textContent = userOptions[group][setting];
+								break;
+							case "text":
+								element.textContent = userOptions[group][setting];
+								break;
+						}
+						index++;
+					}
+				}
+			}
+		}
 	});
 	// window.addEventListener("blur", function() {
 	// 	if (document.getElementById("webpage-state-gameplay").style.display === "block" && document.getElementById("webpage-state-fail-screen").style.display === "none") {
@@ -634,7 +628,7 @@ define(function(require) {
 			} else {
 				AudioManager.play("check-off");
 			}
-			setSettings();
+			saveSettings();
 		});
 		checkbox[i].addEventListener("mouseenter", function() {
 			AudioManager.play("settings-hover");
@@ -643,9 +637,13 @@ define(function(require) {
 	/* All range slider listeners */
 	let sliders = document.getElementsByClassName("slider");
 	for (let i = 0; i < sliders.length; i++) {
-		sliders[i].addEventListener("input", function() {
+		sliders[i].addEventListener("input", function(event) {
 			this.style.background = "linear-gradient(to right, #FD67AE 0%, #FD67AE " + Utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 " + Utils.map(this.value, this.min, this.max, 0, 100) + "%, #7e3c57 100%)";
+			if (event.detail) {
+				return;
+			}
 			AudioManager.play("sliderbar");
+			saveSettings();
 		});
 		sliders[i].addEventListener("mouseenter", function() {
 			AudioManager.play("settings-hover");
@@ -667,7 +665,7 @@ define(function(require) {
 					}
 				}
 				this.parentNode.parentNode.getElementsByClassName("select-box-selected")[0].textContent = this.textContent;
-				setSettings();
+				saveSettings();
 			});
 		}
 		selectBoxSelections.style.height = "auto";
@@ -724,58 +722,41 @@ define(function(require) {
 		}
 	});
 	/* Specific range slider listeners */
-	document.getElementById("settings-master-volume").addEventListener("input", function() {
+	document.getElementById("settings-master-volume").addEventListener("input", function(event) {
 		document.getElementById("settings-master-volume-text").textContent = "Master volume: " + this.value + "%";
 		menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
-		AudioManager.setEffectsVolume(document.getElementById("settings-master-volume").value / 100 * this.value / 100);
-		setSettings();
+		AudioManager.setMasterVolume(this.value / 100);
 	});
-	document.getElementById("settings-music-volume").addEventListener("input", function() {
+	document.getElementById("settings-music-volume").addEventListener("input", function(event) {
 		document.getElementById("settings-music-volume-text").textContent = "Music volume: " + this.value + "%";
 		menuAudio.volume = (document.getElementById("settings-master-volume").value / 100) * (document.getElementById("settings-music-volume").value / 100);
-		setSettings();
+		AudioManager.setMusicVolume(this.value / 100);
 	});
-	document.getElementById("settings-effects-volume").addEventListener("input", function() {
+	document.getElementById("settings-effects-volume").addEventListener("input", function(event) {
 		document.getElementById("settings-effects-volume-text").textContent = "Effects volume: " + this.value + "%";
-		AudioManager.setEffectsVolume(document.getElementById("settings-master-volume").value / 100 * this.value / 100);
-		setSettings();
+		AudioManager.setEffectsVolume(this.value / 100);
 	});
-	document.getElementById("settings-mouse-sensitivity").addEventListener("input", function() {
+	document.getElementById("settings-mouse-sensitivity").addEventListener("input", function(event) {
 		document.getElementById("settings-mouse-sensitivity-text").textContent = "Mouse sensitivity: " + (this.value / 100).toFixed(2) + "x";
-		setSettings();
 	});
-	document.getElementById("settings-background-dim").addEventListener("input", function() {
+	document.getElementById("settings-background-dim").addEventListener("input", function(event) {
 		document.getElementById("settings-background-dim-text").textContent = "Background dim: " + this.value + "%";
-		setSettings();
 	});
-	document.getElementById("settings-background-blur").addEventListener("input", function() {
+	document.getElementById("settings-background-blur").addEventListener("input", function(event) {
 		document.getElementById("settings-background-blur-text").textContent = "Background blur: " + this.value + "px";
 		if (document.getElementById("background").src.includes("osw-background.png") === false) {
 			document.getElementById("background").style.filter = `blur(${this.value}px)`;
 		}
-		setSettings();
 	});
 	document.getElementById("settings-slider-resolution").addEventListener("input", function() {
-		let resolution = "";
-		switch (this.value) {
-			case "1":
-				resolution = "Full";
-				break;
-			case "2":
-				resolution = "Half";
-				break;
-			case "3":
-				resolution = "Quarter";
-				break;
-			case "4":
-				resolution = "Eighth";
-				break;
-			case "5":
-				resolution = "Sixteenth";
-				break;
-		}
-		document.getElementById("settings-slider-resolution-text").textContent = "Slider resolution: " + resolution;
-		setSettings();
+		let resolutions = [
+			"Full",
+			"Half",
+			"Quarter",
+			"Eighth",
+			"Sixteenth",
+		];
+		document.getElementById("settings-slider-resolution-text").textContent = "Slider resolution: " + resolutions[this.value - 1];
 	});
 	/* Settings button listeners */
 	document.getElementById("settings-button-clear-options").addEventListener("click", function() {
@@ -815,8 +796,6 @@ define(function(require) {
 			});
 		}
 	});
-	/* Splashscreen listener */
-	document.getElementById("splash-screen").addEventListener("click", function() {});
 	/* logo listener */
 	document.getElementById("logo").addEventListener("click", function() {
 		AudioManager.play("menu-hit");
@@ -873,7 +852,7 @@ define(function(require) {
 		}
 	}
 
-	function setSettings() {
+	function saveSettings() {
 		let index = 0;
 		let userOptions = Options.get();
 		for (let group in userOptions) {
