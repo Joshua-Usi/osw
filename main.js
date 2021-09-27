@@ -69,13 +69,6 @@ define(function(require) {
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].textContent = version;
 	}
-	if (Utils.detectIfOnMobile()) {
-		console.log("on mobile");
-		let classes = document.getElementsByClassName("client-version");
-		for (let i = 0; i < classes.length; i++) {
-			classes[i].textContent = "mobile";
-		}
-	}
 	function clickGroup(element) {
 		let beatmapCache = JSON.parse(window.localStorage.getItem("beatmapCache"));
 		let details = element.getElementsByClassName("beatmap-selection-group-pane")[0];
@@ -270,9 +263,12 @@ define(function(require) {
 	let audioCtx = new AudioContext();
 	let analyser = audioCtx.createAnalyser();
 	analyser.fftSize = 128;
-	// let source = audioCtx.createMediaElementSource(menuAudio);
-	// source.connect(analyser);
-	// source.connect(audioCtx.destination);
+	/* Safari doesn't like AudioContext, disabled on mobile devices, it does mean you lose some effects */
+	if (Utils.detectIfOnMobile() === false) {
+		let source = audioCtx.createMediaElementSource(menuAudio);
+		source.connect(analyser);
+		source.connect(audioCtx.destination);	
+	}
 	let audioAnalyserData = new Uint8Array(analyser.frequencyBinCount);
 	let visualiserData = [];
 	let analyserLength = 128;

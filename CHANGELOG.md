@@ -2,6 +2,8 @@ Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
 ## [v0.11.1b-dev] - 3-09-2021
+### Changed
+- Mobile devices have audio visualiser effects disabled for performance and compatibility
 ### Optimised
 - Beatmap uploading even more
 ### Removed
