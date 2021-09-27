@@ -308,19 +308,19 @@ define(function(require) {
 				return string + paddingString;
 			}
 		},
-		secondsToMinuteSeconds(time) {
+		secondsToMinuteSeconds: function(time) {
 			let minutes = Math.floor(time / 60);
 			let seconds = Math.round(time - minutes * 60);
 			return `${minutes}:${this.pad(seconds, 2, "0", true)}`;
 		},
-		totalDistance(points) {
+		totalDistance: function(points) {
 			let totalDistance = 0;
 			for (let i = 0; i < points.length - 1; i++) {
 				totalDistance += this.dist(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y)
 			}
 			return totalDistance;
 		},
-		setDifficultyBars(map, mods) {
+		setDifficultyBars: function(map, mods) {
 			let parts = ["circle-size", "hp-drain", "accuracy", "approach-rate", "star-rating"];
 			let key = ["circleSize", "healthDrain", "overallDifficulty", "approachRate", "starRating"];
 			for (let i = 0; i < parts.length; i++) {
@@ -335,7 +335,7 @@ define(function(require) {
 				document.getElementById(parts[i] + "-difficulty-value").textContent = Utils.roundDigits(difficultyValue, 2);
 			}
 		},
-		setStatisticValues(group, map, mods) {
+		setStatisticValues: function(group, map, mods) {
 			let multiplier = 1;
 			if (mods.doubleTime || mods.nightCore) {
 				multiplier = 1.5;
@@ -352,10 +352,26 @@ define(function(require) {
 			document.getElementById("beatmap-statistics-slider-count").textContent = map.objectCounts.sliders;
 			document.getElementById("beatmap-statistics-spinner-count").textContent = map.objectCounts.spinners;
 		},
-		extractFileExtension(name) {
+		extractFileExtension: function(name) {
 			let split = name.toLowerCase().split(".");
 			return split[split.length - 1];
 		},
+		/* https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser */
+		detectIfOnMobile: function() {
+			const toMatch = [
+				/Android/i,
+				/webOS/i,
+				/iPhone/i,
+				/iPad/i,
+				/iPod/i,
+				/BlackBerry/i,
+				/Windows Phone/i
+			];
+			
+			return toMatch.some((toMatchItem) => {
+				return navigator.userAgent.match(toMatchItem);
+			});
+		}
 	};
 	return Utils;
 });

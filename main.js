@@ -69,6 +69,13 @@ define(function(require) {
 	for (let i = 0; i < classes.length; i++) {
 		classes[i].textContent = version;
 	}
+	if (Utils.detectIfOnMobile()) {
+		console.log("on mobile");
+		let classes = document.getElementsByClassName("client-version");
+		for (let i = 0; i < classes.length; i++) {
+			classes[i].textContent = "mobile";
+		}
+	}
 	function clickGroup(element) {
 		let beatmapCache = JSON.parse(window.localStorage.getItem("beatmapCache"));
 		let details = element.getElementsByClassName("beatmap-selection-group-pane")[0];
