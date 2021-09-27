@@ -9,6 +9,7 @@
 		<link rel="stylesheet" type="text/css" rel="stylesheet" href="./src/stylesheets/webpage-state-always.css">
 		<link rel="stylesheet" type="text/css" rel="stylesheet" href="./src/stylesheets/forms.css">
 		<link rel="stylesheet" type="text/css" rel="stylesheet" href="./src/stylesheets/lib.css">
+		<link rel="stylesheet" type="text/css" rel="stylesheet" href="./src/stylesheets/webpage-state-loading-maps.css">
 		<link rel="stylesheet" type="text/css" rel="stylesheet" href="./src/stylesheets/webpage-state-menu.css">
 		<link rel="stylesheet" type="text/css" rel="stylesheet" href="./src/stylesheets/webpage-state-beatmap-selection.css">
 		<link rel="stylesheet" type="text/css" rel="stylesheet" href="./src/stylesheets/webpage-state-gameplay.css">
@@ -26,14 +27,12 @@
 					<div></div>
 				</div>
 				<div>
-					<img src="./src/images/warning.png" class="splash-screen-warning-img" style="opacity: 0;">
-					<p style="margin: 0;" class="inline-block">volume warning! first run is often loud!</p>
-					<img src="./src/images/warning.png" class="splash-screen-warning-img" style="opacity: 0;">
+					<img src="./src/images/osw-small.png" class="osw-logo-splash-screen" style="opacity: 0;">
+					<p style="margin: 0;"><span style="margin: 0;" class="client-version"></span> is in development</p>
+					<p style="margin: 0;" id="splash-screen-warning">This is not an official Osu! distribution</p>
+					
+					<p style="margin: 0;">Click to continue...</p>
 				</div>
-				<p style="margin: 0;">osw! is in heavy development</p>
-				<p style="margin: 0;" id="splash-screen-warning">this is not an official osu! distribution</p>
-				<p style="margin: 0;" class="client-version"></p>
-				<p style="margin: 0;">click to continue...</p>
 			</div>
 			<div id="orientation-vertical">
 				<p style="margin: 0;">rotate your device horizontally</p>
@@ -190,7 +189,7 @@
 							<p class="selected">Ajax Transparent</p>
 						</div>
 					</div>
-					<button type="button" id="settings-button-upload-skin" disabled class="settings-button triangle-background blue">Upload skin (coming soon)</button>
+					<button type="button" id="settings-button-upload-skin" disabled class="settings-button triangle-background blue">Upload skin</button>
 					<div class="sidenav-divider"></div>
 					<p class="sidenav-title-text">Maintenance</p>
 					<p style="color: #999;">Note! developer mode is performance heavy</p>
@@ -199,7 +198,12 @@
 						<input type="checkbox" id="settings-developer-mode" class="checkbox inline-block float-right">
 					</div>
 					<div id="developer-mode-details"></div>
-					<button type="button" id="settings-button-clear-local-storage" class="settings-button triangle-background red">Clear local storage</button>
+					<p style="color: #999;">Warning! these options can affect</p>
+					<p style="color: #999;">your client in unintended ways</p>
+					<p style="color: #999;">Once done they cannot be reversed</p>
+					<button type="button" id="settings-button-clear-options" class="settings-button triangle-background red">Clear local storage</button>
+					<button type="button" id="settings-button-delete-scores" disabled class="settings-button triangle-background red">Delete all scores</button>
+					<button type="button" id="settings-button-delete-replays" disabled class="settings-button triangle-background red">Delete all replays</button>
 					<button type="button" id="settings-button-delete-beatmap-cache" class="settings-button triangle-background red">Delete beatmap cache</button>
 					<button type="button" id="settings-button-delete-all-beatmaps" class="settings-button triangle-background red">Delete all beatmaps</button>
 				</div>
@@ -214,6 +218,11 @@
 				</div>
 			</div>
 			<p id="frame-rate">0 / 60 fps</p>
+		</div>
+		<div class="webpage-state" id="webpage-state-loading-maps">
+			
+			<p>Your beatmaps are being processed</p>
+			<p>Give it a moment, it should not take long</p>
 		</div>
 		<div class="webpage-state" id="webpage-state-menu">
 			<div class="beat-bar" id="left-beat"></div>

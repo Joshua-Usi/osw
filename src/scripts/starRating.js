@@ -17,9 +17,9 @@ define(function(require) {
 		AIM: 26.25,
 	};
 	const DECAY_WEIGHT = 0.9;
-	// ~200BPM 1/4 streams
+	/* ~200BPM 1/4 streams */
 	let MIN_SPEED_BONUS = 75;
-	// ~330BPM 1/4 streams
+	/* ~330BPM 1/4 streams */
 	const MAX_SPEED_BONUS = 45;
 	const ANGLE_BONUS_SCALE = 90;
 	const AIM_TIMING_THRESHOLD = 107;
@@ -111,7 +111,15 @@ define(function(require) {
 		let circleSizeScalingVector = normaliseCircleSize(beatmap.CircleSize);
 		let normalisedCenterVector = vectorMultiply([256, 192], circleSizeScalingVector);
 		for (let i = 0; i < beatmap.hitObjects.length; i++) {
-			let objectDifficulty = new hitObjectDifficulty(JSON.parse(JSON.stringify(beatmap.hitObjects[i])));
+			let objectDifficulty;
+			try {
+				objectDifficulty = new hitObjectDifficulty(JSON.parse(JSON.stringify(beatmap.hitObjects[i])));
+			} catch (e) {
+				console.log(i);
+				console.log(beatmap);
+				console.log(beatmap.hitObjects[i]);
+				throw new Error(e);
+			}
 			let baseObject = objectDifficulty.baseObject;
 			/* spinner */
 			if (baseObject.type[3] === "1") {

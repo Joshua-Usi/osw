@@ -1,22 +1,7 @@
 define(function(require) {
-  "use strict";
-	const Formulas = require("./formulas.js");
-	const mods = new require("./mods.js");
+	"use strict";
+	const mods = new (require("./mods.js"))();
 	let isOpen = false;
-	let elements = document.getElementsByClassName("mod-icons");
-	for (let i = 0; i < elements.length; i++) {
-		elements[i].addEventListener("click", function() {
-			let modName = this.id.replace("mod-", "");
-			if (this.classList.contains("mod-selected")) {
-				this.className = this.className.replace(/\bmod-selected\b/g, "");
-				mods[modName] = false;
-			} else {
-				this.classList.add("mod-selected");
-				mods[modName] = true;
-			}
-			document.getElementById("mod-score-multiplier").innerHTML = `Score Multiplier: <b>${Formulas.modScoreMultiplier(mods).toFixed(2)}x</b>`;
-		});
-	}
 	let el = [
 		"mods-ui",
 		"mods-blue-one",
@@ -38,34 +23,54 @@ define(function(require) {
 		"1.05s",
 		"0.85s",
 	];
-	function closeModsUI() {
-		for (let i = 0; i < el.length; i++) {
-			let element = document.getElementById(el[i]);
-			element.style.transitionDuration = elCloseTimes[i];
-			element.style.bottom = "-76vh";	
+	return {
+		getMods: function() {
+			return mods;
+		},
+		isOpen: function() {
+			return isOpen;
+		},
+		closeModsUI: function() {
+			for (let i = 0; i < el.length; i++) {
+				let element = document.getElementById(el[i]);
+				element.style.transitionDuration = elCloseTimes[i];
+				element.style.bottom = "-76vh";	
+			}
 			isOpen = false;
-		}
-	}
-	function openModsUI() {
-		for (let i = 0; i < el.length; i++) {
-			let element = document.getElementById(el[i]);
-			element.style.transitionDuration = elOpenTimes[i];
-			element.style.bottom = "0";	
+		},
+		openModsUI: function() {
+			for (let i = 0; i < el.length; i++) {
+				let element = document.getElementById(el[i]);
+				element.style.transitionDuration = elOpenTimes[i];
+				element.style.bottom = "0";	
+			}
 			isOpen = true;
+		},
+		toggleModsUI: function() {
+			if (this.isOpen() === false) {
+				this.openModsUI();
+			} else {
+				this.closeModsUI();
+			}
+		},
+		disableAllMods: function() {
+			let elements = document.getElementsByClassName("mod-icons");
+			for (let i = 0; i < elements.length; i++) {
+				elements[i].className = elements[i].className.replace(/\bmod-selected\b/g, "");
+				let modName = elements[i].id.replace("mod-", "");
+				mods.disableMod(modName)
+			}
+		},
+		showEnabledMods: function() {
+			let elements = document.getElementsByClassName("mod-icons");
+			for (let i = 0; i < elements.length; i++) {
+				let modName = elements[i].id.replace("mod-", "");
+				if (this.getMods()[modName]) {
+					elements[i].classList.add("mod-selected");
+				} else {
+					elements[i].classList.remove("mod-selected");
+				}
+			}
 		}
 	}
-	document.getElementById("mods-close-button").addEventListener("click", closeModsUI);
-	document.getElementById("bottom-bar-mods").addEventListener("click", function() {
-		if (isOpen === false) {
-			openModsUI();
-		} else {
-			closeModsUI();
-		}
-	});
-	document.getElementById("mods-deselect-all").addEventListener("click", function() {
-		let elements = document.getElementsByClassName("mod-icons");
-		for (let i = 0; i < elements.length; i++) {
-			elements[i].className = elements[i].className.replace(/\bmod-selected\b/g, "");
-		}
-	});
 });

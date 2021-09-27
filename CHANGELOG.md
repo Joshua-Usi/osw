@@ -1,27 +1,39 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
-## [vmajor.minor.patch|a,b,rc|] - 27-06-2021
+## [v0.11.1b-dev] - 3-09-2021
+### Optimised
+- Beatmap uploading even more
+### Removed
+- Volume warning on splash screen
+---
+## [v0.11.0b-dev] - 1-09-2021
 ### Added
-- Replays
-- Score Saving
-- Ability to view replays
+- Capability to view replays
 - Notelock (unfortunately)
+- Mod Incompatibilities (such as being able to choose both easy and hard rock at the same time)
+- Screen so user can tell if a beatmap is currently loading
 ### Changed
 - README.MD FAQs
 ### Optimised
--
-### Deprecated
--
+- Beatmap uploading speed
 ### Removed
--
+- Star rating tests (no longer relevant thanks to ojsama)
 ### Fixed
 - An issue where the approach circle size would continue to lower in size
 - Typos in README.MD
-### Security
--
+- Pressing deselect all mods wouldn't update the score multiplier text
+- Auto experiencing notelock
+- Sliders having different velocities for diffferent segments depending on the segments of the slider
 ### Code Quality
 - options.js to have a more consistent API
+- introsequence.js to be more modular
+- Added animatedEventsManager.js
+- Removed quickParseMap from parser.js
+- Optimised ModsUI.js API
+- Moved, setDifficultyBars and setStatisticValues to utils.js
+- Slightly cleaned program main line
+- Removed reliance of utils.js by formulas.js
 ---
 ## [v0.9.2b] - 21-06-2021
 ### Added

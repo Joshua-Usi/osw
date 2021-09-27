@@ -1,14 +1,14 @@
 define(function(require) {
 	class Sound {
-		constructor(src, type, allowMultiPlay) {
+		constructor(src, type = "music", allowMultiPlay = false) {
 			this.audio = new Audio(src);
 			this.type = type;
-			this.allowMultiPlay = allowMultiPlay || false;
+			this.allowMultiPlay = allowMultiPlay;
 		}
 	}
 	return class AudioManager {
 		constructor() {
-			// map for loaded sounds
+			/* map for loaded sounds */
 			this.sounds = {};
 			this.musicVolume = 1;
 			this.effectsVolume = 1;

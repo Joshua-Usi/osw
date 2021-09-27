@@ -1,5 +1,6 @@
 define(function(require) {
 	"use strict";
+	const Formulas = require("./formulas.js");
 	let precomputedFactorials = [];
 	function precomputeFactorial(k) {
 		let total = 1;
@@ -12,11 +13,14 @@ define(function(require) {
 	for (let i = 0; i < 170; i++) {
 		precomputedFactorials.push(precomputeFactorial(i));
 	}
-	return {
+	const Utils =  {
 		map: function(num, numMin, numMax, mapMin, mapMax) {
 			return mapMin + ((mapMax - mapMin) / (numMax - numMin)) * (num - numMin);
 		},
 		factorial: function(k) {
+			if (k > 170) {
+				return Infinity;
+			}
 			return precomputedFactorials[k];
 		},
 		roundDigits: function(value, digits) {
@@ -27,9 +31,8 @@ define(function(require) {
 				return min;
 			} else if (value > max) {
 				return max;
-			} else {
-				return value;
 			}
+			return value;
 		},
 		randomInt: function(min, max) {
 			return Math.round(this.randomRange(min, max));
@@ -290,10 +293,85 @@ define(function(require) {
 				this.callback(...this.args);
 			}
 		},
-		secondsToMinuteSeconds(time) {
+		pad: function(string, length, paddingCharacter, prepend) {
+			/* convert to string first as the length property is needed */
+			string = string.toString();
+			paddingCharacter = paddingCharacter.toString();
+			let paddingString = "";
+			let paddingLength = length - string.length;
+			for (let i = 0; i < paddingLength; i++) {
+				paddingString += paddingCharacter;
+			}
+			if (prepend) {
+				return paddingString + string;
+			} else {
+				return string + paddingString;
+			}
+		},
+		secondsToMinuteSeconds: function(time) {
 			let minutes = Math.floor(time / 60);
 			let seconds = Math.round(time - minutes * 60);
-			return `${minutes}:${seconds}`;
+			return `${minutes}:${this.pad(seconds, 2, "0", true)}`;
 		},
+		totalDistance: function(points) {
+			let totalDistance = 0;
+			for (let i = 0; i < points.length - 1; i++) {
+				totalDistance += this.dist(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y)
+			}
+			return totalDistance;
+		},
+		setDifficultyBars: function(map, mods) {
+			let parts = ["circle-size", "hp-drain", "accuracy", "approach-rate", "star-rating"];
+			let key = ["circleSize", "healthDrain", "overallDifficulty", "approachRate", "starRating"];
+			for (let i = 0; i < parts.length; i++) {
+				let difficultyValue;
+				if (key[i] === "starRating") {
+					difficultyValue = map[key[i]];
+				} else {
+					let multiplier = (key[i] === "circleSize") ? 1.3 : 1.4;
+					difficultyValue = Formulas.applyModMultiplier(map[key[i]], mods, multiplier);
+				}
+				document.getElementById(parts[i] + "-difficulty").style.width = Utils.clamp(difficultyValue, 0, 10) + "vw";
+				document.getElementById(parts[i] + "-difficulty-value").textContent = Utils.roundDigits(difficultyValue, 2);
+			}
+		},
+		setStatisticValues: function(group, map, mods) {
+			let multiplier = 1;
+			if (mods.doubleTime || mods.nightCore) {
+				multiplier = 1.5;
+			} else if (mods.halfTime) {
+				multiplier = 0.75;
+			}
+			document.getElementById("beatmap-statistics-version").textContent = map.version;
+			document.getElementById("beatmap-statistics-title").textContent = group.title;
+			document.getElementById("beatmap-statistics-artist").textContent = group.artist;
+			document.getElementById("beatmap-statistics-creator").textContent = group.creator;
+			document.getElementById("beatmap-statistics-drain-time").textContent = Utils.secondsToMinuteSeconds(map.drainTime);
+			document.getElementById("beatmap-statistics-bpm").textContent = Math.round(60000 / (map.beatLength / multiplier));
+			document.getElementById("beatmap-statistics-circle-count").textContent = map.objectCounts.circles;
+			document.getElementById("beatmap-statistics-slider-count").textContent = map.objectCounts.sliders;
+			document.getElementById("beatmap-statistics-spinner-count").textContent = map.objectCounts.spinners;
+		},
+		extractFileExtension: function(name) {
+			let split = name.toLowerCase().split(".");
+			return split[split.length - 1];
+		},
+		/* https://stackoverflow.com/questions/11381673/detecting-a-mobile-browser */
+		detectIfOnMobile: function() {
+			const toMatch = [
+				/Android/i,
+				/webOS/i,
+				/iPhone/i,
+				/iPad/i,
+				/iPod/i,
+				/BlackBerry/i,
+				/Windows Phone/i
+			];
+			
+			return toMatch.some((toMatchItem) => {
+				return navigator.userAgent.match(toMatchItem);
+			});
+		}
 	};
+	return Utils;
 });

@@ -1,35 +1,7 @@
 define(function(require) {
 	"use strict";
 	let defaultOptions = {
-		version: 6,
-		types: [
-			"slider",
-			"slider",
-			"slider",
-
-			"text",
-			"text",
-			"slider",
-			"checkbox",
-
-			"checkbox",
-			"slider",
-
-			"selectbox",
-			"slider",
-			"checkbox",
-			"checkbox",
-			"selectbox",
-
-			"selectbox",
-			"checkbox",
-			"slider",
-			"selectbox",
-
-			"selectbox",
-
-			"checkbox",
-		],
+		version: 7,
 		Audio: {
 			masterVolume: 1,
 			musicVolume: 1,
@@ -76,7 +48,38 @@ define(function(require) {
 			defaultOptions = optionsTemp;
 		}
 	}
+	let types = [
+		"slider",
+		"slider",
+		"slider",
+
+		"text",
+		"text",
+		"slider",
+		"checkbox",
+
+		"checkbox",
+		"slider",
+
+		"selectbox",
+		"slider",
+		"checkbox",
+		"checkbox",
+		"selectbox",
+
+		"selectbox",
+		"checkbox",
+		"slider",
+		"selectbox",
+
+		"selectbox",
+
+		"checkbox",
+	];
 	return {
+		getTypes: function() {
+			return types;
+		},
 		get: function() {
 			return defaultOptions;
 		},

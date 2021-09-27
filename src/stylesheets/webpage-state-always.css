@@ -53,10 +53,11 @@
 #splash-screen {
 	position: absolute;
 	z-index: 1000;
+	pointer-events: none;
 
 	width: 100vw;
 	height: 100vh;
-	padding-top: calc(50vh - 3em);
+	padding-top: calc(42.5vh - 3em);
 	
 	background: #000;
 
@@ -76,6 +77,15 @@
 
 	transition: opacity 1s;
 }
+.osw-logo-splash-screen {
+	padding: 2vh;
+	height: 10vh;
+	vertical-align: middle;
+	opacity: 0;
+
+	transition: opacity 1s;
+}
+
 
 #orientation-vertical {
 	position: absolute;
@@ -199,6 +209,7 @@
 }
 
 .lds-heart {
+	margin-top: 7.5vh;
 	position: relative;
 
 	display: inline-block;

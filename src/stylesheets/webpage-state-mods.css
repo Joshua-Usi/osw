@@ -123,3 +123,7 @@
 	clip-path: polygon(0 5%, 100% 0, 100% 100%, 0% 100%);
 	z-index: 899;
 }
+
+.mod-score-transition {
+	transition: color 0.5s;
+}

@@ -37,6 +37,10 @@
 	display: block;
 }
 
+#webpage-state-loading-maps {
+	display: none;
+}
+
 #webpage-state-menu {
 	display: block;
 }
@@ -259,7 +263,7 @@ img {
 
 #top-bar {
 	position: fixed;
-	z-index: 300000;
+	z-index: 300;
 	top: 0;
 	left: 0;
 
