@@ -270,9 +270,9 @@ define(function(require) {
 	let audioCtx = new AudioContext();
 	let analyser = audioCtx.createAnalyser();
 	analyser.fftSize = 128;
-	let source = audioCtx.createMediaElementSource(menuAudio);
-	source.connect(analyser);
-	source.connect(audioCtx.destination);
+	// let source = audioCtx.createMediaElementSource(menuAudio);
+	// source.connect(analyser);
+	// source.connect(audioCtx.destination);
 	let audioAnalyserData = new Uint8Array(analyser.frequencyBinCount);
 	let visualiserData = [];
 	let analyserLength = 128;
