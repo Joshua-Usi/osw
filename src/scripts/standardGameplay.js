@@ -6,7 +6,7 @@ define(function(require) {
 	const Mouse = require("./mouse.js");
 	const Keyboard = require("./keyboard.js");
 	const Bezier = require("./bezier.js");
-	const utils = require("./utils.js");
+	const Utils = require("./utils.js");
 	const HitObject = require("./hitObjects.js");
 	const skin = "ajax-transparent";
 	const SkinLoader = require("./skinLoader.js");
@@ -28,7 +28,7 @@ define(function(require) {
 	flashlightCanvas.width = window.innerWidth;
 	flashlightCanvas.height = window.innerHeight;
 	let flashlightCtx = flashlightCanvas.getContext("2d");
-	let flashlightSize = utils.map(100, 0, 512, 0, window.innerWidth);
+	let flashlightSize = Utils.map(100, 0, 512, 0, window.innerWidth);
 	let isRunning = false;
 	/* inputs setup */
 	let mouse = new Mouse("body", 100);
@@ -181,7 +181,7 @@ define(function(require) {
 				/* Calculate Slider Points */
 				let circle;
 				if (hitObject.curvePoints.length === 3) {
-					circle = utils.circumcircle(hitObject.curvePoints[0], hitObject.curvePoints[1], hitObject.curvePoints[2]);
+					circle = Utils.circumcircle(hitObject.curvePoints[0], hitObject.curvePoints[1], hitObject.curvePoints[2]);
 				}
 				if (hitObject.curveType === "B" || hitObject.curveType === "C" || hitObject.curveType === "L" || isFinite(circle.r) === false) {
 					/* Slider Type Bezier, Catmull and Linear */
@@ -195,7 +195,7 @@ define(function(require) {
 							bezierTemp.push(hitObject.curvePoints[j]);
 							let point = Bezier.nGrade(bezierTemp, 1 / hitObject.length);
 							/* second pass */
-							let length = utils.totalDistance(point);
+							let length = Utils.totalDistance(point);
 							point = Bezier.nGrade(bezierTemp, 1 / length);
 							for (let k = 0; k < point.length; k++) {
 								bezier.push(point[k]);
@@ -207,7 +207,7 @@ define(function(require) {
 					}
 					let point = Bezier.nGrade(bezierTemp, 1 / hitObject.length);
 					/* second pass */
-					let length = utils.totalDistance(point);
+					let length = Utils.totalDistance(point);
 					point = Bezier.nGrade(bezierTemp, 1 / length);
 					for (let k = 0; k < point.length; k++) {
 						bezier.push(point[k]);
@@ -216,7 +216,7 @@ define(function(require) {
 				} else if (hitObject.curveType === "P" && hitObject.curvePoints.length === 3) {
 					/* Slider Type Perfect Circle */
 					/* There are a select few maps that have infinity circle radius. I'm look at you sotarks */
-					hitObject.cache.points = utils.circleToPoints(circle.x, circle.y, circle.r, Math.abs(hitObject.length), -utils.direction(circle.x, circle.y, hitObject.curvePoints[0].x, hitObject.curvePoints[0].y) - Math.PI / 2, utils.orientation(hitObject.curvePoints[0], hitObject.curvePoints[1], hitObject.curvePoints[2]));
+					hitObject.cache.points = Utils.circleToPoints(circle.x, circle.y, circle.r, Math.abs(hitObject.length), -Utils.direction(circle.x, circle.y, hitObject.curvePoints[0].x, hitObject.curvePoints[0].y) - Math.PI / 2, Utils.orientation(hitObject.curvePoints[0], hitObject.curvePoints[1], hitObject.curvePoints[2]));
 				}
 			} else if (hitObject.type[3] === "1") {
 				hitObject.cache.cacheSet = true;
@@ -289,7 +289,7 @@ define(function(require) {
 			return;
 		}
 		let hasSpliced = false;
-		let hitObjectMapped = utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+		let hitObjectMapped = Utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 		if (playDetails.mods.auto) {
 			keyboard.emulateKeyUp(Options.getProperty("Inputs", "keyboardLeftButton"));
 			if (index === 0) {
@@ -302,7 +302,7 @@ define(function(require) {
 				keyboard.emulateKeyDown(Options.getProperty("Inputs", "keyboardLeftButton"));
 			}
 			if (hitObject.type[1] === "1" && useTime > hitObject.time - odTime[2] / 2) {
-				let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+				let sliderFollowCirclePos = Utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 				mouse.setPosition(sliderFollowCirclePos.x, sliderFollowCirclePos.y);
 				keyboard.emulateKeyDown(Options.getProperty("Inputs", "keyboardLeftButton"));
 			}
@@ -317,14 +317,14 @@ define(function(require) {
 				keyboard.emulateKeyDown(Options.getProperty("Inputs", "keyboardLeftButton"));
 			}
 		/* Hit Circle Hit Handling */
-		if (hitObject.type[0] === "1" && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) && keyboardLeftReleased) || (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")) && keyboardRightReleased))) {
+		if (hitObject.type[0] === "1" && Utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) && keyboardLeftReleased) || (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")) && keyboardRightReleased))) {
 			let hitWindowScore = 0;
-			if (utils.withinRange(useTime, hitObject.time, odTime[0])) {
-				if (utils.withinRange(useTime, hitObject.time, odTime[2])) {
+			if (Utils.withinRange(useTime, hitObject.time, odTime[0])) {
+				if (Utils.withinRange(useTime, hitObject.time, odTime[2])) {
 					hitWindowScore = 300;
-				} else if (utils.withinRange(useTime, hitObject.time, odTime[1])) {
+				} else if (Utils.withinRange(useTime, hitObject.time, odTime[1])) {
 					hitWindowScore = 100;
-				} else if (utils.withinRange(useTime, hitObject.time, odTime[0])) {
+				} else if (Utils.withinRange(useTime, hitObject.time, odTime[0])) {
 					hitWindowScore = 50;
 				}
 				hitErrors.push(useTime - hitObject.time);
@@ -350,7 +350,7 @@ define(function(require) {
 				let time = Math.abs(hitObject.length) / (hitObject.cache.sliderInheritedMultiplier * 100) * currentLoadedMap.timingPoints[hitObject.cache.timingPointUninheritedIndex].beatLength;
 				hitObject.cache.sliderFollowCirclePreviousPosition = hitObject.cache.sliderFollowCirclePosition - 10;
 				if (hitObject.cache.currentSlide % 2 === 0) {
-					hitObject.cache.sliderFollowCirclePosition = Math.floor(utils.map(useTime, hitObject.time + time * hitObject.cache.currentSlide, hitObject.time + time * (hitObject.cache.currentSlide + 1), 0, hitObject.cache.points.length - 1));
+					hitObject.cache.sliderFollowCirclePosition = Math.floor(Utils.map(useTime, hitObject.time + time * hitObject.cache.currentSlide, hitObject.time + time * (hitObject.cache.currentSlide + 1), 0, hitObject.cache.points.length - 1));
 					/* Prevent Index Errors */
 					hitObject.cache.sliderFollowCirclePosition = Math.max(hitObject.cache.sliderFollowCirclePosition, 0);
 					/* Check if slider repeats, then switch direction */
@@ -359,7 +359,7 @@ define(function(require) {
 						sliderRepeat = true;
 					}
 				} else if (hitObject.cache.currentSlide % 2 === 1) {
-					hitObject.cache.sliderFollowCirclePosition = Math.floor(utils.map(useTime, hitObject.time + time * hitObject.cache.currentSlide, hitObject.time + time * (hitObject.cache.currentSlide + 1), hitObject.cache.points.length - 1, 0));
+					hitObject.cache.sliderFollowCirclePosition = Math.floor(Utils.map(useTime, hitObject.time + time * hitObject.cache.currentSlide, hitObject.time + time * (hitObject.cache.currentSlide + 1), hitObject.cache.points.length - 1, 0));
 					/* Prevent Index Errors */
 					hitObject.cache.sliderFollowCirclePosition = Math.min(hitObject.cache.sliderFollowCirclePosition, hitObject.cache.points.length - 1);
 					/* Check if slider repeats, then switch direction */
@@ -371,7 +371,7 @@ define(function(require) {
 				/* Check if slider follow circle went over slider ticks */
 				for (let j = 0; j < hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide].length; j++) {
 					if (hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] === false && (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
-						let mapped = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].x, hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+						let mapped = Utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].x, hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 						if (hitObject.cache.sliderFollowCirclePreviousPosition < hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j] && hitObject.cache.sliderFollowCirclePosition > hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]) {
 							hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j] = true;
 							hitObject.cache.sliderTicksHit++;
@@ -380,10 +380,10 @@ define(function(require) {
 						}
 					}
 				}
-				let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
-				if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * FOLLLOW_CIRCLE_SIZE / 2 && hitObject.cache.onFollowCircle && (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
+				let sliderFollowCirclePos = Utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+				if (Utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * FOLLLOW_CIRCLE_SIZE / 2 && hitObject.cache.onFollowCircle && (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
 					hitObject.cache.onFollowCircle = true;
-				} else if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter / 2 && (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
+				} else if (Utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter / 2 && (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
 					hitObject.cache.onFollowCircle = true;
 				} else {
 					hitObject.cache.onFollowCircle = false;
@@ -391,8 +391,8 @@ define(function(require) {
 				if (sliderRepeat) {
 					hitObject.cache.currentSlide++;
 					if (hitObject.cache.currentSlide < hitObject.slides) {
-						let sliderFollowCirclePos = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
-						if (utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * FOLLLOW_CIRCLE_SIZE / 2 && hitObject.cache.onFollowCircle && (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
+						let sliderFollowCirclePos = Utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+						if (Utils.dist(mouse.position.x, mouse.position.y, sliderFollowCirclePos.x, sliderFollowCirclePos.y) <= circleDiameter * FOLLLOW_CIRCLE_SIZE / 2 && hitObject.cache.onFollowCircle && (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) || keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")))) {
 							hitObject.cache.repeatsHit++;
 							hitEvents.push(new HitObject.Event("slider-element", 30, "increasing", sliderFollowCirclePos.x));
 							if (playDetails.mods.hidden === false) {
@@ -407,12 +407,12 @@ define(function(require) {
 			} else {
 				hitObject.cache.hasEnded = true;
 				if (hitObject.cache.currentSlide % 2 === 0) {
-					if (utils.dist(mouse.position.x, mouse.position.y, hitObject.cache.points[0].x, hitObject.cache.points[0].y) <= circleDiameter / 2) {
+					if (Utils.dist(mouse.position.x, mouse.position.y, hitObject.cache.points[0].x, hitObject.cache.points[0].y) <= circleDiameter / 2) {
 						hitObject.cache.hitEnd = true;
 						hitObject.cache.hasHitAtAll = true;
 					}
 				} else if (hitObject.cache.currentSlide % 2 === 1) {
-					if (utils.dist(mouse.position.x, mouse.position.y, hitObject.cache.points[hitObject.cache.points.length - 1].x, hitObject.cache.points[hitObject.cache.points.length - 1].y) <= circleDiameter / 2) {
+					if (Utils.dist(mouse.position.x, mouse.position.y, hitObject.cache.points[hitObject.cache.points.length - 1].x, hitObject.cache.points[hitObject.cache.points.length - 1].y) <= circleDiameter / 2) {
 						hitObject.cache.hitEnd = true;
 						hitObject.cache.hasHitAtAll = true;
 					}
@@ -420,7 +420,7 @@ define(function(require) {
 			}
 		}
 		/* Slider Head Hit Handling */
-		if (hitObject.type[1] === "1" && hitObject.cache.hitHead === false && utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) && keyboardLeftReleased) || (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")) && keyboardRightReleased)) && utils.withinRange(useTime, hitObject.time, odTime[0])) {
+		if (hitObject.type[1] === "1" && hitObject.cache.hitHead === false && Utils.dist(mouse.position.x, mouse.position.y, hitObjectMapped.x, hitObjectMapped.y) <= circleDiameter / 2 && ((keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardLeftButton")) && keyboardLeftReleased) || (keyboard.getKeyDown(Options.getProperty("Inputs", "keyboardRightButton")) && keyboardRightReleased)) && Utils.withinRange(useTime, hitObject.time, odTime[0])) {
 			hitErrors.push(useTime - hitObject.time);
 			hitEvents.push(new HitObject.Event("slider-element", 30, "increasing", hitObjectMapped.x, hitObjectMapped.y));
 			if (playDetails.mods.hidden === false) {
@@ -460,9 +460,9 @@ define(function(require) {
 			}
 			let mapped;
 			if (hitObject.slides % 2 === 0) {
-				mapped = utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+				mapped = Utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 			} else {
-				mapped = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.points.length - 1].x, hitObject.cache.points[hitObject.cache.points.length - 1].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+				mapped = Utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.points.length - 1].x, hitObject.cache.points[hitObject.cache.points.length - 1].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 			}
 			let hitScore = 0;
 			if (sliderElementsHit >= totalSliderElements) {
@@ -494,9 +494,9 @@ define(function(require) {
 			miss = true;
 			let mapped;
 			if (hitObject.slides % 2 === 0) {
-				mapped = utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+				mapped = Utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 			} else {
-				mapped = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.points.length - 1].x, hitObject.cache.points[hitObject.cache.points.length - 1].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+				mapped = Utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.points.length - 1].x, hitObject.cache.points[hitObject.cache.points.length - 1].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 			}
 		}
 		if (miss) {
@@ -544,7 +544,7 @@ define(function(require) {
 		}
 		/* Spinner end handling */
 		if (hitObject.type[3] === "1" && useTime >= hitObject.endTime) {
-			let mapped = utils.mapToOsuPixels(PLAYFIELD_CENTER_X, PLAYFIELD_CENTER_Y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+			let mapped = Utils.mapToOsuPixels(PLAYFIELD_CENTER_X, PLAYFIELD_CENTER_Y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 			/* spinner is cleared is if the time spent spinning is over 25% of the spinner length */
 			if (hitObject.cache.cleared) {
 				hitEvents.push(new HitObject.Event("hit-circle", 300, "increasing", mapped.x, mapped.y));
@@ -570,8 +570,8 @@ define(function(require) {
 
 	function renderHitObject(hitObject, useTime, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y) {
 		/* Approach Circle Calculations */
-		let approachCircleSize = utils.map(useTime - (hitObject.time - arTime), 0, arTime, APPROACH_CIRCLE_MAX_SIZE, APPROACH_CIRCLE_MIN_SIZE);
-		let hitObjectMapped = utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+		let approachCircleSize = Utils.map(useTime - (hitObject.time - arTime), 0, arTime, APPROACH_CIRCLE_MAX_SIZE, APPROACH_CIRCLE_MIN_SIZE);
+		let hitObjectMapped = Utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 		/* approach circle max size */
 		approachCircleSize = Math.min(approachCircleSize, APPROACH_CIRCLE_MAX_SIZE)
 		/* approach circle min size */
@@ -580,27 +580,27 @@ define(function(require) {
 		if (hitObject.type[0] === "1") {
 			if (playDetails.mods.hidden) {
 				/* hidden fade in and out for hit circle */
-				if (utils.map(useTime - (hitObject.time - arTime), 0, arTime, 0, 1) <= HIDDEN_FADE_IN_PERCENT) {
-					canvas.setGlobalAlpha(utils.map(useTime - (hitObject.time - arTime), 0, arTime * HIDDEN_FADE_IN_PERCENT, 0, 1));
-				} else if (utils.map(useTime - (hitObject.time - arTime), 0, arTime, 0, 1) <= HIDDEN_FADE_OUT_PERCENT) {
-					canvas.setGlobalAlpha(utils.map(useTime - (hitObject.time - arTime), arTime * HIDDEN_FADE_IN_PERCENT, arTime * HIDDEN_FADE_OUT_PERCENT, 1, 0));
+				if (Utils.map(useTime - (hitObject.time - arTime), 0, arTime, 0, 1) <= HIDDEN_FADE_IN_PERCENT) {
+					canvas.setGlobalAlpha(Utils.map(useTime - (hitObject.time - arTime), 0, arTime * HIDDEN_FADE_IN_PERCENT, 0, 1));
+				} else if (Utils.map(useTime - (hitObject.time - arTime), 0, arTime, 0, 1) <= HIDDEN_FADE_OUT_PERCENT) {
+					canvas.setGlobalAlpha(Utils.map(useTime - (hitObject.time - arTime), arTime * HIDDEN_FADE_IN_PERCENT, arTime * HIDDEN_FADE_OUT_PERCENT, 1, 0));
 				} else {
 					/* if fully transparent, don't bother rendering */
 					return;
 				}
 			} else {
 				/* normal fade in and out for hit circle */
-				if (utils.map(useTime - (hitObject.time - arTime), 0, arTime, 0, 1) <= 1) {
-					canvas.setGlobalAlpha(utils.map(useTime - (hitObject.time - arTime), 0, arFadeIn, 0, 1));
+				if (Utils.map(useTime - (hitObject.time - arTime), 0, arTime, 0, 1) <= 1) {
+					canvas.setGlobalAlpha(Utils.map(useTime - (hitObject.time - arTime), 0, arFadeIn, 0, 1));
 				} else {
-					let alpha = utils.map(useTime - (hitObject.time - arTime), arTime, arTime + odTime[0] / 2, 1, 0);
+					let alpha = Utils.map(useTime - (hitObject.time - arTime), arTime, arTime + odTime[0] / 2, 1, 0);
 					alpha = Math.max(alpha, 0);
 					canvas.setGlobalAlpha(alpha);
 				}
 			}
 		} else if (hitObject.type[1] === "1") {
-			if (utils.map(useTime - (hitObject.time - arTime), 0, arTime, 0, 1) <= 1) {
-				canvas.setGlobalAlpha(utils.map(useTime - (hitObject.time - arTime), 0, arFadeIn, 0, 1));
+			if (Utils.map(useTime - (hitObject.time - arTime), 0, arTime, 0, 1) <= 1) {
+				canvas.setGlobalAlpha(Utils.map(useTime - (hitObject.time - arTime), 0, arFadeIn, 0, 1));
 			} else {
 				canvas.setGlobalAlpha(1);
 			}
@@ -617,7 +617,7 @@ define(function(require) {
 			let aspectRatio = Assets.comboNumbers[0].width / Assets.comboNumbers[0].height;
 			canvas.drawDigits(Assets.comboNumbers, individualDigits, hitObjectMapped.x, hitObjectMapped.y, circleDiameter / 3, circleDiameter / 3 / aspectRatio);
 		} else if (hitObject.type[1] === "1") {
-			let sliderOpacity = utils.map(useTime, hitObject.time, hitObject.time + arTime, 1, 0);
+			let sliderOpacity = Utils.map(useTime, hitObject.time, hitObject.time + arTime, 1, 0);
 			if (playDetails.mods.hidden === false) {
 				sliderOpacity = 1;
 			}
@@ -627,7 +627,7 @@ define(function(require) {
 				}
 				/* Draw Slider */
 				/* Slider slide in code */
-				let sliderDrawPercent = Math.floor(utils.map(useTime, hitObject.time - arTime, hitObject.time - arTime / 4, hitObject.cache.points.length / 4, hitObject.cache.points.length));
+				let sliderDrawPercent = Math.floor(Utils.map(useTime, hitObject.time - arTime, hitObject.time - arTime / 4, hitObject.cache.points.length / 4, hitObject.cache.points.length));
 				if (sliderDrawPercent < Math.floor(hitObject.cache.points.length / 4)) {
 					sliderDrawPercent = Math.floor(hitObject.cache.points.length / 4);
 				}
@@ -647,11 +647,11 @@ define(function(require) {
 				canvas.setStrokeStyle("#fff");
 				ctx.beginPath();
 				for (let j = 0; j < sliderDrawPercent; j += inc) {
-					let mapped = utils.mapToOsuPixels(hitObject.cache.points[j].x, hitObject.cache.points[j].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+					let mapped = Utils.mapToOsuPixels(hitObject.cache.points[j].x, hitObject.cache.points[j].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 					ctx.lineTo(mapped.x, mapped.y);
 				}
 				/* draw last point to make sure slider ends properly */
-				let mapped = utils.mapToOsuPixels(hitObject.cache.points[sliderDrawPercent].x, hitObject.cache.points[sliderDrawPercent].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+				let mapped = Utils.mapToOsuPixels(hitObject.cache.points[sliderDrawPercent].x, hitObject.cache.points[sliderDrawPercent].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 				ctx.lineTo(mapped.x, mapped.y);
 				ctx.stroke();
 				/* Draw Inner Slider Body */
@@ -659,7 +659,7 @@ define(function(require) {
 				canvas.setStrokeStyle("#222");
 				ctx.beginPath();
 				for (let j = 0; j < sliderDrawPercent; j += inc) {
-					let mapped = utils.mapToOsuPixels(hitObject.cache.points[j].x, hitObject.cache.points[j].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+					let mapped = Utils.mapToOsuPixels(hitObject.cache.points[j].x, hitObject.cache.points[j].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 					ctx.lineTo(mapped.x, mapped.y);
 				}
 				/* draw last point to make sure slider ends properly */
@@ -671,7 +671,7 @@ define(function(require) {
 						if (hitObject.cache.specificSliderTicksHit[hitObject.cache.currentSlide][j]) {
 							continue;
 						}
-						let mapped = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].x, hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+						let mapped = Utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].x, hitObject.cache.points[hitObject.cache.specificSliderTicksPosition[hitObject.cache.currentSlide][j]].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 						canvas.drawImage(Assets.sliderScorePoint, mapped.x, mapped.y);
 					}
 				}
@@ -682,7 +682,7 @@ define(function(require) {
 				let isEndRepeat = false;
 				if (hitObject.slides > 1 && hitObject.cache.currentSlide < hitObject.slides) {
 					ctx.translate(mapped.x, mapped.y);
-					let direction = utils.direction(hitObject.cache.points[hitObject.cache.points.length - 2].x, hitObject.cache.points[hitObject.cache.points.length - 2].y, hitObject.cache.points[hitObject.cache.points.length - 1].x, hitObject.cache.points[hitObject.cache.points.length - 1].y) - Math.PI / 2;
+					let direction = Utils.direction(hitObject.cache.points[hitObject.cache.points.length - 2].x, hitObject.cache.points[hitObject.cache.points.length - 2].y, hitObject.cache.points[hitObject.cache.points.length - 1].x, hitObject.cache.points[hitObject.cache.points.length - 1].y) - Math.PI / 2;
 					if (playDetails.mods.hardRock) {
 						ctx.rotate(direction);
 					} else {
@@ -709,9 +709,9 @@ define(function(require) {
 						}
 					}
 				} else if (hitObject.cache.currentSlide >= 1 && hitObject.cache.currentSlide < hitObject.slides - 1) {
-					let mapped = utils.mapToOsuPixels(hitObject.cache.points[0].x, hitObject.cache.points[0].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+					let mapped = Utils.mapToOsuPixels(hitObject.cache.points[0].x, hitObject.cache.points[0].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 					ctx.translate(mapped.x, mapped.y);
-					let direction = utils.direction(hitObject.cache.points[1].x, hitObject.cache.points[1].y, hitObject.cache.points[0].x, hitObject.cache.points[0].y) - Math.PI / 2;
+					let direction = Utils.direction(hitObject.cache.points[1].x, hitObject.cache.points[1].y, hitObject.cache.points[0].x, hitObject.cache.points[0].y) - Math.PI / 2;
 					if (playDetails.mods.hardRock) {
 						ctx.rotate(direction);
 					} else {
@@ -723,7 +723,7 @@ define(function(require) {
 				}
 			}
 			if (useTime >= hitObject.time) {
-				let mapped = utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+				let mapped = Utils.mapToOsuPixels(hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].x, hitObject.cache.points[hitObject.cache.sliderFollowCirclePosition].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 				let tempAlpha = canvas.getGlobalAlpha();
 				canvas.setGlobalAlpha(1);
 				canvas.drawImage(Assets.sliderBody, mapped.x, mapped.y, circleDiameter, circleDiameter);
@@ -740,10 +740,10 @@ define(function(require) {
 				canvas.drawDigits(Assets.scoreNumbers, individualDigits, window.innerWidth / 2, window.innerHeight * 3 / 4, window.innerWidth * 0.03 * (hitObject.cache.size + 1), window.innerWidth * 0.03 * (hitObject.cache.size + 1) / aspectRatio);
 			}
 			/* draw spinner */
-			let mapped = utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+			let mapped = Utils.mapToOsuPixels(hitObject.x, hitObject.y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 			ctx.translate(mapped.x, mapped.y);
 			ctx.rotate(hitObject.cache.spinAngle);
-			let size = utils.map(hitObject.endTime - useTime, 0, hitObject.endTime - (hitObject.time - arTime), 0, 0.8) * utils.map(Math.abs(hitObject.cache.velocity), 0, 50, 1, 1.2);
+			let size = Utils.map(hitObject.endTime - useTime, 0, hitObject.endTime - (hitObject.time - arTime), 0, 0.8) * Utils.map(Math.abs(hitObject.cache.velocity), 0, 50, 1, 1.2);
 			canvas.drawImage(Assets.spinnerApproachCircle, 0, 0, size * window.innerHeight, size * window.innerHeight);
 			let tempAlpha = ctx.globalAlpha;
 			canvas.setGlobalAlpha(1);
@@ -762,11 +762,11 @@ define(function(require) {
 			displayedScore = score;
 		}
 		/* update score html element */
-		utils.htmlCounter(Math.round(displayedScore).toString(), "score-container", "score-digit-", Assets.scoreNumbers, "left", "calc(100vw - " + (document.getElementById("score-container").childNodes.length * 2) + "vw)");
+		Utils.htmlCounter(Math.round(displayedScore).toString(), "score-container", "score-digit-", Assets.scoreNumbers, "left", "calc(100vw - " + (document.getElementById("score-container").childNodes.length * 2) + "vw)");
 		/* update combo html element */
-		utils.htmlCounter(combo + Options.getProperty("Inputs", "keyboardRightButton"), "combo-container", "combo-digit-", Assets.scoreNumbers, "top", "calc(100vh - 52 / 32 * " + 2 * (comboPulseSize + 1) + "vw)");
+		Utils.htmlCounter(combo + Options.getProperty("Inputs", "keyboardRightButton"), "combo-container", "combo-digit-", Assets.scoreNumbers, "top", "calc(100vh - 52 / 32 * " + 2 * (comboPulseSize + 1) + "vw)");
 		/* update accuracy html element */
-		utils.htmlCounter(playDetails.accuracy.toFixed(2) + "%", "accuracy-container", "accuracy-digit-", Assets.scoreNumbers, "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
+		Utils.htmlCounter(playDetails.accuracy.toFixed(2) + "%", "accuracy-container", "accuracy-digit-", Assets.scoreNumbers, "left", "calc(100vw - " + (document.getElementById("accuracy-container").childNodes.length * 1) + "vw)");
 		/* rank grade */
 		document.getElementById("grade").src = Assets.grades[playDetails.grade].src;
 		/* combo pulse size */
@@ -783,10 +783,10 @@ define(function(require) {
 		let maxMouseTrails = 128;
 		if (Options.getProperty("Gameplay", "cursorTrails") === "Interpolated") {
 			for (let i = mouse.previousPositions.x.length - 1; i >= 0; i--) {
-				let distance = utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]);
+				let distance = Utils.dist(mouse.previousPositions.x[i], mouse.previousPositions.y[i], mouse.previousPositions.x[i + 1], mouse.previousPositions.y[i + 1]);
 				for (let j = distance; j >= 0; j -= 2) {
-					canvas.setGlobalAlpha(utils.map(numberOfMouseTrailsRendered, 0, maxMouseTrails, 0.5, 0));
-					canvas.drawImage(Assets.cursorTrail, utils.map(j, 0, distance, mouse.previousPositions.x[i], mouse.previousPositions.x[i + 1]), utils.map(j, 0, distance, mouse.previousPositions.y[i], mouse.previousPositions.y[i + 1]));
+					canvas.setGlobalAlpha(Utils.map(numberOfMouseTrailsRendered, 0, maxMouseTrails, 0.5, 0));
+					canvas.drawImage(Assets.cursorTrail, Utils.map(j, 0, distance, mouse.previousPositions.x[i], mouse.previousPositions.x[i + 1]), Utils.map(j, 0, distance, mouse.previousPositions.y[i], mouse.previousPositions.y[i + 1]));
 					numberOfMouseTrailsRendered++;
 					/* prevent the rendering of too many trails otherwise it will lag */
 					if (numberOfMouseTrailsRendered >= maxMouseTrails) {
@@ -807,7 +807,7 @@ define(function(require) {
 	}
 
 	function detectSpinSpeed(useTime, previousTime, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y) {
-		let b = utils.mapToOsuPixels(PLAYFIELD_CENTER_X, PLAYFIELD_CENTER_Y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
+		let b = Utils.mapToOsuPixels(PLAYFIELD_CENTER_X, PLAYFIELD_CENTER_Y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 		previousAngle = angle;
 		angle = Math.atan2(mouse.position.y - b.y, mouse.position.x - b.x);
 		if (Math.sign(angle) === -1) {
@@ -944,17 +944,17 @@ define(function(require) {
 						useImage = 3;
 						break;
 				}
-				canvas.setGlobalAlpha(Math.min(utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 2, 0), 1));
+				canvas.setGlobalAlpha(Math.min(Utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 2, 0), 1));
 				let size = circleDiameter * 0.75;
 				if (judgementObjects[i].score === 0) {
-					let x = Math.sin(utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, 4 * Math.PI) * judgementObjects[i].rotationVelocity) * size / 64;
-					let y = utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, 75) ** 2 / 75 ** 1;
+					let x = Math.sin(Utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, 4 * Math.PI) * judgementObjects[i].rotationVelocity) * size / 64;
+					let y = Utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, 75) ** 2 / 75 ** 1;
 					ctx.translate(judgementObjects[i].x + x, judgementObjects[i].y + y);
-					ctx.rotate(utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, 1) * judgementObjects[i].rotationVelocity);
+					ctx.rotate(Utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, 1) * judgementObjects[i].rotationVelocity);
 					canvas.drawImage(Assets.hitNumbers[useImage], 0, 0, size, size);
 					ctx.resetTransform();
 				} else {
-					size *= JUDGEMENT_BEZIER_ANIMATION[Math.floor(utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, JUDGEMENT_BEZIER_ANIMATION.length - 1))].y;
+					size *= JUDGEMENT_BEZIER_ANIMATION[Math.floor(Utils.map(useTime, judgementObjects[i].initialTime, judgementObjects[i].lifetime, 0, JUDGEMENT_BEZIER_ANIMATION.length - 1))].y;
 					canvas.drawImage(Assets.hitNumbers[useImage], judgementObjects[i].x, judgementObjects[i].y, size, size);
 				}
 			} else {
@@ -964,9 +964,9 @@ define(function(require) {
 		}
 		for (let i = 0; i < effectObjects.length; i++) {
 			if (effectObjects[i].lifetime - useTime >= 0) {
-				let alpha = Math.min(utils.map(useTime, effectObjects[i].initialTime, effectObjects[i].lifetime, 1, 0), 1);
+				let alpha = Math.min(Utils.map(useTime, effectObjects[i].initialTime, effectObjects[i].lifetime, 1, 0), 1);
 				canvas.setGlobalAlpha(alpha);
-				let size = circleDiameter * utils.map(useTime, effectObjects[i].initialTime, effectObjects[i].lifetime, 1, 1.5);
+				let size = circleDiameter * Utils.map(useTime, effectObjects[i].initialTime, effectObjects[i].lifetime, 1, 1.5);
 				canvas.drawImage(effectObjects[i].src, effectObjects[i].x, effectObjects[i].y, size, size);
 			} else {
 				effectObjects.splice(i, 1);
@@ -988,18 +988,18 @@ define(function(require) {
 				break;
 			}
 			let useError = hitErrors[hitErrors.length - 1 - i];
-			let alpha = Math.max(utils.map(i, 40, 0, 0, 0.5), 0);
+			let alpha = Math.max(Utils.map(i, 40, 0, 0, 0.5), 0);
 			canvas.setGlobalAlpha(alpha);
-			if (utils.withinRange(useError, 0, odTime[2])) {
+			if (Utils.withinRange(useError, 0, odTime[2])) {
 				canvas.setFillStyle("#66ccff");
-			} else if (utils.withinRange(useError, 0, odTime[1])) {
+			} else if (Utils.withinRange(useError, 0, odTime[1])) {
 				canvas.setFillStyle("#88b300");
-			} else if (utils.withinRange(useError, 0, odTime[0])) {
+			} else if (Utils.withinRange(useError, 0, odTime[0])) {
 				canvas.setFillStyle("#ffcc22");
 			}
 			ctx.fillRect(window.innerWidth / 2 + useError * 1000, window.innerHeight * 0.975 - window.innerHeight * 0.025 / 2, window.innerHeight * 0.005, window.innerHeight * 0.025);
 		}
-		let mean = utils.weightedMean(hitErrors, function(n) {return Math.E ** (- n / 2)}, (hitErrors.length > 40) ? hitErrors.length - 40 : 0, hitErrors.length);
+		let mean = Utils.weightedMean(hitErrors, function(n) {return Math.E ** (- n / 2)}, (hitErrors.length > 40) ? hitErrors.length - 40 : 0, hitErrors.length);
 		meanHitErrorPosition += (mean - meanHitErrorPosition) / 16;
 		canvas.setGlobalAlpha(1);
 		canvas.setFillStyle("#fff");
@@ -1047,21 +1047,21 @@ define(function(require) {
 			if (currentHitObject >= currentLoadedMap.hitObjects.length || (audio.currentTime > 0 && audio.paused)) {
 				if (useTime > endingTime || (audio.currentTime > 0 && audio.paused)) {
 					exitPointerLock();
-					utils.showWebpageStates([
+					Utils.showWebpageStates([
 						"webpage-state-always",
 						"top-bar",
 						"webpage-state-results-screen",
 						"bottom-bar"
 					]);
-					utils.hideWebpageStates([
+					Utils.hideWebpageStates([
 						"webpage-state-beatmap-selection",
 						"webpage-state-gameplay",
 						"webpage-state-fail-screen",
 						"webpage-state-pause-screen"
 					]);
 					let date = new Date();
-					playDetails.datePlayed = utils.formatDate(date.getDate(), date.getMonth(), date.getFullYear(), date.getHours(), date.getMinutes());
-					playDetails.unstableRate = utils.standardDeviation(hitErrors) * 1000 * 10;
+					playDetails.datePlayed = Utils.formatDate(date.getDate(), date.getMonth(), date.getFullYear(), date.getHours(), date.getMinutes());
+					playDetails.unstableRate = Utils.standardDeviation(hitErrors) * 1000 * 10;
 					playDetails.title = currentLoadedMap.Title;
 					playDetails.creator = currentLoadedMap.Creator;
 					playDetails.artist = currentLoadedMap.Artist;
@@ -1166,11 +1166,11 @@ define(function(require) {
 			previousTime = useTime;
 
 			if (combo >= 200) {
-				flashlightSize = utils.map(60, 0, 512, 0, window.innerWidth);
+				flashlightSize = Utils.map(60, 0, 512, 0, window.innerWidth);
 			} else if (combo >= 100) {
-				flashlightSize = utils.map(80, 0, 512, 0, window.innerWidth);
+				flashlightSize = Utils.map(80, 0, 512, 0, window.innerWidth);
 			} else {
-				flashlightSize = utils.map(100, 0, 512, 0, window.innerWidth);
+				flashlightSize = Utils.map(100, 0, 512, 0, window.innerWidth);
 			}
 
 			if (keyboard.getKeyDown("escape")) {
@@ -1195,11 +1195,11 @@ define(function(require) {
 			ctx.lineWidth = 5;
 			canvas.setImageAlignment("top-left");
 			canvas.drawImage(Assets.scoreBarBg, 10, 10, window.innerWidth / 2, Assets.scoreBarBg.height);
-			canvas.drawImage(Assets.scoreBarColour, 0, 0, utils.map(hpDisplay, 0, 1, 0, Assets.scoreBarColour.width), Assets.scoreBarColour.height, 15, 10 + Assets.scoreBarColour.height / 1.5, utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2 - 0.01 * window.innerWidth), Assets.scoreBarColour.height);
+			canvas.drawImage(Assets.scoreBarColour, 0, 0, Utils.map(hpDisplay, 0, 1, 0, Assets.scoreBarColour.width), Assets.scoreBarColour.height, 15, 10 + Assets.scoreBarColour.height / 1.5, Utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2 - 0.01 * window.innerWidth), Assets.scoreBarColour.height);
 			canvas.setImageAlignment("center");
 
 			canvas.setFillStyle("#ffdf0044");
-			let x = utils.map(audio.currentTime, currentLoadedMap.hitObjects[0].time, endingTime, 0, window.innerWidth * 0.13);
+			let x = Utils.map(audio.currentTime, currentLoadedMap.hitObjects[0].time, endingTime, 0, window.innerWidth * 0.13);
 			if (x < 0) {
 				x = 0;
 			}
@@ -1246,7 +1246,7 @@ define(function(require) {
 		},
 		playMap: function(mapData, mods) {
 			Options.read();
-			let hex = Math.round(utils.map(Options.getProperty("Gameplay", "backgroundDim"), 0, 1, 0, 255)).toString(16);
+			let hex = Math.round(Utils.map(Options.getProperty("Gameplay", "backgroundDim"), 0, 1, 0, 255)).toString(16);
 			document.getElementById("webpage-state-gameplay").style.background = "#000000" + hex;
 			mouse.sensitivity = Options.getProperty("Inputs", "mouseSensitivity") * 10;
 			enterPointerLock();
@@ -1329,7 +1329,7 @@ define(function(require) {
 			arTime = Formulas.AR(mapData.ApproachRate, playDetails.mods);
 			arFadeIn = Formulas.ARFadeIn(mapData.ApproachRate, playDetails.mods);
 			/* Map from osu!pixels to screen pixels */
-			circleDiameter = utils.map(Formulas.CS(mapData.CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3));
+			circleDiameter = Utils.map(Formulas.CS(mapData.CircleSize, playDetails.mods) * 2, 0, 512, 0, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3));
 			odTime = Formulas.ODHitWindow(mapData.OverallDifficulty, playDetails.mods);
 			let lastHitObject = currentLoadedMap.hitObjects[currentLoadedMap.hitObjects.length - 1];
 			if (lastHitObject.type[0] === "1") {

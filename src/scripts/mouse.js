@@ -1,5 +1,6 @@
 define(function(require) {
 	"use strict";
+	const Utils = require("./utils.js");
 	return class Mouse {
 		constructor(element, max, sensitivity) {
 			if (max === undefined) {
@@ -145,16 +146,20 @@ define(function(require) {
 			this.canUserControl = true;
 		}
 		lockPointer() {
-			this.locked = true;
-			document.getElementById(this.element).requestPointerLock();
-			document.getElementById(this.element).removeEventListener("mousemove", this.mousemove);
-			document.getElementById(this.element).addEventListener("mousemove", this.mousemovelocked);
+			if (Utils.detectIfOnMobile() === false) {
+				this.locked = true;
+				document.getElementById(this.element).requestPointerLock();
+				document.getElementById(this.element).removeEventListener("mousemove", this.mousemove);
+				document.getElementById(this.element).addEventListener("mousemove", this.mousemovelocked);
+			}
 		}
 		unlockPointer() {
-			this.locked = false;
-			document.exitPointerLock();
-			document.getElementById(this.element).removeEventListener("mousemove", this.mousemovelocked);
-			document.getElementById(this.element).addEventListener("mousemove", this.mousemove);
+			if (Utils.detectIfOnMobile() === false) {
+				this.locked = false;
+				document.exitPointerLock();
+				document.getElementById(this.element).removeEventListener("mousemove", this.mousemovelocked);
+				document.getElementById(this.element).addEventListener("mousemove", this.mousemove);
+			}
 		}
 		positionBound(lowerX, lowerY, upperX, upperY) {
 			this.positionLimit = true;
