@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Sound effects not taking on the correct volume
 - Show FPS setting not saving
+- Prevented an error on mobile devices for orientation checks
 ### Code Quality
 - Removed unnecessary event listener for splash screen
 ---
