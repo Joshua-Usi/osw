@@ -52,13 +52,13 @@
 				</div>
 				<canvas id="intro-logo"></canvas>
 			</div>
-			<div id="sidenav">
-				<div id="sidenav-padding">
+			<div class="sidenav" id="sidenav-left">
+				<div class="sidenav-padding">
+					<a href="javascript:void(0)" class="close-btn">&times;</a>
 					<p style="font-size: 5vh; padding: 0;">settings</p>
 					<p style="padding: 0; color: #FD67AE;">change the way osw! behaves</p>
 					<!-- Padding -->
 					<div style="padding-top: 5vh;"></div>
-					<a href="javascript:void(0)" id="close-btn">&times;</a>
 					<!-- General Settings -->
 					<div class="sidenav-divider"></div>
 					<p class="sidenav-title-text">General</p>
@@ -208,6 +208,13 @@
 					<button type="button" id="settings-button-delete-all-beatmaps" class="settings-button triangle-background red">Delete all beatmaps</button>
 				</div>
 			</div>
+			<div class="sidenav" id="sidenav-right">
+				<div class="sidenav-padding">
+					<a href="javascript:void(0)" class="close-btn">&times;</a>
+					<p class="sidenav-title-text">Notifications</p>
+					<div id="sidenav-notifications"></div>
+				</div>
+			</div>
 			<div id="top-bar">
 				<div class="span-top-bar-text" style="float: left;">
 					<img id="settings-icon" class="gamemode-icons" src="./src/images/settings.png">
@@ -215,6 +222,9 @@
 				<p class="top-bar-text float-right" id="pause">&#x275A;&#x275A;</p>
 				<div class="span-top-bar-text float-right">
 					<img id="shuffle-icon" class="gamemode-icons" src="./src/images/shuffle.png">
+				</div>
+				<div class="span-top-bar-text float-right">
+					<img id="notifications-icon" class="gamemode-icons" src="./src/images/notifications.png">
 				</div>
 			</div>
 			<p id="frame-rate">0 / 60 fps</p>

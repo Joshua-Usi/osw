@@ -145,6 +145,7 @@ define(function(require) {
 				});
 			}
 		} else {
+			a
 			let database = window.indexedDB.open("osw-database");
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
@@ -157,8 +158,8 @@ define(function(require) {
 					Utils.showWebpageStates(["webpage-state-gameplay"]);
 					Utils.hideWebpageStates(["webpage-state-menu", "webpage-state-beatmap-selection", "webpage-state-mods", "webpage-state-pause-screen", "webpage-state-fail-screen", "webpage-state-results-screen", "top-bar", "bottom-bar", ]);
 					// hide sidenav
-					document.getElementById("sidenav").style.width = "0";
-					document.getElementById("sidenav").style.opacity = "0.2";
+					document.getElementById("sidenav-left").style.width = "0";
+					document.getElementById("sidenav-left").style.opacity = "0.2";
 					menuAudio.pause();
 					/* reset audio time */
 					menuAudio.currentTime = 0;
@@ -330,8 +331,25 @@ define(function(require) {
 		}
 		setTimeout(logoResetBeat, 4000 / 60);
 	}, 375);
+	window.addEventListener("error", function(event) {
+		console.log(event);
+		let p = document.createElement("p");
+		p.textContent = event.error;
+		document.getElementById("sidenav-notifications").appendChild(p);
+	});
 	/* Event Listeners */
-	window.addEventListener("click", function() {
+	window.addEventListener("click", function(event) {
+		if (event.target.classList.contains("close-btn")) {
+			console.log("close button pressed");
+			let currentElement = event.target;
+			while (currentElement.classList.contains("sidenav") === false) {
+				currentElement = currentElement.parentNode;
+			}
+			currentElement.style.width = "0";
+			currentElement.style.opacity = "0.2";
+			AudioManager.play("back-button-click");
+
+		}
 		if (isFirstClick && document.readyState === "complete") {
 			document.getElementById("splash-screen").style.opacity = 0;
 			IntroSequence.start();
@@ -573,11 +591,6 @@ define(function(require) {
 		chooseRandomMap();
 	});
 	/* Sidenav event listener */
-	document.getElementById("close-btn").addEventListener("click", function() {
-		document.getElementById("sidenav").style.width = "0";
-		document.getElementById("sidenav").style.opacity = 0.2;
-		AudioManager.play("back-button-click");
-	});
 	document.getElementById("settings-icon").addEventListener("click", function() {
 		document.getElementById("menu-bar-settings").dispatchEvent(new CustomEvent("click"));
 	});
@@ -687,8 +700,8 @@ define(function(require) {
 	}
 	/* Specific menu bar button listeners */
 	document.getElementById("menu-bar-settings").addEventListener("click", function() {
-		document.getElementById("sidenav").style.width = "25vw";
-		document.getElementById("sidenav").style.opacity = 1;
+		document.getElementById("sidenav-left").style.width = "27.5vw";
+		document.getElementById("sidenav-left").style.opacity = 1;
 	});
 	document.getElementById("menu-bar-exit").addEventListener("click", function() {
 		setTimeout(function() {
@@ -1061,8 +1074,8 @@ define(function(require) {
 			beatmapRequest.addEventListener("success", function(event) {
 				Utils.showWebpageStates(["webpage-state-gameplay"]);
 				Utils.hideWebpageStates(["webpage-state-menu", "webpage-state-beatmap-selection", "webpage-state-mods", "webpage-state-pause-screen", "webpage-state-fail-screen", "webpage-state-results-screen", "top-bar", "bottom-bar", ]);
-				document.getElementById("sidenav").style.width = "0";
-				document.getElementById("sidenav").style.opacity = "0.2";
+				document.getElementById("sidenav-left").style.width = "0";
+				document.getElementById("sidenav-left").style.opacity = "0.2";
 				/* reset audio time */
 				menuAudio.currentTime = 0;
 				GameplayHandler.watchReplay(event.target.result.data, map);

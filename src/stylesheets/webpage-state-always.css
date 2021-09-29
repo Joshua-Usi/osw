@@ -130,7 +130,7 @@
 	transition: filter 0.5s;
 }
 
-#sidenav {
+.sidenav {
 	position: fixed;
 	z-index: 1000000;
 
@@ -145,8 +145,8 @@
 	transition-timing-function: cubic-bezier(0.15, 0.6, 0.3, 1);
 }
 
-#sidenav p,
-#sidenav a {
+.sidenav p,
+.sidenav a {
 	margin: 0;
 	padding: 1vh;
 
@@ -157,7 +157,19 @@
 	text-decoration: none;
 }
 
-#sidenav #close-btn {
+#sidenav-left {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+#sidenav-right {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.close-btn {
 	position: absolute;
 	top: 0;
 	right: 1vw;
@@ -173,7 +185,7 @@
 	font-size: 3.3vh !important;
 }
 
-#sidenav-padding {
+.sidenav-padding {
 	padding: 2.5%;
 }
 
