@@ -145,7 +145,6 @@ define(function(require) {
 				});
 			}
 		} else {
-			a
 			let database = window.indexedDB.open("osw-database");
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
@@ -334,8 +333,10 @@ define(function(require) {
 	window.addEventListener("error", function(event) {
 		console.log(event);
 		let p = document.createElement("p");
-		p.textContent = event.error;
+		p.innerHTML = `${event.error} <br> in file ${event.filename.replace(location.href, "")} @ ${event.colno}:${event.lineno}`;
 		document.getElementById("sidenav-notifications").appendChild(p);
+		document.getElementById("sidenav-right").style.width = "25vw";
+		document.getElementById("sidenav-right").style.opacity = 1;
 	});
 	/* Event Listeners */
 	window.addEventListener("click", function(event) {
@@ -578,21 +579,14 @@ define(function(require) {
 	document.getElementById("top-bar").addEventListener("mouseleave", function() {
 		document.getElementById("background-dim").style.filter = "brightness(1)";
 	});
-	document.getElementById("pause").addEventListener("click", function() {
-		if (menuAudio.paused) {
-			menuAudio.play();
-			this.innerHTML = "&#x275A;&#x275A;";
-		} else {
-			menuAudio.pause();
-			this.innerHTML = "&#x25BA;";
-		}
-	});
-	document.getElementById("shuffle-icon").addEventListener("click", function() {
-		chooseRandomMap();
-	});
 	/* Sidenav event listener */
 	document.getElementById("settings-icon").addEventListener("click", function() {
 		document.getElementById("menu-bar-settings").dispatchEvent(new CustomEvent("click"));
+	});
+	document.getElementById("notifications-icon").addEventListener("click", function() {
+		document.getElementById("sidenav-right").style.width = "25vw";
+		document.getElementById("sidenav-right").style.opacity = 1;
+		AudioManager.play("menu-options-click");
 	});
 	/* Menu bar buttons listeners */
 	let buttons = document.getElementsByClassName("menu-bar-buttons-parent");

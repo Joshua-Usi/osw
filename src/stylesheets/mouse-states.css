@@ -1,12 +1,4 @@
-#settings-icon {
-	cursor: pointer;
-}
-
-#shuffle-icon {
-	cursor: pointer;
-}
-
-#pause {
+.span-top-bar-text {
 	cursor: pointer;
 }
 
