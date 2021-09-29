@@ -97,6 +97,12 @@ define(function(require) {
 	audio.addEventListener("canplaythrough", function() {
 		audio.play();
 	});
+	/* after 3s just start playing */
+	setTimeout(function() {
+		if (audio.paused === true) {
+			audio.play();
+		}
+	}, 3000);
 	/* Beatmap difficulty data constants */
 	let arTime;
 	let arFadeIn;
