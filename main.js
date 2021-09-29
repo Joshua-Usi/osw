@@ -890,10 +890,12 @@ define(function(require) {
 	}
 	window.addEventListener("orientationchange", function(event) {
 		/* osw! only allows horizontal screens */
-		if (event.target.screen.orientation.angle === 0 && window.innerWidth < window.innerHeight) {
-			document.getElementById("orientation-vertical").style.display = "block";
-		} else {
-			document.getElementById("orientation-vertical").style.display = "none";
+		if (event.target) {
+			if (event.target.screen.orientation.angle === 0 && window.innerWidth < window.innerHeight) {
+				document.getElementById("orientation-vertical").style.display = "block";
+			} else {
+				document.getElementById("orientation-vertical").style.display = "none";
+			}
 		}
 	});
 	document.body.addEventListener("touchmove", function(e) {
