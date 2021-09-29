@@ -1,17 +1,5 @@
 define(function(require) {
 	"use strict";
-	class UntimedEvent {
-		constructor(callback) {
-			this.callback = callback;
-		}
-	}
-	class TimedEvent extends UntimedEvent {
-		constructor(time, callback) {
-			super(callback);
-			this.time = time;
-		}
-	}
-
 	return class AnimatedEventsManager {
 		constructor() {
 			this.events = [];
@@ -19,8 +7,17 @@ define(function(require) {
 			this.currentEvent = 0;
 			this.isDone = false;
 		}
-		static UntimedEvent = UntimedEvent;
-		static TimedEvent = TimedEvent;
+		static UntimedEvent = class UntimedEvent {
+			constructor(callback) {
+				this.callback = callback;
+			}
+		};
+		static TimedEvent = class TimedEvent extends this.UntimedEvent {
+			constructor(time, callback) {
+				super(callback);
+				this.time = time;
+			}
+		};
 		addEvent(event) {
 			this.events.push(event);
 		}

@@ -99,9 +99,7 @@ define(function(require) {
 	});
 	/* after 3s just start playing */
 	setTimeout(function() {
-		if (audio.paused === true) {
-			audio.play();
-		}
+		audio.play();
 	}, 3000);
 	/* Beatmap difficulty data constants */
 	let arTime;
