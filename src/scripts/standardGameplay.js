@@ -679,12 +679,13 @@ define(function(require) {
 						canvas.drawImage(Assets.sliderScorePoint, mapped.x, mapped.y);
 					}
 				}
-				/* Draw Slider End */
-				let showHead = true;
-				let isHeadRepeat = false;
-				let showEnd = true;
-				let isEndRepeat = false;
-				if (hitObject.slides > 1 && hitObject.cache.currentSlide < hitObject.slides) {
+				let elements = Utils.generateSliderElements(hitObject.slides);
+
+				/* draw tail, determine whether or not to draw reverse arrow */
+				if (elements.tail[Utils.elementIndex(hitObject.cache.currentSlide, "tail")] === "normal") {
+					canvas.drawImage(hitCircleComboBuffers[hitObject.cache.comboColour], mapped.x, mapped.y, circleDiameter, circleDiameter);
+					canvas.drawImage(Assets.hitCircleOverlay, mapped.x, mapped.y, circleDiameter, circleDiameter);
+				} else if (elements.tail[Utils.elementIndex(hitObject.cache.currentSlide, "tail")] === "repeat") {
 					ctx.translate(mapped.x, mapped.y);
 					let direction = Utils.direction(hitObject.cache.points[hitObject.cache.points.length - 2].x, hitObject.cache.points[hitObject.cache.points.length - 2].y, hitObject.cache.points[hitObject.cache.points.length - 1].x, hitObject.cache.points[hitObject.cache.points.length - 1].y) - Math.PI / 2;
 					if (playDetails.mods.hardRock) {
@@ -695,12 +696,9 @@ define(function(require) {
 					canvas.drawImage(hitCircleComboBuffers[hitObject.cache.comboColour], 0, 0, circleDiameter, circleDiameter);
 					canvas.drawImage(Assets.reverseArrow, 0, 0, circleDiameter, circleDiameter);
 					ctx.resetTransform();
-				} else if (hitObject.slides === 1 || hitObject.cache.currentSlide === hitObject.slides - 1) {
-					canvas.drawImage(hitCircleComboBuffers[hitObject.cache.comboColour], mapped.x, mapped.y, circleDiameter, circleDiameter);
-					canvas.drawImage(Assets.hitCircleOverlay, mapped.x, mapped.y, circleDiameter, circleDiameter);
 				}
-				/* Draw Slider Head */
-				if (hitObject.cache.hasHitAtAll === false || (hitObject.cache.currentSlide === hitObject.slides - 1 && hitObject.slides > 1)) {
+				/* draw head, determine whether or not to draw reverse arrow */
+				if (elements.head[Utils.elementIndex(hitObject.cache.currentSlide, "head")] === "normal" || (hitObject.cache.hitHead === false && hitObject.cache.currentSlide === 0)) {
 					canvas.drawImage(hitCircleComboBuffers[hitObject.cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
 					canvas.drawImage(Assets.hitCircleOverlay, hitObjectMapped.x, hitObjectMapped.y, circleDiameter, circleDiameter);
 					if (hitObject.cache.currentSlide === 0) {
@@ -712,7 +710,7 @@ define(function(require) {
 							canvas.drawImage(Assets.comboNumbers[individualDigits[j]], hitObjectMapped.x - (individualDigits.length - 1) * circleDiameter / 6 + j * circleDiameter / 3, hitObjectMapped.y, circleDiameter / 3, circleDiameter / 3 * (Assets.comboNumbers[individualDigits[j]].height / Assets.comboNumbers[individualDigits[j]].width));
 						}
 					}
-				} else if (hitObject.cache.currentSlide >= 1 && hitObject.cache.currentSlide < hitObject.slides - 1) {
+				} else if (elements.head[Utils.elementIndex(hitObject.cache.currentSlide, "head")] === "repeat") {
 					let mapped = Utils.mapToOsuPixels(hitObject.cache.points[0].x, hitObject.cache.points[0].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
 					ctx.translate(mapped.x, mapped.y);
 					let direction = Utils.direction(hitObject.cache.points[1].x, hitObject.cache.points[1].y, hitObject.cache.points[0].x, hitObject.cache.points[0].y) - Math.PI / 2;

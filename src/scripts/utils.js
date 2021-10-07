@@ -371,7 +371,36 @@ define(function(require) {
 			return toMatch.some((toMatchItem) => {
 				return navigator.userAgent.match(toMatchItem);
 			});
-		}
+		},
+		elementIndex: function(x, type) {
+			if (type === "head") {
+				return Math.floor(x / 2) + 1
+			} else if (type === "tail") {
+				return Math.floor((x - 1) / 2) + 1
+			}
+		},
+		generateSliderElements: function(n) {
+			let sliderElements = {
+				head: [],
+				tail: [],
+			}
+			sliderElements.head.push("normal");
+
+			for (let i = 0; i < n - 1; i++) {
+				if (i % 2 === 0) {
+					sliderElements.tail.push("repeat");
+				} else {
+					sliderElements.head.push("repeat");
+				}
+			}
+			if ((n + 1) % 2 === 1) {
+				sliderElements.head.push("normal");
+			} else {
+				sliderElements.tail.push("normal");
+			}
+
+			return sliderElements;
+		},
 	};
 	return Utils;
 });
