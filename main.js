@@ -697,6 +697,8 @@ define(function(require) {
 		document.getElementById("sidenav").style.opacity = 1;
 	});
 	document.getElementById("menu-bar-exit").addEventListener("click", function() {
+		document.getElementById("sidenav").style.width = "0";
+		document.getElementById("sidenav").style.opacity = 0;
 		setTimeout(function() {
 			window.close();
 		}, 4000);
