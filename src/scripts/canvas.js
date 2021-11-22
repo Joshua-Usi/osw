@@ -8,7 +8,6 @@ define(function(require) {
 				textAlign: "left",
 				imageAlign: "top-left",
 			}
-			console.log(this.context);
 		}
 		setWidth(width) {
 			this.canvas.width = width;
