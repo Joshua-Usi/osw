@@ -16,6 +16,8 @@ define(function(require) {
 	const endScreen = require("./endScreen.js");
 	const databaseManager = require("./databaseManager.js");
 	const ReplayManager = require("./replay.js");
+	const AudioManager = new(require("./audioManager.js"))();
+	AudioManager.load("hitsound", "../src/audio/hitsounds/soft-hitnormal.wav", "effects", true);
 	let currentLoadedMap;
 	/* canvas setup */
 	let canvas = new Canvas("gameplay");
