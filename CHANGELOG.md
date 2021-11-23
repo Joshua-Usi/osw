@@ -1,29 +1,5 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
----
-## [v0.11.2b-dev] - 7-10-2021
-### Fixed
-- Made sliders show the correct slider elements
----
-## [v0.11.1b-dev] - 3-09-2021
-### Added
-- Notifications side nav (Useful for debugging errors)
-### Changed
-- Mobile devices have audio visualiser effects disabled for performance and compatibility
-- Increased width of options side nav from 25% to 27.5%
-### Optimised
-- Beatmap uploading even more
-- Performance when saving settings by preventing some buttons from saving settings twice
-### Removed
-- Volume warning on splash screen
-- Removed unnecessary event listener for splash screen
-### Fixed
-- Sound effects not taking on the correct volume
-- Show FPS setting not saving
-- Prevented an error on mobile devices for orientation checks
-### Code Quality
-- Removed unnecessary event listener for splash screen
----
 ## [v0.11.0b-dev] - 1-09-2021
 ### Added
 - Capability to view replays
