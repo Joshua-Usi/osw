@@ -928,12 +928,16 @@ define(function(require) {
 	});
 	document.getElementById("back-button").addEventListener("click", function() {
 		AudioManager.play("back-button-click");
-		if (document.getElementById("webpage-state-results-screen").style.display === "block") {
-			Utils.showWebpageStates(["webpage-state-beatmap-selection", "webpage-state-mods", "top-bar", ]);
-			Utils.hideWebpageStates(["webpage-state-results-screen", ]);
+		if (ModsUI.isOpen()) {
+			ModsUI.closeModsUI();
 		} else {
-			Utils.showWebpageStates(["webpage-state-menu", ]);
-			Utils.hideWebpageStates(["webpage-state-mods", "webpage-state-beatmap-selection", "bottom-bar", ]);
+			if (document.getElementById("webpage-state-results-screen").style.display === "block") {
+				Utils.showWebpageStates(["webpage-state-beatmap-selection", "webpage-state-mods", "top-bar", ]);
+				Utils.hideWebpageStates(["webpage-state-results-screen", ]);
+			} else {
+				Utils.showWebpageStates(["webpage-state-menu", ]);
+				Utils.hideWebpageStates(["webpage-state-mods", "webpage-state-beatmap-selection", "bottom-bar", ]);
+			}
 		}
 		menuAudio.play();
 	});

@@ -4,6 +4,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v0.11.1b-dev] - 3-09-2021
 ### Optimised
 - Beatmap uploading even more
+### Fixed
+- When exiting with settings open: settings GUI now closes as well [#9](https://github.com/Joshua-Usi/osw/issues/9)
+- Pressing the back button while the mods menu is open will close the mods menu and does not go back to main menu [#9](https://github.com/Joshua-Usi/osw/issues/9)
 ### Removed
 - Volume warning on splash screen
 ---
