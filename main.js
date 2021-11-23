@@ -704,6 +704,8 @@ define(function(require) {
 		document.getElementById("sidenav-left").style.opacity = 1;
 	});
 	document.getElementById("menu-bar-exit").addEventListener("click", function() {
+		document.getElementById("sidenav").style.width = "0";
+		document.getElementById("sidenav").style.opacity = 0;
 		setTimeout(function() {
 			window.close();
 		}, 4000);
@@ -916,12 +918,16 @@ define(function(require) {
 	});
 	document.getElementById("back-button").addEventListener("click", function() {
 		AudioManager.play("back-button-click");
-		if (document.getElementById("webpage-state-results-screen").style.display === "block") {
-			Utils.showWebpageStates(["webpage-state-beatmap-selection", "webpage-state-mods", "top-bar", ]);
-			Utils.hideWebpageStates(["webpage-state-results-screen", ]);
+		if (ModsUI.isOpen()) {
+			ModsUI.closeModsUI();
 		} else {
-			Utils.showWebpageStates(["webpage-state-menu", ]);
-			Utils.hideWebpageStates(["webpage-state-mods", "webpage-state-beatmap-selection", "bottom-bar", ]);
+			if (document.getElementById("webpage-state-results-screen").style.display === "block") {
+				Utils.showWebpageStates(["webpage-state-beatmap-selection", "webpage-state-mods", "top-bar", ]);
+				Utils.hideWebpageStates(["webpage-state-results-screen", ]);
+			} else {
+				Utils.showWebpageStates(["webpage-state-menu", ]);
+				Utils.hideWebpageStates(["webpage-state-mods", "webpage-state-beatmap-selection", "bottom-bar", ]);
+			}
 		}
 		menuAudio.play();
 	});
