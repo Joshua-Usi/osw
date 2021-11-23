@@ -59,12 +59,6 @@ define(function(require) {
 	if (!window.indexedDB) {
 		throw new Error("IndexedDB is not supported on your browser. You will not be able to save your beatmaps");
 	}
-	/* osw! version incremented manually */
-	const MAJOR_VERSION = 0;
-	const MINOR_VERSION = 11;
-	const PATCH_VERSION = 1;
-	const BUILD_METADATA = "b-dev";
-	const version = `osw! v${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}${BUILD_METADATA}`;
 	/* Set element version numbers */
 	let classes = document.getElementsByClassName("client-version");
 	for (let i = 0; i < classes.length; i++) {
@@ -205,7 +199,7 @@ define(function(require) {
 	/* if cache already exist, then use it */
 	if (localStorage.getItem("beatmapCache") && localStorage.getItem("beatmapCache") !== "[]" && parseInt(localStorage.getItem("beatmapCacheVersion")) === CACHE_VERSION) {
 		/* Beatmap loading and adding to dom */
-		let cache = CacheManager.getCache("beatmapCache");
+		let cache = JSON.parse(window.localStorage.getItem("beatmapCache"));
 		if (cache === null) {
 			cache = [];
 		}
@@ -221,8 +215,8 @@ define(function(require) {
 			/* Beatmap loading and adding to dom */
 			let cache = CacheManager.generate(loadedMaps);
 			if (cache.length > 0) {
-				CacheManager.setCache("beatmapCache", cache);
-				CacheManager.setCache("beatmapCacheVersion", CACHE_VERSION);
+				window.localStorage.setItem("beatmapCache", JSON.stringify(cache));
+				window.localStorage.setItem("beatmapCacheVersion", JSON.stringify(CACHE_VERSION));
 			}
 			document.getElementById("beatmap-selection-right").innerHTML = BeatMapSelectionPaneTemplate.generate(cache);
 		} else {
@@ -347,7 +341,6 @@ define(function(require) {
 	/* Event Listeners */
 	window.addEventListener("click", function(event) {
 		if (event.target.classList.contains("close-btn")) {
-			console.log("close button pressed");
 			let currentElement = event.target;
 			while (currentElement.classList.contains("sidenav") === false) {
 				currentElement = currentElement.parentNode;
@@ -371,7 +364,7 @@ define(function(require) {
 					Utils.hideWebpageStates(["webpage-state-loading-maps"]);
 					screenShowing = false;
 					if (newBeatmapData.length > 0) {
-						let cache = CacheManager.getCache("beatmapCache");
+						let cache = JSON.parse(window.localStorage.getItem("beatmapCache"));
 						if (cache === null) {
 							cache = [];
 						}
@@ -379,7 +372,7 @@ define(function(require) {
 							cache.push(newBeatmapData[i]);
 						}
 						newBeatmapData = [];
-						CacheManager.setCache("beatmapCache", cache);
+						window.localStorage.setItem("beatmapCache", JSON.stringify(cache));
 						document.getElementById("beatmap-selection-right").innerHTML = BeatMapSelectionPaneTemplate.generate(cache);
 					}
 				} else if (pendingFileCount > 0 && screenShowing === false) {
@@ -776,21 +769,21 @@ define(function(require) {
 	/* Settings button listeners */
 	document.getElementById("settings-button-clear-options").addEventListener("click", function() {
 		if (window.confirm("Are you sure you want to clear your options?")) {
-			CacheManager.deleteCache("options");
+			window.localStorage.removeItem("options");
 			window.alert("options cleared, the webpage will now refresh");
 			window.location.reload();
 		}
 	});
 	document.getElementById("settings-button-delete-beatmap-cache").addEventListener("click", function() {
-		CacheManager.deleteCache("beatmapCache");
+		window.localStorage.removeItem("beatmapCache");
 		window.alert("beatmap cache cleared, the webpage will now refresh");
 		window.location.reload();
 	});
 	document.getElementById("settings-button-delete-all-beatmaps").addEventListener("click", function() {
 		if (window.confirm("Are you sure you want to delete all beatmaps? this option is not undoable")) {
 			let database = window.indexedDB.open("osw-database");
-			CacheManager.deleteCache("beatmapCache");
-			CacheManager.deleteCache("loadedOSZ");
+			window.localStorage.removeItem("beatmapCache");
+			window.localStorage.removeItem("loadedOSZ");
 			database.addEventListener("success", function(event) {
 				let database = event.target.result;
 				const toDelete = ["beatmaps", "audio", "images"];
@@ -956,7 +949,7 @@ define(function(require) {
 	document.getElementById("fail-menu-quit").addEventListener("click", quit);
 	document.getElementById("upload-beatmap").addEventListener("change", function() {
 		for (let i = 0; i < this.files.length; i++) {
-			let cache = CacheManager.getCache("loadedOSZ");
+			let cache = JSON.parse(window.localStorage.getItem("loadedOSZ"));
 			if (cache === null) {
 				cache = [];
 			}
@@ -964,7 +957,7 @@ define(function(require) {
 				continue;
 			} else {
 				cache.push(this.files[i].name);
-				CacheManager.setCache("loadedOSZ", cache);
+				window.localStorage.setItem("loadedOSZ", JSON.stringidfy(cache));
 			}
 			let fileReader = new FileReader();
 			fileReader.addEventListener("load", function(event) {

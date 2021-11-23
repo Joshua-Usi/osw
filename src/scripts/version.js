@@ -1,6 +1,6 @@
 define(function() {
 	/* osw! version incremented manually */
-	const BUILD_PREFIX = "osw! v";
+	const BUILD_PREFIX = "osw!";
 	const MAJOR_VERSION = 0;
 	const MINOR_VERSION = 11;
 	const PATCH_VERSION = 2;
