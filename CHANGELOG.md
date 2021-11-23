@@ -2,8 +2,14 @@ Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
 ## [v0.11.1b-dev] - 23-11-2021
+### Added
+- Notifications side nav (Useful for debugging errors)
+### Changed
+- Mobile devices have audio visualiser effects disabled for performance and compatibility
+- Increased width of options side nav from 25% to 27.5%
 ### Optimised
 - Beatmap uploading even more
+- Performance when saving settings by preventing some buttons from saving settings twice
 ### Fixed
 - When exiting with settings open: settings GUI now closes as well [#9](https://github.com/Joshua-Usi/osw/issues/9)
 - Pressing the back button while the mods menu is open will close the mods menu and does not go back to main menu [#9](https://github.com/Joshua-Usi/osw/issues/9)
