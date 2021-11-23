@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - When exiting with settings open: settings GUI now closes as well [#9](https://github.com/Joshua-Usi/osw/issues/9)
 - Pressing the back button while the mods menu is open will close the mods menu and does not go back to main menu [#9](https://github.com/Joshua-Usi/osw/issues/9)
+- Prevented the ability to move the mouse whenever an using the Auto mod or watching a replay
+- Cursor is now no longer locked when using Auto mod or watching a replay
 ### Removed
 - Volume warning on splash screen
 ---

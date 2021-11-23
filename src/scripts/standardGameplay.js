@@ -1224,7 +1224,9 @@ define(function(require) {
 		continue: function() {
 			isRunning = true;
 			audio.play();
-			enterPointerLock();
+			if ((isReplay || playDetails.mods.auto) === false) {
+				enterPointerLock();
+			}
 		},
 		pause: function() {
 			isRunning = false;
@@ -1235,12 +1237,17 @@ define(function(require) {
 			isRunning = false;
 			this.play(currentLoadedMap, playDetails.mapIdentifier, playDetails.mods);
 		},
-		watchReplay: function(mapData, playDetails2) {
+		watchReplay: function(mapData, replayDetails) {
 			isReplay = true;
 			currentMouseEvent = 0;
 			currentKeyEvent = 0;
-			playDetails = new PlayDetails(playDetails2.mapIdentifier, playDetails2.mods);
-			playDetails.replay = playDetails2.replay;
+			playDetails = new PlayDetails(replayDetails.mapIdentifier, replayDetails.mods);
+			/* prevent auto mods from being applied twice */
+			playDetails.mods.auto = false;
+			playDetails.mods.autopilot = false;
+			playDetails.mods.relax = false;
+			playDetails.mods.spunOut = false;
+			playDetails.replay = replayDetails.replay;
 			this.playMap(mapData, playDetails.mapIdentifier, playDetails.mods);
 		},
 		play(mapData, mapIdentifier, mods) {
@@ -1249,18 +1256,25 @@ define(function(require) {
 			this.playMap(mapData, mods);
 		},
 		playMap: function(mapData, mods) {
+			if (isReplay || mods.auto || mods.autopilot) {
+				mouse.disableUserControl();
+			} else {
+				mouse.enableUserControl();
+			}
+			if ((isReplay || mods.auto) === false) {
+				enterPointerLock();
+			}
 			Options.read();
 			let hex = Math.round(Utils.map(Options.getProperty("Gameplay", "backgroundDim"), 0, 1, 0, 255)).toString(16);
 			document.getElementById("webpage-state-gameplay").style.background = "#000000" + hex;
 			mouse.sensitivity = Options.getProperty("Inputs", "mouseSensitivity") * 10;
-			enterPointerLock();
 			if (mapData.hitObjects[0].time > 10) {
 				document.getElementById("skip-button").style.opacity = "1";
 			} else {
 				document.getElementById("skip-button").style.opacity = "0";
 			}
 			currentLoadedMap = mapData;
-			if (playDetails.mods.flashlight === false) {
+			if (mods.flashlight === false) {
 				document.getElementById("gameplay-flashlight").style.display = "none";
 			} else {
 				document.getElementById("gameplay-flashlight").style.display = "block";
@@ -1279,7 +1293,7 @@ define(function(require) {
 			timingPointUninheritedIndex = 0;
 			currentTimingPoint = 0;
 			/* Score letiables */
-			scoreMultiplier = Formulas.modScoreMultiplier(playDetails.mods);
+			scoreMultiplier = Formulas.modScoreMultiplier(mods);
 			score = 0;
 			displayedScore = 0;
 			/* Combo letiables */

@@ -38,7 +38,7 @@ define(function(require) {
 			let that = this;
 			/* References to functions for destroying */
 			this.mousemove = function(event) {
-				if (that.canUserControl) {
+				if (that.canUserControl === true) {
 					that.events.push(Date.now());
 					that.previousPositions.x.push(that.position.x);
 					that.previousPositions.y.push(that.position.y);
@@ -53,7 +53,7 @@ define(function(require) {
 				}
 			};
 			this.mousemovelocked = function(event) {
-				if (that.canUserControl) {
+				if (that.canUserControl === true) {
 					that.events.push(Date.now());
 					that.previousPositions.x.push(that.position.x);
 					that.previousPositions.y.push(that.position.y);
@@ -83,12 +83,12 @@ define(function(require) {
 			};
 			this.contextmenu = event => event.preventDefault();
 			this.mousedown = function(event) {
-				if (that.canUserControl) {
+				if (that.canUserControl === true) {
 					that.isLeftButtonDown = true;
 				}
 			};
 			this.mouseup = function(event) {
-				if (that.canUserControl) {
+				if (that.canUserControl === true) {
 					that.isLeftButtonDown = false;
 				}
 			};
@@ -106,7 +106,6 @@ define(function(require) {
 			document.getElementById(this.element).removeEventListener("mouseup", this.mouseup);
 		}
 		setPosition(x, y) {
-			// this.removeOldEvents(this);
 			this.events.push(Date.now());
 			this.previousPositions.x.push(this.position.x);
 			this.previousPositions.y.push(this.position.y);
@@ -120,7 +119,6 @@ define(function(require) {
 			this.position.y = y;
 		}
 		changePosition(x, y) {
-			// this.removeOldEvents(this);
 			this.events.push(Date.now());
 			this.previousPositions.x.push(this.position.x);
 			this.previousPositions.y.push(this.position.y);
