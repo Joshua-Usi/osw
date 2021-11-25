@@ -111,7 +111,7 @@ function defaultComboColours() {
 	];
 }
 
-export function Parser(data) {
+export function parseBeatmap(data) {
 	let splited = data.split(/[\n\r]/g);
 	let beatmap = {
 		version: splited[0],
