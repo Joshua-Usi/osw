@@ -10,7 +10,7 @@ import {Canvas} from "./canvas.js"
 import {PlayDetails} from "./playDetails.js"
 import * as EndScreen from "./endScreen.js"
 import * as DatabaseManager from "./databaseManager.js"
-import * as ReplayManager from "./ReplayManager.js"
+import * as ReplayManager from "./replayManager.js"
 import {AudioManager} from "./audioManager.js"
 
 const skin = "ajax-transparent";
