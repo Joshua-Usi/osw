@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -	Dependency on require.js
 ### Fixed
 - Score update rate not working for "Every frame" option
+- An error with beatmap uploading
 ### Code Quality
 - All scripts now use javascript standardised modules
 ---

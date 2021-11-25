@@ -42,7 +42,7 @@ Sorry to hear that. Unfortunately theres not much I can do about it in the short
 As of current browser specfications and to my knowledge. It is currently impossible to provide hardware tablet support for customisable area. However, tablets are currently supported as of osw! 0.7.10b
 
 ### Will the PP and star rating systems be accurate?
-osw! will use an adapted version of the pp and star rating system from [ojsama](https://github.com/Francesco149/ojsama) by [Francesco149](https://github.com/Francesco149), it is the most accurate implementation, however it may deviate by ±0.03 stars 
+osw! will use an adapted version of the pp and star rating system from [ojsama](https://github.com/Francesco149/ojsama) by [Francesco149](https://github.com/Francesco149), it is the most accurate implementation, however it is an old implementation and as accurate as the March 2021 PP star and PP system
  
 ### So and so feature does not work exactly the same as osu!, will you fix it?
 Some osu features are near impossible to emulate unless of course I were to deep dive into the lazer codebase, which I don't want to. Things such as HP and spinners work on custom algorithms that try to be as fair as possible

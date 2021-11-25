@@ -957,7 +957,7 @@ document.getElementById("upload-beatmap").addEventListener("change", function() 
 			continue;
 		} else {
 			cache.push(this.files[i].name);
-			window.localStorage.setItem("loadedOSZ", JSON.stringidfy(cache));
+			window.localStorage.setItem("loadedOSZ", JSON.stringify(cache));
 		}
 		let fileReader = new FileReader();
 		fileReader.addEventListener("load", function(event) {
