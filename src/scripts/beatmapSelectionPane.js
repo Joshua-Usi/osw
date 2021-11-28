@@ -1,9 +1,9 @@
 import * as Utils from "./utils.js"
 import * as Formulas from "./formulas.js"
-export function generate(cache) {
+export function generate(maps) {
 	let concatenated = "";
-	for (let i = 0; i < cache.length; i++) {
-		concatenated += this.group(cache[i], i);
+	for (let i = 0; i < maps.length; i++) {
+		concatenated += this.group(maps[i], i);
 	}
 	return concatenated;
 }

@@ -31,7 +31,6 @@ import * as IntroSequence from "./src/scripts/introSequence.js"
 import * as DatabaseManager from "./src/scripts/databaseManager.js"
 import * as Parser from "./src/scripts/parser.js"
 import * as Formulas from "./src/scripts/formulas.js"
-import * as CacheManager from "./src/scripts/cacheManager.js"
 import * as ModsUI from "./src/scripts/modsUI.js"
 import {Version} from "./src/scripts/version.js"
 
@@ -196,8 +195,8 @@ document.getElementById("beatmap-selection-right").addEventListener("click", fun
 	}
 });
 const CACHE_VERSION = 2;
-/* if cache already exist, then use it */
-if (localStorage.getItem("beatmapCache") && localStorage.getItem("beatmapCache") !== "[]" && parseInt(localStorage.getItem("beatmapCacheVersion")) === CACHE_VERSION) {
+/* if cache already exist, then use it, also check for changes in the star rating or beatmap version system */
+if (localStorage.getItem("beatmapCache") && localStorage.getItem("beatmapCache") !== "[]" && parseInt(localStorage.getItem("beatmapCacheVersion")) === CACHE_VERSION && parseInt(localStorage.getItem("starRatingVersion")) === BeatmapFetcher.getStarRatingVersion()) {
 	/* Beatmap loading and adding to dom */
 	let cache = JSON.parse(window.localStorage.getItem("beatmapCache"));
 	if (cache === null) {
@@ -206,23 +205,17 @@ if (localStorage.getItem("beatmapCache") && localStorage.getItem("beatmapCache")
 	document.getElementById("beatmap-selection-right").innerHTML = BeatmapSelectionPane.generate(cache);
 } else {
 	BeatmapFetcher.refresh();
-	loadMaps();
-}
-
-function loadMaps() {
-	if (BeatmapFetcher.allMapsLoaded()) {
+	BeatmapFetcher.onLoadingComplete(function() {
 		let loadedMaps = BeatmapFetcher.get();
 		/* Beatmap loading and adding to dom */
-		let cache = CacheManager.generate(loadedMaps);
+		let cache = BeatmapFetcher.generate(loadedMaps);
 		if (cache.length > 0) {
 			window.localStorage.setItem("beatmapCache", JSON.stringify(cache));
 			window.localStorage.setItem("beatmapCacheVersion", JSON.stringify(CACHE_VERSION));
+			window.localStorage.setItem("starRatingVersion", JSON.stringify(BeatmapFetcher.getStarRatingVersion()));
 		}
 		document.getElementById("beatmap-selection-right").innerHTML = BeatmapSelectionPane.generate(cache);
-	} else {
-		/* every 250ms try and load maps from the window.indexedDB */
-		setTimeout(loadMaps, 250);
-	}
+	});
 }
 
 function logoResetBeat() {
@@ -1008,7 +1001,7 @@ document.getElementById("upload-beatmap").addEventListener("change", function() 
 						pendingFileCount--;
 						/* start processing audio and images once all beatmaps are processed */
 						if (j >= beatmapFiles.length - 1) {
-							let beatmapGroupData = new CacheManager.MapSet(mapSet);
+							let beatmapGroupData = new BeatmapFetcher.MapSet(mapSet);
 							newBeatmapData.push(beatmapGroupData);
 							/* process audio */
 							for (let k = 0; k < audioFiles.length; k++) {

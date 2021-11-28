@@ -1,6 +1,6 @@
 /* used https://github.com/Francesco149/ojsama by https://github.com/Francesco149 */
 import * as Formulas from "./formulas.js"
-
+const STAR_RATING_VERSION = 2;
 const HARD_ROCK_MULTIPLIER = 1.4;
 const HARD_ROCK_CS_MULTIPLIER = 1.3;
 const EASY_MULTIPLIER = 0.5;
@@ -18,14 +18,11 @@ const WEIGHT_SCALING = {
 const DECAY_WEIGHT = 0.9;
 /* ~200BPM 1/4 streams */
 let MIN_SPEED_BONUS = 75;
-/* ~330BPM 1/4 streams */
-const MAX_SPEED_BONUS = 45;
 const ANGLE_BONUS_SCALE = 90;
 const AIM_TIMING_THRESHOLD = 107;
 const SPEED_ANGLE_BONUS_BEGIN = 5 * Math.PI / 6;
 const AIM_ANGLE_BONUS_BEGIN = Math.PI / 3;
 const STAR_SCALING_FACTOR = 0.0675;
-const EXTREME_SCALING_FACTOR = 0.5;
 class BeatmapStats {
 	constructor(ar, od, hp, cs) {
 		this.ApproachRate = ar;
@@ -193,7 +190,6 @@ function spacingWeight(type, distance, deltaTime, previousDistance, previousDelt
 		}
 		case "SPEED": {
 			distance = Math.min(distance, SINGLE_SPACING);
-			deltaTime = Math.max(deltaTime, MAX_SPEED_BONUS);
 			let speedBonus = 1;
 			if (deltaTime < MIN_SPEED_BONUS) {
 				speedBonus += Math.pow((MIN_SPEED_BONUS - deltaTime) / 40, 2);
@@ -252,8 +248,13 @@ function calculateDifficulty(type, objectDifficulties, speedMultiplier) {
 	return difficulty;
 }
 
+/* initial version */
+if (window.localStorage.getItem("starRatingVersion") === null) {
+	window.localStorage.setItem("starRatingVersion", 1);
+}
+
 export function version() {
-	return 1;
+	return STAR_RATING_VERSION;
 }
 export function calculate(beatmap, mods) {
 	let baseStats = new BeatmapStatsCache(beatmap);
@@ -261,5 +262,5 @@ export function calculate(beatmap, mods) {
 	let objectDifficulties = initialiseObjects(beatmap);
 	let speed = Math.sqrt(calculateDifficulty("SPEED", objectDifficulties, stats.speedMultiplier)) * STAR_SCALING_FACTOR;
 	let aim = Math.sqrt(calculateDifficulty("AIM", objectDifficulties, stats.speedMultiplier)) * STAR_SCALING_FACTOR;
-	return (aim + speed + Math.abs(speed - aim) * EXTREME_SCALING_FACTOR);
+	return Math.cbrt(4 * (Math.pow(aim, 3) + Math.pow(speed, 3)))
 }

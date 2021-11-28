@@ -5,17 +5,6 @@ export class AnimatedEventsManager {
 		this.currentEvent = 0;
 		this.isDone = false;
 	}
-	static UntimedEvent = class UntimedEvent {
-		constructor(callback) {
-			this.callback = callback;
-		}
-	};
-	static TimedEvent = class TimedEvent extends this.UntimedEvent {
-		constructor(time, callback) {
-			super(callback);
-			this.time = time;
-		}
-	};
 	addEvent(event) {
 		this.events.push(event);
 	}
@@ -42,3 +31,14 @@ export class AnimatedEventsManager {
 		}
 	}
 }
+export class UntimedEvent {
+	constructor(callback) {
+		this.callback = callback;
+	}
+};
+export class TimedEvent extends UntimedEvent {
+	constructor(time, callback) {
+		super(callback);
+		this.time = time;
+	}
+};

@@ -1,6 +1,6 @@
 import * as Bezier from "./bezier.js"
 import * as Utils from "./utils.js"
-import {AnimatedEventsManager} from "./animatedEventsManager.js"
+import {AnimatedEventsManager, UntimedEvent, TimedEvent} from "./animatedEventsManager.js"
 let animationManager = new AnimatedEventsManager();
 let canvas = document.getElementById("intro-logo");
 canvas.width = 0.8 * window.innerWidth;
@@ -68,40 +68,38 @@ function setPositions(elements, width, newWidth, range, newRange) {
 
 function createTriangle(type, x, y, size, triangleN) {
 	document.getElementById("triangles-container").innerHTML += `<svg class="intro-triangle" id="triangle-${triangleN}" style="position: absolute; top: ${y}px; left: ${x};" height="${size}" width="${size}">
-	<polygon points="${size * 0.5},${size / 6} ${size * 5 / 6},${size * 5 / 6} ${size / 6},${size * 5 / 6}" style="fill:${(type === 0) ? "white" : "transparent"};stroke:white;stroke-width:2" />
+	<polygon points="${size * 0.5},${size / 6} ${size * 5 / 6},${size * 5 / 6} ${size / 6},${size * 5 / 6}" style="fill:${(type === 0) ? "white" : "transparent"};stroke:white; stroke-width:2" />
 	</svg>`;
 	document.getElementById(`triangle-${triangleN}`).querySelector("polygon").style.animation = `${TRIANGLE_FADE_OUT_TIME}s ease ${0.9 + triangleN * TIME_BETWEEN_EACH_TRIANGLE}s 1 normal none running fade-in-out`;
 }
 /* intro sequence events */
-animationManager.addEvent(new AnimatedEventsManager.TimedEvent(0.2, function() {
+animationManager.addEvent(new TimedEvent(0.2, function() {
 	document.getElementById("intro-text").textContent = "wel";
-	let triangleNumber = 0;
-	while (triangleNumber <= NUMBER_OF_TRIANGLES) {
-		createTriangle(Utils.randomInt(0, 1), Utils.randomInt(window.innerWidth * 0.3, window.innerWidth * 0.7), Utils.randomInt(window.innerHeight * 0.4, window.innerHeight * 0.6), Utils.randomInt(10, 120), triangleNumber);
-		triangleNumber++;
+	for (let i = 0; i < NUMBER_OF_TRIANGLES; i++) {
+		createTriangle(Utils.randomInt(0, 1), Utils.randomInt(window.innerWidth * 0.3, window.innerWidth * 0.7), Utils.randomInt(window.innerHeight * 0.4, window.innerHeight * 0.6), Utils.randomInt(10, 120), i);
 	}
 }));
-animationManager.addEvent(new AnimatedEventsManager.TimedEvent(0.4, function() {
+animationManager.addEvent(new TimedEvent(0.4, function() {
 	document.getElementById("intro-text").textContent = "welcome";
 }));
-animationManager.addEvent(new AnimatedEventsManager.TimedEvent(0.6, function() {
+animationManager.addEvent(new TimedEvent(0.6, function() {
 	document.getElementById("intro-text").textContent = "welcome to";
 }));
-animationManager.addEvent(new AnimatedEventsManager.TimedEvent(0.9, function() {
+animationManager.addEvent(new TimedEvent(0.9, function() {
 	document.getElementById("intro-text").textContent = "welcome to osw!";
 	document.getElementById("intro-text").style.letterSpacing = "0.75vh";
 }));
-animationManager.addEvent(new AnimatedEventsManager.TimedEvent(1.6, function() {
+animationManager.addEvent(new TimedEvent(1.6, function() {
 	document.getElementById("intro-text").style.display = "none";
 	setPositions(document.getElementsByClassName("intro-gamemodes"), 4, 3.5, 25, 24);
 }));
-animationManager.addEvent(new AnimatedEventsManager.TimedEvent(1.8, function() {
+animationManager.addEvent(new TimedEvent(1.8, function() {
 	setPositions(document.getElementsByClassName("intro-gamemodes"), 8, 7, 12.5, 11);
 }));
-animationManager.addEvent(new AnimatedEventsManager.TimedEvent(2.0, function() {
+animationManager.addEvent(new TimedEvent(2.0, function() {
 	setPositions(document.getElementsByClassName("intro-gamemodes"), 16, 18, 17.5, 20);
 }));
-animationManager.addEvent(new AnimatedEventsManager.TimedEvent(2.2, function() {
+animationManager.addEvent(new TimedEvent(2.2, function() {
 	let introGamemodes = document.getElementsByClassName("intro-gamemodes");
 	for (let i = 0; i < introGamemodes.length; i++) {
 		introGamemodes[i].style.display = "none";
@@ -113,7 +111,7 @@ animationManager.addEvent(new AnimatedEventsManager.TimedEvent(2.2, function() {
 	introLogo.style.width = "70vh";
 	introLogo.style.height = "70vh";
 }));
-animationManager.addEvent(new AnimatedEventsManager.TimedEvent(3.1, function() {
+animationManager.addEvent(new TimedEvent(3.1, function() {
 	/* cleanup, remove DOM nodes for extra performance */
 	let introGamemodes = document.getElementsByClassName("intro-gamemodes");
 	document.getElementById("intro").style.background = "#fff";
@@ -121,7 +119,7 @@ animationManager.addEvent(new AnimatedEventsManager.TimedEvent(3.1, function() {
 	document.getElementById("intro").style.pointerEvents = "none";
 	document.getElementById("triangles-container").innerHTML = "";
 }));
-animationManager.addEventEveryFrame(new AnimatedEventsManager.UntimedEvent(function(time) {
+animationManager.addEventEveryFrame(new UntimedEvent(function(time) {
 	if (time >= 2.2 && time <= 3.1) {
 		let animationStage = Utils.map(time, 2.2, 3.4, 0.025, 1);
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -129,10 +127,7 @@ animationManager.addEventEveryFrame(new AnimatedEventsManager.UntimedEvent(funct
 		for (let i = 0; i < pointArrays.length; i++) {
 			ctx.strokeStyle = "#fff9";
 			ctx.beginPath();
-			let maxIndex = pointArrays[i].length - (Utils.map(animationStage, 0, 1, pointArrays[i].length, 0) ** 4 / pointArrays[i].length ** 3);
-			if (maxIndex > pointArrays[i].length) {
-				maxIndex = pointArrays[i].length;
-			}
+			let maxIndex = Math.min(pointArrays[i].length, pointArrays[i].length - (Utils.map(animationStage, 0, 1, pointArrays[i].length, 0) ** 4 / pointArrays[i].length ** 3));
 			if (i === 1 || i === 3) {
 				maxIndex = pointArrays[i].length;
 			}
@@ -140,16 +135,15 @@ animationManager.addEventEveryFrame(new AnimatedEventsManager.UntimedEvent(funct
 				ctx.lineTo(pointArrays[i][j].x * canvas.height, pointArrays[i][j].y * canvas.height);
 			}
 			ctx.stroke();
-			ctx.strokeStyle = "#fff";
-			ctx.beginPath();
-			let starting = Math.floor(maxIndex - (pointArrays[i].length - maxIndex) / 1.5);
-			if (starting < 0) {
-				starting = 0;
+			if (i !== 1 && i !== 3) {
+				ctx.strokeStyle = "#fff";
+				ctx.beginPath();
+				let starting = Math.max(0, Math.floor(maxIndex - (pointArrays[i].length - maxIndex) / 1.5));
+				for (let j = starting; j < maxIndex; j++) {
+					ctx.lineTo(pointArrays[i][j].x * canvas.height, pointArrays[i][j].y * canvas.height);
+				}
+				ctx.stroke();
 			}
-			for (let j = starting; j < maxIndex; j++) {
-				ctx.lineTo(pointArrays[i][j].x * canvas.height, pointArrays[i][j].y * canvas.height);
-			}
-			ctx.stroke();
 		}
 	}
 }));

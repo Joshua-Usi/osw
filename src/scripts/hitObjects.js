@@ -24,7 +24,7 @@ export class Slider {
 		this.hitSound = hitSound;
 		this.curveType = curveTypecurvePoints[0];
 		this.curvePoints = curveTypecurvePoints.substr(1).split("|");
-		/* also push hit object origin point for simplicity*/
+		/* also push hit object origin point for simplicity */
 		this.curvePoints.unshift(x + ":" + y);
 		for (var i = 0; i < this.curvePoints.length; i++) {
 			if (this.curvePoints[i] === "") {

@@ -61,13 +61,12 @@ let playfieldXOffset = 0;
 let playfieldYOffset = window.innerHeight / 50;
 /* HP values */
 let currentHP = 1;
-let hpDisplay = 1;
+let displayedHP = 1;
 let previousTime = 0;
 /* Timing point indexes */
 let timingPointUninheritedIndex = 0;
 let currentTimingPoint = 0;
 /* Score letiables */
-let scoreMultiplier = 1;
 let score = 0;
 let displayedScore = 0;
 let meanHitErrorPosition = 0;
@@ -76,6 +75,9 @@ let combo = 0;
 let currentComboNumber = 1;
 let currentComboColour = 0;
 let comboPulseSize = 1;
+/* break periods */
+let currentBreakPeriod = 0;
+let isBreakPeriod = false;
 /* spinner tests */
 let previousSigns = [];
 let angleChange = 0;
@@ -115,7 +117,6 @@ const APPROACH_CIRCLE_MAX_SIZE = 5;
 const APPROACH_CIRCLE_MIN_SIZE = 1.4;
 const HIDDEN_FADE_IN_PERCENT = 0.4;
 const HIDDEN_FADE_OUT_PERCENT = 0.7;
-const SLIDER_STROKE_SIZE_PERCENT = 0.9;
 const PLAYFIELD_ACTUAL_SIZE = 0.8;
 let HIT_OBJECT_OFFSET_X = playfieldXOffset + window.innerWidth / 2 - window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3) / 2;
 let HIT_OBJECT_OFFSET_Y = playfieldYOffset + window.innerHeight / 2 - window.innerHeight * PLAYFIELD_ACTUAL_SIZE / 2;
@@ -123,6 +124,8 @@ const PLAYFIELD_SIZE_X = 512;
 const PLAYFIELD_SIZE_Y = 384;
 const PLAYFIELD_CENTER_X = PLAYFIELD_SIZE_X / 2;
 const PLAYFIELD_CENTER_Y = PLAYFIELD_SIZE_Y / 2;
+/* client constant*/
+const SLIDER_STROKE_SIZE_PERCENT = 0.9;
 const JUDGEMENT_BEZIER_ANIMATION = Bezier.cubic(0, 1.4, 0, 1);
 /* in radians */
 const AUTO_SPIN_SPEED = 50;
@@ -163,7 +166,6 @@ function setHitObjectsCache(hitObject, useTime, HIT_OBJECT_OFFSET_X, HIT_OBJECT_
 		/* Immediate Cache setup */
 		hitObject.cache.comboNumber = currentComboNumber;
 		hitObject.cache.comboColour = currentComboColour;
-		currentComboNumber++;
 		if (hitObject.type[0] === "1") {
 			/* Cache setup for HitCircle */
 			hitObject.cache.cacheSet = true;
@@ -621,7 +623,7 @@ function renderHitObjects(hitObject, useTime, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OF
 		}
 		let individualDigits = hitObject.cache.comboNumber.toString();
 		let aspectRatio = Assets.comboNumbers[0].width / Assets.comboNumbers[0].height;
-		canvas.drawDigits(Assets.comboNumbers, individualDigits, hitObjectMapped.x, hitObjectMapped.y, circleDiameter / 3, circleDiameter / 3 / aspectRatio);
+		canvas.drawDigits(Assets.comboNumbers, individualDigits, hitObjectMapped.x, hitObjectMapped.y, circleDiameter / 4, circleDiameter / (4 * aspectRatio));
 	} else if (hitObject.type[1] === "1") {
 		let sliderOpacity = Utils.map(useTime, hitObject.time, hitObject.time + arTime, 1, 0);
 		if (playDetails.mods.hidden === false) {
@@ -708,9 +710,8 @@ function renderHitObjects(hitObject, useTime, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OF
 						canvas.drawImage(approachCircleComboBuffers[hitObject.cache.comboColour], hitObjectMapped.x, hitObjectMapped.y, circleDiameter * approachCircleSize, circleDiameter * approachCircleSize);
 					}
 					let individualDigits = hitObject.cache.comboNumber.toString();
-					for (let j = 0; j < individualDigits.length; j++) {
-						canvas.drawImage(Assets.comboNumbers[individualDigits[j]], hitObjectMapped.x - (individualDigits.length - 1) * circleDiameter / 6 + j * circleDiameter / 3, hitObjectMapped.y, circleDiameter / 3, circleDiameter / 3 * (Assets.comboNumbers[individualDigits[j]].height / Assets.comboNumbers[individualDigits[j]].width));
-					}
+					let aspectRatio = Assets.comboNumbers[0].width / Assets.comboNumbers[0].height;
+					canvas.drawDigits(Assets.comboNumbers, individualDigits, hitObjectMapped.x, hitObjectMapped.y, circleDiameter / 4, circleDiameter / (4 * aspectRatio));
 				}
 			} else if (elements.head[Utils.elementIndex(hitObject.cache.currentSlide, "head")] === "repeat") {
 				let mapped = Utils.mapToOsuPixels(hitObject.cache.points[0].x, hitObject.cache.points[0].y, window.innerHeight * PLAYFIELD_ACTUAL_SIZE * (4 / 3), window.innerHeight * PLAYFIELD_ACTUAL_SIZE, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y, playDetails.mods.hardRock);
@@ -847,11 +848,11 @@ function updateHp(useTime, previousTime) {
 		isGameRunning = false;
 		exitPointerLock();
 	}
-	/* only start draining health 2 seconds before the first hit object */
-	if (useTime > currentLoadedMap.hitObjects[0].time - 2) {
+	/* only start draining health 2 seconds before the first hit object and also not during breaks */
+	if (useTime > currentLoadedMap.hitObjects[0].time - 2 && isBreakPeriod === false) {
 		currentHP -= Formulas.HPDrain(currentLoadedMap.HPDrainRate, useTime - previousTime);
 	}
-	hpDisplay += (currentHP - hpDisplay) / 8;
+	displayedHP += (currentHP - displayedHP) / 8;
 }
 
 function processHitEvent(useTime, context) {
@@ -880,7 +881,7 @@ function processHitEvent(useTime, context) {
 			context.retry();
 			return;
 		}
-		score += Formulas.hitScore(hitEvents[0].score, (combo === 0) ? combo : combo - 1, difficultyMultiplier, scoreMultiplier);
+		score += Formulas.hitScore(hitEvents[0].score, (combo === 0) ? combo : combo - 1, difficultyMultiplier, Formulas.modScoreMultiplier(mods));
 		let lifetime = (hitEvents[0].score === 0) ? 1 : 0.4;
 		judgementObjects.push(new HitObjects.ScoreObject(hitEvents[0].score, hitEvents[0].x, hitEvents[0].y, useTime, useTime + lifetime));
 	} else {
@@ -908,6 +909,7 @@ function processHitEvent(useTime, context) {
 function nextHitObjects() {
 	/* create copy not reference, otherwise retrying wouldn't work */
 	hitObjects.push(JSON.parse(JSON.stringify(currentLoadedMap.hitObjects[currentHitObjects])));
+	currentComboNumber++;
 	/* second bit flag determines new combo */
 	if (currentLoadedMap.hitObjects[currentHitObjects].type[2] === "1") {
 		currentComboNumber = 1;
@@ -924,6 +926,11 @@ function nextTimingPoint() {
 	if (currentLoadedMap.timingPoints[currentTimingPoint].uninherited === 1) {
 		timingPointUninheritedIndex = currentTimingPoint;
 	}
+}
+
+function nextBreakPeriod() {
+	currentBreakPeriod++;
+	isBreakPeriod = true;
 }
 
 function renderEffects(useTime) {
@@ -1124,6 +1131,12 @@ export function tick() {
 	while (currentHitObjects < currentLoadedMap.hitObjects.length && useTime >= currentLoadedMap.hitObjects[currentHitObjects].time - arTime) {
 		nextHitObjects();
 	}
+	while (currentBreakPeriod < currentLoadedMap.breakPeriods.length && useTime >= currentLoadedMap.breakPeriods[currentBreakPeriod].startTime / 1000) {
+		nextBreakPeriod();
+	}
+	if (currentBreakPeriod > 0 && useTime >= currentLoadedMap.breakPeriods[currentBreakPeriod - 1].endTime / 1000 && isBreakPeriod === true) {
+		isBreakPeriod = false;
+	}
 	/* Cache Loop */
 	for (let i = 0; i < hitObjects.length; i++) {
 		setHitObjectsCache(hitObjects[i], useTime, HIT_OBJECT_OFFSET_X, HIT_OBJECT_OFFSET_Y);
@@ -1198,7 +1211,7 @@ export function render() {
 	ctx.lineWidth = 5;
 	canvas.setImageAlignment("top-left");
 	canvas.drawImage(Assets.scoreBarBg, 10, 10, window.innerWidth / 2, Assets.scoreBarBg.height);
-	canvas.drawImage(Assets.scoreBarColour, 0, 0, Utils.map(hpDisplay, 0, 1, 0, Assets.scoreBarColour.width), Assets.scoreBarColour.height, 15, 10 + Assets.scoreBarColour.height / 1.5, Utils.map(hpDisplay, 0, 1, 0, window.innerWidth / 2 - 0.01 * window.innerWidth), Assets.scoreBarColour.height);
+	canvas.drawImage(Assets.scoreBarColour, 0, 0, Utils.map(displayedHP, 0, 1, 0, Assets.scoreBarColour.width), Assets.scoreBarColour.height, 15, 10 + Assets.scoreBarColour.height / 1.5, Utils.map(displayedHP, 0, 1, 0, window.innerWidth / 2 - 0.01 * window.innerWidth), Assets.scoreBarColour.height);
 	canvas.setImageAlignment("center");
 
 	canvas.setFillStyle("#ffdf0044");
@@ -1286,13 +1299,12 @@ export function playMap(mapData, mods) {
 	effectObjects = [];
 	/* HP values */
 	currentHP = 1;
-	hpDisplay = 1;
+	displayedHP = 1;
 	previousTime = 0;
 	/* Timing point indexes */
 	timingPointUninheritedIndex = 0;
 	currentTimingPoint = 0;
 	/* Score letiables */
-	scoreMultiplier = Formulas.modScoreMultiplier(mods);
 	score = 0;
 	displayedScore = 0;
 	/* Combo letiables */
@@ -1365,10 +1377,7 @@ export function playMap(mapData, mods) {
 		if (currentLoadedMap.timingPoints[currentLoadedMap.timingPoints.length - 1].uninherited === 1) {
 			sliderSpeedMultiplier *= Formulas.sliderMultiplier(currentLoadedMap.timingPoints[currentLoadedMap.timingPoints.length - 1].beatLength);
 		}
-		let pixelsPerBeat = sliderSpeedMultiplier * currentLoadedMap.timingPoints[lastUninheritedTimingPoint].beatLength;
-		let sliderLengthInBeats = (Math.abs(lastHitObjects.length) * lastHitObjects.slides) / pixelsPerBeat;
-		let sliderTime = pixelsPerBeat * sliderLengthInBeats / 100;
-		endingTime = lastHitObjects.time + sliderTime + 5;
+		endingTime = lastHitObjects.time + (Math.abs(lastHitObjects.length) * lastHitObjects.slides) / 100 + 5;
 	}
 	if (lastHitObjects.type[3] === "1") {
 		endingTime = lastHitObjects.endTime + 2;

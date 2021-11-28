@@ -1,6 +1,20 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v0.12.1b-dev] - 2021-11-28
+### Added
+- Checks and auto-updates whenever the database changes or star rating
+- Break Periods (no HP drain) now occur based on the map break periods
+### Changed
+- Star rating is now no longer limited to 330bpm streams (matching osu!'s 2021-11-09 changes
+- Star rating extreme scaling factor has been changed, Maps with more of 1 skill decreases in star rating (Matching changes specified [here](https://docs.google.com/document/d/10DZGYYSsT_yjz2Mtp6yIJld0Rqx4E-vVHupCqiM4TNI/edit))
+- README to better reflect the state of star rating
+- Reduced the size of combo numbers slightly
+### Code Quality
+- Refactored animatedEventsManager.js
+- Refactored introSequence.js
+- Moved cacheManager.js into beatmapFetcher.js
+---
 ## [v0.12.0b-dev] - 2021-11-25
 ### Removed
 -	Dependency on require.js

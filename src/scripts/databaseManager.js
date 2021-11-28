@@ -30,6 +30,7 @@ export function getAllInDatabase(database, store, asyncReturns) {
 			cursor.continue();
 		} else {
 			asyncReturns.complete = true;
+			asyncReturns.onComplete();
 		}
 	});
 }
