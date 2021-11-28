@@ -1134,7 +1134,7 @@ export function tick() {
 	while (currentBreakPeriod < currentLoadedMap.breakPeriods.length && useTime >= currentLoadedMap.breakPeriods[currentBreakPeriod].startTime / 1000) {
 		nextBreakPeriod();
 	}
-	if (currentBreakPeriod > 0 && useTime >= currentLoadedMap.breakPeriods[currentBreakPeriod - 1].endTime / 1000 && isBreakPeriod === true) {
+	if (currentBreakPeriod > 0 && currentBreakPeriod < currentLoadedMap.breakPeriods.length && useTime >= currentLoadedMap.breakPeriods[currentBreakPeriod - 1].endTime / 1000 && isBreakPeriod === true) {
 		isBreakPeriod = false;
 	}
 	/* Cache Loop */
