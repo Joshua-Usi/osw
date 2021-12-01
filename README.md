@@ -9,7 +9,7 @@ Heavy development phase as the project heads closer to a release candidate
 - [x] Local Beatmaps
 - [x] Star rating (no online API)
 - [x] Mods
-- [ ] Custom skins (not animated)
+- [ ] Custom skins (animated)
 - [ ] PP system (no online API)
 - [ ] Keybinds
 - [ ] Extensible rulsets
