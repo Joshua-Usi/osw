@@ -10,6 +10,16 @@ Heavy development phase as the project heads closer to a release candidate
 - [x] Star rating (no online API)
 - [x] Mods
 - [ ] Custom skins (animated)
+> Custom Skins checklist
+> [ ] Approach Circles
+> [ ] Hit Objects
+> [ ] Sliders
+> [x] Hp Bar
+> [ ] Spinner
+> [ ] Key Overlay
+> [x] Skin parser
+> [ ] Skin saving
+> [ ] Skin animation
 - [ ] PP system (no online API)
 - [ ] Keybinds
 - [ ] Extensible rulsets
