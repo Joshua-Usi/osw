@@ -262,5 +262,5 @@ export function calculate(beatmap, mods) {
 	let objectDifficulties = initialiseObjects(beatmap);
 	let speed = Math.sqrt(calculateDifficulty("SPEED", objectDifficulties, stats.speedMultiplier)) * STAR_SCALING_FACTOR;
 	let aim = Math.sqrt(calculateDifficulty("AIM", objectDifficulties, stats.speedMultiplier)) * STAR_SCALING_FACTOR;
-	return Math.cbrt(4 * (Math.pow(aim, 3) + Math.pow(speed, 3)))
+	return Math.cbrt(4 * (Math.pow(aim, 3) + Math.pow(speed, 3)));
 }

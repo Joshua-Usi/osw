@@ -189,7 +189,8 @@
 							<p class="selected">Ajax Transparent</p>
 						</div>
 					</div>
-					<button type="button" id="settings-button-upload-skin" disabled class="settings-button triangle-background blue">Upload skin</button>
+					<button type="button" id="settings-button-upload-skin" class="settings-button triangle-background blue" onclick="document.getElementById('upload-skin').click();">Upload skin</button>
+				<input type="file" id="upload-skin" style="display: none;">
 					<div class="sidenav-divider"></div>
 					<p class="sidenav-title-text">Maintenance</p>
 					<p style="color: #999;">Note! developer mode is performance heavy</p>
@@ -226,7 +227,6 @@
 			<p id="frame-rate">0 / 60 fps</p>
 		</div>
 		<div class="webpage-state" id="webpage-state-loading-maps">
-			
 			<p>Your beatmaps are being processed</p>
 			<p>Give it a moment, it should not take long</p>
 		</div>

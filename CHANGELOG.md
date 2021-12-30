@@ -1,12 +1,25 @@
 Changelog format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ---
+## [v0.13.0b-dev] - 2021-12-30
+### Added
+- Partial skin support (Switched to vaxei skin)
+- Close confirmation window when loading beatmaps [#16](https://github.com/Joshua-Usi/osw/issues/16)
+### Fixed
+- Being able to affect auto using keyboard buttons [#15](https://github.com/Joshua-Usi/osw/issues/15)
+### Changed
+- Reduced approach circle size
+- Settings tray closes when opening beatmap selector [#18](https://github.com/Joshua-Usi/osw/issues/18)
+### Code Quality
+- Refactored rendering in standardGameplay.js and moved to hitObjectRenderer.js
+### Issues
+---
 ## [v0.12.1b-dev] - 2021-11-28
 ### Added
 - Checks and auto-updates whenever the database changes or star rating
 - Break Periods (no HP drain) now occur based on the map break periods
 ### Changed
-- Star rating is now no longer limited to 330bpm streams (matching osu!'s 2021-11-09 changes
+- Star rating is now no longer limited to 330bpm streams (matching [osu!'s 2021-11-09 changes](https://osu.ppy.sh/home/news/2021-11-09-performance-points-star-rating-updates))
 - Star rating extreme scaling factor has been changed, Maps with more of 1 skill decreases in star rating (Matching changes specified [here](https://docs.google.com/document/d/10DZGYYSsT_yjz2Mtp6yIJld0Rqx4E-vVHupCqiM4TNI/edit))
 - README to better reflect the state of star rating
 - Reduced the size of combo numbers slightly

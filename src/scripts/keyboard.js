@@ -1,5 +1,6 @@
 export class Keyboard {
 	constructor(id) {
+		this.canUserControl = true;
 		/* the element the keyboard is attached to */
 		this.element = document.getElementById(id);
 		this.keys = [];
@@ -59,15 +60,25 @@ export class Keyboard {
 		})();
 		const that = this;
 		this.keydown = function(e) {
-			if (that.keys[e.keyCode] === true) {
-				that.releasedKeys[e.keyCode] = false;
+			if (that.canUserControl) {
+				if (that.keys[e.keyCode]) {
+					that.releasedKeys[e.keyCode] = false;
+				}
+				that.keys[e.keyCode] = true;
 			}
-			that.keys[e.keyCode] = true;
 		};
 		this.keyup = function(e) {
-			that.releasedKeys[e.keyCode] = true;
-			that.keys[e.keyCode] = false;
+			if (that.canUserControl) {
+				that.releasedKeys[e.keyCode] = true;
+				that.keys[e.keyCode] = false;
+			}
 		};
+	}
+	disableUserControl() {
+		this.canUserControl = false;
+	}
+	enableUserControl() {
+		this.canUserControl = true;
 	}
 	getKeyDown(keyName) {
 		return this.keys[this.keyMap[keyName]];

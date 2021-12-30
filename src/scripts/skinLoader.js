@@ -4,6 +4,13 @@ function loadImage(src) {
 	return image;
 }
 
+export class Skin {
+	constructor(iniData, elements) {
+		this.iniData = iniData;
+		this.elements = [];
+	}
+}
+
 export class SkinLoader {
 	constructor(skin) {
 		/* cursor assets */
@@ -41,20 +48,20 @@ export class SkinLoader {
 			loadImage(`./src/images/skins/${skin}/fonts/aller/default-9.png`),
 		];
 		this.scoreNumbers = [
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-0.png`),
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-1.png`),
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-2.png`),
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-3.png`),
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-4.png`),
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-5.png`),
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-6.png`),
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-7.png`),
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-8.png`),
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-9.png`),
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-comma.png`),
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-dot.png`),
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-percent.png`),
-			loadImage(`./src/images/skins/${skin}/fonts/aller/score-x.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-0.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-1.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-2.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-3.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-4.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-5.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-6.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-7.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-8.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-9.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-comma.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-dot.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-percent.png`),
+			loadImage(`./src/images/skins/${skin}/fonts/aller/numbers-x.png`),
 		];
 		/* hit score number assets */
 		this.hitNumbers = [

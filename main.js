@@ -155,7 +155,7 @@ function clickMap(element) {
 			beatmapRequest.addEventListener("success", function(event) {
 				Utils.showWebpageStates(["webpage-state-gameplay"]);
 				Utils.hideWebpageStates(["webpage-state-menu", "webpage-state-beatmap-selection", "webpage-state-mods", "webpage-state-pause-screen", "webpage-state-fail-screen", "webpage-state-results-screen", "top-bar", "bottom-bar", ]);
-				// hide sidenav
+				/* hide sidenav */
 				document.getElementById("sidenav-left").style.width = "0";
 				document.getElementById("sidenav-left").style.opacity = "0.2";
 				menuAudio.pause();
@@ -819,6 +819,9 @@ document.getElementById("logo").addEventListener("click", function() {
 document.getElementById("menu-bar-play").addEventListener("click", function() {
 	Utils.showWebpageStates(["webpage-state-beatmap-selection", "webpage-state-mods", "bottom-bar", ]);
 	Utils.hideWebpageStates(["webpage-state-menu"]);
+	/* hide sidenav */
+	document.getElementById("sidenav-left").style.width = "0";
+	document.getElementById("sidenav-left").style.opacity = "0.2";
 	chooseRandomMap();
 });
 /* Helper */
@@ -1039,6 +1042,23 @@ document.getElementById("upload-beatmap").addEventListener("change", function() 
 		fileReader.readAsBinaryString(this.files[i]);
 	}
 });
+document.getElementById("upload-skin").addEventListener("change", function() {
+	for (let i = 0; i < this.files.length; i++) {
+		console.log(this.files[i]);
+		let fileReader = new FileReader();
+		fileReader.addEventListener("load", function(event) {
+			let new_zip = new JSZip();
+			new_zip.loadAsync(event.target.result).then(function(zip) {
+				let files = [];
+				for (let key in zip.files) {
+					console.log(key);
+					console.log(key.split("/"));
+				}
+			});
+		});
+		fileReader.readAsBinaryString(this.files[i]);
+	}
+});
 document.getElementById("beatmap-search-bar").addEventListener("input", function() {
 	let groups = document.getElementsByClassName("beatmap-selection-group");
 	for (let i = 0; i < groups.length; i++) {
@@ -1104,5 +1124,12 @@ document.getElementById("mods").addEventListener("click", function(event) {
 			scoreMultiplierElement.style.color = "#fff";
 		}
 		scoreMultiplierElement.innerHTML = `Score Multiplier: <b>${newModMultiplier}x</b>`;
+	}
+});
+window.addEventListener('beforeunload', function (e) {
+	if (screenShowing) {
+  		e.preventDefault();
+  		e.returnValue = "";
+  		return ""
 	}
 });
