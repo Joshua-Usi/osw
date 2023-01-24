@@ -3,7 +3,7 @@
 An in-development osu! clone designed to run on web browers
 It is planned to emulate the osu! experience as closely as possible in the browser
 
-Heavy development phase as the project heads closer to a release candidate
+**NOTE this project is no longer under development and is likely abandoned for now. Any bugs that exist are unlikely to be fixed**
 
 ### Expected features
 - [x] Local Beatmaps
